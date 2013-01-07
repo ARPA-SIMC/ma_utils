@@ -1,0 +1,32 @@
+!--------------------------------------------------------------------------
+! Sigla identificativa e altri parametri richiesti da trasp_seriet relativi
+! alla tab. 203 (variabili accessorie Lokal Modell).
+! Altri parametri Lokal Model sono nelle tabelle 002 e 201
+!
+! Contenuto dei campi
+! Cod:     condice GRIB del parametro
+! Sigla:   identificativo del parametro nell'output seriet
+! dec:     numero di decimali nell'output seriet
+! val.min: valore minimo accettabile
+! val.max: valore massimo accettabile
+! cp2:     codice 2a componente (se vento U); 
+!          500 + codice 1a componente (se vento V);
+!          -1 (se temperatura); -2 (se lugh.MO); -3 (se sw budget); 
+!          -4 (se cloud cover); -5 (se flussi di calore); 0 (altri casi)
+!
+!                                                    Versione 2, 15/10/2004
+!--------------------------------------------------------------------------
+!123--12345678--123--1234567890--1234567890--123
+!Cod  Sigla     dec     val.min     val.max  cp2
+  57  soiltyp     4    -9999.99    99999.99    0
+  61  lai         4    -9999.99    99999.99    0
+  62  rootdp      4    -9999.99    99999.99    0
+  64  hmo3        4    -9999.99    99999.99    0
+  65  vio3        4    -9999.99    99999.99    0
+ 113  fc          4    -9999.99    99999.99    0
+ 114  phi         4    -9999.99    99999.99    0
+ 115  rla         4    -9999.99    99999.99    0
+ 121  ztd         4    -9999.99    99999.99    0
+ 122  zwd         4    -9999.99    99999.99    0
+ 123  zhd         4    -9999.99    99999.99    0
+!123--12345678--123--1234567890--1234567890--123

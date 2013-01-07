@@ -1,0 +1,54 @@
+
+  ID DESCRIZ.       
+---- ----------     
+   1 SYNOP          
+   2 TEMP           
+   3 BOA            
+   4 IDRMGI         
+   5 CER            
+   6 UMSUOL         
+   7 CRO            
+   8 CAELAMI        
+   9 ETG            
+  10 METAR          
+  11 LOCALI         
+  12 FIDUTO         
+  13 AGRMET         
+  14 POLLINI        
+  15 URBANE         
+  16 NURBAN         
+  17 FIDUMA         
+  18 FIDUPO         
+  19 ICIRFE         
+  20 SIMNBO         
+  21 SIMNPR         
+  22 SPDSRA         
+  23 EMLOKM         
+  24 LILOKM         
+  25 PILOKM         
+  26 TRLOKM         
+  27 VELOKM         
+  28 SALOKM         
+  29 LOLOKM         
+  30 MALOKM         
+  31 FRLOKM         
+  32 BZLOKM         
+  33 PO267          
+  35 CLIMAT         
+  36 GIAS           
+  37 IDROST         
+  38 VMSTAT         
+  39 IDRMEC         
+  40 CLINUR         
+  41 IDRSTA         
+  42 SYREP          
+  43 FREATI         
+  44 COREMO         
+  45 IDRTL9         
+  46 FIDUVE         
+  47 FIDULI         
+  48 COFOR          
+  99 DELETE         
+
+48 rows selected.
+

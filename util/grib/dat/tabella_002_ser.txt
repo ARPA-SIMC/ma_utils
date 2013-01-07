@@ -1,0 +1,78 @@
+!--------------------------------------------------------------------------
+! Sigla identificativa e altri parametri richiesti da trasp_seriet relativi
+! alla tab. 002. Fino a 128 sono i parametri standard WMO, da 129 sono 
+! parametri per uso locale, dipendenti dal centro di emissione.
+!
+! Contenuto dei campi
+! Cod:     condice GRIB del parametro
+! Sigla:   identificativo del parametro nell'output seriet
+! dec:     numero di decimali nell'output seriet
+! val.min: valore minimo accettabile
+! val.max: valore massimo accettabile
+! cp2:     codice 2a componente (se vento U); 
+!          500 + codice 1a componente (se vento V);
+!          -1 (se temperatura); -2 (se lugh.MO); -3 (se sw budget); 
+!          -4 (se cloud cover); -5 (se flussi di calore); 0 (altri casi)
+!
+!                                          Ultimo aggiornamento: 26/03/2012
+!--------------------------------------------------------------------------
+!123--12345678--123--1234567890--1234567890--123
+!Cod  Sigla     dec     val.min     val.max  cp2
+   1  pr          0       10.00   105000.00    0
+   2  msl         0      950.00   105000.00    0
+   3  dpsdt       4    -9999.99    99999.99    0
+   6  gph         1    -10000.0    500000.0    0
+   8  z           4    -9999.99    99999.99    0
+  11  Temp        1      193.16      323.16   -1
+  15  tmax        4    -9999.99    99999.99    0
+  16  tmin        4    -9999.99    99999.99    0
+  17  td          1      173.16      323.16    0
+  31  Dir-wind    0        0.00      360.00    0
+  32  Mod-wind    1        0.00       70.00    0
+  33  U-wind      1      -60.00       70.00   34
+  34  V-wind      1      -60.00       50.00  533
+  39  omega       4    -9999.99    99999.99    0
+  40  W-wind      4       -1.00        1.00    0
+  51  q         exp        0.00        1.00    0
+  52  relhum      4        0.00      100.00    0
+  54  iwv         4    -9999.99    99999.99    0
+  57  aevap       4    -9999.99    99999.99    0
+  58  ici         4    -9999.99    99999.99    0
+  61  tp          2        0.00     1000.00    0
+  65  wsnow       4    -9999.99    99999.99    0
+  71  tcc         0        0.00      100.00   -4
+  73  clcl        0        0.00      100.00   -4
+  74  clcm        0        0.00      100.00   -4
+  75  clch        0        0.00      100.00   -4
+  76  icw         4    -9999.99    99999.99    0
+  78  consnw      2        0.00     1000.00    0
+  79  gspsnw      2        0.00     1000.00    0
+  81  landfr      4        0.00        1.00    0
+  83  z0          4        0.00       50.00    0
+  84  alb         4        0.00      100.00    0
+  85  tg          4      243.16      323.16    0
+  86  wg          4        0.00    99999.99    0
+  87  plcov       4        0.00      100.00    0
+  90  runoff      4    -9999.99    99999.99    0
+ 111  SW_Budg     1        0.00     1300.00   -3
+ 112  LW_Budg     1    -1000.00     1000.00    0
+ 113  swbudt      4    -9999.99    99999.99    0
+ 114  lwbudt      4    -9999.99    99999.99    0
+ 121  LHF         1    -1000.00     1000.00   -5
+ 122  SHF         1    -1000.00     1000.00   -5
+ 124  umfl        4    -9999.99    99999.99    0
+ 125  vmfl        4    -9999.99    99999.99    0
+ 150  qcr       exp        0.00        1.00    0
+ 151  qis       exp        0.00        1.00    0
+ 152  cp          2        0.00     1000.00    0
+ 153  sf          2        0.00     1000.00    0
+ 200  molm        1   -10000.99    10000.99   -2
+ 201  ustarlm     3        0.00       10.00    0
+ 202  ipgtlm      0       -9.00        9.00    0
+ 203  tinv        2      -50.00       50.00    0
+ 210  modia       1   -10000.00    10000.00   -2
+ 211  ustardia    3        0.00       10.00    0
+ 212  hmixdia     0        0.00     5000.00    0
+ 213  wstardia    3        0.00       10.00    0
+
+!123--12345678--123--1234567890--1234567890--123

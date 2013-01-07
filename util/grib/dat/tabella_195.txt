@@ -1,0 +1,43 @@
+!--------------------------------------------------------------------------
+! Sigla GRADS e descrizione dei parametri della tabella 195 (usata da 
+! Chimere V2008 e successive). 
+! I parametri gas Chimere sono nella tabella 200, le variabili prognostiche
+! aerosol nella tabella 196
+!
+!                                          Ultimo aggiornamento: 30/12/2011
+!--------------------------------------------------------------------------
+!123--12345678--1234567890123456789012345678901234567890--12345
+!Cod  Sigla     Descrizione e unita'                      B-Tab 
+!Classi granulometriche, V2008
+   1  pm10      Total aerosol < 10 um (ug/m3)             15195
+   2  pm5       Total aerosol < 5 um (ug/m3)              15202
+   3  pm25      Total aerosol < 2.5 um (ug/m3)            15198
+   4  pm1       Total aerosol < 1.25 um (ug/m3)           15203
+   5  pm06      Total aerosol < 0.625 um (ug/m3)          15204
+   6  pm03      Total aerosol < 0.3125 um (ug/m3)         15205
+   7  pm015     Total aerosol < 0.15625 um (ug/m3)        15206
+   8  pm008     Total aerosol < 0.078125 um (ug/m3)       15207
+
+!Speciazione PM10, V2008
+   9  p10ppm    Primary part. matter in PM10 (ug/m3)      15208
+  10  p10h2so4  Sulfate in PM10 (ug/m3)                   15209
+  11  p10hno3   Nitrate in PM10 (ug/m3)                   15210
+  12  p10nh3    Ammonium in PM10 (ug/m3)                  15211
+  13  p10bcar   Black carbon in PM10 (ug/m3)              15212
+  14  p10ocar   Organic carbon in PM10 (ug/m3)            15213
+  15  p10dust   Dust in PM10 (ug/m3)                      15214
+  16  p10AnA1D  Anthropogenic A1D in PM10 (ug/m3)         15215
+  17  p10AnBmP  Anthropogenic BmP in PM10 (ug/m3)         15216
+  18  p10BiA1D  Biogenic A1D in PM10 (ug/m3)              15217
+  19  p10BiBmP  Biogenic BmP in PM10 (ug/m3)              15218
+  20  p10WATER  Water in PM10 (ug/m3)                     15219
+  21  p10salt   Sea salt in PM10 (ug/m3)                  15220
+  22  pISOPA1   ISOPA1 in PM10 (ug/m3)                    15235
+  30  p10tsoa   Total secondary organic in PM10 (ug/m3)   15221
+  31  p10tpri   Total primary part. in PM10 (ug/m3)       15222
+  32  p10tsec   Total secondary part. in PM10 (ug/m3)     15223
+  33  p10ant    Total anthrop. part. in PM10 (ug/m3)
+  34  p10bio    Total biogenic part. in PM10 (ug/m3)
+  44  p25bio    Total biogenic part. in PM2.5 (ug/m3)
+
+!123--12345678--1234567890123456789012345678901234567890

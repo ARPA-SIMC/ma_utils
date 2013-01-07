@@ -1,0 +1,142 @@
+!--------------------------------------------------------------------------
+! Sigla identificativa e altri parametri richiesti da trasp_seriet relativi
+! alla tab. 199 (variabili prognostiche aerosol di Chimere V2008)
+! I parametri aerosol di Chimere 2005 sono nella tab. 199
+! I parametri Chimere gas sono nella tabella 200
+!
+! Contenuto dei campi
+! Cod:     condice GRIB del parametro
+! Sigla:   identificativo del parametro nell'output seriet
+! dec:     numero di decimali nell'output seriet
+! val.min: valore minimo accettabile
+! val.max: valore massimo accettabile
+! cp2:     codice 2a componente (se vento U); 
+!          500 + codice 1a componente (se vento V);
+!          -1 (se temperatura); -2 (se lugh.MO); -3 (se sw budget); 
+!          -4 (se cloud cover); -5 (se flussi di calore); 0 (altri casi)
+!
+!                                               mic  Versione 2.1  10/12/2012
+!--------------------------------------------------------------------------
+!123--12345678--123--1234567890--1234567890--123
+!Cod  Sigla     dec     val.min     val.max  cp2
+   1  p01BCAR   exp        0.00      100.00   -6
+   2  p01DUST   exp        0.00      100.00   -6
+   3  p01OCAR   exp        0.00      100.00   -6
+   4  p01PPM    exp        0.00      100.00   -6
+   5  p01SALT   exp        0.00      100.00   -6
+   6  p01AnA1D  exp        0.00      100.00   -6
+   7  p01AnBmP  exp        0.00      100.00   -6
+   8  p01BiA1D  exp        0.00      100.00   -6
+   9  p01BiBmP  exp        0.00      100.00   -6
+  10  p01H2SO4  exp        0.00      100.00   -6
+  11  p01HNO3   exp        0.00      100.00   -6
+  12  p01NH3    exp        0.00      100.00   -6
+  13  p01WATER  exp        0.00      100.00   -6
+  14  p01ISOPA1 exp        0.00      100.00   -6
+  21  p02BCAR   exp        0.00      100.00   -6
+  22  p02DUST   exp        0.00      100.00   -6
+  23  p02OCAR   exp        0.00      100.00   -6
+  24  p02PPM    exp        0.00      100.00   -6
+  25  p02SALT   exp        0.00      100.00   -6
+  26  p02AnA1D  exp        0.00      100.00   -6
+  27  p02AnBmP  exp        0.00      100.00   -6
+  28  p02BiA1D  exp        0.00      100.00   -6
+  29  p02BiBmP  exp        0.00      100.00   -6
+  30  p02H2SO4  exp        0.00      100.00   -6
+  31  p02HNO3   exp        0.00      100.00   -6
+  32  p02NH3    exp        0.00      100.00   -6
+  33  p02WATER  exp        0.00      100.00   -6
+  34  p02ISOPA1 exp        0.00      100.00   -6
+  41  p03BCAR   exp        0.00      100.00   -6
+  42  p03DUST   exp        0.00      100.00   -6
+  43  p03OCAR   exp        0.00      100.00   -6
+  44  p03PPM    exp        0.00      100.00   -6
+  45  p03SALT   exp        0.00      100.00   -6
+  46  p03AnA1D  exp        0.00      100.00   -6
+  47  p03AnBmP  exp        0.00      100.00   -6
+  48  p03BiA1D  exp        0.00      100.00   -6
+  49  p03BiBmP  exp        0.00      100.00   -6
+  50  p03H2SO4  exp        0.00      100.00   -6
+  51  p03HNO3   exp        0.00      100.00   -6
+  52  p03NH3    exp        0.00      100.00   -6
+  53  p03WATER  exp        0.00      100.00   -6
+  54  p03ISOPA1 exp        0.00      100.00   -6
+  61  p04BCAR   exp        0.00      100.00   -6
+  62  p04DUST   exp        0.00      100.00   -6
+  63  p04OCAR   exp        0.00      100.00   -6
+  64  p04PPM    exp        0.00      100.00   -6
+  65  p04SALT   exp        0.00      100.00   -6
+  66  p04AnA1D  exp        0.00      100.00   -6
+  67  p04AnBmP  exp        0.00      100.00   -6
+  68  p04BiA1D  exp        0.00      100.00   -6
+  69  p04BiBmP  exp        0.00      100.00   -6
+  70  p04H2SO4  exp        0.00      100.00   -6
+  71  p04HNO3   exp        0.00      100.00   -6
+  72  p04NH3    exp        0.00      100.00   -6
+  73  p04WATER  exp        0.00      100.00   -6
+  74  p04ISOPA1 exp        0.00      100.00   -6
+  81  p05BCAR   exp        0.00      100.00   -6
+  82  p05DUST   exp        0.00      100.00   -6
+  83  p05OCAR   exp        0.00      100.00   -6
+  84  p05PPM    exp        0.00      100.00   -6
+  85  p05SALT   exp        0.00      100.00   -6
+  86  p05AnA1D  exp        0.00      100.00   -6
+  87  p05AnBmP  exp        0.00      100.00   -6
+  88  p05BiA1D  exp        0.00      100.00   -6
+  89  p05BiBmP  exp        0.00      100.00   -6
+  90  p05H2SO4  exp        0.00      100.00   -6
+  91  p05HNO3   exp        0.00      100.00   -6
+  92  p05NH3    exp        0.00      100.00   -6
+  93  p05WATER  exp        0.00      100.00   -6
+  94  p05ISOPA1 exp        0.00      100.00   -6
+ 101  p06BCAR   exp        0.00      100.00   -6
+ 102  p06DUST   exp        0.00      100.00   -6
+ 103  p06OCAR   exp        0.00      100.00   -6
+ 104  p06PPM    exp        0.00      100.00   -6
+ 105  p06SALT   exp        0.00      100.00   -6
+ 106  p06AnA1D  exp        0.00      100.00   -6
+ 107  p06AnBmP  exp        0.00      100.00   -6
+ 108  p06BiA1D  exp        0.00      100.00   -6
+ 109  p06BiBmP  exp        0.00      100.00   -6
+ 110  p06H2SO4  exp        0.00      100.00   -6
+ 111  p06HNO3   exp        0.00      100.00   -6
+ 112  p06NH3    exp        0.00      100.00   -6
+ 113  p06WATER  exp        0.00      100.00   -6
+ 114  p06ISOPA1 exp        0.00      100.00   -6
+ 121  p07BCAR   exp        0.00      100.00   -6
+ 122  p07DUST   exp        0.00      100.00   -6
+ 123  p07OCAR   exp        0.00      100.00   -6
+ 124  p07PPM    exp        0.00      100.00   -6
+ 125  p07SALT   exp        0.00      100.00   -6
+ 126  p07AnA1D  exp        0.00      100.00   -6
+ 127  p07AnBmP  exp        0.00      100.00   -6
+ 128  p07BiA1D  exp        0.00      100.00   -6
+ 129  p07BiBmP  exp        0.00      100.00   -6
+ 130  p07H2SO4  exp        0.00      100.00   -6
+ 131  p07HNO3   exp        0.00      100.00   -6
+ 132  p07NH3    exp        0.00      100.00   -6
+ 133  p07WATER  exp        0.00      100.00   -6
+ 134  p07ISOPA1 exp        0.00      100.00   -6
+ 141  p08BCAR   exp        0.00      100.00   -6
+ 142  p08DUST   exp        0.00      100.00   -6
+ 143  p08OCAR   exp        0.00      100.00   -6
+ 144  p08PPM    exp        0.00      100.00   -6
+ 145  p08SALT   exp        0.00      100.00   -6
+ 146  p08AnA1D  exp        0.00      100.00   -6
+ 147  p08AnBmP  exp        0.00      100.00   -6
+ 148  p08BiA1D  exp        0.00      100.00   -6
+ 149  p08BiBmP  exp        0.00      100.00   -6
+ 150  p08H2SO4  exp        0.00      100.00   -6
+ 151  p08HNO3   exp        0.00      100.00   -6
+ 152  p08NH3    exp        0.00      100.00   -6
+ 153  p08WATER  exp        0.00      100.00   -6
+ 154  p08ISOPA1 exp        0.00      100.00   -6
+ 201  BCARAQ    exp        0.00      100.00   -6
+ 203  OCARAQ    exp        0.00      100.00   -6
+ 205  SALTAQ    exp        0.00      100.00   -6
+ 206  AnA1DAQ   exp        0.00      100.00   -6
+ 207  AnBmPAQ   exp        0.00      100.00   -6
+ 208  BiA1DAQ   exp        0.00      100.00   -6
+ 209  BiBmPAQ   exp        0.00      100.00   -6
+
+!123--12345678--123--1234567890--1234567890--123

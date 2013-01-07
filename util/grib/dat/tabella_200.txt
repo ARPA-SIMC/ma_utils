@@ -1,0 +1,157 @@
+!--------------------------------------------------------------------------
+! Sigla GRADS e descrizione dei parametri della tabella 200 (usata da 
+! Calmet e modelli fotochimici)
+! I parametri aerosol Chimere sono nelle tabelle 196 e 199.
+!
+!                                          Ultimo aggiornamento: 17/01/2012
+!--------------------------------------------------------------------------
+!123--12345678--1234567890123456789012345678901234567890--12345
+!Cod  Sigla     Descrizione e unita'                      B-Tab 
+!Meteorological parameters
+   8  z         Geometric height [m]                      10007
+  11  t         Temperature [K]                           12101
+  33  u         X (zonal) wind component [m/s]            11003
+  34  v         Y (meridional) wind component [m/s]       11004
+  35  dd        Wind direction [deg]                      11001
+  36  ff        Wind speed [m/s]                          11002
+  40  w         Vertical Velocity (ter.foll.) [m/s]       11192
+  41  wc        Vertical Velocity (cartesian) [m/s]       11006
+  89  ro        Air density [mle/cm3]
+  90  xxx       Reserved for temporary use
+  92  phat      Cloud Photolysis Attenuation [0-1]
+  93  aerr      Aerodynamic resistance [s/m]
+  94  kz        Coeff. of turbulent vertical diffusion
+
+!Kriging uncertainity (Pesco)
+  95  o3u       Uncertainity on O3 estimate [ug/m3]       15224
+  96  pm10u     Uncertainity on PM10 estimate [ug/m3]     15225
+  97  no2u      Uncertainity on NO2 estimate [ug/m3]      15226
+  98  pm25u     Uncertainity on PM2.5 estimate [ug/m3]    15227
+
+!Calmet turbolent parameters
+ 100  ipgt      Stability class (Calmet) [1-6]            11193
+ 101  ustar     Friction Velocity (Calmet) [m/s]          11194
+ 102  hmix      Mixing Height (Calmet) [m]                11195
+ 103  mo        Monin Obukov lenght (Calmet) [m]          11196
+ 104  wstar     Convective Velocity Scale (Calmet) [m/s]  11197 
+
+!Extra output Calmet
+ 110  swbudg    Solar Radiation Budget [W/m2]             14018
+ 111  lwbudg    IR Radiation Budget [W/m2]                14017
+ 112  lhf       Latent Heat Flux [W/m2]                   14193
+ 113  shf       Sensible Heat Flux [W/m2]                 14192
+ 114  tcc       Total Cloud Cover [%]                     20010
+
+!Physiografic parametrs
+ 121  luse      Land Use [10-90]
+ 122  orog      Orography [m]                             10007
+ 123  z0        Roughness [m]                             11199
+ 124  alb       Albedo [0-1]                              14019
+ 125  bowen     Bowen Ratio
+ 126  soilhfc   Soil Heat Flux constant 
+ 127  ahf       Antropogenic Heat Flux
+ 128  lai       Leaf Area Index
+
+!Fractions or frequences (0-1) of complementary parameters (es: LU)
+ 131  f1        Parameter 1       
+ 132  f2        Parameter 2       
+ 133  f3        Parameter 3       
+ 134  f4        Parameter 4       
+ 135  f5        Parameter 5       
+ 136  f6        Parameter 6       
+ 137  f7        Parameter 7       
+ 138  f8        Parameter 8       
+ 139  f9        Parameter 9       
+
+!Deposition (dry and wet)
+ 140  dh2so4    Dry deposition of H2SO4 (moli/m2)         23192
+ 141  wh2so4    Wet deposition of H2SO4 (moli/m2)         23193
+ 142  dnh4      Dry deposition of NH4 (moli/m2)           23194
+ 143  wnh4      Wet deposition of NH4 (moli/m2)           23195
+ 144  dhno3     Dry deposition of HNO3 (moli/m2)          23196
+ 145  whno3     Wet deposition of HNO3 (moli/m2)          23197
+
+!Main inorganic species
+ 151  o3        O3 (ppb)                                  15194
+ 152  no        NO (ppb)                                  15192
+ 153  no2       NO2 (ppb)                                 15193
+ 154  co        CO (ppb)                                  15196
+ 155  so2       SO2 (ppb)                                 15197
+ 157  hno4      HNO4 (ppb)
+ 158  ho2       HO2 (ppb)
+ 159  pan       PAN (ppb)
+
+!Chimere GAS species
+ 170  hcho      HCHO (ppb)
+ 175  mglyox    MGLYOX (ppb)
+ 180  bpinen    BPINEN (chimere: ppb)
+ 181  limone   	LIMONE (chimere: ppb)
+ 182  terpen   	TERPEN (chimere: ppb)
+ 183  ocimen   	OCIMEN (chimere: ppb)
+ 184  humule   	HUMULE (chimere: ppb)
+ 185  tol       TOL (chimere: ppb)
+ 186  tmb       TMB (chimere: ppb)
+ 187  ana1d     AnA1D (chimere: ppb)
+ 188  anbmp     AnBmP (chimere: ppb)
+ 189  bia1d     BiA1D (chimere: ppb)
+ 190  bibmp     BiBmP (chimere: ppb)
+ 191  hno3      HNO3 (chimere: ppb)
+ 192  ch4       CH4 (chimere: ppb)
+ 193  c2h6      C2H6 (chimere: ppb)
+ 194  nc4h10    NC4H10 (chimere: ppb)
+ 195  c2h4      C2H4 (chimere: ppb)
+ 196  c3h6      C3H6 (chimere: ppb)
+ 197  oxyl      OXYL (chimere: ppb)
+ 198  c5h8      C5H8 (chimere: ppb)
+ 199  apinen    APINEN (chimere: ppb)
+ 200  ch3cho    CH3CHO (chimere: ppb)
+ 201  glyox     GLYOX (chimere: ppb)
+ 202  ch3coe    CH3COE (chimere: ppb)
+ 204  topan     toPAN (chimere: ppb)
+ 205  nh3       NH3 (chimere: ppb)                        15228
+ 206  h2so4     H2SO4 (chimere: ppb)
+ 207  ch3oh     CH3OH (chimere, solo Melchior 1)
+ 208  c2h5oh    C2H5OH (chimere, solo Melchior 1)
+ 209  noy       NOX estesi (Chimere, 12 specie, ppb)      15199
+ 210  nox       NOX ristretti (NO+NO2; per ADMS) 
+ 211  h2o2      H2O2 (chimere: ppb) 
+ 212  hono      HONO (chimere: ppb)
+ 213  voc       VOC totali (Chimere, 31 specie, ppb)
+ 214  hcnm      HCNM (ppb)                                15200
+ 215  alde      Aldeidi totali (ppb)                      15201
+
+!Chimere Aerosol Families and emissions (V2005)
+ 220  pm10      Total aerosol < 10 um (ug/m3)             15195
+ 221  pm25      Total aerosol < 2.5 um (ug/m3)            15198
+ 222  ppm1      PPM1 (emissions > 10 um; mle/cm2*s)
+ 223  ppm2      PPM2 (10 um > emi > 2.5 um; mle/cm2*s)
+ 224  ppm3      PPM3 (emissions < 2.5 um; mle/cm2*s)
+ 225  pppm      Primary Parti. Matter in aerosol (ug/m3)  15229
+ 226  ph2so4    Sulfate particulate in aerosol (ug/m3)    15230
+ 227  phno3     Nitrate particulate in aerosol (ug/m3)    15231
+ 228  pnh3      Ammonium particulate in aerosl (ug/m3)    15232
+ 229  pasoa     Anthropogenic Sec. Org. Aerosol (ug/m3)   15233
+ 230  pbsoa     Biogenic Sec. Org. Aerosol (ug/m3)        15234
+ 231  PM5       Total aerosol < 5 um (ug/m3)              15202
+ 232  PM1       Total aerosol < 1.25 um (ug/m3)           15203
+ 233  PM03      Total aerosol < 0.312 um (ug/m3)          15205
+ 234  PM008     Total aerosol < 0.078 um (ug/m3)          15207
+ 235  pm06      Tot aero < 0.625 um (classes 1-3, ug/m3)  15204
+ 236  pm015     Tot aero < 0.156 um (classes 1-2, ug/m3)  15206
+ 237  pm004     Total aerosol < 0.04 um (class 1, ug/m3)
+ 241  p10ppm    Primary Parti. Matter in PM10 (ug/m3)     15208
+ 242  p10h2so4  Sulfate particulate in PM10 (ug/m3)       15209
+ 243  p10hno3   Nitrate particulate in PM10 (ug/m3)       15210
+ 244  p10nh3    Ammonium particulate in PM10 (ug/m3)      15211
+ 245  p10bcar   Black carbon in PM10 (ug/m3)              15212
+ 246  p10ocar   Organic carbon in PM10 (ug/m3)            15213
+ 247  p10soa    Total Sec. Org. Aerosol in PM10 (ug/m3)   15221
+ 248  p10dust   Dust Aerosol in PM10 (ug/m3)              15214
+ 249  p10AnA1D  Anthr. A1D in PM10 (ug/m3)                15215
+ 250  p10AnBmP  Anthr. BmP in PM10 (ug/m3)                15216
+ 251  p10BiA1D  Biogenic A1D in PM10 (ug/m3)              15217
+ 252  p10BiBmP  Biogenic BmP in PM10 (ug/m3)              15218
+ 253  p10WATER  Water in PM10 (ug/m3)                     15219
+ 254  p10salt   Sea salt in PM10 (ug/m3)                  15220
+ 255  p10salt   Sea salt in PM10 (ug/m3)                  15220
+!123--12345678--1234567890123456789012345678901234567890

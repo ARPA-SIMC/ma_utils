@@ -1,0 +1,960 @@
+
+RETE REPORT      ID BREVE           DESCRIZIONE                                        UNITA  VALEN  KIND     
+---- -------- ----- --------------- -------------------------------------------------- ------ ------ ----     
+   1 SYNOP        1 HH              Altezza nubi piu' basse                            M      P5     RILE     
+   1 SYNOP        2 VIS             Visibilita' orizzontale                            HM     P5     RILE     
+   1 SYNOP        3 NTOT            Copertura totale                                   CN8    P5     RILE     
+   1 SYNOP        4 DD              Direzione vento                                    GSES   P10    RILE     
+   1 SYNOP        5 FF              Intensita' vento                                   KN     P10    RILE     
+   1 SYNOP        6 TATA            Temperatura aria                                   GC     P5     RILE     
+   1 SYNOP        7 TDTD            Temperatura rugiada                                GC     P5     RILE     
+   1 SYNOP        8 UMID            Umidita' percentuale                               PERC   P5     RILE     
+   1 SYNOP        9 PRES            Pressione aria a livello mare                      MBAR   P5     RILE     
+   1 SYNOP       10 GEOP            Geopotenziale                                      GEOP   P5     RILE     
+   1 SYNOP       11 P0P0            Pressione aria a livello stazione istantanea       MBAR   P5     RILE     
+   1 SYNOP       12 CART            Caratteristica tendenza barometrica                NUM    P5     RILE     
+   1 SYNOP       13 TEND            Tendenza barometrica                               MBAR   P5     RILE     
+   1 SYNOP       14 PRECI           Precipitazione cumulata nel periodo                MM     P360   RILE     
+   1 SYNOP       15 PRECI           Precipitazione cumulata nel periodo                MM     P720   RILE     
+   1 SYNOP       17 TEMPRS          Tempo presente                                     NUM    P5     RILE     
+   1 SYNOP       18 TEMPAS          Tempo passato                                      NUM    P180   RILE     
+   1 SYNOP       19 NH              Copertura nubi basse (SYNOP)                       CN8    P5     RILE     
+   1 SYNOP       20 CL              Tipo nubi basse (SYNOP)                            NUM    P5     RILE     
+   1 SYNOP       21 CM              Tipo nubi medie (SYNOP)                            NUM    P5     RILE     
+   1 SYNOP       22 CH              Tipo nubi alte (SYNOP)                             NUM    P5     RILE     
+   1 SYNOP       23 TW              Temperatura dell' acqua                            GC     P5     RILE     
+   1 SYNOP       24 PWA             Periodo onde di vento                              SEC    P5     RILE     
+   1 SYNOP       25 HWA             Altezza onde di vento                              CM     P5     RILE     
+   1 SYNOP       26 PW              Periodo onde                                       SEC    P5     RILE     
+   1 SYNOP       27 RADSOL          Radiazione solare                                  RADCC  P60    RILE     
+   1 SYNOP       28 HW              Altezza onde                                       CM     P5     RILE     
+   1 SYNOP       29 E               Stato suolo                                        NUM    P5     RILE     
+   1 SYNOP       30 TMINS           Temperatura minima suolo                           GC     P5     RILE     
+   1 SYNOP       31 EG              Stato ghiaccio suolo                               NUM    P5     RILE     
+   1 SYNOP       32 SSS             Spessore strato neve                               MM     P5     RILE     
+   1 SYNOP       33 NS(1)           Copertura delle nubi da tipo nubi da gruppo        CN8    P5     RILE     
+   1 SYNOP       34 NS(2)           Copertura delle nubi da tipo nubi da gruppo        CN8    P5     RILE     
+   1 SYNOP       35 NS(3)           Copertura delle nubi da tipo nubi da gruppo        CN8    P5     RILE     
+   1 SYNOP       36 NS(4)           Copertura delle nubi da tipo nubi da gruppo        CN8    P5     RILE     
+   1 SYNOP       37 CSS(1)          Tipo nubi da gruppo (SYNOP)                        NUM    P5     RILE     
+   1 SYNOP       38 CSS(2)          Tipo nubi da gruppo (SYNOP)                        NUM    P5     RILE     
+   1 SYNOP       39 CSS(3)          Tipo nubi da gruppo (SYNOP)                        NUM    P5     RILE     
+   1 SYNOP       40 CSS(4)          Tipo nubi da gruppo (SYNOP)                        NUM    P5     RILE     
+   1 SYNOP       41 HHSS(1)         Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     RILE     
+   1 SYNOP       42 HHSS(2)         Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     RILE     
+   1 SYNOP       43 HHSS(3)         Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     RILE     
+   1 SYNOP       44 HHSS(4)         Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     RILE     
+   1 SYNOP       45 TMAX            Temperatura massima aria                           GC     P720   RILE     
+   1 SYNOP       46 TMIN            Temperatura minima aria                            GC     P720   RILE     
+   1 SYNOP       67 SYNOP           Report SYNOP (Come da messaggio)                   ASCII  P180   REPO     
+   1 SYNOP      204 HH              Altezza nubi piu' basse                            M      P5     CALC     
+   1 SYNOP      205 HHSS            Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     CALC     
+   1 SYNOP      206 HHSS            Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     CALC     
+   1 SYNOP      207 HHSS            Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     CALC     
+   3 BOA        476 PROF                                                               M      P60    RILE     
+   3 BOA        477 TEMP                                                               GC     P60    RILE     
+   3 BOA        478 COND            conducibilita'                                     SM     P60    RILE     
+   3 BOA        479 PRES            Pressione aria a livello mare                      DBAR   P60    RILE     
+   3 BOA        480 OXYG                                                               MLL    P60    RILE     
+   3 BOA        481 PH                                                                 PH     P60    RILE     
+   3 BOA        482 ORP                                                                MV     P60    RILE     
+   3 BOA        483 SAL                                                                PSU    P60    RILE     
+   3 BOA        484 DENS                                                               KGM3   P60    RILE     
+   3 BOA        485 FLUO                                                               RFU    P60    RILE     
+   3 BOA        486 TCFLUO                                                             RFU    P60    RILE     
+   3 BOA        487 TURB                                                               NTU    P60    RILE     
+   3 BOA        488 STEMP                                                              GC     P60    RILE     
+   3 BOA        489 CURRSPEED                                                          CSEC   P60    RILE     
+   3 BOA        490 CURRDIR                                                            GSES   P60    RILE     
+   3 BOA        491 DTEMP                                                              GC     P60    RILE     
+   3 BOA        492 CURRCOMPASS                                                        NUM    P60    RILE     
+   3 BOA        493 CURRTX                                                             NUM    P60    RILE     
+   3 BOA        494 CURRTY                                                             NUM    P60    RILE     
+   3 BOA        495 BATTERY                                                            VOLT   P60    RILE     
+   3 BOA        496 DATE_ADD                                                           NUM    P60    RILE     
+   3 BOA        497 TIME_ADD                                                           NUM    P60    RILE     
+   3 BOA        498 LAT                                                                GCEN   P60    RILE     
+   3 BOA        499 LON                                                                GCEN   P60    RILE     
+   3 BOA        500 WIND_SPEED                                                         MSEC   P60    RILE     
+   3 BOA        501 WIND_GUST                                                          MSEC   P60    RILE     
+   3 BOA        502 WIND_DIR                                                           GSES   P60    RILE     
+   3 BOA        503 TWIND_DIR                                                          GSES   P60    RILE     
+   3 BOA        504 AIR_TEMP                                                           GC     P60    RILE     
+   3 BOA        505 AIR_PRES                                                           HPA    P60    RILE     
+   3 BOA        506 REL_HUM                                                            PERC   P60    RILE     
+   3 BOA        507 NET_RAD                                                            RADWM  P60    RILE     
+   3 BOA        508 HDG                                                                GSES   P60    RILE     
+   3 BOA        509 ROLL                                                               GSES   P60    RILE     
+   3 BOA        510 PITCH                                                              GSES   P60    RILE     
+   3 BOA        511 BATTERY                                                            VOLT   P60    RILE     
+   3 BOA        629 HS              Altezza significativa delle onde                   M      P30    RILE     
+   3 BOA        630 DIRW            Direzione delle onde di vento                      GSES   P30    RILE     
+   3 BOA        631 TM              Periodo medio delle onde                           SEC    P30    RILE     
+   3 BOA        632 TP              Periodo di picco delle onde                        SEC    P30    RILE     
+   3 BOA        633 TSEA            Temperatura dell' acqua                            GC     P30    RILE     
+   4 IDRMGI     250 PRECI           Precipitazione cumulata nel periodo                MM     P1440  CALC     
+   5 CER        158 TATA            Temperatura aria                                   GC     P5     RILE     
+   5 CER        159 PRECI           Precipitazione cumulata nel periodo                MM     P30    RILE     
+   5 CER        161 IDRO            Livello idrometrico                                M      P5     RILE     
+   5 CER        167 P0P0            Pressione aria a livello stazione istantanea       HPA    P5     RILE     
+   5 CER        169 TW              Temperatura istantanea dell' acqua                 GC     P5     RILE     
+   6 UMSUOL     522 TISTSLV1        Temperatura instantanea suolo                      GC     P5     RILE     
+   6 UMSUOL     523 TISTSLV2        Temperatura instantanea suolo                      GC     P5     RILE     
+   6 UMSUOL     524 TISTSLV3        Temperatura instantanea suolo                      GC     P5     RILE     
+   6 UMSUOL     525 TISTSLV4        Temperatura instantanea suolo                      GC     P5     RILE     
+   6 UMSUOL     526 TISTSLV5        Temperatura instantanea suolo                      GC     P5     RILE     
+   6 UMSUOL     527 TISTSLV6        Temperatura instantanea suolo                      GC     P5     RILE     
+   6 UMSUOL     528 TISTSLV7        Temperatura instantanea suolo                      GC     P5     RILE     
+   6 UMSUOL     529 UMSLV1          Umidita' suolo                                     NUM    P5     RILE     
+   6 UMSUOL     530 UMSLV2          Umidita' suolo                                     NUM    P5     RILE     
+   6 UMSUOL     531 UMSLV3          Umidita' suolo                                     NUM    P5     RILE     
+   6 UMSUOL     532 UMSLV4          Umidita' suolo                                     NUM    P5     RILE     
+   6 UMSUOL     533 UMSLV5          Umidita' suolo                                     NUM    P5     RILE     
+   6 UMSUOL     534 UMSLV6          Umidita' suolo                                     NUM    P5     RILE     
+   6 UMSUOL     535 UMSLV7          Umidita' suolo                                     NUM    P5     RILE     
+   7 CRO        158 TATA            Temperatura aria                                   GC     P5     RILE     
+   7 CRO        159 PRECI           Precipitazione cumulata nel periodo                MM     P30    RILE     
+   9 ETG         78 LMEDT1          Temperatura media aria                             GC     P60    RILE     
+   9 ETG         79 LVMNT1          Temperatura minima aria                            GC     P60    RILE     
+   9 ETG         80 LVMXT1          Temperatura massima aria                           GC     P60    RILE     
+   9 ETG        114 LPRECI          Precipitazione cumulata nel periodo                MM     P60    RILE     
+   9 ETG        427 PREC15          Precipitazione cumulata nel periodo                MM     P60    RILE     
+  10 METAR       47 DDD             Direzione vento                                    GSES   P10    RILE     
+  10 METAR       48 FF              Intensita' vento                                   KN     P10    RILE     
+  10 METAR       49 FM              Intensita' vento massimo                           KN     P10    RILE     
+  10 METAR       50 VVVV            Visibilita' orizzontale                            M      P5     RILE     
+  10 METAR       51 IWW             Tempo presente o previsto                          ASCII  P5     RILE     
+  10 METAR       52 NS(1)           Copertura delle nubi da tipo nubi da gruppo        CN8    P5     RILE     
+  10 METAR       53 NS(2)           Copertura delle nubi da tipo nubi da gruppo        CN8    P5     RILE     
+  10 METAR       54 NS(3)           Copertura delle nubi da tipo nubi da gruppo        CN8    P5     RILE     
+  10 METAR       55 NS(4)           Copertura delle nubi da tipo nubi da gruppo        CN8    P5     RILE     
+  10 METAR       56 ICC(1)          Tipo nube (METAR)                                  ASCII  P5     RILE     
+  10 METAR       57 ICC(2)          Tipo nube (METAR)                                  ASCII  P5     RILE     
+  10 METAR       58 ICC(3)          Tipo nube (METAR)                                  ASCII  P5     RILE     
+  10 METAR       59 ICC(4)          Tipo nube (METAR)                                  ASCII  P5     RILE     
+  10 METAR       60 HHH(1)          Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     RILE     
+  10 METAR       61 HHH(2)          Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     RILE     
+  10 METAR       62 HHH(3)          Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     RILE     
+  10 METAR       63 HHH(4)          Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     RILE     
+  10 METAR       64 TT              Temperatura aria                                   GC     P5     RILE     
+  10 METAR       65 TD              Temperatura rugiada                                GC     P5     RILE     
+  10 METAR       66 PH              Pressione aria a livello mare                      MBAR   P5     RILE     
+  10 METAR       68 METAR           Repor METAR (Come da messaggio)                    ASCII  P30    REPO     
+  10 METAR      212 HH              Altezza nubi piu' basse                            M      P5     CALC     
+  10 METAR      213 HHSS            Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     CALC     
+  10 METAR      214 HHSS            Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     CALC     
+  10 METAR      215 HHSS            Altezza delle nubi da tipo nubi da gruppo (SYNOP)  M      P5     CALC     
+  11 LOCALI      69 LMVV60          Intensita' vento                                   MSEC   P60    RILE     
+  11 LOCALI      70 LMVV10          Intensita' vento                                   MSEC   P10    RILE     
+  11 LOCALI      71 LAMV10          Direzione vento                                    GSES   P10    RILE     
+  11 LOCALI      72 LVMNVE                                                             MSEC   P60    RILE     
+  11 LOCALI      73 LVMXVE          Intensita' vento massimo                           MSEC   P60    RILE     
+  11 LOCALI      74 LHMNVE          Ora del minimo                                     HHMN   P60    RILE     
+  11 LOCALI      75 LHMXVE          Ora del massimo                                    HHMN   P60    RILE     
+  11 LOCALI      76 LDIPVE          Direzione prevalente vento medio                   OTTAVI P60    RILE     
+  11 LOCALI      77 LISTT1          Temperatura aria                                   GC     P5     RILE     
+  11 LOCALI      78 LMEDT1          Temperatura media aria                             GC     P60    RILE     
+  11 LOCALI      79 LVMNT1          Temperatura minima aria                            GC     P60    RILE     
+  11 LOCALI      80 LVMXT1          Temperatura massima aria                           GC     P60    RILE     
+  11 LOCALI      81 LHMNT1          Ora del minimo                                     HHMN   P60    RILE     
+  11 LOCALI      82 LHMXT1          Ora del massimo                                    HHMN   P60    RILE     
+  11 LOCALI      83 LISTT2          Temperatura aria                                   GC     P5     RILE     
+  11 LOCALI      84 LMEDT2          Temperatura media aria                             GC     P60    RILE     
+  11 LOCALI      85 LVMNT2          Temperatura minima aria                            GC     P60    RILE     
+  11 LOCALI      86 LVMXT2          Temperatura massima aria                           GC     P60    RILE     
+  11 LOCALI      87 LHMNT2          Ora del minimo                                     HHMN   P60    RILE     
+  11 LOCALI      88 LHMXT2          Ora del massimo                                    HHMN   P60    RILE     
+  11 LOCALI      89 LISTTS          Temperatura instantanea suolo                      GC     P5     RILE     
+  11 LOCALI      90 LMEDTS          Temperatura media suolo                            GC     P60    RILE     
+  11 LOCALI      91 LVMNTS          Temperatura minima suolo                           GC     P60    RILE     
+  11 LOCALI      92 LVMXTS          Temperatura massima suolo                          GC     P60    RILE     
+  11 LOCALI      93 LHMNTS          Ora del minimo                                     HHMN   P60    RILE     
+  11 LOCALI      94 LHMXTS          Ora del massimo                                    HHMN   P60    RILE     
+  11 LOCALI      99 LHMNUM          Ora del minimo                                     HHMN   P60    RILE     
+  11 LOCALI     100 LHMXUM          Ora del massimo                                    HHMN   P60    RILE     
+  11 LOCALI     105 LHMNPR          Ora del minimo                                     HHMN   P60    RILE     
+  11 LOCALI     106 LHMXPR          Ora del massimo                                    HHMN   P60    RILE     
+  11 LOCALI     107 LISTRS          Radiazione solare istantanea                       RADCC  P5     RILE     
+  11 LOCALI     108 LINTRS          Radiazione solare                                  RADCC  P60    RILE     
+  11 LOCALI     109 LVMNRS          Radiazione solare minima                           RADCC  P5     RILE     
+  11 LOCALI     110 LVMXRS          Radiazione solare massima                          RADCC  P5     RILE     
+  11 LOCALI     111 LHMNRS          Ora del minimo                                     HHMN   P60    RILE     
+  11 LOCALI     112 LHMXRS          Ora del massimo                                    HHMN   P60    RILE     
+  11 LOCALI     113 LINSOL          Insolazione                                        MN     P60    RILE     
+  11 LOCALI     114 LPRECI          Precipitazione cumulata nel periodo                MM     P60    RILE     
+  11 LOCALI     115 LISTT3          Temperatura aria                                   GC     P5     RILE     
+  11 LOCALI     116 LMEDT3          Temperatura media aria                             GC     P60    RILE     
+  11 LOCALI     117 LVMNT3          Temperatura minima aria                            GC     P60    RILE     
+  11 LOCALI     118 LVMXT3          Temperatura massima aria                           GC     P60    RILE     
+  11 LOCALI     119 LHMNT3          Ora del minimo                                     HHMN   P60    RILE     
+  11 LOCALI     120 LHMXT3          Ora del massimo                                    HHMN   P60    RILE     
+  11 LOCALI     121 LISTT4          Temperatura aria                                   GC     P5     RILE     
+  11 LOCALI     122 LMEDT4          Temperatura media aria                             GC     P60    RILE     
+  11 LOCALI     123 LVMNT4          Temperatura minima aria                            GC     P60    RILE     
+  11 LOCALI     124 LVMXT4          Temperatura massima aria                           GC     P60    RILE     
+  11 LOCALI     125 LHMNT4          Ora del minimo                                     HHMN   P60    RILE     
+  11 LOCALI     126 LHMXT4          Ora del massimo                                    HHMN   P60    RILE     
+  11 LOCALI     139 UM180           Umidita' percentuale                               PERC   P5     RILE     
+  11 LOCALI     140 UM180ME         Umidita' percentuale media                         PERC   P60    RILE     
+  11 LOCALI     141 UM180MN         Umidita' percentuale minima                        PERC   P60    RILE     
+  11 LOCALI     142 UM180MX         Umidita' percentuale massima                       PERC   P60    RILE     
+  11 LOCALI     144 BAGNA           Bagnatura fogliare                                 MN     P60    RILE     
+  11 LOCALI     162 SSM             strato nevoso                                      M      P5     RILE     
+  11 LOCALI     167 P0P0            Pressione aria a livello stazione istantanea       HPA    P5     RILE     
+  11 LOCALI     403 TDEV            deviazione standard                                GC     P60    RILE     
+  11 LOCALI     404 TMIN_M          Temperatura aria                                   GC     P60    RILE     
+  11 LOCALI     405 TMAX_M          Temperatura aria                                   GC     P60    RILE     
+  11 LOCALI     406 UML1H_DEV       Umidita' percentuale                               PERC   P60    RILE     
+  11 LOCALI     409 RAVUAV          radiazione visibile                                RADWM  P60    RILE     
+  11 LOCALI     410 RAVUMN          radiazione visibile                                RADWM  P60    RILE     
+  11 LOCALI     411 RAVUMX          radiazione visibile                                RADWM  P60    RILE     
+  11 LOCALI     412 RAVUIT          radiazione visibile                                MJ     P60    RILE     
+  11 LOCALI     413 RAVUMJ          radiazione visibile                                MJ     P60    RILE     
+  11 LOCALI     427 PREC15          Precipitazione cumulata nel periodo                MM     P60    RILE     
+  11 LOCALI     431 FFVAVG          Intensita' vento                                   MSEC   P60    RILE     
+  11 LOCALI     432 FFVDEV          Intensita' vento                                   MSEC   P60    RILE     
+  11 LOCALI     433 FFVMAX          Intensita' vento                                   MSEC   P60    RILE     
+  11 LOCALI     434 FFVMIN          Intensita' vento                                   MSEC   P60    RILE     
+  11 LOCALI     435 FFSAVG          Intensita' vento                                   MSEC   P60    RILE     
+  11 LOCALI     436 FFSDEV          Intensita' vento                                   MSEC   P60    RILE     
+  11 LOCALI     437 FFSMAX          Intensita' vento                                   MSEC   P60    RILE     
+  11 LOCALI     438 FFSMIN          Intensita' vento                                   MSEC   P60    RILE     
+  11 LOCALI     439 FFSA10          Intensita' vento                                   MSEC   P60    RILE     
+  11 LOCALI     440 DDVAVG          Direzione vento                                    GSES   P60    RILE     
+  11 LOCALI     441 DDVDEV          Direzione vento                                    GSES   P60    RILE     
+  11 LOCALI     442 DDSA10          Direzione vento                                    GSES   P60    RILE     
+  11 LOCALI     444 PAV             Pressione aria a livello mare                      HPA    P60    RILE     
+  11 LOCALI     445 PDEV            Pressione aria a livello mare                      HPA    P60    RILE     
+  11 LOCALI     446 PMN             Pressione aria a livello mare                      HPA    P60    RILE     
+  11 LOCALI     447 PMX             Pressione aria a livello mare                      HPA    P60    RILE     
+  11 LOCALI     448 EXDC            tensione di alimenta                               VOLT   P60    RILE     
+  11 LOCALI     449 ERROR           errori                                             NUM    P60    RILE     
+  11 LOCALI     450 ALARM           allarmi                                            NUM    P60    RILE     
+  11 LOCALI     451 TINT            temperatura interna                                GC     P60    RILE     
+  11 LOCALI     452 SSTT            stato del barometro                                STR    P60    RILE     
+  11 LOCALI     453 SSUR            stato del barometro                                STR    P60    RILE     
+  11 LOCALI     454 SSRAVU          stato del barometro                                STR    P60    RILE     
+  11 LOCALI     458 SSPR            stato del barometro                                STR    P60    RILE     
+  11 LOCALI     459 SSWIND          stato del barometro                                STR    P60    RILE     
+  11 LOCALI     460 SSP             stato del barometro                                STR    P60    RILE     
+  11 LOCALI     461 SSLW            stato del barometro                                STR    P60    RILE     
+  11 LOCALI     518 SSSAV           strato nevoso                                      M      P60    RILE     
+  11 LOCALI     519 SSSDEV          strato nevoso                                      M      P60    RILE     
+  11 LOCALI     520 SSSMN           strato nevoso                                      M      P60    RILE     
+  11 LOCALI     521 SSSMX           strato nevoso                                      M      P60    RILE     
+  11 LOCALI     550 LISTT5          Temperatura aria                                   GC     P5     RILE     
+  11 LOCALI     551 LMEDT5          Temperatura media aria                             GC     P60    RILE     
+  11 LOCALI     552 LVMNT5          Temperatura minima aria                            GC     P60    RILE     
+  11 LOCALI     553 LVMXT5          Temperatura massima aria                           GC     P60    RILE     
+  11 LOCALI     554 LHMNT5          Ora del minimo                                     HHMN   P60    RILE     
+  11 LOCALI     555 LHMXT5          Ora del massimo                                    HHMN   P60    RILE     
+  11 LOCALI     562 TDEV-15         deviazione standard                                GC     P60    RILE     
+  11 LOCALI     563 TDEV50          deviazione standard                                GC     P60    RILE     
+  11 LOCALI     564 SSTTSS          stato del barometro                                STR    P60    RILE     
+  11 LOCALI     565 SSTT50          stato del barometro                                STR    P60    RILE     
+  12 FIDUTO     139 UM180           Umidita' percentuale                               PERC   P5     RILE     
+  12 FIDUTO     158 TATA            Temperatura aria                                   GC     P5     RILE     
+  12 FIDUTO     159 PRECI           Precipitazione cumulata nel periodo                MM     P30    RILE     
+  12 FIDUTO     161 IDRO            Livello idrometrico                                M      P5     RILE     
+  12 FIDUTO     164 RADDIR          Radiazione diretta                                 RADWM  P30    RILE     
+  12 FIDUTO     165 DD              Direzione vento                                    GSES   P5     RILE     
+  12 FIDUTO     166 FF              Intensita' vento                                   MSEC   P5     RILE     
+  12 FIDUTO     167 P0P0            Pressione aria a livello stazione istantanea       HPA    P5     RILE     
+  12 FIDUTO     169 TW              Temperatura istantanea dell' acqua                 GC     P5     RILE     
+  12 FIDUTO     351 FFRAFF          Intensita' vento                                   KMHH   P5     RILE     
+  12 FIDUTO     353 DDRAFF          Direzione vento                                    GSES   P5     RILE     
+  12 FIDUTO     357 RADRIFL         Radiazione solare                                  RADCC  P60    RILE     
+  12 FIDUTO     512 POR                                                                MCS    P60    RILE     
+  13 AGRMET      77 LISTT1          Temperatura aria                                   GC     P5     RILE     
+  13 AGRMET      78 LMEDT1          Temperatura media aria                             GC     P60    RILE     
+  13 AGRMET      79 LVMNT1          Temperatura minima aria                            GC     P60    RILE     
+  13 AGRMET      80 LVMXT1          Temperatura massima aria                           GC     P60    RILE     
+  13 AGRMET      81 LHMNT1          Ora del minimo                                     HHMN   P60    RILE     
+  13 AGRMET      82 LHMXT1          Ora del massimo                                    HHMN   P60    RILE     
+  13 AGRMET      99 LHMNUM          Ora del minimo                                     HHMN   P60    RILE     
+  13 AGRMET     100 LHMXUM          Ora del massimo                                    HHMN   P60    RILE     
+  13 AGRMET     108 LINTRS          Radiazione solare                                  RADCC  P60    RILE     
+  13 AGRMET     114 LPRECI          Precipitazione cumulata nel periodo                MM     P60    RILE     
+  13 AGRMET     115 LISTT3          Temperatura aria                                   GC     P5     RILE     
+  13 AGRMET     116 LMEDT3          Temperatura media aria                             GC     P60    RILE     
+  13 AGRMET     117 LVMNT3          Temperatura minima aria                            GC     P60    RILE     
+  13 AGRMET     118 LVMXT3          Temperatura massima aria                           GC     P60    RILE     
+  13 AGRMET     135 T180            Temperatura aria                                   GC     P5     RILE     
+  13 AGRMET     136 T180ME          Temperatura media aria                             GC     P60    RILE     
+  13 AGRMET     137 T180MN          Temperatura minima aria                            GC     P60    RILE     
+  13 AGRMET     138 T180MX          Temperatura massima aria                           GC     P60    RILE     
+  13 AGRMET     139 UM180           Umidita' percentuale                               PERC   P5     RILE     
+  13 AGRMET     140 UM180ME         Umidita' percentuale media                         PERC   P60    RILE     
+  13 AGRMET     141 UM180MN         Umidita' percentuale minima                        PERC   P60    RILE     
+  13 AGRMET     142 UM180MX         Umidita' percentuale massima                       PERC   P60    RILE     
+  13 AGRMET     143 PREC            Precipitazione cumulata nel periodo                MM     P60    RILE     
+  13 AGRMET     144 BAGNA           Bagnatura fogliare                                 MN     P60    RILE     
+  13 AGRMET     147 V60             Intensita' vento                                   MSEC   P60    RILE     
+  13 AGRMET     167 P0P0            Pressione aria a livello stazione istantanea       HPA    P5     RILE     
+  13 AGRMET     403 TDEV            deviazione standard                                GC     P60    RILE     
+  13 AGRMET     404 TMIN_M          Temperatura aria                                   GC     P60    RILE     
+  13 AGRMET     405 TMAX_M          Temperatura aria                                   GC     P60    RILE     
+  13 AGRMET     406 UML1H_DEV       Umidita' percentuale                               PERC   P60    RILE     
+  13 AGRMET     409 RAVUAV          radiazione visibile                                RADWM  P60    RILE     
+  13 AGRMET     410 RAVUMN          radiazione visibile                                RADWM  P60    RILE     
+  13 AGRMET     411 RAVUMX          radiazione visibile                                RADWM  P60    RILE     
+  13 AGRMET     412 RAVUIT          radiazione visibile                                MJ     P60    RILE     
+  13 AGRMET     413 RAVUMJ          radiazione visibile                                MJ     P60    RILE     
+  13 AGRMET     427 PREC15          Precipitazione cumulata nel periodo                MM     P60    RILE     
+  13 AGRMET     431 FFVAVG          Intensita' vento                                   MSEC   P60    RILE     
+  13 AGRMET     432 FFVDEV          Intensita' vento                                   MSEC   P60    RILE     
+  13 AGRMET     433 FFVMAX          Intensita' vento                                   MSEC   P60    RILE     
+  13 AGRMET     434 FFVMIN          Intensita' vento                                   MSEC   P60    RILE     
+  13 AGRMET     435 FFSAVG          Intensita' vento                                   MSEC   P60    RILE     
+  13 AGRMET     436 FFSDEV          Intensita' vento                                   MSEC   P60    RILE     
+  13 AGRMET     437 FFSMAX          Intensita' vento                                   MSEC   P60    RILE     
+  13 AGRMET     438 FFSMIN          Intensita' vento                                   MSEC   P60    RILE     
+  13 AGRMET     439 FFSA10          Intensita' vento                                   MSEC   P60    RILE     
+  13 AGRMET     440 DDVAVG          Direzione vento                                    GSES   P60    RILE     
+  13 AGRMET     441 DDVDEV          Direzione vento                                    GSES   P60    RILE     
+  13 AGRMET     442 DDSA10          Direzione vento                                    GSES   P60    RILE     
+  13 AGRMET     444 PAV             Pressione aria a livello mare                      HPA    P60    RILE     
+  13 AGRMET     445 PDEV            Pressione aria a livello mare                      HPA    P60    RILE     
+  13 AGRMET     446 PMN             Pressione aria a livello mare                      HPA    P60    RILE     
+  13 AGRMET     447 PMX             Pressione aria a livello mare                      HPA    P60    RILE     
+  13 AGRMET     448 EXDC            tensione di alimenta                               VOLT   P60    RILE     
+  13 AGRMET     449 ERROR           errori                                             NUM    P60    RILE     
+  13 AGRMET     450 ALARM           allarmi                                            NUM    P60    RILE     
+  13 AGRMET     451 TINT            temperatura interna                                GC     P60    RILE     
+  13 AGRMET     452 SSTT            stato del barometro                                STR    P60    RILE     
+  13 AGRMET     453 SSUR            stato del barometro                                STR    P60    RILE     
+  13 AGRMET     454 SSRAVU          stato del barometro                                STR    P60    RILE     
+  13 AGRMET     458 SSPR            stato del barometro                                STR    P60    RILE     
+  13 AGRMET     459 SSWIND          stato del barometro                                STR    P60    RILE     
+  13 AGRMET     460 SSP             stato del barometro                                STR    P60    RILE     
+  13 AGRMET     461 SSLW            stato del barometro                                STR    P60    RILE     
+  13 AGRMET     536 TDEVLV2         deviazione standard                                GC     P5     RILE     
+  13 AGRMET     537 SSTLV2          stato del barometro                                STR    P5     RILE     
+  14 POLLINI    360 POLS1           Graminacee                                         NUM    P1440  RILE     
+  14 POLLINI    361 POLS2           Betulacee                                          NUM    P1440  RILE     
+  14 POLLINI    362 POLS3           Betulacee                                          NUM    P1440  RILE     
+  14 POLLINI    363 POLS4           Betulacee                                          NUM    P1440  RILE     
+  14 POLLINI    364 POLS5           Composite                                          NUM    P1440  RILE     
+  14 POLLINI    365 POLS6           Composite                                          NUM    P1440  RILE     
+  14 POLLINI    366 POLS7           Composite                                          NUM    P1440  RILE     
+  14 POLLINI    367 POLS8           Corilacee                                          NUM    P1440  RILE     
+  14 POLLINI    368 POLS9           Corilacee                                          NUM    P1440  RILE     
+  14 POLLINI    369 POLS10          Corilacee                                          NUM    P1440  RILE     
+  14 POLLINI    370 POLS11          Fagacee                                            NUM    P1440  RILE     
+  14 POLLINI    371 POLS12          Fagacee                                            NUM    P1440  RILE     
+  14 POLLINI    372 POLS13          Fagacee                                            NUM    P1440  RILE     
+  14 POLLINI    373 POLS14          Fagacee                                            NUM    P1440  RILE     
+  14 POLLINI    374 POLS15          Oleacee                                            NUM    P1440  RILE     
+  14 POLLINI    375 POLS16          Oleacee                                            NUM    P1440  RILE     
+  14 POLLINI    376 POLS17          Oleacee                                            NUM    P1440  RILE     
+  14 POLLINI    377 POLS18          Plantaginacee                                      NUM    P1440  RILE     
+  14 POLLINI    378 POLS19          Urticacee                                          NUM    P1440  RILE     
+  14 POLLINI    379 POLS20          Cupressacee - Taxacee indistinte                   NUM    P1440  RILE     
+  14 POLLINI    380 POLS21          Cupressacee - Taxacee indistinte                   NUM    P1440  RILE     
+  14 POLLINI    381 POLS22          Chenopodiacee - Amarantacee Indistinte             NUM    P1440  RILE     
+  14 POLLINI    382 POLS23          Chenopodiacee - Amarantacee Indistinte             NUM    P1440  RILE     
+  14 POLLINI    383 POLS24          Poligonacee                                        NUM    P1440  RILE     
+  14 POLLINI    384 POLS25          Euphorbiacee                                       NUM    P1440  RILE     
+  14 POLLINI    385 POLS26          Mirtacee                                           NUM    P1440  RILE     
+  14 POLLINI    386 POLS27          Ulmacee                                            NUM    P1440  RILE     
+  14 POLLINI    387 POLS28          Ulmacee                                            NUM    P1440  RILE     
+  14 POLLINI    388 POLS29          Ulmacee                                            NUM    P1440  RILE     
+  14 POLLINI    389 POLS30          Platanacee                                         NUM    P1440  RILE     
+  14 POLLINI    390 POLS31          Aceraceae                                          NUM    P1440  RILE     
+  14 POLLINI    391 POLS32          Pinacee                                            NUM    P1440  RILE     
+  14 POLLINI    392 POLS33          Salicacee                                          NUM    P1440  RILE     
+  14 POLLINI    393 POLS34          Salicacee                                          NUM    P1440  RILE     
+  14 POLLINI    394 POLS35          Salicacee                                          NUM    P1440  RILE     
+  14 POLLINI    395 POLS36          Ciperacee                                          NUM    P1440  RILE     
+  14 POLLINI    396 POLS37          Juglandacee                                        NUM    P1440  RILE     
+  14 POLLINI    397 POLS38          Ippocastanacee                                     NUM    P1440  RILE     
+  14 POLLINI    398 POLS39          Spore fungine                                      NUM    P1440  RILE     
+  14 POLLINI    399 POLS40          Spore fungine                                      NUM    P1440  RILE     
+  14 POLLINI    400 POLS41          Spore fungine                                      NUM    P1440  RILE     
+  14 POLLINI    401 POLS42          Spore fungine                                      NUM    P1440  RILE     
+  14 POLLINI    402 POLS43          Spore fungine                                      NUM    P1440  RILE     
+  14 POLLINI    513 POLS44          Altri Pollini / Non Identificati                   NUM    P1440  RILE     
+  14 POLLINI    514 POLS45          Altri Pollini / Non Identificati                   NUM    P1440  RILE     
+  14 POLLINI    515 POLS46          Altri Pollini / Non Identificati                   NUM    P1440  RILE     
+  14 POLLINI    516 POLS47          Altri Pollini / Non Identificati                   NUM    P1440  RILE     
+  14 POLLINI    538 POLS48          Graminacee                                         NUM    P1440  RILE     
+  14 POLLINI    539 POLS49          Plantaginacee                                      NUM    P1440  RILE     
+  14 POLLINI    540 POLS50          Urticacee                                          NUM    P1440  RILE     
+  14 POLLINI    541 POLS51          Poligonacee                                        NUM    P1440  RILE     
+  14 POLLINI    542 POLS52          Euphorbiacee                                       NUM    P1440  RILE     
+  14 POLLINI    543 POLS53          Mirtacee                                           NUM    P1440  RILE     
+  14 POLLINI    544 POLS54          Platanacee                                         NUM    P1440  RILE     
+  14 POLLINI    545 POLS55          Aceraceae                                          NUM    P1440  RILE     
+  14 POLLINI    546 POLS56          Pinacee                                            NUM    P1440  RILE     
+  14 POLLINI    547 POLS57          Ciperacee                                          NUM    P1440  RILE     
+  14 POLLINI    548 POLS58          Juglandacee                                        NUM    P1440  RILE     
+  14 POLLINI    549 POLS59          Ippocastanacee                                     NUM    P1440  RILE     
+  14 POLLINI    569 POLS1           Graminacee                                         NUM    P1440  RILE     
+  14 POLLINI    570 POLS2           Betulacee                                          NUM    P1440  RILE     
+  14 POLLINI    571 POLS3           Betulacee                                          NUM    P1440  RILE     
+  14 POLLINI    572 POLS4           Betulacee                                          NUM    P1440  RILE     
+  14 POLLINI    573 POLS5           Composite                                          NUM    P1440  RILE     
+  14 POLLINI    574 POLS6           Composite                                          NUM    P1440  RILE     
+  14 POLLINI    575 POLS7           Composite                                          NUM    P1440  RILE     
+  14 POLLINI    576 POLS8           Corilacee                                          NUM    P1440  RILE     
+  14 POLLINI    577 POLS9           Corilacee                                          NUM    P1440  RILE     
+  14 POLLINI    578 POLS10          Corilacee                                          NUM    P1440  RILE     
+  14 POLLINI    579 POLS11          Fagacee                                            NUM    P1440  RILE     
+  14 POLLINI    580 POLS12          Fagacee                                            NUM    P1440  RILE     
+  14 POLLINI    581 POLS13          Fagacee                                            NUM    P1440  RILE     
+  14 POLLINI    582 POLS14          Fagacee                                            NUM    P1440  RILE     
+  14 POLLINI    583 POLS15          Oleacee                                            NUM    P1440  RILE     
+  14 POLLINI    584 POLS16          Oleacee                                            NUM    P1440  RILE     
+  14 POLLINI    585 POLS17          Oleacee                                            NUM    P1440  RILE     
+  14 POLLINI    586 POLS18          Plantaginacee                                      NUM    P1440  RILE     
+  14 POLLINI    587 POLS19          Urticacee                                          NUM    P1440  RILE     
+  14 POLLINI    588 POLS20          Cupressacee - Taxacee indistinte                   NUM    P1440  RILE     
+  14 POLLINI    589 POLS21          Cupressacee - Taxacee indistinte                   NUM    P1440  RILE     
+  14 POLLINI    590 POLS22          Chenopodiacee - Amarantacee Indistinte             NUM    P1440  RILE     
+  14 POLLINI    591 POLS23          Chenopodiacee - Amarantacee Indistinte             NUM    P1440  RILE     
+  14 POLLINI    592 POLS24          Poligonacee                                        NUM    P1440  RILE     
+  14 POLLINI    593 POLS25          Euphorbiacee                                       NUM    P1440  RILE     
+  14 POLLINI    594 POLS26          Mirtacee                                           NUM    P1440  RILE     
+  14 POLLINI    595 POLS27          Ulmacee                                            NUM    P1440  RILE     
+  14 POLLINI    596 POLS28          Ulmacee                                            NUM    P1440  RILE     
+  14 POLLINI    597 POLS29          Ulmacee                                            NUM    P1440  RILE     
+  14 POLLINI    598 POLS30          Platanacee                                         NUM    P1440  RILE     
+  14 POLLINI    599 POLS31          Aceraceae                                          NUM    P1440  RILE     
+  14 POLLINI    600 POLS32          Pinacee                                            NUM    P1440  RILE     
+  14 POLLINI    601 POLS33          Salicacee                                          NUM    P1440  RILE     
+  14 POLLINI    602 POLS34          Salicacee                                          NUM    P1440  RILE     
+  14 POLLINI    603 POLS35          Salicacee                                          NUM    P1440  RILE     
+  14 POLLINI    604 POLS36          Ciperacee                                          NUM    P1440  RILE     
+  14 POLLINI    605 POLS37          Juglandacee                                        NUM    P1440  RILE     
+  14 POLLINI    606 POLS38          Ippocastanacee                                     NUM    P1440  RILE     
+  14 POLLINI    607 POLS39          Spore fungine                                      NUM    P1440  RILE     
+  14 POLLINI    608 POLS40          Spore fungine                                      NUM    P1440  RILE     
+  14 POLLINI    609 POLS41          Spore fungine                                      NUM    P1440  RILE     
+  14 POLLINI    610 POLS42          Spore fungine                                      NUM    P1440  RILE     
+  14 POLLINI    611 POLS43          Spore fungine                                      NUM    P1440  RILE     
+  14 POLLINI    612 POLS44          Altri Pollini / Non Identificati                   NUM    P1440  RILE     
+  14 POLLINI    613 POLS45          Altri Pollini / Non Identificati                   NUM    P1440  RILE     
+  14 POLLINI    614 POLS46          Altri Pollini / Non Identificati                   NUM    P1440  RILE     
+  14 POLLINI    615 POLS47          Altri Pollini / Non Identificati                   NUM    P1440  RILE     
+  14 POLLINI    616 POLS48          Graminacee                                         NUM    P1440  RILE     
+  14 POLLINI    617 POLS49          Plantaginacee                                      NUM    P1440  RILE     
+  14 POLLINI    618 POLS50          Urticacee                                          NUM    P1440  RILE     
+  14 POLLINI    619 POLS51          Poligonacee                                        NUM    P1440  RILE     
+  14 POLLINI    620 POLS52          Euphorbiacee                                       NUM    P1440  RILE     
+  14 POLLINI    621 POLS53          Mirtacee                                           NUM    P1440  RILE     
+  14 POLLINI    622 POLS54          Platanacee                                         NUM    P1440  RILE     
+  14 POLLINI    623 POLS55          Aceraceae                                          NUM    P1440  RILE     
+  14 POLLINI    624 POLS56          Pinacee                                            NUM    P1440  RILE     
+  14 POLLINI    625 POLS57          Ciperacee                                          NUM    P1440  RILE     
+  14 POLLINI    626 POLS58          Juglandacee                                        NUM    P1440  RILE     
+  14 POLLINI    627 POLS59          Ippocastanacee                                     NUM    P1440  RILE     
+  15 URBANE      77 LISTT1          Temperatura aria                                   GC     P5     RILE     
+  15 URBANE      78 LMEDT1          Temperatura media aria                             GC     P60    RILE     
+  15 URBANE      79 LVMNT1          Temperatura minima aria                            GC     P60    RILE     
+  15 URBANE      80 LVMXT1          Temperatura massima aria                           GC     P60    RILE     
+  15 URBANE      81 LHMNT1          Ora del minimo                                     HHMN   P60    RILE     
+  15 URBANE      82 LHMXT1          Ora del massimo                                    HHMN   P60    RILE     
+  15 URBANE      99 LHMNUM          Ora del minimo                                     HHMN   P60    RILE     
+  15 URBANE     100 LHMXUM          Ora del massimo                                    HHMN   P60    RILE     
+  15 URBANE     114 LPRECI          Precipitazione cumulata nel periodo                MM     P60    RILE     
+  15 URBANE     139 UM180           Umidita' percentuale                               PERC   P5     RILE     
+  15 URBANE     140 UM180ME         Umidita' percentuale media                         PERC   P60    RILE     
+  15 URBANE     141 UM180MN         Umidita' percentuale minima                        PERC   P60    RILE     
+  15 URBANE     142 UM180MX         Umidita' percentuale massima                       PERC   P60    RILE     
+  15 URBANE     144 BAGNA           Bagnatura fogliare                                 MN     P60    RILE     
+  15 URBANE     403 TDEV            deviazione standard                                GC     P60    RILE     
+  15 URBANE     404 TMIN_M          Temperatura aria                                   GC     P60    RILE     
+  15 URBANE     405 TMAX_M          Temperatura aria                                   GC     P60    RILE     
+  15 URBANE     406 UML1H_DEV       Umidita' percentuale                               PERC   P60    RILE     
+  15 URBANE     409 RAVUAV          radiazione visibile                                RADWM  P60    RILE     
+  15 URBANE     410 RAVUMN          radiazione visibile                                RADWM  P60    RILE     
+  15 URBANE     411 RAVUMX          radiazione visibile                                RADWM  P60    RILE     
+  15 URBANE     412 RAVUIT          radiazione visibile                                MJ     P60    RILE     
+  15 URBANE     413 RAVUMJ          radiazione visibile                                MJ     P60    RILE     
+  15 URBANE     414 RAVDAV          radiazione visibile                                RADWM  P60    RILE     
+  15 URBANE     415 RAVDMN          radiazione visibile                                RADWM  P60    RILE     
+  15 URBANE     416 RAVDMX          radiazione visibile                                RADWM  P60    RILE     
+  15 URBANE     417 RAVDIT          radiazione visibile                                MJ     P60    RILE     
+  15 URBANE     418 RAVDMJ          radiazione visibile                                MJ     P60    RILE     
+  15 URBANE     419 RAIUAV          radiazione infrarossa                              RADWM  P60    RILE     
+  15 URBANE     420 RAIUMN          radiazione infrarossa                              RADWM  P60    RILE     
+  15 URBANE     421 RAIUMX          radiazione infrarossa                              RADWM  P60    RILE     
+  15 URBANE     422 RAIUIT          radiazione infrarossa                              RADWM  P60    RILE     
+  15 URBANE     423 RAIDAV          radiazione infrarossa                              RADWM  P60    RILE     
+  15 URBANE     424 RAIDMN          radiazione infrarossa                              RADWM  P60    RILE     
+  15 URBANE     425 RAIDMX          radiazione infrarossa                              RADWM  P60    RILE     
+  15 URBANE     426 RAIDIT          radiazione infrarossa                              RADWM  P60    RILE     
+  15 URBANE     427 PREC15          Precipitazione cumulata nel periodo                MM     P60    RILE     
+  15 URBANE     431 FFVAVG          Intensita' vento                                   MSEC   P60    RILE     
+  15 URBANE     432 FFVDEV          Intensita' vento                                   MSEC   P60    RILE     
+  15 URBANE     433 FFVMAX          Intensita' vento                                   MSEC   P60    RILE     
+  15 URBANE     434 FFVMIN          Intensita' vento                                   MSEC   P60    RILE     
+  15 URBANE     435 FFSAVG          Intensita' vento                                   MSEC   P60    RILE     
+  15 URBANE     436 FFSDEV          Intensita' vento                                   MSEC   P60    RILE     
+  15 URBANE     437 FFSMAX          Intensita' vento                                   MSEC   P60    RILE     
+  15 URBANE     438 FFSMIN          Intensita' vento                                   MSEC   P60    RILE     
+  15 URBANE     439 FFSA10          Intensita' vento                                   MSEC   P60    RILE     
+  15 URBANE     440 DDVAVG          Direzione vento                                    GSES   P60    RILE     
+  15 URBANE     441 DDVDEV          Direzione vento                                    GSES   P60    RILE     
+  15 URBANE     442 DDSA10          Direzione vento                                    GSES   P60    RILE     
+  15 URBANE     444 PAV             Pressione aria a livello mare                      HPA    P60    RILE     
+  15 URBANE     445 PDEV            Pressione aria a livello mare                      HPA    P60    RILE     
+  15 URBANE     446 PMN             Pressione aria a livello mare                      HPA    P60    RILE     
+  15 URBANE     447 PMX             Pressione aria a livello mare                      HPA    P60    RILE     
+  15 URBANE     448 EXDC            tensione di alimenta                               VOLT   P60    RILE     
+  15 URBANE     449 ERROR           errori                                             NUM    P60    RILE     
+  15 URBANE     450 ALARM           allarmi                                            NUM    P60    RILE     
+  15 URBANE     451 TINT            temperatura interna                                GC     P60    RILE     
+  15 URBANE     452 SSTT            stato del barometro                                STR    P60    RILE     
+  15 URBANE     453 SSUR            stato del barometro                                STR    P60    RILE     
+  15 URBANE     454 SSRAVU          stato del barometro                                STR    P60    RILE     
+  15 URBANE     455 SSRAVD          stato del barometro                                STR    P60    RILE     
+  15 URBANE     456 SSRAIU          stato del barometro                                STR    P60    RILE     
+  15 URBANE     457 SSRAID          stato del barometro                                STR    P60    RILE     
+  15 URBANE     458 SSPR            stato del barometro                                STR    P60    RILE     
+  15 URBANE     459 SSWIND          stato del barometro                                STR    P60    RILE     
+  15 URBANE     460 SSP             stato del barometro                                STR    P60    RILE     
+  15 URBANE     461 SSLW            stato del barometro                                STR    P60    RILE     
+  16 NURBAN      77 LISTT1          Temperatura aria                                   GC     P5     RILE     
+  16 NURBAN      78 LMEDT1          Temperatura media aria                             GC     P60    RILE     
+  16 NURBAN      79 LVMNT1          Temperatura minima aria                            GC     P60    RILE     
+  16 NURBAN      80 LVMXT1          Temperatura massima aria                           GC     P60    RILE     
+  16 NURBAN      81 LHMNT1          Ora del minimo                                     HHMN   P60    RILE     
+  16 NURBAN      82 LHMXT1          Ora del massimo                                    HHMN   P60    RILE     
+  16 NURBAN      99 LHMNUM          Ora del minimo                                     HHMN   P60    RILE     
+  16 NURBAN     100 LHMXUM          Ora del massimo                                    HHMN   P60    RILE     
+  16 NURBAN     114 LPRECI          Precipitazione cumulata nel periodo                MM     P60    RILE     
+  16 NURBAN     139 UM180           Umidita' percentuale                               PERC   P5     RILE     
+  16 NURBAN     140 UM180ME         Umidita' percentuale media                         PERC   P60    RILE     
+  16 NURBAN     141 UM180MN         Umidita' percentuale minima                        PERC   P60    RILE     
+  16 NURBAN     142 UM180MX         Umidita' percentuale massima                       PERC   P60    RILE     
+  16 NURBAN     144 BAGNA           Bagnatura fogliare                                 MN     P60    RILE     
+  16 NURBAN     167 P0P0            Pressione aria a livello stazione istantanea       HPA    P5     RILE     
+  16 NURBAN     403 TDEV            deviazione standard                                GC     P60    RILE     
+  16 NURBAN     404 TMIN_M          Temperatura aria                                   GC     P60    RILE     
+  16 NURBAN     405 TMAX_M          Temperatura aria                                   GC     P60    RILE     
+  16 NURBAN     406 UML1H_DEV       Umidita' percentuale                               PERC   P60    RILE     
+  16 NURBAN     409 RAVUAV          radiazione visibile                                RADWM  P60    RILE     
+  16 NURBAN     410 RAVUMN          radiazione visibile                                RADWM  P60    RILE     
+  16 NURBAN     411 RAVUMX          radiazione visibile                                RADWM  P60    RILE     
+  16 NURBAN     412 RAVUIT          radiazione visibile                                MJ     P60    RILE     
+  16 NURBAN     413 RAVUMJ          radiazione visibile                                MJ     P60    RILE     
+  16 NURBAN     427 PREC15          Precipitazione cumulata nel periodo                MM     P60    RILE     
+  16 NURBAN     431 FFVAVG          Intensita' vento                                   MSEC   P60    RILE     
+  16 NURBAN     432 FFVDEV          Intensita' vento                                   MSEC   P60    RILE     
+  16 NURBAN     433 FFVMAX          Intensita' vento                                   MSEC   P60    RILE     
+  16 NURBAN     434 FFVMIN          Intensita' vento                                   MSEC   P60    RILE     
+  16 NURBAN     435 FFSAVG          Intensita' vento                                   MSEC   P60    RILE     
+  16 NURBAN     436 FFSDEV          Intensita' vento                                   MSEC   P60    RILE     
+  16 NURBAN     437 FFSMAX          Intensita' vento                                   MSEC   P60    RILE     
+  16 NURBAN     438 FFSMIN          Intensita' vento                                   MSEC   P60    RILE     
+  16 NURBAN     439 FFSA10          Intensita' vento                                   MSEC   P60    RILE     
+  16 NURBAN     440 DDVAVG          Direzione vento                                    GSES   P60    RILE     
+  16 NURBAN     441 DDVDEV          Direzione vento                                    GSES   P60    RILE     
+  16 NURBAN     442 DDSA10          Direzione vento                                    GSES   P60    RILE     
+  16 NURBAN     444 PAV             Pressione aria a livello mare                      HPA    P60    RILE     
+  16 NURBAN     445 PDEV            Pressione aria a livello mare                      HPA    P60    RILE     
+  16 NURBAN     446 PMN             Pressione aria a livello mare                      HPA    P60    RILE     
+  16 NURBAN     447 PMX             Pressione aria a livello mare                      HPA    P60    RILE     
+  16 NURBAN     448 EXDC            tensione di alimenta                               VOLT   P60    RILE     
+  16 NURBAN     449 ERROR           errori                                             NUM    P60    RILE     
+  16 NURBAN     450 ALARM           allarmi                                            NUM    P60    RILE     
+  16 NURBAN     451 TINT            temperatura interna                                GC     P60    RILE     
+  16 NURBAN     452 SSTT            stato del barometro                                STR    P60    RILE     
+  16 NURBAN     453 SSUR            stato del barometro                                STR    P60    RILE     
+  16 NURBAN     454 SSRAVU          stato del barometro                                STR    P60    RILE     
+  16 NURBAN     458 SSPR            stato del barometro                                STR    P60    RILE     
+  16 NURBAN     459 SSWIND          stato del barometro                                STR    P60    RILE     
+  16 NURBAN     460 SSP             stato del barometro                                STR    P60    RILE     
+  16 NURBAN     461 SSLW            stato del barometro                                STR    P60    RILE     
+  17 FIDUMA     139 UM180           Umidita' percentuale                               PERC   P5     RILE     
+  17 FIDUMA     158 TATA            Temperatura aria                                   GC     P5     RILE     
+  17 FIDUMA     159 PRECI           Precipitazione cumulata nel periodo                MM     P30    RILE     
+  17 FIDUMA     161 IDRO            Livello idrometrico                                M      P5     RILE     
+  17 FIDUMA     162 SSM             strato nevoso                                      M      P5     RILE     
+  17 FIDUMA     164 RADDIR          Radiazione diretta                                 RADWM  P30    RILE     
+  17 FIDUMA     165 DD              Direzione vento                                    GSES   P5     RILE     
+  17 FIDUMA     166 FF              Intensita' vento                                   MSEC   P5     RILE     
+  17 FIDUMA     167 P0P0            Pressione aria a livello stazione istantanea       HPA    P5     RILE     
+  17 FIDUMA     512 POR                                                                MCS    P60    RILE     
+  18 FIDUPO      89 LISTTS          Temperatura instantanea suolo                      GC     P5     RILE     
+  18 FIDUPO     139 UM180           Umidita' percentuale                               PERC   P5     RILE     
+  18 FIDUPO     158 TATA            Temperatura aria                                   GC     P5     RILE     
+  18 FIDUPO     159 PRECI           Precipitazione cumulata nel periodo                MM     P30    RILE     
+  18 FIDUPO     161 IDRO            Livello idrometrico                                M      P5     RILE     
+  18 FIDUPO     162 SSM             strato nevoso                                      M      P5     RILE     
+  18 FIDUPO     164 RADDIR          Radiazione diretta                                 RADWM  P30    RILE     
+  18 FIDUPO     165 DD              Direzione vento                                    GSES   P5     RILE     
+  18 FIDUPO     166 FF              Intensita' vento                                   MSEC   P5     RILE     
+  18 FIDUPO     167 P0P0            Pressione aria a livello stazione istantanea       HPA    P5     RILE     
+  18 FIDUPO     169 TW              Temperatura istantanea dell' acqua                 GC     P5     RILE     
+  18 FIDUPO     172 PRECI           Precipitazione cumulata nel periodo                MM     P15    RILE     
+  18 FIDUPO     351 FFRAFF          Intensita' vento                                   KMHH   P5     RILE     
+  18 FIDUPO     353 DDRAFF          Direzione vento                                    GSES   P5     RILE     
+  18 FIDUPO     357 RADRIFL         Radiazione solare                                  RADCC  P60    RILE     
+  18 FIDUPO     512 POR                                                                MCS    P60    RILE     
+  19 ICIRFE     158 TATA            Temperatura aria                                   GC     P5     RILE     
+  19 ICIRFE     159 PRECI           Precipitazione cumulata nel periodo                MM     P30    RILE     
+  19 ICIRFE     160 PRECI           Precipitazione cumulata nel periodo                MM     P60    RILE     
+  19 ICIRFE     161 IDRO            Livello idrometrico                                M      P5     RILE     
+  19 ICIRFE     172 PRECI           Precipitazione cumulata nel periodo                MM     P15    RILE     
+  19 ICIRFE     512 POR                                                                MCS    P60    RILE     
+  20 SIMNBO     139 UM180           Umidita' percentuale                               PERC   P5     RILE     
+  20 SIMNBO     158 TATA            Temperatura aria                                   GC     P5     RILE     
+  20 SIMNBO     159 PRECI           Precipitazione cumulata nel periodo                MM     P30    RILE     
+  20 SIMNBO     160 PRECI           Precipitazione cumulata nel periodo                MM     P60    RILE     
+  20 SIMNBO     161 IDRO            Livello idrometrico                                M      P5     RILE     
+  20 SIMNBO     162 SSM             strato nevoso                                      M      P5     RILE     
+  20 SIMNBO     164 RADDIR          Radiazione diretta                                 RADWM  P30    RILE     
+  20 SIMNBO     165 DD              Direzione vento                                    GSES   P5     RILE     
+  20 SIMNBO     166 FF              Intensita' vento                                   MSEC   P5     RILE     
+  20 SIMNBO     167 P0P0            Pressione aria a livello stazione istantanea       HPA    P5     RILE     
+  20 SIMNBO     169 TW              Temperatura istantanea dell' acqua                 GC     P5     RILE     
+  20 SIMNBO     172 PRECI           Precipitazione cumulata nel periodo                MM     P15    RILE     
+  20 SIMNBO     351 FFRAFF          Intensita' vento                                   KMHH   P5     RILE     
+  20 SIMNBO     353 DDRAFF          Direzione vento                                    GSES   P5     RILE     
+  20 SIMNBO     427 PREC15          Precipitazione cumulata nel periodo                MM     P60    RILE     
+  20 SIMNBO     512 POR                                                                MCS    P60    RILE     
+  21 SIMNPR     139 UM180           Umidita' percentuale                               PERC   P5     RILE     
+  21 SIMNPR     158 TATA            Temperatura aria                                   GC     P5     RILE     
+  21 SIMNPR     159 PRECI           Precipitazione cumulata nel periodo                MM     P30    RILE     
+  21 SIMNPR     160 PRECI           Precipitazione cumulata nel periodo                MM     P60    RILE     
+  21 SIMNPR     161 IDRO            Livello idrometrico                                M      P5     RILE     
+  21 SIMNPR     162 SSM             strato nevoso                                      M      P5     RILE     
+  21 SIMNPR     164 RADDIR          Radiazione diretta                                 RADWM  P30    RILE     
+  21 SIMNPR     165 DD              Direzione vento                                    GSES   P5     RILE     
+  21 SIMNPR     166 FF              Intensita' vento                                   MSEC   P5     RILE     
+  21 SIMNPR     167 P0P0            Pressione aria a livello stazione istantanea       HPA    P5     RILE     
+  21 SIMNPR     169 TW              Temperatura istantanea dell' acqua                 GC     P5     RILE     
+  21 SIMNPR     172 PRECI           Precipitazione cumulata nel periodo                MM     P15    RILE     
+  21 SIMNPR     351 FFRAFF          Intensita' vento                                   KMHH   P5     RILE     
+  21 SIMNPR     353 DDRAFF          Direzione vento                                    GSES   P5     RILE     
+  21 SIMNPR     512 POR                                                                MCS    P60    RILE     
+  22 SPDSRA     158 TATA            Temperatura aria                                   GC     P5     RILE     
+  22 SPDSRA     159 PRECI           Precipitazione cumulata nel periodo                MM     P30    RILE     
+  22 SPDSRA     160 PRECI           Precipitazione cumulata nel periodo                MM     P60    RILE     
+  22 SPDSRA     161 IDRO            Livello idrometrico                                M      P5     RILE     
+  22 SPDSRA     165 DD              Direzione vento                                    GSES   P5     RILE     
+  22 SPDSRA     166 FF              Intensita' vento                                   MSEC   P5     RILE     
+  22 SPDSRA     172 PRECI           Precipitazione cumulata nel periodo                MM     P15    RILE     
+  22 SPDSRA     512 POR                                                                MCS    P60    RILE     
+  23 EMLOKM     220 PRECI           Precipitazione cumulata nel periodo                DMM    P60    RILE     
+  23 EMLOKM     221 TATA            Temperatura aria                                   GC10   P60    RILE     
+  23 EMLOKM     222 DD              Direzione vento                                    GT     P60    RILE     
+  23 EMLOKM     223 FF              Intensita' vento                                   DMSEC  P60    RILE     
+  23 EMLOKM     224 UMID            Umidita' percentuale                               PERC   P60    RILE     
+  23 EMLOKM     225 TMAX            Temperatura massima aria                           GC10   P60    RILE     
+  23 EMLOKM     226 TMIN            Temperatura minima aria                            GC10   P60    RILE     
+  24 LILOKM     220 PRECI           Precipitazione cumulata nel periodo                DMM    P60    RILE     
+  24 LILOKM     221 TATA            Temperatura aria                                   GC10   P60    RILE     
+  24 LILOKM     222 DD              Direzione vento                                    GT     P60    RILE     
+  24 LILOKM     223 FF              Intensita' vento                                   DMSEC  P60    RILE     
+  24 LILOKM     224 UMID            Umidita' percentuale                               PERC   P60    RILE     
+  24 LILOKM     225 TMAX            Temperatura massima aria                           GC10   P60    RILE     
+  24 LILOKM     226 TMIN            Temperatura minima aria                            GC10   P60    RILE     
+  25 PILOKM     220 PRECI           Precipitazione cumulata nel periodo                DMM    P60    RILE     
+  25 PILOKM     221 TATA            Temperatura aria                                   GC10   P60    RILE     
+  25 PILOKM     222 DD              Direzione vento                                    GT     P60    RILE     
+  25 PILOKM     223 FF              Intensita' vento                                   DMSEC  P60    RILE     
+  25 PILOKM     224 UMID            Umidita' percentuale                               PERC   P60    RILE     
+  25 PILOKM     225 TMAX            Temperatura massima aria                           GC10   P60    RILE     
+  25 PILOKM     226 TMIN            Temperatura minima aria                            GC10   P60    RILE     
+  26 TRLOKM     220 PRECI           Precipitazione cumulata nel periodo                DMM    P60    RILE     
+  26 TRLOKM     221 TATA            Temperatura aria                                   GC10   P60    RILE     
+  26 TRLOKM     222 DD              Direzione vento                                    GT     P60    RILE     
+  26 TRLOKM     223 FF              Intensita' vento                                   DMSEC  P60    RILE     
+  26 TRLOKM     224 UMID            Umidita' percentuale                               PERC   P60    RILE     
+  26 TRLOKM     225 TMAX            Temperatura massima aria                           GC10   P60    RILE     
+  26 TRLOKM     226 TMIN            Temperatura minima aria                            GC10   P60    RILE     
+  27 VELOKM     220 PRECI           Precipitazione cumulata nel periodo                DMM    P60    RILE     
+  27 VELOKM     221 TATA            Temperatura aria                                   GC10   P60    RILE     
+  27 VELOKM     222 DD              Direzione vento                                    GT     P60    RILE     
+  27 VELOKM     223 FF              Intensita' vento                                   DMSEC  P60    RILE     
+  27 VELOKM     224 UMID            Umidita' percentuale                               PERC   P60    RILE     
+  27 VELOKM     225 TMAX            Temperatura massima aria                           GC10   P60    RILE     
+  27 VELOKM     226 TMIN            Temperatura minima aria                            GC10   P60    RILE     
+  28 SALOKM     220 PRECI           Precipitazione cumulata nel periodo                DMM    P60    RILE     
+  28 SALOKM     221 TATA            Temperatura aria                                   GC10   P60    RILE     
+  28 SALOKM     222 DD              Direzione vento                                    GT     P60    RILE     
+  28 SALOKM     223 FF              Intensita' vento                                   DMSEC  P60    RILE     
+  28 SALOKM     224 UMID            Umidita' percentuale                               PERC   P60    RILE     
+  28 SALOKM     225 TMAX            Temperatura massima aria                           GC10   P60    RILE     
+  28 SALOKM     226 TMIN            Temperatura minima aria                            GC10   P60    RILE     
+  29 LOLOKM     220 PRECI           Precipitazione cumulata nel periodo                DMM    P60    RILE     
+  29 LOLOKM     221 TATA            Temperatura aria                                   GC10   P60    RILE     
+  29 LOLOKM     222 DD              Direzione vento                                    GT     P60    RILE     
+  29 LOLOKM     223 FF              Intensita' vento                                   DMSEC  P60    RILE     
+  29 LOLOKM     224 UMID            Umidita' percentuale                               PERC   P60    RILE     
+  29 LOLOKM     225 TMAX            Temperatura massima aria                           GC10   P60    RILE     
+  29 LOLOKM     226 TMIN            Temperatura minima aria                            GC10   P60    RILE     
+  30 MALOKM     220 PRECI           Precipitazione cumulata nel periodo                DMM    P60    RILE     
+  30 MALOKM     221 TATA            Temperatura aria                                   GC10   P60    RILE     
+  30 MALOKM     222 DD              Direzione vento                                    GT     P60    RILE     
+  30 MALOKM     223 FF              Intensita' vento                                   DMSEC  P60    RILE     
+  30 MALOKM     224 UMID            Umidita' percentuale                               PERC   P60    RILE     
+  30 MALOKM     225 TMAX            Temperatura massima aria                           GC10   P60    RILE     
+  30 MALOKM     226 TMIN            Temperatura minima aria                            GC10   P60    RILE     
+  31 FRLOKM     220 PRECI           Precipitazione cumulata nel periodo                DMM    P60    RILE     
+  31 FRLOKM     221 TATA            Temperatura aria                                   GC10   P60    RILE     
+  31 FRLOKM     222 DD              Direzione vento                                    GT     P60    RILE     
+  31 FRLOKM     223 FF              Intensita' vento                                   DMSEC  P60    RILE     
+  31 FRLOKM     224 UMID            Umidita' percentuale                               PERC   P60    RILE     
+  31 FRLOKM     225 TMAX            Temperatura massima aria                           GC10   P60    RILE     
+  31 FRLOKM     226 TMIN            Temperatura minima aria                            GC10   P60    RILE     
+  32 IDROPO     158 TATA            Temperatura aria                                   GC     P5     RILE     
+  32 IDROPO     159 PRECI           Precipitazione cumulata nel periodo                MM     P30    RILE     
+  32 IDROPO     160 PRECI           Precipitazione cumulata nel periodo                MM     P60    RILE     
+  32 IDROPO     161 IDRO            Livello idrometrico                                M      P5     RILE     
+  32 IDROPO     162 SSM             strato nevoso                                      M      P5     RILE     
+  32 BZLOKM     220 PRECI           Precipitazione cumulata nel periodo                DMM    P60    RILE     
+  32 BZLOKM     221 TATA            Temperatura aria                                   GC10   P60    RILE     
+  32 BZLOKM     222 DD              Direzione vento                                    GT     P60    RILE     
+  32 BZLOKM     223 FF              Intensita' vento                                   DMSEC  P60    RILE     
+  32 BZLOKM     224 UMID            Umidita' percentuale                               PERC   P60    RILE     
+  32 BZLOKM     225 TMAX            Temperatura massima aria                           GC10   P60    RILE     
+  32 BZLOKM     226 TMIN            Temperatura minima aria                            GC10   P60    RILE     
+  33 PO267      158 TATA            Temperatura aria                                   GC     P5     RILE     
+  33 PO267      159 PRECI           Precipitazione cumulata nel periodo                MM     P30    RILE     
+  33 PO267      160 PRECI           Precipitazione cumulata nel periodo                MM     P60    RILE     
+  33 PO267      161 IDRO            Livello idrometrico                                M      P5     RILE     
+  33 PO267      162 SSM             strato nevoso                                      M      P5     RILE     
+  35 CLIMAT     227 FF10MT          Intensita' vento                                   MSEC   P1440  CALC     
+  35 CLIMAT     228 FN10MT          Intensita' vento                                   MSEC   P1440  CALC     
+  35 CLIMAT     229 FM10MT          Intensita' vento massimo                           MSEC   P1440  CALC     
+  35 CLIMAT     230 DIRPRE10MT      Direzione prevalente vento medio                   OTTAVI P1440  CALC     
+  35 CLIMAT     231 TMED180         Temperatura media aria                             GC     P1440  CALC     
+  35 CLIMAT     232 TMINASS180      Temperatura minima aria                            GC     P1440  CALC     
+  35 CLIMAT     233 TMAXASS180      Temperatura massima aria                           GC     P1440  CALC     
+  35 CLIMAT     234 TMED50          Temperatura media aria                             GC     P1440  CALC     
+  35 CLIMAT     235 TMINASS50       Temperatura minima aria                            GC     P1440  CALC     
+  35 CLIMAT     236 TMAXASS50       Temperatura massima aria                           GC     P1440  CALC     
+  35 CLIMAT     237 TMEDSUOLO       Temperatura media suolo                            GC     P1440  CALC     
+  35 CLIMAT     238 TMINASSSUOLO    Temperatura minima suolo                           GC     P1440  CALC     
+  35 CLIMAT     239 TMAXASSSUOLO    Temperatura massima suolo                          GC     P1440  CALC     
+  35 CLIMAT     240 UMED180         Umidita' percentuale media                         PERC   P1440  CALC     
+  35 CLIMAT     241 UMINASS180      Umidita' percentuale minima                        PERC   P1440  CALC     
+  35 CLIMAT     242 UMAXASS180      Umidita' percentuale massima                       PERC   P1440  CALC     
+  35 CLIMAT     243 PRES0M          Pressione aria a livello stazione media            MBAR   P1440  CALC     
+  35 CLIMAT     244 PRES0N          Pressione aria a livello stazione minima           MBAR   P1440  CALC     
+  35 CLIMAT     245 PRES0X          Pressione aria a livello stazione massima          MBAR   P1440  CALC     
+  35 CLIMAT     246 RADSOL          Radiazione solare                                  RADCC  P1440  CALC     
+  35 CLIMAT     247 RADMIN          Radiazione solare minima                           RADCC  P1440  CALC     
+  35 CLIMAT     248 RADMAX          Radiazione solare massima                          RADCC  P1440  CALC     
+  35 CLIMAT     249 LINSOL          Insolazione                                        MN     P1440  CALC     
+  35 CLIMAT     250 PRECI           Precipitazione cumulata nel periodo                MM     P1440  CALC     
+  35 CLIMAT     251 TMED-10         Temperatura media aria                             GC     P1440  CALC     
+  35 CLIMAT     252 TMINASS-10      Temperatura minima aria                            GC     P1440  CALC     
+  35 CLIMAT     253 TMAXASS-10      Temperatura massima aria                           GC     P1440  CALC     
+  35 CLIMAT     254 TMED-50         Temperatura media aria                             GC     P1440  CALC     
+  35 CLIMAT     255 TMINASS-50      Temperatura minima aria                            GC     P1440  CALC     
+  35 CLIMAT     256 TMAXASS-50      Temperatura massima aria                           GC     P1440  CALC     
+  35 CLIMAT     257 BAGNA           Bagnatura fogliare                                 MN     P1440  CALC     
+  35 CLIMAT     258 FF              Intensita' vento                                   MSEC   P1440  CALC     
+  35 CLIMAT     271 PRECISYN        Precipitazione cumulata nel periodo                MM     P1440  CALC     
+  35 CLIMAT     272 TMAXSYN         Temperatura massima aria                           GC     P1440  CALC     
+  35 CLIMAT     273 TMINSYN         Temperatura minima aria                            GC     P1440  CALC     
+  35 CLIMAT     275 NVALFF          Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     276 NVALFN          Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     277 NVALFM          Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     278 NVALDIRPRE      Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     279 NVALTMED180     Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     280 NVALTMINASS180  Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     281 NVALTMAXASS180  Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     282 NVALTMED50      Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     283 NVALTMINASS50   Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     284 NVALTMAXASS50   Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     285 NVALTMEDSUOLO   Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     286 NVALTMINASSSUOL Numero dei Valori                                  NUM    P1440  CALC     
+                    O                                                                                         
+                                                                                                              
+  35 CLIMAT     287 NVALTMAXASSSUOL Numero dei Valori                                  NUM    P1440  CALC     
+                    O                                                                                         
+                                                                                                              
+  35 CLIMAT     288 NVALUMED        Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     289 NVALUMINASS     Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     290 NVALUMAXASS     Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     291 NVALPRES0M      Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     292 NVALPRES0N      Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     293 NVALPRES0X      Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     294 NVALRADSOL      Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     295 NVALRADMIN      Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     296 NVALRADMAX      Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     297 NVALLINSOL      Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     298 NVALPRECI       Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     299 NVALTMED-10     Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     300 NVALTMINASS-10  Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     301 NVALTMAXASS-10  Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     302 NVALTMED-50     Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     303 NVALTMINASS-50  Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     304 NVALTMAXASS-50  Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     305 NVALBAGNA       Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     306 NVALPRECISYN    Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     307 NVALTMAXSYN     Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     308 NVALTMINSYN     Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     315 NVALFF          Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     323 ETP             Stato suolo                                        MM     P1440  CALC     
+  35 CLIMAT     324 VETTVENTO       Intensita' vento                                   MSEC   P1440  CALC     
+  35 CLIMAT     325 VETTVENTO       Direzione prevalente vento medio                   OTTAVI P1440  CALC     
+  35 CLIMAT     326 VENTO SFILATO   Percorso in KM del vento medio                     KM     P1440  CALC     
+  35 CLIMAT     327 NUVMED                                                             CN8    P1440  CALC     
+  35 CLIMAT     328 NUVMAX                                                             CN8    P1440  CALC     
+  35 CLIMAT     329 NUVMIN                                                             CN8    P1440  CALC     
+  35 CLIMAT     330 NVALNUMED       Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     331 NVALNUVMAX      Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     332 NVALNUVMIN      Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     333 NVESFI                                                             NUM    P1440  CALC     
+  35 CLIMAT     340 TM100                                                              GC     P1440  CALC     
+  35 CLIMAT     341 TN100                                                              GC     P1440  CALC     
+  35 CLIMAT     342 TX100                                                              GC     P1440  CALC     
+  35 CLIMAT     343 NTMED100                                                           NUM    P1440  CALC     
+  35 CLIMAT     344 NTMIN100                                                           NUM    P1440  CALC     
+  35 CLIMAT     345 NTMAX100                                                           NUM    P1440  CALC     
+  35 CLIMAT     346 PREMAX                                                             MM     P1440  CALC     
+  35 CLIMAT     347 NPREMAX                                                            NUM    P1440  CALC     
+  35 CLIMAT     556 TMAXASS100      Temperatura massima aria                           GC     P1440  CALC     
+  35 CLIMAT     557 TMED100         Temperatura media aria                             GC     P1440  CALC     
+  35 CLIMAT     558 TMINASS100      Temperatura minima aria                            GC     P1440  CALC     
+  35 CLIMAT     559 NVALTMED100     Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     560 NVALTMINASS100  Numero dei Valori                                  NUM    P1440  CALC     
+  35 CLIMAT     561 NVALTMAXASS100  Numero dei Valori                                  NUM    P1440  CALC     
+  37 IDROST     473 PRECI           Precipitazione cumulata nel periodo                MM     P1440  CALC     
+  37 IDROST     474 TMINASS180      Temperatura minima aria                            GC     P1440  CALC     
+  37 IDROST     475 TMAXASS180      Temperatura massima aria                           GC     P1440  CALC     
+  37 IDROST     566 PRECIMENS       Precipitazione cumulata nel periodo                MM     P43200 RILE     
+  39 IDRMEC     160 PRECI           Precipitazione cumulata nel periodo                MM     P60    RILE     
+  39 IDRMEC     172 PRECI           Precipitazione cumulata nel periodo                MM     P15    RILE     
+  39 IDRMEC     463 PRECIMX5M       Precipitazione cumulata nel periodo                MM     P15    RILE     
+  39 IDRMEC     464 PRECIMX10M      Precipitazione cumulata nel periodo                MM     P15    RILE     
+  39 IDRMEC     465 PRECIMX15M      Precipitazione cumulata nel periodo                MM     P15    RILE     
+  39 IDRMEC     466 PRECIMX20M      Precipitazione cumulata nel periodo                MM     P15    RILE     
+  39 IDRMEC     467 PRECIMX30M      Precipitazione cumulata nel periodo                MM     P15    RILE     
+  39 IDRMEC     468 PRECIMX60M      Precipitazione cumulata nel periodo                MM     P15    RILE     
+  39 IDRMEC     469 PRECIMX180M     Precipitazione cumulata nel periodo                MM     P15    RILE     
+  39 IDRMEC     470 PRECIMX360M     Precipitazione cumulata nel periodo                MM     P15    RILE     
+  39 IDRMEC     471 PRECIMX720M     Precipitazione cumulata nel periodo                MM     P15    RILE     
+  39 IDRMEC     472 PRECIMX1440M    Precipitazione cumulata nel periodo                MM     P15    RILE     
+  40 CLINUR     227 FF10MT          Intensita' vento                                   MSEC   P1440  CALC     
+  40 CLINUR     228 FN10MT          Intensita' vento                                   MSEC   P1440  CALC     
+  40 CLINUR     229 FM10MT          Intensita' vento massimo                           MSEC   P1440  CALC     
+  40 CLINUR     230 DIRPRE10MT      Direzione prevalente vento medio                   OTTAVI P1440  CALC     
+  40 CLINUR     231 TMED180         Temperatura media aria                             GC     P1440  CALC     
+  40 CLINUR     232 TMINASS180      Temperatura minima aria                            GC     P1440  CALC     
+  40 CLINUR     233 TMAXASS180      Temperatura massima aria                           GC     P1440  CALC     
+  40 CLINUR     234 TMED50          Temperatura media aria                             GC     P1440  CALC     
+  40 CLINUR     235 TMINASS50       Temperatura minima aria                            GC     P1440  CALC     
+  40 CLINUR     236 TMAXASS50       Temperatura massima aria                           GC     P1440  CALC     
+  40 CLINUR     237 TMEDSUOLO       Temperatura media suolo                            GC     P1440  CALC     
+  40 CLINUR     238 TMINASSSUOLO    Temperatura minima suolo                           GC     P1440  CALC     
+  40 CLINUR     239 TMAXASSSUOLO    Temperatura massima suolo                          GC     P1440  CALC     
+  40 CLINUR     240 UMED180         Umidita' percentuale media                         PERC   P1440  CALC     
+  40 CLINUR     241 UMINASS180      Umidita' percentuale minima                        PERC   P1440  CALC     
+  40 CLINUR     242 UMAXASS180      Umidita' percentuale massima                       PERC   P1440  CALC     
+  40 CLINUR     243 PRES0M          Pressione aria a livello stazione media            MBAR   P1440  CALC     
+  40 CLINUR     244 PRES0N          Pressione aria a livello stazione minima           MBAR   P1440  CALC     
+  40 CLINUR     245 PRES0X          Pressione aria a livello stazione massima          MBAR   P1440  CALC     
+  40 CLINUR     246 RADSOL          Radiazione solare                                  RADCC  P1440  CALC     
+  40 CLINUR     247 RADMIN          Radiazione solare minima                           RADCC  P1440  CALC     
+  40 CLINUR     248 RADMAX          Radiazione solare massima                          RADCC  P1440  CALC     
+  40 CLINUR     249 LINSOL          Insolazione                                        MN     P1440  CALC     
+  40 CLINUR     250 PRECI           Precipitazione cumulata nel periodo                MM     P1440  CALC     
+  40 CLINUR     251 TMED-10         Temperatura media aria                             GC     P1440  CALC     
+  40 CLINUR     252 TMINASS-10      Temperatura minima aria                            GC     P1440  CALC     
+  40 CLINUR     253 TMAXASS-10      Temperatura massima aria                           GC     P1440  CALC     
+  40 CLINUR     254 TMED-50         Temperatura media aria                             GC     P1440  CALC     
+  40 CLINUR     255 TMINASS-50      Temperatura minima aria                            GC     P1440  CALC     
+  40 CLINUR     256 TMAXASS-50      Temperatura massima aria                           GC     P1440  CALC     
+  40 CLINUR     257 BAGNA           Bagnatura fogliare                                 MN     P1440  CALC     
+  40 CLINUR     258 FF              Intensita' vento                                   MSEC   P1440  CALC     
+  40 CLINUR     271 PRECISYN        Precipitazione cumulata nel periodo                MM     P1440  CALC     
+  40 CLINUR     272 TMAXSYN         Temperatura massima aria                           GC     P1440  CALC     
+  40 CLINUR     273 TMINSYN         Temperatura minima aria                            GC     P1440  CALC     
+  40 CLINUR     275 NVALFF          Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     276 NVALFN          Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     277 NVALFM          Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     278 NVALDIRPRE      Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     279 NVALTMED180     Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     280 NVALTMINASS180  Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     281 NVALTMAXASS180  Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     282 NVALTMED50      Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     283 NVALTMINASS50   Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     284 NVALTMAXASS50   Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     285 NVALTMEDSUOLO   Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     286 NVALTMINASSSUOL Numero dei Valori                                  NUM    P1440  CALC     
+                    O                                                                                         
+                                                                                                              
+  40 CLINUR     287 NVALTMAXASSSUOL Numero dei Valori                                  NUM    P1440  CALC     
+                    O                                                                                         
+                                                                                                              
+  40 CLINUR     288 NVALUMED        Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     289 NVALUMINASS     Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     290 NVALUMAXASS     Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     291 NVALPRES0M      Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     292 NVALPRES0N      Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     293 NVALPRES0X      Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     294 NVALRADSOL      Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     295 NVALRADMIN      Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     296 NVALRADMAX      Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     297 NVALLINSOL      Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     298 NVALPRECI       Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     299 NVALTMED-10     Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     300 NVALTMINASS-10  Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     301 NVALTMAXASS-10  Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     302 NVALTMED-50     Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     303 NVALTMINASS-50  Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     304 NVALTMAXASS-50  Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     305 NVALBAGNA       Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     306 NVALPRECISYN    Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     307 NVALTMAXSYN     Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     308 NVALTMINSYN     Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     315 NVALFF          Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     323 ETP             Stato suolo                                        MM     P1440  CALC     
+  40 CLINUR     324 VETTVENTO       Intensita' vento                                   MSEC   P1440  CALC     
+  40 CLINUR     325 VETTVENTO       Direzione prevalente vento medio                   OTTAVI P1440  CALC     
+  40 CLINUR     326 VENTO SFILATO   Percorso in KM del vento medio                     KM     P1440  CALC     
+  40 CLINUR     327 NUVMED                                                             CN8    P1440  CALC     
+  40 CLINUR     328 NUVMAX                                                             CN8    P1440  CALC     
+  40 CLINUR     329 NUVMIN                                                             CN8    P1440  CALC     
+  40 CLINUR     330 NVALNUMED       Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     331 NVALNUVMAX      Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     332 NVALNUVMIN      Numero dei Valori                                  NUM    P1440  CALC     
+  40 CLINUR     333 NVESFI                                                             NUM    P1440  CALC     
+  40 CLINUR     340 TM100                                                              GC     P1440  CALC     
+  40 CLINUR     341 TN100                                                              GC     P1440  CALC     
+  40 CLINUR     342 TX100                                                              GC     P1440  CALC     
+  40 CLINUR     343 NTMED100                                                           NUM    P1440  CALC     
+  40 CLINUR     344 NTMIN100                                                           NUM    P1440  CALC     
+  40 CLINUR     345 NTMAX100                                                           NUM    P1440  CALC     
+  40 CLINUR     346 PREMAX                                                             MM     P1440  CALC     
+  40 CLINUR     347 NPREMAX                                                            NUM    P1440  CALC     
+  42 SYREP      232 TMINASS180      Temperatura minima aria                            GC     P1440  CALC     
+  42 SYREP      233 TMAXASS180      Temperatura massima aria                           GC     P1440  CALC     
+  42 SYREP      238 TMINASSSUOLO    Temperatura minima suolo                           GC     P1440  CALC     
+  42 SYREP      241 UMINASS180      Umidita' percentuale minima                        PERC   P1440  CALC     
+  42 SYREP      242 UMAXASS180      Umidita' percentuale massima                       PERC   P1440  CALC     
+  42 SYREP      246 RADSOL          Radiazione solare                                  RADCC  P1440  CALC     
+  42 SYREP      249 LINSOL          Insolazione                                        MN     P1440  CALC     
+  42 SYREP      634 DD              Direzione vento                                    GSES   P1440  RILE     
+  42 SYREP      635 FF              Intensita' vento                                   KN     P1440  RILE     
+  42 SYREP      636 HHHV            Ora del massimo                                    HHMN   P1440  RILE     
+  42 SYREP      638 HHHX            Ora del massimo                                    HHMN   P1440  RILE     
+  42 SYREP      640 HHHN            Ora del minimo                                     HHMN   P1440  RILE     
+  42 SYREP      643 P0012           Precipitazione cumulata nel periodo                MM     P1440  RILE     
+  42 SYREP      644 P1224           Precipitazione cumulata nel periodo                MM     P1440  RILE     
+  42 SYREP      646 E               stato del barometro                                NUM    P1440  RILE     
+  42 SYREP      648 EG              stato del barometro                                NUM    P1440  RILE     
+  42 SYREP      649 SSS             strato nevoso                                      M      P1440  RILE     
+  42 SYREP      650 F_A                                                                NUM    P1440  RILE     
+  42 SYREP      651 F_B                                                                NUM    P1440  RILE     
+  42 SYREP      652 F_C                                                                NUM    P1440  RILE     
+  42 SYREP      653 F_D                                                                NUM    P1440  RILE     
+  42 SYREP      654 F_E                                                                NUM    P1440  RILE     
+  42 SYREP      655 F_F                                                                NUM    P1440  RILE     
+  42 SYREP      656 F_G                                                                NUM    P1440  RILE     
+  42 SYREP      657 F_H                                                                NUM    P1440  RILE     
+  42 SYREP      658 F_I                                                                NUM    P1440  RILE     
+  43 FREATI     660 LIVFREAT        livello                                            M      P60    RILE     
+  43 FREATI     661 TSS             Temperatura dell' acqua                            GC     P60    RILE     
+  43 FREATI     662 CONDWSS         conducibilita'                                     SM     P60    RILE     
+
+946 rows selected.
+

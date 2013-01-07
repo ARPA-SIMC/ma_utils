@@ -1,0 +1,45 @@
+! File che contiene gli estremi delle aree geografiche degli archivi SIMC         
+! Note:
+! - Xmin,Ymin si riferiscono al centro della cella posta nell'angolo SW del
+!   grigliato
+! - Per le aree Chimere, "codice" deve avere al max 6 caratteri 
+! - Usato da sel_punti.f90 (catena crea_progetto_estra)
+!
+!                                               Ultimo aggiornamento: 14/04/2011
+!-------------------------------------------------------------------------------
+!234567890-1234-1234-12345678-12345678-12345678-12345678-12345678-12345678-123-!- ...
+!Codice      Nx   Ny     Xmin     Ymin     Xmax     Ymax     Xrot     Yrot smf ! Note (testo, non letto dai programmi)
+                                                                               
+aladin1      51   51    7.000   43.000   12.000   48.000    0.000    0.000 000 ! Dati operativi Aladin per City-Delta (0.1 x 0.1)
+as2pm_bpa   136   60    6.255   43.095   14.355   46.635    0.000    0.000 010 ! Stime di PM da satellite, dominio BPA 
+cont1        65   33  -10.000   40.500   22.000   56.500    0.000    0.000 010 ! Chimere continentale piccolo (0.5 x 0.5)
+cont2        65   65  -10.000   40.500   22.000   56.500    0.000    0.000 010 ! Chimere continentale piccolo (0.25 x 0.5)
+cont3        67   46  -10.500   35.000   22.500   57.500    0.000    0.000 010 ! Chimere continentale allargato (0.5 x 0.5)
+dwd_fisiog  961  769  -26.750  -38.750   33.250    9.250   10.000   57.500 010 ! Area del dataset fisiografico europeo DWD (0.0625 x 0.0625)
+lama        234  272   -5.000  -24.000    9.563   -7.063   10.000   57.500 010 ! Uguale a lmsmr2, usata per gli archivi LAMA e LAMA3
+lama3       301  191   -3.750  -14.500    3.750   -9.750   10.000   57.500 010 ! Analisi LAMA 2.8 km e RUC (0.025 x 0.025)
+lamaw       234  272   -5.000  -24.000    9.563   -7.063   10.000   57.500 010 ! Uguale a lmsmr2, usata per l'archivio LAMAW
+lamaz       169  181   -2.937  -21.125    7.563   -9.875   10.000   57.500 010 ! Sottoarera di lmsmr2, usata per archivio LAMAZ
+lambo_fi    137  113   -6.500   -8.500   10.500    5.500    9.000   45.000 010 ! Area operativa LAMBO (0.125 x 0.125)
+lmbpa       100   85   -3.125  -15.563    3.063  -10.313   10.000   57.500 010 ! Archivio analisi LM su BPA + Toscana (zoom: 31,136,130,220)
+lmctnbpa    100   66   -3.125  -14.500    3.063  -10.438   10.000   57.500 010 ! Distribuzione LM per CTN, dominio BPA (zoom: 31,153,130,218)
+lmctnmed     80   66    0.875  -18.250    5.813  -14.188   10.000   57.500 010 ! Distribuzione LM per CTN, dominio MED (zoom: 95, 93,174,158)
+lmsmr2      234  272   -5.000  -24.000    9.563   -7.063   10.000   57.500 010 ! Area operativa LAMI 7 km, vecchia (0.0625 x 0.0625)
+lmsmr4      297  313   -8.500  -25.000   10.000   -5.500   10.000   57.500 010 ! Area operativa LAMI 7 km, allargata (0.0625 x 0.0625)
+lmsmr5      447  532   -3.500  -21.925    7.650   -8.650   10.000   57.500 010 ! Area operativa LAMI 2.8 km (0.025 x 0.025)
+lmtosc       46   44   -8.120  -15.563    2.000  -12.875   10.000   57.500 010 ! Distribuzione LM per Toscana (zoom da LMSMR2: 68,136,113,179)
+med025      173   65   -6.000   30.000   37.000   46.000    0.000    0.000 000 ! Area IFS-ECMWF Mediterraneo (0.25 x 0.25)
+prvbpa       24   16    4.000   41.500   15.500   49.000    0.000    0.000 010 ! Area Prev'Air richiesta da CTN per BC su BPA (0.5 x 0.5)
+prvemr       19   11    5.500   42.500   14.500   47.500    0.000    0.000 010 ! Area Prev'Air richiesta da EmR, operativa (0.5 x 0.5)
+prvita       33   29    3.500   35.500   19.500   49.500    0.000    0.000 010 ! Area Prev'Air richiesta da EmR, run off-line 2006 (0.5 x 0.5)
+prvmed       21   14    9.500   37.500   19.500   44.000    0.000    0.000 010 ! Area Prev'Air richiesta da CTN per BC su MED (0.5 x 0.5)
+swanad       97   73   12.000   40.000   20.000   46.000    0.000    0.000 010 ! Area SWAN Adriatico (0.083 x 0.083)
+swann1       61   73   12.000   43.800   13.000   45.000    0.000    0.000 010 ! Area SWAN Emilia Romagna (0.0167 x 0.0167)
+swaemr      121  145   12.000   43.800   13.000   45.000    0.000    0.000 010 ! Area SWAN Emilia Romagna (0.0083 x 0.0083)
+swamar      241  193   12.500   42.600   14.500   44.200    0.000    0.000 010 ! Area SWAN Marche (0.0083 x 0.0083)
+swatos      157  151    9.400   42.000   12.000   44.500    0.000    0.000 010 ! Area SWAN Toscana (0.0167 x 0.0167)
+swacam      181  121   13.000   39.500   16.000   41.500    0.000    0.000 010 ! Area SWAN Campania (0.0167 x 0.0167)
+swasne      241  241    8.500   40.000   10.500   42.000    0.000    0.000 010 ! Area SWAN Sardegna NE (0.0083 x 0.0083)
+swita       169  145    6.000   34.000   20.000   46.000    0.000    0.000 010 ! Area SWAN Italia (0.083 x 0.083)
+swmed       173   65   -6.000   30.000   37.000   46.000    0.000    0.000 010 ! Area SWAN Mediterraneo (0.25 x 0.25)
+wammed      426  161   -6.000   30.000   36.500   46.000    0.000    0.000 010 ! Area WAM Mediterraneo (0.1 x 0.1)

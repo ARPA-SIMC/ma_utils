@@ -1,0 +1,24 @@
+!--------------------------------------------------------------------------
+! Sigla identificativa e altri parametri richiesti da trasp_seriet relativi
+! alla tab. 128 (usata da ECMWF)
+!
+! Contenuto dei campi
+! Cod:     condice GRIB del parametro
+! Sigla:   identificativo del parametro nell'output seriet
+! dec:     numero di decimali nell'output seriet
+! val.min: valore minimo accettabile
+! val.max: valore massimo accettabile
+! cp2:     codice 2a componente (se vento U); 
+!          500 + codice 1a componente (se vento V);
+!          -1 (se temperatura); -2 (se lugh.MO); -3 (se sw budget); 
+!          -4 (se cloud cover); -5 (se flussi di calore); 0 (altri casi)
+!
+!                                                  Versione 1.1, 25/02/2009
+!--------------------------------------------------------------------------
+!123--12345678--123--1234567890--1234567890--123
+!Cod  Sigla     dec     val.min     val.max  cp2
+ 165  U-10m       1      -50.00       50.00  166
+ 166  V-10m       1      -50.00       50.00  665
+ 167  T-2m        1      193.16      323.16   -1
+
+!123--12345678--123--1234567890--1234567890--123

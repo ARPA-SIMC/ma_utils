@@ -1,0 +1,20 @@
+!--------------------------------------------------------------------------
+! Sigla GRADS e descrizione dei parametri della tabella 203 (variabili 
+! accessorie Lokal Modell). 
+! Altri parametri Lokal Model sono nelle tabelle 002 e 201
+!
+!                                                   Versione 2, 15/10/2004
+!--------------------------------------------------------------------------
+!123--12345678--1234567890123456789012345678901234567890
+!Cod  Sigla     Descrizione e unita'
+  57  soiltyp   type of the soil [0-9]
+  61  lai       leaf area index 
+  62  rootdp    depth of the roots [m]
+  64  hmo3      ozone maximum [pa]
+  65  vio3      vertical integrated O3 contents [pa O3]
+ 113  fc        coriolis-parameter [1/s]
+ 114  phi       latitude [rad]
+ 115  rla       longitude [rad]
+ 121  ztd       (surf.)
+ 122  zwd       (surf.)
+ 123  zhd       (surf.)

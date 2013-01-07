@@ -1,0 +1,89 @@
+!--------------------------------------------------------------------------
+! Sigla identificativa e altri parametri richiesti da trasp_seriet relativi
+! alla tab. 199 (variabili prognostiche aerosol di Chimere, V2005)
+! I parametri aerosol di Chimere 2008 sono nella tab. 196
+! I parametri Chimere gas sono nella tabella 200
+!
+! Contenuto dei campi
+! Cod:     condice GRIB del parametro
+! Sigla:   identificativo del parametro nell'output seriet
+! dec:     numero di decimali nell'output seriet
+! val.min: valore minimo accettabile
+! val.max: valore massimo accettabile
+! cp2:     codice 2a componente (se vento U); 
+!          500 + codice 1a componente (se vento V);
+!          -1 (se temperatura); -2 (se lugh.MO); -3 (se sw budget); 
+!          -4 (se cloud cover); -5 (se flussi di calore); 0 (altri casi)
+!
+!                                                    Versione 6, 11/04/2011
+!--------------------------------------------------------------------------
+!123--12345678--123--1234567890--1234567890--123
+!Cod  Sigla     dec     val.min     val.max  cp2
+  10  p1SALT    exp        0.00      100.00   -6
+  11  p1PPM     exp        0.00      100.00   -6
+  12  p1ASOA    exp        0.00      100.00   -6
+  13  p1BSOA    exp        0.00      100.00   -6
+  14  p1H2SO4   exp        0.00      100.00   -6
+  15  p1HNO3    exp        0.00      100.00   -6
+  16  p1NH3     exp        0.00      100.00   -6
+  17  p1WATER   exp        0.00      100.00   -6
+  18  p1DUST    exp        0.00      100.00   -6
+  19  p1SOA     exp        0.00      100.00   -6
+  20  p2SALT    exp        0.00      100.00   -6
+  21  p2PPM     exp        0.00      100.00   -6
+  22  p2ASOA    exp        0.00      100.00   -6
+  23  p2BSOA    exp        0.00      100.00   -6
+  24  p2H2SO4   exp        0.00      100.00   -6
+  25  p2HNO3    exp        0.00      100.00   -6
+  26  p2NH3     exp        0.00      100.00   -6
+  27  p2WATER   exp        0.00      100.00   -6
+  28  p2DUST    exp        0.00      100.00   -6
+  29  p2SOA     exp        0.00      100.00   -6
+  30  p3SALT    exp        0.00      100.00   -6
+  31  p3PPM     exp        0.00      100.00   -6
+  32  p3ASOA    exp        0.00      100.00   -6
+  33  p3BSOA    exp        0.00      100.00   -6
+  34  p3H2SO4   exp        0.00      100.00   -6
+  35  p3HNO3    exp        0.00      100.00   -6
+  36  p3NH3     exp        0.00      100.00   -6
+  37  p3WATER   exp        0.00      100.00   -6
+  38  p3DUST    exp        0.00      100.00   -6
+  39  p3SOA     exp        0.00      100.00   -6
+  40  p4SALT    exp        0.00      100.00   -6
+  41  p4PPM     exp        0.00      100.00   -6
+  42  p4ASOA    exp        0.00      100.00   -6
+  43  p4BSOA    exp        0.00      100.00   -6
+  44  p4H2SO4   exp        0.00      100.00   -6
+  45  p4HNO3    exp        0.00      100.00   -6
+  46  p4NH3     exp        0.00      100.00   -6
+  47  p4WATER   exp        0.00      100.00   -6
+  48  p4DUST    exp        0.00      100.00   -6
+  49  p4SOA     exp        0.00      100.00   -6
+  50  p5SALT    exp        0.00      100.00   -6
+  51  p5PPM     exp        0.00      100.00   -6
+  52  p5ASOA    exp        0.00      100.00   -6
+  53  p5BSOA    exp        0.00      100.00   -6
+  54  p5H2SO4   exp        0.00      100.00   -6
+  55  p5HNO3    exp        0.00      100.00   -6
+  56  p5NH3     exp        0.00      100.00   -6
+  57  p5WATER   exp        0.00      100.00   -6
+  58  p5DUST    exp        0.00      100.00   -6
+  59  p5SOA     exp        0.00      100.00   -6
+  60  p6SALT    exp        0.00      100.00   -6
+  61  p6PPM     exp        0.00      100.00   -6
+  62  p6ASOA    exp        0.00      100.00   -6
+  63  p6BSOA    exp        0.00      100.00   -6
+  64  p6H2SO4   exp        0.00      100.00   -6
+  65  p6HNO3    exp        0.00      100.00   -6
+  66  p6NH3     exp        0.00      100.00   -6
+  67  p6WATER   exp        0.00      100.00   -6
+  68  p6DUST    exp        0.00      100.00   -6
+  69  p6SOA     exp        0.00      100.00   -6
+ 101  PPMAQ     exp        0.00      100.00   -6
+ 102  ASOAAQ    exp        0.00      100.00   -6
+ 103  BSOAAQ    exp        0.00      100.00   -6
+ 104  H2SO4AQ   exp        0.00      100.00   -6
+ 105  HNO3AQ    exp        0.00      100.00   -6
+ 106  NH3AQ     exp        0.00      100.00   -6
+ 108  DUSTAQ    exp        0.00      100.00   -6
+!123--12345678--123--1234567890--1234567890--123

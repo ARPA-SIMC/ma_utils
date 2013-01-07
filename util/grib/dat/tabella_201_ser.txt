@@ -1,0 +1,62 @@
+!--------------------------------------------------------------------------
+! Sigla identificativa e altri parametri richiesti da trasp_seriet relativi
+! alla tab. 201 (variabili accessorie Lokal Modell)
+! Altri parametri Lokal Model sono nelle tabelle 002 e 203
+!
+! Contenuto dei campi
+! Cod:     condice GRIB del parametro
+! Sigla:   identificativo del parametro nell'output seriet
+! dec:     numero di decimali nell'output seriet
+! val.min: valore minimo accettabile
+! val.max: valore massimo accettabile
+! cp2:     codice 2a componente (se vento U); 
+!          500 + codice 1a componente (se vento V);
+!          -1 (se temperatura); -2 (se lugh.MO); -3 (se sw budget); 
+!          -4 (se cloud cover); -5 (se flussi di calore); 0 (altri casi)
+!
+!                                          Ultimo aggiornamento: 28/06/2011
+!--------------------------------------------------------------------------
+!123--12345678--123--1234567890--1234567890--123
+!Cod  Sigla     dec     val.min     val.max  cp2
+   5  apabs       4    -9999.99    99999.99    0   
+  22  radir       1        0.00     1300.00    0
+  23  radiff      1        0.00     1300.00    0
+  29  clc         4    -9999.99    99999.99    0   
+  31  qw        exp        0.00        1.00    0   
+  33  qi        exp        0.00        1.00    0   
+  35  qr        exp        0.00        1.00    0   
+  36  qs        exp        0.00        1.00    0   
+  39  qrs       exp        0.00        1.00    0   
+  41  iwater      4    -9999.99    99999.99    0   
+  42  idivhum     4    -9999.99    99999.99    0   
+  68  hbascon     4    -9999.99    99999.99    0   
+  69  htopcon     4    -9999.99    99999.99    0   
+  72  bascon      4    -9999.99    99999.99    0   
+  73  topcon      4    -9999.99    99999.99    0   
+  82  htopdc      4    -9999.99    99999.99    0   
+  84  hzerocl     4    -9999.99    99999.99    0   
+  85  snowlmt     4    -9999.99    99999.99    0   
+  99  qrs       exp        0.00        1.00    0   
+ 100  prrgsp      4    -9999.99    99999.99    0   
+ 101  prsgsp      4    -9999.99    99999.99    0   
+ 102  gsprai      2        0.00     1000.00    0
+ 111  prrcon      4    -9999.99    99999.99    0   
+ 112  prscon      4    -9999.99    99999.99    0   
+ 113  conrai      2        0.00     1000.00    0
+ 139  pp          4    -9999.99    99999.99    0   
+ 152  tke       exp        0.00       1.e10    0   
+ 153  tkvm        4    -9999.99    99999.99    0   
+ 154  tkvh        4    -9999.99    99999.99    0   
+ 170  tcm         4    -9999.99    99999.99    0   
+ 171  tch         4    -9999.99    99999.99    0   
+ 187  vmax        2    -9999.99    99999.99    0   
+ 197  tso         4    -9999.99    99999.99    0   
+ 198  wso         4    -9999.99    99999.99    0   
+ 199  wice        4    -9999.99    99999.99    0   
+ 200  wi          4    -9999.99    99999.99    0   
+ 203  tsnow       4    -9999.99    99999.99    0   
+ 240  mflxcon     4    -9999.99    99999.99    0   
+ 241  capecon     4    -9999.99    99999.99    0   
+ 242  qcvgcon     4    -9999.99    99999.99    0   
+ 243  tkecon      4    -9999.99    99999.99    0   
+!123--12345678--123--1234567890--1234567890--123

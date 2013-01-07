@@ -1,0 +1,54 @@
+!--------------------------------------------------------------------------
+! Sigla identificativa e altri parametri richiesti da gacsv2seriet relativi
+! alla tab. 195 (usata da Chimere V2008 e successive). 
+! I parametri gas Chimere sono nella tabella 200, le variabili prognostiche
+! aerosol nella tabella 196
+!
+! Contenuto dei campi
+! Cod:     condice GRIB del parametro
+! Sigla:   identificativo del parametro nell'output seriet
+! dec:     numero di decimali nell'output seriet
+! val.min: valore minimo accettabile
+! val.max: valore massimo accettabile
+! cp2:     codice 2a componente (se vento U); 
+!          500 + codice 1a componente (se vento V);
+!          -1 (se temperatura); -2 (se lugh.MO); -3 (se sw budget); 
+!          -4 (se cloud cover); -5 (se flussi di calore); 0 (altri casi)
+!
+!                                                    Versione 1, 11/04/2011
+!--------------------------------------------------------------------------
+!123--12345678--123--1234567890--1234567890--123
+!Cod  Sigla     dec     val.min     val.max  cp2
+!Classi granulometriche, V2008
+   1  pm10        1       0.00       250.00   -6
+   2  pm5         1       0.00       250.00   -6
+   3  pm25        1       0.00       250.00   -6
+   4  pm1         1       0.00       250.00   -6
+   5  pm06        1       0.00       250.00   -6
+   6  pm03        1       0.00       250.00   -6
+   7  pm015       1       0.00       250.00   -6
+   8  pm008       1       0.00       250.00   -6
+
+!Speciazione PM10, V2008
+   9  p10ppm      1       0.00       250.00   -6
+  10  p10h2so4    1       0.00       250.00   -6
+  11  p10hno3     1       0.00       250.00   -6
+  12  p10nh3      1       0.00       250.00   -6
+  13  p10bcar     1       0.00       250.00   -6
+  14  p10ocar     1       0.00       250.00   -6
+  15  p10dust     1       0.00       250.00   -6
+  16  p10AnA1D    1       0.00       250.00   -6
+  17  p10AnBmP    1       0.00       250.00   -6
+  18  p10BiA1D    1       0.00       250.00   -6
+  19  p10BiBmP    1       0.00       250.00   -6
+  20  p10WATER    1       0.00       250.00   -6
+  21  p10salt     1       0.00       250.00   -6
+  22  pISOPA1     1       0.00       250.00   -6
+  30  p10tsoa     1       0.00       250.00   -6
+  31  p10tpri     1       0.00       250.00   -6
+  32  p10tsec     1       0.00       250.00   -6
+  33  p10ant      1       0.00       250.00   -6
+  34  p10bio      1       0.00       250.00   -6
+  44  p25bio      1       0.00       250.00   -6
+ 
+!123--12345678--1234567890123456789012345678901234567890

@@ -1,0 +1,10 @@
+!--------------------------------------------------------------------------
+!Sigla GRADS e descrizione dei parametri della tabella 128 (usata da ECMWF)
+!
+!                                                  Versione 1.1, 25/02/2009
+!--------------------------------------------------------------------------
+!123--12345678--1234567890123456789012345678901234567890
+!Cod  Sigla     Descrizione e unita'
+ 165  u10       10 m zonal wind [m/s]
+ 166  v10       10 m meridional wind [m/s]
+ 167  t2m       2 m temperature [K]

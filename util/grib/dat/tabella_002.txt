@@ -1,0 +1,65 @@
+!--------------------------------------------------------------------------
+! Sigla GRADS e descrizione dei parametri della tabella 002
+! Fino a 128 sono i parametri standard WMO, da 129 sono parametri per
+! uso locale, dipendenti dal centro di emissione.
+!
+!                                          Ultimo aggiornamento: 26/03/2012
+!--------------------------------------------------------------------------
+!123--12345678--1234567890123456789012345678901234567890--12345
+!Cod  Sigla     Descrizione e unita'                      B-Tab 
+   1  pr        pressure [Pa]                             10004
+   2  msl       sea level Pressure [Pa]                   10051
+   3  dpsdt     tendency of the surface pressure [Pa/s]
+   6  gph       geopotential [m2/s2]                      10008
+   8  z         geometical heigt [m]                      10007 
+  11  t         Temperature [K]                           12101
+  15  tmax      maximum temperature (2m) [K]              
+  16  tmin      minimum temperature (2m) [K]
+  17  td        dew-point (2m) [K]                        12103
+  31  dd        Wind direction [deg]                      11001
+  32  ff        Wind speed [m/s]                          11002
+  33  u         zonal wind [m/s]                          11003
+  34  v         meridional wind [m/s]                     11004
+  39  omega     vertical velocity [Pa/s]                  11005
+  40  w         vertical velocity [m/s]                   11006
+  51  q         specific water vapor content [kg/kg]      13001
+  52  relhum    relative humidity [%]                     13003
+  54  iwv       (surf.)       
+  57  aevap     accum. moisture flux (surf.) [kg/m2]
+  58  ici       (surf.)
+  61  tp        total precipitation [kg/m2]               13011
+  65  wsnow     water content of snow [mm H2O]            13194
+  71  tcc       total cloud fraction [%]                  20010
+  73  clcl      low cloud fraction [%]                    20051
+  74  clcm      medium cloud fraction [%]                 20052
+  75  clch      high cloud fraction [%]                   20053
+  76  icw       (surf.)
+  78  consnw    snow from convective precip. [kg/m2]      13203
+  79  gspsnw    snow from grid-scale precip. [kg/m2]      13201
+  81  landfr    fraction of land in a grid box [0-1]      29192
+  83  z0        surface roughness ouput COSMO [m]         11199
+  84  alb       albedo of the ground [%]                  14019
+  85  tg        ground temperature (surf or soil) [K]
+  86  wg        soil water content [mm H2O]               13206
+  87  plcov     fraction of plant cover [%]
+  90  runoff    accumulated water runoff [kg/m2]
+ 111  swbudg    avg. solar rad. budget (surf.) [W/m2]     14018
+ 112  lwbudg    avg. IR rad. budget (surf.) [W/m2]        14017
+ 113  swbudt    avg. solar rad. budget (top) [W/m2]      
+ 114  lwbudt    avg. IR rad. budget (top) [W/m2]
+ 121  lhf       avg. latent heat flux (surf.) [W/m2]      14193
+ 122  shf       avg. sensible heat flux (surf.) [W/m2]    14192
+ 124  umfl      avg. u-momentum flux (surf.) [N/m2]       11200
+ 125  vmfl      avg. v-momentum flux (surf.) [N/m2]       11201
+ 150  qcr       total liquid water (cloud+prec.) [kg/kg]  13198
+ 151  qis       total ice (cloud+precip.) [kg/kg]         13199
+ 152  cp        total convective prec. (rain+snow)[kg/m2] 13204
+ 153  sf        snowfall (conv+lscale) [kg/m2]            13205
+ 200  molm      monin Obukov lenght (LM) [m]              11207
+ 201  ustarlm   friction Velocity (LM) [m/s]              11206
+ 202  ipgtlm    stability class (LM) [1-6]                11193
+ 203  tinv      surface temperature inversion [K]
+ 210  modia     monin Obukov lenght (diagmet) [m]         11204
+ 211  ustardia  friction Velocity (diagmet) [m/s]         11202
+ 212  hmixdia   mixing height (diagmet) [m]               11203
+ 213  wstardia  conv. velocity scale (diagmet) [m/s]      11205

@@ -1,0 +1,57 @@
+! File che contiene gli estremi delle aree UTM per i run Calmet, Chimere, ecc.
+! Note (last update: 23/03/2009)
+! - Xorig,Yorig si riferiscono al centro della cella posta nell'angolo SW del grigliato
+! - Per le aree Chimere, "codice" deve avere al max 6 caratteri 
+! - Letto da sel_punti.f90, sel_staz_calmet.f90, crea_calmet_inp.f90
+!------------------------------------------------------------------------------------
+!234567890-1234-1234-12345678-12345678-12345678-12345678-1234-!- ...
+!Codice      Nx   Ny     Xmin     Ymin     Xmax     Ymax UTMZ ! Note (testo, non letto dai programmi)
+
+! AREE OPERATIVE
+ctnbp1       64   41  265.000 4785.000  895.000 5185.000   32 ! Area operativa Chimere BPA (10 x 10 km)
+ctnbp2      128   82  262.500 4782.500  897.500 5187.500   32 ! Area alta ris. Chimere BPA (5 x 5 km)
+ctnemr       63   37  502.500 4832.500  812.500 5012.500   32 ! Area alta ris. CHIMERE EMR (5 x 5 km)
+emilia1      38   17  597.500 4892.500  782.500 4972.500   32 ! Vecchi run Calgrid Emilia (5 x 5 km)
+iaemr        58   31  517.500 4847.500  802.500 4997.500   32 ! Area inventario IA EMR (5 x 5 km)
+padania1     90   52  402.500 4852.500  847.500 5107.500   32 ! Area operativa Calmet (5 x 5 km)
+padan2       90   58  406.790 4787.860  851.790 5072.860   32 ! Run Calgrid su Emilia allargata (5 x 5 km) [in gribarch: PADANIA2]
+pesemr      297  161  510.500 4843.500  806.500 5003.500   32 ! Area operativa PESCO (1 x 1 km)
+
+! AREE SIMULAZIONI LAPMOD
+acc01       100  100  636.250 4903.750  685.750 4953.250   32 ! Run LAPMOD, incendio Savignano 20/11/2007 (0.5 x 0.5 km)
+acc02       100  100  754.000 4879.000  952.000 5077.000   32 ! Calmet incendio nave feb2008 (2 x 2 km) [nel progetto: adrnor1]
+incenbo1    100  100  683.200 4923.200  703.000 4943.000   32 ! Calmet per inceneritore Bo (0.2 x 0.2 km)
+incenbo2    100  100  685.125 4925.125  709.875 4949.875   32 ! Calmet per inceneritore Bo, include SPC e GMargh (0.25 x 0.25 km)
+raporto1     60   60  752.125 4920.125  766.875 4934.875   32 ! Calmet per porto RA (0.25 x 0.25 km)
+incenrn1    100  100  781.600 4866.100  801.400 4885.900   32 ! Calmet per inceneritore RN (0.2 x 0.2 km)
+incenfe1    100  100  692.100 4961.100  711.900 4980.900   32 ! Calmet per inceneritore FE (0.2 x 0.2 km)
+mldforl1     33   69  739.000 4888.000  747.000 4905.000   32 ! Calmet per ciclotrone Meldola e area urbana Forli' (0.25 x 0.25 km)
+aeropbo1     50   50  678.600 4928.600  688.400 4938.400   32 ! Calmet per cave presso Aeroporto Marconi (0.2 x 0.2 km)
+vulcano1     50   50  350.000 4750.00   850.000 5250.000   32 ! Calmet per vulcano Islandese (10 x 5 km)
+ptotoll1    100  100  750.502 4959.078  800.002 5008.578   32 ! Calmet per Porto Tolle (0.5 x 0.5 km)
+raporto2     60   53  749.000 4919.000  766.700 4934.600   32 ! Calmet per porto e citta' RA (0.3 x 0.3 km)
+aeropbo2     43   43  680.750 4930.150  687.050 4936.450   32 ! Calmet per cave presso Aeroporto Marconi (0.15 x 0.15km)
+incenre1    100  100  618.100 4943.600  637.900 4963.400   32 ! Calmet per inceneritore RE (0.2 x 0.2 km)
+incenpr1    100  100  597.200 4956.000  617.000 4975.800   32 ! Calmet per inceneritore PR (0.2 x 0.2 km)
+biomsbo1     50	  50  678.000 4899.100  687.800	4908.900   32 ! Calmet per linee guida biomasse crinale e fondovalle (0.2 x 0.2 km)
+biomspc1     50	  50  570.400 4976.700  580.200	4986.500   32 ! Calmet per linee guida biomasse pianura (0.2 x 0.2 km)
+marecch1    100  100  760.250 4860.779  780.050 4880.579   32 ! Calmet per odori in Val Marecchia (0.2 x 0.2 km)
+imola1       30   30  713.000 4913.000  718.800 4918.800   32 ! Calmet per Imola (0.2 x 0.2 km)
+migliar1    100  100  726.846 4956.299  741.696 4971.149   32 ! Calmet per incendio Migliaro (0.15 x 0.15 km)
+rangone1     35   35  649.900 4930.800  656.700 4937.600   32 ! Calmet per Castelnuovo Rangone (0.2 x 0.2 km)
+mo_west1     11   11  649.287 4945.140  651.287 4947.140   32 ! Calmet per Modena ovest (0.2 x 0.2 km)
+
+
+! ALTRE AREE (PROGETTI ETC)
+cabella      60   60  495.250 4928.250  524.750 4957.750   32 ! Calmet per eolico, Cabella (0.5 x 0.5 km)
+campania1    70   50  802.500 4402.500 1147.500 4647.500   32 ! Run diagmet per ARPA Campania (5 x 5 km) [nel progetto: arpac]
+cesi02       41   41  450.000 4950.000  490.000 4990.000   32 ! 
+cesi03       41   41  485.000 4340.000  525.000 4380.000   32 ! 
+cityde       60   60  386.500 4892.500  681.500 5187.500   32 ! CityDelta Milano (5 x 5 km) [in gribarch: CITY_D]
+city10km     30   30  389.000 4895.000  679.000 5185.000   32 ! CityDelta Milano (10 x 10 km)
+lamareno     75   75  669.405 4907.377  684.205 4922.177   32 ! Calmet per Lama di Reno (0.2 x 0.2 km)
+lazio1       40   40  692.500 4542.500  887.500 4737.500   32 ! Run Calmet per ARPA Lazio (5 x 5 km)
+pesemr500   594  322  510.250 4843.250  806.750 5003.750   32 ! Area PESCO per analisi clima vento (0.5 x 0.5 km)
+savena      100  100  673.100 4890.100  692.900 4909.900   32 ! Calmet per test eolico, Val Savena (0.2 x 0.2 km)
+umbria1     100   80  542.500 4547.500 1037.500 4942.500   32 ! Run diagmet per ARPA Umbria (5 x 5 km) [nel progetto: cita]
+appennino    64   36  500.000 4815.000  815.000 4990.000   32
