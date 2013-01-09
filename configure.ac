@@ -3,11 +3,12 @@
 
 AC_PREREQ(2.61)
 AC_INIT(ma_utils, 0.1, dbranchini@arpa.emr.it)
+LT_INIT
 AM_INIT_AUTOMAKE([-Wall foreign])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Checks for programs.
-AC_PROG_CC
+AC_PROG_FC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 
@@ -19,8 +20,13 @@ AM_PROG_LIBTOOL
 # Checks for typedefs, structures, and compiler characteristics.
 
 # Checks for library functions.
+#AC_CHECK_LIB([grib_api],[grib_values_check])
+LIBS="-lgrib_api -lgrib_api_f90 -lemos -lsim_base -lsim_volgrid6d  -lsim_vol7d"
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile
+		modules/Makefile
+		arkimet/src/Makefile
+		calmet/src/Makefile])
 #AC_CONFIG_FILES([Makefile
 #		arkimet/src/Makefile
 #		calmet/src/Makefile
