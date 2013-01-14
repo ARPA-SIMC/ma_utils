@@ -30,14 +30,10 @@ AC_CONFIG_FILES([Makefile
 		chimere/src/ver2007/Makefile
 		chimere/src/ver2011/Makefile
 		chimere/src/Makefile
-		fisiog/src/Makefile])
+		fisiog/src/Makefile
+		osservazioni/src/Makefile])
 
 #AC_CONFIG_FILES([Makefile
-
-#		chimere/src/ver2011/Makefile
-#		chimere/src/ver2007/tools/Makefile
-
-
 #		arkimet/src/Makefile
 #		calmet/src/Makefile
 #		chimere/src/Makefile
@@ -46,4 +42,5 @@ AC_CONFIG_FILES([Makefile
 #		post_lm/src/Makefile
 #		util/grads/src/Makefile
 #		util/grib/src/Makefile])
+
 AC_OUTPUT
