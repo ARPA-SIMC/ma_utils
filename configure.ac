@@ -21,13 +21,22 @@ AM_PROG_LIBTOOL
 
 # Checks for library functions.
 #AC_CHECK_LIB([grib_api],[grib_values_check])
-LIBS="-lgrib_api -lgrib_api_f90 -lemos -lsim_base -lsim_volgrid6d  -lsim_vol7d"
+LIBS="-lgrib_api -lgrib_api_f90 -lgrib_util -lemos -lsim_base -lsim_volgrid6d  -lsim_vol7d -lnetcdf -lnetcdff"
 
 AC_CONFIG_FILES([Makefile
 		modules/Makefile
 		arkimet/src/Makefile
-		calmet/src/Makefile])
+		calmet/src/Makefile
+		chimere/src/ver2007/Makefile
+		chimere/src/ver2011/Makefile
+		chimere/src/Makefile])
+
 #AC_CONFIG_FILES([Makefile
+
+#		chimere/src/ver2011/Makefile
+#		chimere/src/ver2007/tools/Makefile
+
+
 #		arkimet/src/Makefile
 #		calmet/src/Makefile
 #		chimere/src/Makefile

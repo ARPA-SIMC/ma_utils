@@ -3,7 +3,14 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = \
 	modules \
 	arkimet/src \
-	calmet/src
+	calmet/src \
+	chimere/src/ver2007 \
+	chimere/src/ver2011 \
+	chimere/src
+
+#	chimere/src/ver2011/
+#	chimere/src/ver2007/tools
+
 
 #SUBDIRS = arkimet/src calmet/src chimere/src fisiog/src osservazioni/src post_lm/src util/grads/src util/grib/src
 
