@@ -32,16 +32,8 @@ AC_CONFIG_FILES([Makefile
 		chimere/src/Makefile
 		fisiog/src/Makefile
 		osservazioni/src/Makefile
-		post_lm/src/Makefile])
-
-#AC_CONFIG_FILES([Makefile
-#		arkimet/src/Makefile
-#		calmet/src/Makefile
-#		chimere/src/Makefile
-#		fisiog/src/Makefile
-#		osservazioni/src/Makefile
-#		post_lm/src/Makefile
-#		util/grads/src/Makefile
-#		util/grib/src/Makefile])
+		post_lm/src/Makefile
+		util/grads/src/Makefile
+		util/grib/src/Makefile])
 
 AC_OUTPUT
