@@ -6,7 +6,9 @@ SUBDIRS = \
 	calmet/src \
 	chimere/src/ver2007 \
 	chimere/src/ver2011 \
-	chimere/src
+	chimere/src \
+	fisiog/src
+
 
 #	chimere/src/ver2011/
 #	chimere/src/ver2007/tools

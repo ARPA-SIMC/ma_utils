@@ -29,7 +29,8 @@ AC_CONFIG_FILES([Makefile
 		calmet/src/Makefile
 		chimere/src/ver2007/Makefile
 		chimere/src/ver2011/Makefile
-		chimere/src/Makefile])
+		chimere/src/Makefile
+		fisiog/src/Makefile])
 
 #AC_CONFIG_FILES([Makefile
 
