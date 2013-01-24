@@ -6,55 +6,48 @@ PROGRAM proc_seriet_surf
 !
 ! Note:
 ! - Il nome del file di output deve essere nella forma: NNN_SSSSS.st2
-! - Tracciato file di input (seriet): 
+! - Il file di input (seriet) deve contenere i campi: 
 !   Ps,T02,Td02,dd10m,ff10m,tp,tcc,lcl,mcl,hcl
 ! - Tracciato file di output (.st2): 1 record header, poi (6iN, 8f8.1): 
 !   staz,net,anno,mese,giorno,ora, ff, dd, ceil,  tcc, tt, rh, prs,cod_prc 
 !                                 [m/s grd ft*100 10i  K   %   mb  Calmet ]
 !
-!                                           Versione 1.0, Enrico 12/11/2007
+!                                         Versione 2.0.0, Enrico 28/12/2012
 !--------------------------------------------------------------------------
 IMPLICIT NONE
 
-INTERFACE
+INTEGER, PARAMETER :: fw = 10         ! ampiezza dei campi nei files seriet
+INTEGER, PARAMETER :: nf_in = 10      ! n.ro di parametri richiesti in input
+REAL, PARAMETER :: rmis_in = -9999.   ! dato mancante nei files seriet
+REAL, PARAMETER :: rmis_out = 9999.   ! dato mancante nei files .st2a
 
-  FUNCTION lowercase(chin) RESULT (chout)
-  IMPLICIT NONE
-  CHARACTER (*), INTENT(IN) :: chin
-  CHARACTER (LEN=LEN_TRIM(chin)) :: chout
-  END FUNCTION lowercase
+! Label seriet dei parametri in input
+CHARACTER(LEN=fw) :: reqlab(nf_in) = &
+  (/"pr        ","Temp      ","td        ","Dir-wind  ","Mod-wind  ", &
+    "tp        ","tcc       ","clcl      ","clcm      ","clch      "/)
+INTEGER, PARAMETER :: reqlev(nf_in) = (/0,2,2,10,10,0,0,0,0,0/)
 
-  FUNCTION uppercase(chin) RESULT (chout)
-  IMPLICIT NONE
-  CHARACTER (LEN=*), INTENT(IN) :: chin
-  CHARACTER (LEN=LEN_TRIM(chin)) :: chout
-  END FUNCTION uppercase
-
-END INTERFACE
-
-REAL, PARAMETER :: rmis_in = -9999.
-REAL, PARAMETER :: rmis_out = 9999.
-
-CHARACTER(LEN=127), PARAMETER :: head_in4 = &
-  "Livello ->                 0          2          2         10         10          0          0          0          0          0"
-CHARACTER(LEN=127), PARAMETER :: head_in6 = &
-  "gg/mm/aaaa hh sca         pr       Temp         td   Dir-wind   Mod-wind         tp        tcc       clcl       clcm       clch"
+! Header files .st2 (output)
 CHARACTER(LEN=87), PARAMETER :: head_out = &
   " staz net aaaa mm gg hh      ff      dd    ceil     tcc      tt      rh     prs cod_prc"
 
-INTEGER :: kpar,kr,cnt_par,ios,eof,eor
-INTEGER :: gg,mm,yy,hh,net,staz
+! Altre variabili del programma
+REAL, ALLOCATABLE :: field(:)
 REAL :: ceilh
 REAL :: pr,tt,td,dd,ff,tp,tcc,cll,clm,clh,ceil,rh,idprc,esat_tt,esat_td
-CHARACTER(LEN=127) :: rec_in
+INTEGER :: idf_in(nf_in),kpar,kr,kp,k2,cnt_par,ios,eof,eor
+INTEGER :: gg,mm,yy,hh,net,staz,npar_tot,levid
+CHARACTER(LEN=10000) :: header_lev,header_par,rec_in
 CHARACTER(LEN=87) :: rec_out
 CHARACTER(LEN=80) :: filein,fileout,chpar
-LOGICAL :: ltest
+CHARACTER(LEN=fw) :: par_lab,lev_lab
+LOGICAL :: ltest,luv
 
 !--------------------------------------------------------------------------
 ! Parametri da riga comandi
 
 ltest = .FALSE.
+luv = .TRUE.
 cnt_par = 0
 DO kpar = 1,HUGE(0)
   CALL getarg(kpar,chpar)
@@ -65,6 +58,8 @@ DO kpar = 1,HUGE(0)
     STOP
   ELSE IF (TRIM(chpar) == "-test") THEN
     ltest = .TRUE.
+  ELSE IF (TRIM(chpar) == "-nouv") THEN
+    luv = .FALSE.
   ELSE IF (cnt_par == 0) THEN
     cnt_par = 1
     filein = chpar
@@ -89,22 +84,42 @@ ENDIF
 ! Codice EOF
 CALL get_eof_eor(eof, eor)
 
-! Apro files
+! Apro filein e leggo gli headers
 OPEN (UNIT=30, FILE=filein, STATUS="OLD", ACTION="READ", IOSTAT=ios)
 IF (ios /= 0) GOTO 9999
+READ (30,*)
+READ (30,*)
+READ (30,*)
+READ (30,'(17x,a)',ERR=9998) header_lev
+READ (30,*,ERR=9998)
+READ (30,'(17x,a)',ERR=9998) header_par
+
+IF (MOD(LEN(TRIM(header_lev)), (fw+1)) /= 0) THEN
+  GOTO 9998
+ELSE
+  npar_tot = LEN(TRIM(header_lev)) / (fw+1)
+ENDIF
+
+! Cerco negli headers i campi relativi ai parametri richiesti
+idf_in(:) = -9999
+DO kp = 1,npar_tot
+  lev_lab = ADJUSTL(header_lev((kp-1)*(fw+1)+1:kp*(fw+1)))
+  par_lab = ADJUSTL(header_par((kp-1)*(fw+1)+1:kp*(fw+1)))
+  READ (lev_lab,*,ERR=9998) levid
+
+  DO k2 = 1,10
+    IF (TRIM(par_lab) == TRIM(reqlab(k2)) .AND. levid == reqlev(k2)) &
+      idf_in(k2) = kp
+  ENDDO
+ENDDO
+
+IF (ANY(idf_in(:) == -9999)) GOTO 9997 
+
+! Altre operazioni
 OPEN (UNIT=31, FILE=fileout, STATUS="REPLACE", FORM="FORMATTED")
-
-! Leggo e controllo header
-READ (30,*)
-READ (30,*)
-READ (30,*)
-READ (30,'(a)') rec_in
-IF (lowercase(rec_in(18:)) /= lowercase(head_in4(18:)) ) GOTO 9998
-READ (30,*)
-READ (30,'(a)') rec_in
-IF (lowercase(rec_in) /= lowercase(head_in6)) GOTO 9998
-
 WRITE (31,'(a)') head_out
+
+ALLOCATE(field(1:npar_tot))
 
 !--------------------------------------------------------------------------
 ! Lettura - scrittura (ciclo sugli istanti)
@@ -114,12 +129,23 @@ DO kr = 1,HUGE(0)
 ! Leggo dati da filein
   READ (30,'(a)',IOSTAT=ios) rec_in
   IF (ios == eof) EXIT
-  IF (ios /= 0) GOTO 9997
+  IF (ios /= 0) GOTO 9996
  
   READ (rec_in,'(i2,1x,i2,1x,i4,1x,i2)',IOSTAT=ios) gg,mm,yy,hh
-  IF (ios /= 0) GOTO 9997
-  READ (rec_in(18:127),*,IOSTAT=ios) pr,tt,td,dd,ff,tp,tcc,cll,clm,clh
-  IF (ios /= 0) GOTO 9997
+  IF (ios /= 0) GOTO 9996
+  READ (rec_in(18:),*,IOSTAT=ios) field(1:npar_tot)
+  IF (ios /= 0) GOTO 9996
+
+  pr = field(idf_in(1))
+  tt = field(idf_in(2))
+  td = field(idf_in(3))
+  dd = field(idf_in(4))
+  ff = field(idf_in(5))
+  tp = field(idf_in(6))
+  tcc = field(idf_in(7))
+  cll = field(idf_in(8))
+  clm = field(idf_in(9))
+  clh = field(idf_in(10))
 
 ! Converto unita' di misura e calcolo grandezze derivate
   IF (ff == rmis_in) ff=rmis_out
@@ -165,7 +191,7 @@ DO kr = 1,HUGE(0)
   IF (ltest) THEN
     ff = 100.
     dd = 45.
-  ELSE
+  ELSE IF (.NOT. luv) THEN
     ff = 9999.
     dd = 9999.
   ENDIF
@@ -187,10 +213,17 @@ WRITE (*,*) "Errore aprendo ",TRIM(filein)
 STOP
 
 9998 CONTINUE
-WRITE (*,*) "Errore, ",TRIM(filein)," non contiene i parametri richiesti"
+WRITE (*,*) "Errore leggendo headers ",TRIM(filein)
 STOP
 
 9997 CONTINUE
+WRITE (*,*) "Errore, ",TRIM(filein)," non contiene alcuni i parametri richiesti:"
+DO kp = 1, 10
+  IF (idf_in(kp) == -9999) WRITE (*,*) TRIM(reqlab(kp))
+ENDDO
+STOP
+
+9996 CONTINUE
 WRITE (*,*) "Errore leggendo ",TRIM(filein)," riga ",kr+6
 STOP
 
@@ -285,68 +318,6 @@ RETURN
 
 END SUBROUTINE get_eof_eor
 
-!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-FUNCTION lowercase(chin) RESULT (chout)
-!
-! Replace uppercase letters with lowercase and takes off trailing blanks
-! Non-literal characters are left unchanged.
-!
-IMPLICIT NONE
-
-CHARACTER (LEN=*), INTENT(IN) :: chin
-CHARACTER (LEN=LEN_TRIM(chin)) :: chout
-!
-INTEGER :: i,l
-CHARACTER (LEN=26), PARAMETER :: &
-upper='ABCDEFGHIJKLMNOPQRSTUVWXYZ', &
-lower='abcdefghijklmnopqrstuvwxyz'
-
-!--------------------------------------------------------------------------
-
-chout=TRIM(chin)
-DO i=1,LEN(chout)
-  l=INDEX(upper,chin(i:i))
-  IF (l == 0) THEN
-    chout(i:i) = chin(i:i)
-  ELSE
-    chout(i:i) = lower(l:l)
-  ENDIF
-ENDDO
-
-END FUNCTION lowercase
-
-!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-FUNCTION uppercase(chin) RESULT (chout)
-!
-! Replace lowercase letters with uppercase and takes off trailing blanks
-! Non-literal characters are left unchanged.
-!
-IMPLICIT NONE
-
-CHARACTER (LEN=*), INTENT(IN) :: chin
-CHARACTER (LEN=LEN_TRIM(chin)) :: chout
-!
-INTEGER :: i,l
-CHARACTER (LEN=26), PARAMETER :: &
-upper='ABCDEFGHIJKLMNOPQRSTUVWXYZ', &
-lower='abcdefghijklmnopqrstuvwxyz'
-
-!--------------------------------------------------------------------------
-
-chout=TRIM(chin)
-DO i=1,LEN(chout)
-  l=INDEX(lower,chin(i:i))
-  IF (l == 0) THEN
-    chout(i:i) = chin(i:i)
-  ELSE
-    chout(i:i) = upper(l:l)
-  ENDIF
-ENDDO
-
-END FUNCTION uppercase
-
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 SUBROUTINE scrive_help
@@ -355,11 +326,11 @@ SUBROUTINE scrive_help
 !
 IMPLICIT NONE
 
-WRITE (*,*) "Uso: proc_seriet_surf.exe filein fileout [-test] [-h]"
+WRITE (*,*) "Uso: proc_seriet_surf.exe filein fileout [-nouv] [-test] [-h]"
 WRITE (*,*) "Filein: in formato seriet"
 WRITE (*,*) "Fileout: nella forma NNN_SSSSS.st2"
-WRITE (*,*) "  -test: sostituisce alcuni dati con valori fittizi"
-WRITE (*,*) "         (opzione usata per debug calmet; modificare nel sorgente)"
+WRITE (*,*) "  -nouv: mette mancanti i dati di vento (per prenderli solo da profili)"
+WRITE (*,*) "  -test: sostituisce alcuni dati con valori fittizi (per debug Calmet)"
 
 RETURN
 END SUBROUTINE scrive_help

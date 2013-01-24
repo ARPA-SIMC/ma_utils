@@ -5,7 +5,7 @@
 ! - Per le aree Chimere, "codice" deve avere al max 6 caratteri 
 ! - Usato da sel_punti.f90 (catena crea_progetto_estra)
 !
-!                                               Ultimo aggiornamento: 14/04/2011
+!                                               Ultimo aggiornamento: 04/01/2013
 !-------------------------------------------------------------------------------
 !234567890-1234-1234-12345678-12345678-12345678-12345678-12345678-12345678-123-!- ...
 !Codice      Nx   Ny     Xmin     Ymin     Xmax     Ymax     Xrot     Yrot smf ! Note (testo, non letto dai programmi)
@@ -16,10 +16,9 @@ cont1        65   33  -10.000   40.500   22.000   56.500    0.000    0.000 010 !
 cont2        65   65  -10.000   40.500   22.000   56.500    0.000    0.000 010 ! Chimere continentale piccolo (0.25 x 0.5)
 cont3        67   46  -10.500   35.000   22.500   57.500    0.000    0.000 010 ! Chimere continentale allargato (0.5 x 0.5)
 dwd_fisiog  961  769  -26.750  -38.750   33.250    9.250   10.000   57.500 010 ! Area del dataset fisiografico europeo DWD (0.0625 x 0.0625)
-lama        234  272   -5.000  -24.000    9.563   -7.063   10.000   57.500 010 ! Uguale a lmsmr2, usata per gli archivi LAMA e LAMA3
-lama3       301  191   -3.750  -14.500    3.750   -9.750   10.000   57.500 010 ! Analisi LAMA 2.8 km e RUC (0.025 x 0.025)
+lama3       241  161   -3.000  -14.400    3.000  -10.400   10.000   57.500 010 ! Sottoarea di RUC, usata per l'archivio LAMA3 (2.8 km)
 lamaw       234  272   -5.000  -24.000    9.563   -7.063   10.000   57.500 010 ! Uguale a lmsmr2, usata per l'archivio LAMAW
-lamaz       169  181   -2.937  -21.125    7.563   -9.875   10.000   57.500 010 ! Sottoarera di lmsmr2, usata per archivio LAMAZ
+lamaz       169  181   -2.937  -21.125    7.563   -9.875   10.000   57.500 010 ! Sottoarea di LMSMR2, usata per archivio LAMAZ (7 km)
 lambo_fi    137  113   -6.500   -8.500   10.500    5.500    9.000   45.000 010 ! Area operativa LAMBO (0.125 x 0.125)
 lmbpa       100   85   -3.125  -15.563    3.063  -10.313   10.000   57.500 010 ! Archivio analisi LM su BPA + Toscana (zoom: 31,136,130,220)
 lmctnbpa    100   66   -3.125  -14.500    3.063  -10.438   10.000   57.500 010 ! Distribuzione LM per CTN, dominio BPA (zoom: 31,153,130,218)
@@ -33,6 +32,7 @@ prvbpa       24   16    4.000   41.500   15.500   49.000    0.000    0.000 010 !
 prvemr       19   11    5.500   42.500   14.500   47.500    0.000    0.000 010 ! Area Prev'Air richiesta da EmR, operativa (0.5 x 0.5)
 prvita       33   29    3.500   35.500   19.500   49.500    0.000    0.000 010 ! Area Prev'Air richiesta da EmR, run off-line 2006 (0.5 x 0.5)
 prvmed       21   14    9.500   37.500   19.500   44.000    0.000    0.000 010 ! Area Prev'Air richiesta da CTN per BC su MED (0.5 x 0.5)
+ruc         301  191   -3.750  -14.500    3.750   -9.750   10.000   57.500 010 ! Area RUC Nord Italia 2.8 km (0.025 x 0.025)
 swanad       97   73   12.000   40.000   20.000   46.000    0.000    0.000 010 ! Area SWAN Adriatico (0.083 x 0.083)
 swann1       61   73   12.000   43.800   13.000   45.000    0.000    0.000 010 ! Area SWAN Emilia Romagna (0.0167 x 0.0167)
 swaemr      121  145   12.000   43.800   13.000   45.000    0.000    0.000 010 ! Area SWAN Emilia Romagna (0.0083 x 0.0083)

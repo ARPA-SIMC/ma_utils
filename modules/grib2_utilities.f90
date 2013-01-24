@@ -2,7 +2,7 @@ MODULE grib2_utilities
 !--------------------------------------------------------------------------
 ! Utilita' per la getione dei GRIB2 in logica GRIB1
 !
-!                                         Versione 1.1.3, Enrico 13/02/2012
+!                                         Versione 1.1.4, Enrico 14/01/2013
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -311,18 +311,29 @@ IF (PRESENT(vtime)) THEN
     iret = 1
     vtime_work = datetime_miss
 
-  ELSE IF (scad(3) /= 0) THEN
-    vtime_work = rtime_work + timedelta_new(hour=scad(3))
+  ELSE
+    SELECT CASE (scad(4))
+    CASE(0)
+      vtime_work = rtime_work + timedelta_new(hour=scad(2))
 
-  ELSE IF (scad(3) == 0) THEN
-    vtime_work = rtime_work + timedelta_new(hour=scad(2))
+    CASE(2,3,4,5,14,15)
+      vtime_work = rtime_work + timedelta_new(hour=scad(3))
 
+    CASE(13)
+      vtime_work = rtime_work
+
+    CASE DEFAULT
+      iret = 2
+      vtime_work = datetime_miss
+
+    END SELECT
   ENDIF
 ENDIF
 
 ! 3) Ritorno i parametri richiesti
 IF (PRESENT(vtime)) vtime = vtime_work
 IF (PRESENT(rtime)) rtime = rtime_work
+iret = 0
 
 RETURN
 END SUBROUTINE get_grib_time

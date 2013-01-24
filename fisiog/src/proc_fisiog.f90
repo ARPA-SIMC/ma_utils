@@ -77,7 +77,7 @@
 ! - volendo la correzione alle coordinate Lambert potrebbe essere affinata,
 !   rendendo piu' precisa l'analisi nei punti di test (vedi subdir Lambert) 
 !
-!                                         Versione 2.4.4, Enrico 31/10/2012 
+!                                         Versione 2.4.5, Enrico 21/12/2012 
 !==========================================================================
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -2159,7 +2159,7 @@ ksec1(14)=0
 ksec1(15)=1
 ksec1(16)=0
 ksec1(17)=0
-ksec1(18)=1
+ksec1(18)=0
 ksec1(19)=0
 ksec1(20)=0
 ksec1(21)=21

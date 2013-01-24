@@ -29,7 +29,7 @@ PROGRAM grib_runmean
 !   Eventualmente si potrebbero tenere in memoria i campi corripondenti al 
 !   vettore igin (in modo da decodificare i grib una volta sola)
 !
-!                                                 V3.0.1, Enrico 22/11/2012
+!                                                 V3.0.2, Enrico 14/01/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -45,10 +45,10 @@ REAL, PARAMETER :: rmis = -9999.
 INTEGER, PARAMETER :: igmiss = 0              ! Handler di un grib mancante
 
 ! Variabili locali
-REAL, ALLOCATABLE :: values(:,:),mean(:),nok(:)
+REAL, ALLOCATABLE :: values(:,:),mean(:),nok(:),val_deb(:)
 INTEGER, ALLOCATABLE :: igin(:)
 INTEGER :: ifin,ifout,ig_read,ig_first,ig_write
-INTEGER :: nhr,nreq,hrout,nhincr,nx,ny,np,ibm,en,fstep
+INTEGER :: nhr,nreq,hrout,nhincr,nx,ny,np,ibm,en,fstep,kdeb
 INTEGER :: ios(3),cnt_par,cnt_out,kpar,kg,ksk,iret,ier,idata,ihr,clret(0:5)
 CHARACTER(LEN=80) :: filein,fileout,chpar
 CHARACTER (LEN=12) :: ch12,ch12b
@@ -62,6 +62,9 @@ TYPE(datetime) :: rtime_read,rtime_first
 !==========================================================================
 ! 1) Preliminari
 
+ldeb = .TRUE.
+kdeb = 10095
+
 ! 1.1 Parametri da riga comando
 next_arg = ""
 cnt_par = 0
@@ -69,7 +72,6 @@ ios(:) = 0
 nreq = -999
 hrout = -HUGE(0)
 rq_forc = .FALSE.
-ldeb = .FALSE.
 
 DO kpar = 1,HUGE(0)
   CALL getarg(kpar,chpar)
@@ -84,8 +86,6 @@ DO kpar = 1,HUGE(0)
     next_arg = "nvl"
   ELSE IF (TRIM(chpar) == "-istout") THEN
     next_arg = "ist"
-  ELSE IF (TRIM(chpar) == "-deb") THEN
-    ldeb = .TRUE.
   ELSE IF (next_arg == "nvl") THEN
     READ(chpar,*,IOSTAT=ios(2)) nreq
     next_arg = ""
@@ -163,6 +163,7 @@ DO kg = 1,HUGE(0)
     CALL grib_get(ig_read,"numberOfPointsAlongAMeridian",ny)
     np = nx * ny
     ALLOCATE (values(np,nhr),mean(np),nok(np))
+    IF (ldeb) ALLOCATE(val_deb(np))
 
     ig_first = ig_read
     rtime_first = rtime_read
@@ -195,7 +196,9 @@ DO kg = 1,HUGE(0)
 
   IF (ldeb) THEN
     CALL getval(vtime_read, SIMPLEDATE=ch12)
-    WRITE (*,'(a,i4,2a)') "kg ",kg," vtime_read ",ch12
+    CALL grib_get(ig_read,"values",val_deb(1:np))
+    WRITE (*,'(a,i4,3a,f12.5)') "kg ",kg," vtime_read ",ch12, &
+      " valore ",val_deb(kdeb)
   ENDIF
  
 !--------------------------------------------------------------------------
@@ -234,8 +237,8 @@ DO kg = 1,HUGE(0)
     IF (ldeb) THEN
       CALL getval(vtime_curr, SIMPLEDATE=ch12)
       CALL getval(vtime_out, SIMPLEDATE=ch12b)
-      WRITE (*,'(5a,i6)') "  VT fine periodo media: ",ch12,"   VT output: ", &
-        ch12b,"    nok ",COUNT(mean(1:np) /= rmis)
+      WRITE (*,'(5a,i6,a,f12.5)') "  VT fine periodo media: ",ch12,"   VT output: ", &
+        ch12b,"    nok ",COUNT(mean(1:np) /= rmis)," valore ",mean(kdeb)
     ENDIF
 
     CALL grib_clone(ig_read,ig_write)
@@ -350,7 +353,7 @@ IMPLICIT NONE
 
 !                12345678901234567890123456789012345678901234567890123456789012345678901234567890
 WRITE (*,*)
-WRITE (*,'(a)') "Uso: grib_runmean filein fileout nhr [-nval nreq] [-istout hrout] [-forc] [-deb]"
+WRITE (*,'(a)') "Uso: grib_runmean filein fileout nhr [-nval nreq] [-istout hrout] [-forc]"
 WRITE (*,'(a)') "filein   file grib in input (stessa griglia, verif.time crescente e univoco)"
 WRITE (*,'(a)') "fileout  file grib in output (timerange istantaneo)"
 WRITE (*,'(a)') "nhr      numero di ore su cui calcolare la media mobile"
@@ -359,7 +362,6 @@ WRITE (*,'(a)') "hrout    istante a cui viene attribuita la media mobile in outp
 WRITE (*,'(a)') "         tra 1 (=istante iniziale) e nhr (=istante finale; default)"
 WRITE (*,'(a)') "-forc    scrive i dati in output come previsioni istantanee (def: analisi)"
 WRITE (*,'(a)') "         i dati in input devono essere previsioni con lo stesso reference time"
-WRITE (*,'(a)') "-deb     attiva log estso per debug"
 
 RETURN
 END SUBROUTINE scrive_help

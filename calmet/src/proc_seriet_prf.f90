@@ -9,12 +9,13 @@ PROGRAM proc_seriet_prf
 !   . deve contenete i parametri TT,DD,FF,PP (con parametro -calmet, PP
 !     non e' richiesta, e viene sostituita con valori inventati)
 !   . L'intestazione deve contenere le quote dalla superficie
-!   . E'ammessa la presenza di un livello formato da V10m, T2m, Psup
-!
 ! - Tracciato file di output (up.dat, esclusi headers): 
 !   pp(mb), zz(m), tt(K), dd(grd), ff(m/s)
 !
-!                                         Versione 2.0.1, Enrico 16/01/2012
+! Todo: gestire la presenza di un livello formato da V10m,T2m,Psup (utile 
+!   per run con dati ECMWF o LAMA ante 2006)
+!
+!                                         Versione 2.0.2, Enrico 02/01/2013
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -25,7 +26,7 @@ REAL, PARAMETER :: rmis = -9999.   ! dati mancanti nei files seriet
 INTEGER, PARAMETER :: fw = 10      ! ampiezza dei campi nei files seriet
 INTEGER, PARAMETER :: maxlev = 50  ! numero max di livelli nei files seriet
 CHARACTER(LEN=fw) :: reqlab(4) = &
-  (/"Temp      ","Dir-wind  ","Mod-wind  ","Pr        "/)
+  (/"Temp      ","Dir-wind  ","Mod-wind  ","pr        "/)
 
 TYPE(date) :: data1,data2,datac
 REAL, ALLOCATABLE :: field(:),tt(:),dd(:),ff(:),pp(:),zz(:)
@@ -404,15 +405,14 @@ SUBROUTINE scrive_help
 IMPLICIT NONE
 
 WRITE (*,*) "Uso: proc_seriet_prf.exe filein fileout stzid orog"
-WRITE (*,*) " [-calmet PSUP] [-test]"
+WRITE (*,*) "  [-calmet PSUP][-test]"
 WRITE (*,*) "Filein:  in formato seriet"
 WRITE (*,*) "Fileout: in formato UP*.DAT"
 WRITE (*,*) "stzid:   codice stazione (CH*5; per headers fileout)"
 WRITE (*,*) "orog:    quota stazione (i.e. quota punto LM)"
 WRITE (*,*) "-calmet: non legge i dati di pressione, ma li calcola a partire dalla"
 WRITE (*,*) "         pressione alla superficie (PSUP, hPa) e dal profilo di T"
-WRITE (*,*) "  -test: sostituisce alcuni dati con valori fittizi"
-WRITE (*,*) "         (opzione usata per debug calmet; modificare nel sorgente)"
+WRITE (*,*) "-test:   sostituisce alcuni dati con valori fittizi (per debug calmet)"
 
 RETURN
 END SUBROUTINE scrive_help

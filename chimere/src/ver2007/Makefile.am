@@ -1,4 +1,4 @@
-noinst_LTLIBRARIES = libchimere2007lmsmr4.la libchimere2007lamaz.la
+noinst_LTLIBRARIES = libchimere2007lmsmr4.la libchimere2007lamaz.la libchimere2007lama3.la
 
 libchimere2007lmsmr4_la_SOURCES = \
 	modules/chimere_params.LMSMR4.F90 \
@@ -15,6 +15,19 @@ libchimere2007lmsmr4_la_SOURCES = \
 
 libchimere2007lamaz_la_SOURCES = \
 	modules/chimere_params.LAMAZ.F90 \
+	modules/chimere_consts.F90 \
+	diag/diagmet_common.F90 \
+	diag/diagbio_common.F90 \
+	diag/diagmet_science.F90 \
+	diag/deepconvtiedke.F90 \
+	diag/diagmet.F90 \
+	tools/calendar.F90 \
+	tools/subs.F90 \
+	tools/io.F90 \
+	tools/layave.F90
+
+libchimere2007lama3_la_SOURCES = \
+	modules/chimere_params.LAMA3.F90 \
 	modules/chimere_consts.F90 \
 	diag/diagmet_common.F90 \
 	diag/diagbio_common.F90 \

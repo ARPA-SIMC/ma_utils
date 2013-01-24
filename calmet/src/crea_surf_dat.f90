@@ -27,7 +27,7 @@ PROGRAM crea_surf_dat
 !     ff, dd, ceil,  tcc, tt, rh, prs,cod_prc 
 !    [m/s grd ft*100 10i  K   %   mb  Calmet ]
 !
-!                         V1, Enrico 01/01/2003, da cut_tosurf_sim.f (Manu)
+!                                         Versione 1.0.1, Enrico 03/02/2013
 !--------------------------------------------------------------------------
 USE date_handler
 
@@ -37,7 +37,6 @@ IMPLICIT NONE
 INTEGER, PARAMETER :: ibtz = -1
 
 ! Files costanti
-CHARACTER(LEN=80), PARAMETER :: file_lst  = "surf_req.dat"
 CHARACTER(LEN=80), PARAMETER :: file_out  = "surf.dat"
 
 ! Dati mancanti
@@ -110,8 +109,8 @@ CLOSE(31)
 ALLOCATE (par(nstaz,8,nhr), id_out(nstaz))
 par(:,:,:) = rmis
 
-WRITE (*,'(a,i3,a,i3,a)') "crea_surf_dat: richieste ", &
-  nstaz," stazioni e",nhr," scad."
+WRITE (*,'(a,i3,a,i5,a)') "crea_surf_dat: richieste ", &
+  nstaz," stazioni e ",nhr," scad."
 
 !--------------------------------------------------------------------------
 ! 2: Leggo tutti i report e travaso i dati sull'array di lavoro
@@ -249,7 +248,7 @@ WRITE (*,*) "Errore leggendo ",TRIM(filedate)
 STOP
 
 9998 CONTINUE
-WRITE (*,*) "Errore leggendo ",TRIM(file_lst)
+WRITE (*,*) "Errore leggendo ",TRIM(filesurf)
 STOP
 
 9997 CONTINUE
