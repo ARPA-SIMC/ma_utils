@@ -9,13 +9,14 @@ PROGRAM proc_seriet_prf
 !   . deve contenete i parametri TT,DD,FF,PP (con parametro -calmet, PP
 !     non e' richiesta, e viene sostituita con valori inventati)
 !   . L'intestazione deve contenere le quote dalla superficie
-! - Tracciato file di output (up.dat, esclusi headers): 
-!   pp(mb), zz(m), tt(K), dd(grd), ff(m/s)
+! - Tracciato file di output (up*.dat): 
+!   9999, id_staz, yy, mm, dd, hh, nlev_org, nlev
+!   pp(mb), zz(m-AMSL), tt(K), dd(grd), ff(m/s); livelli ordinati dal basso.
 !
 ! Todo: gestire la presenza di un livello formato da V10m,T2m,Psup (utile 
 !   per run con dati ECMWF o LAMA ante 2006)
 !
-!                                         Versione 2.0.2, Enrico 02/01/2013
+!                                         Versione 2.0.3, Enrico 28/01/2013
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -35,14 +36,14 @@ INTEGER :: nlev_in(4),iz(4,maxlev),idf_in(4,maxlev)
 INTEGER :: iz_out(maxlev),idf_out(4,maxlev),idf2(4)
 INTEGER :: tiz_sorted(maxlev),idx_sorted(maxlev)
 INTEGER :: npar_tot,nlev_out,hh1,hh2,hhc,l1out,npar_req
-INTEGER :: cnt_par,k,k1,k2,krec,kpar,kp,kl
+INTEGER :: cnt_par,k,k1,k2,krec,kpar,kp,kl,kl2
 INTEGER :: eof,eor,ios
 CHARACTER(LEN=10000) :: header_lev,header_par,chrec
 CHARACTER(LEN=120) :: filein,fileout,chpar,chfmt
 CHARACTER(LEN=5) :: stzid,next_arg
 CHARACTER(LEN=fw) :: lev_lab,par_lab
 
-LOGICAL :: ltest,lcalmet,unsorted(maxlev)
+LOGICAL :: ltest,lcalmet,is_sorted(maxlev),ldeb
 
 !REAL :: dd10,ff10,tt02,psup
 
@@ -52,6 +53,7 @@ LOGICAL :: ltest,lcalmet,unsorted(maxlev)
 !--------------------------------------------------------------------------
 ! 1.1 Parametri da riga comandi etc.
 
+ldeb = .FALSE.
 ltest = .FALSE.
 lcalmet = .FALSE.
 next_arg = ""
@@ -162,24 +164,34 @@ DO kp = 1,npar_tot
   ENDDO
 ENDDO
 
-!print *,nlev_in
-!do k = 1,4
-!  print *,idf_in(k,:)
-!  print *,iz(k,:)
-!enddo
+IF (ldeb) THEN
+  WRITE (*,*) "T in input file: nlevs ",nlev_in(1)
+  WRITE (*,'(30i5)') idf_in(1,1:nlev_in(1))
+  WRITE (*,'(30i5)') iz(1,1:nlev_in(1))
+ENDIF
 
 !--------------------------------------------------------------------------
-! 2.3 Costruisco la lista ordinata dei livelli di T presenti in input
+! 2.3 Costruisco la lista ordinata dal basso dei livelli di T
 
-tiz_sorted(1:nlev_in(1)) = 0
+tiz_sorted(1:nlev_in(1)) = HUGE(0)
 idx_sorted(1:nlev_in(1)) = 0
-unsorted(1:nlev_in(1)) = .TRUE.
+is_sorted(1:nlev_in(1)) = .FALSE.
 DO kl = 1,nlev_in(1)
-  tiz_sorted(kl) = MINVAL(iz(1,1:nlev_in(1)), MASK=unsorted(1:nlev_in(1)))  
-  idx_sorted(kl) = MINLOC(iz(1,1:nlev_in(1)), DIM=1, &
-    MASK=unsorted(1:nlev_in(1)))  
-  unsorted(idx_sorted(kl)) =.FALSE.
+  DO kl2 = 1,nlev_in(1)
+    IF (is_sorted(kl2)) CYCLE
+    IF (iz(1,kl2) < tiz_sorted(kl)) THEN
+      tiz_sorted(kl) = iz(1,kl2)
+      idx_sorted(kl) = kl2
+    ENDIF
+  ENDDO
+  is_sorted(idx_sorted(kl)) = .TRUE.
 ENDDO
+
+IF (ldeb) THEN
+  WRITE (*,*) "T sorted:"
+  WRITE (*,'(30i5)') idx_sorted(1:nlev_in(1))
+  WRITE (*,'(30i5)') tiz_sorted(1:nlev_in(1))
+ENDIF
 
 !--------------------------------------------------------------------------
 ! 2.4 Cerco i livelli con tutti i dati necessari: scorro dal basso i 
@@ -205,8 +217,12 @@ DO kl = 1,nlev_in(1)
 ! Se ho trovato un livello completo, lo salvo
   IF (ALL(idf2(1:npar_req) /= 0)) THEN
     nlev_out = nlev_out + 1
-    iz_out(nlev_out) = iz(1,kl)
+    iz_out(nlev_out) = tiz_sorted(kl)
     idf_out(:,nlev_out) = idf2(:)
+  ENDIF
+
+  IF (ldeb) THEN
+    WRITE (*,*) kl,tiz_sorted(kl),"  ",idf2(:),nlev_out,iz_out(nlev_out)
   ENDIF
 
 ENDDO
@@ -412,6 +428,7 @@ WRITE (*,*) "stzid:   codice stazione (CH*5; per headers fileout)"
 WRITE (*,*) "orog:    quota stazione (i.e. quota punto LM)"
 WRITE (*,*) "-calmet: non legge i dati di pressione, ma li calcola a partire dalla"
 WRITE (*,*) "         pressione alla superficie (PSUP, hPa) e dal profilo di T"
+WRITE (*,*) "         (usare se i dati di input sono l'ouptut di Calmet)"
 WRITE (*,*) "-test:   sostituisce alcuni dati con valori fittizi (per debug calmet)"
 
 RETURN
