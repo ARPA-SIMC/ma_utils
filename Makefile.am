@@ -18,7 +18,7 @@ pkgdatarootdir = $(datarootdir)/$(PACKAGE)
 pkgdataroot_DATA = \
 	$(top_srcdir)/data/aree_geo.dat \
 	$(top_srcdir)/data/aree_utm.dat \
-	$(top_srcdir)/data/arkimet_aree.dat
+	$(top_srcdir)/data/arkimet_aree.dat \
 	$(top_srcdir)/data/tabella_002_ser.txt \
 	$(top_srcdir)/data/tabella_002.txt \
 	$(top_srcdir)/data/tabella_128_ser.txt \
