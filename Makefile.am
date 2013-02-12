@@ -3,6 +3,7 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = \
 	modules \
 	arkimet/src \
+	arkimet/postprocessors/seriet \
 	calmet/src \
 	chimere/src/ver2007 \
 	chimere/src/ver2011 \

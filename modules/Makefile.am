@@ -1,5 +1,7 @@
 noinst_LTLIBRARIES = libmautils.la
 
+AM_FCFLAGS = -I/usr/lib64/gfortran/modules -I/usr/lib/gfortran/modules
+
 libmautils_la_SOURCES = \
 	date_handler.f90 \
 	grib2_utilities.f90 \

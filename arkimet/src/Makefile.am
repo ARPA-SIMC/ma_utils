@@ -1,7 +1,7 @@
-AM_FCFLAGS = -I/usr/lib64/gfortran/modules -I$(top_builddir)/modules
+AM_FCFLAGS = -I/usr/lib64/gfortran/modules -I/usr/lib/gfortran/modules -I$(top_builddir)/modules
 AM_LDFLAGS = $(top_builddir)/modules/libmautils.la
 
-bin_PROGRAMS = gacsv2seriet.exe gacsv_scan.exe indice2coor.exe mvl_create.exe pm_profile_zi.exe ptn2pts_csv.exe scores_seriet.exe scores_seriet_wind.exe sel_punti.exe sel_punti_grid.exe tfill_seriet.exe write_fisiog_csv.exe write_libsim_anag.exe
+pkglibexec_PROGRAMS = gacsv2seriet.exe gacsv_scan.exe indice2coor.exe mvl_create.exe pm_profile_zi.exe ptn2pts_csv.exe scores_seriet.exe scores_seriet_wind.exe sel_punti.exe sel_punti_grid.exe tfill_seriet.exe write_fisiog_csv.exe write_libsim_anag.exe
 
 gacsv2seriet_exe_SOURCES = gacsv2seriet.f90
 gacsv_scan_exe_SOURCES = gacsv_scan.f90

@@ -1,7 +1,7 @@
 AM_FCFLAGS = -I/usr/lib64/gfortran/modules -I$(top_builddir)/modules
 AM_LDFLAGS = $(top_builddir)/modules/libmautils.la
 
-bin_PROGRAMS = calc_anh01.exe calc_inv_max.exe calc_ipgt.exe calc_ipgt_inv_multi.exe calc_ps_cosmo.exe calc_swdown.exe calc_ustar_mo.exe correct_lamaz.exe decumula_lm.exe grib_ttd2rh.exe lm_levels2layers.exe post_wind_lm.exe post_zi_diagmet.exe qsoil_ecmwf2lama.exe split_qrs.exe stat_qrs_temp.exe
+pkglibexec_PROGRAMS = calc_anh01.exe calc_inv_max.exe calc_ipgt.exe calc_ipgt_inv_multi.exe calc_ps_cosmo.exe calc_swdown.exe calc_ustar_mo.exe correct_lamaz.exe decumula_lm.exe grib_ttd2rh.exe lm_levels2layers.exe post_wind_lm.exe post_zi_diagmet.exe qsoil_ecmwf2lama.exe split_qrs.exe stat_qrs_temp.exe
 
 calc_anh01_exe_SOURCES = calc_anh01.f90
 calc_inv_max_exe_SOURCES = calc_inv_max.f90

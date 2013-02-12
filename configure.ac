@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(ma_utils, 0.1, dbranchini@arpa.emr.it)
+AC_INIT(ma_utils, 0.2, dbranchini@arpa.emr.it)
 LT_INIT
 AM_INIT_AUTOMAKE([-Wall foreign])
 AC_CONFIG_MACRO_DIR([m4])
@@ -26,6 +26,7 @@ LIBS="-lgrib_api -lgrib_api_f90 -lgrib_util -lemos -lsim_base -lsim_volgrid6d  -
 AC_CONFIG_FILES([Makefile
 		modules/Makefile
 		arkimet/src/Makefile
+		arkimet/postprocessors/seriet/Makefile
 		calmet/src/Makefile
 		chimere/src/ver2007/Makefile
 		chimere/src/ver2011/Makefile

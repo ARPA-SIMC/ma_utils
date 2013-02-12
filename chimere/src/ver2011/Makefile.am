@@ -1,3 +1,5 @@
+AM_FCFLAGS = -I/usr/lib64/gfortran/modules -I/usr/lib/gfortran/modules
+
 noinst_LTLIBRARIES = libchimere2011.la
 
 libchimere2011_la_SOURCES = \

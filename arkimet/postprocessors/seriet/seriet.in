@@ -1,0 +1,55 @@
+#!/bin/bash
+# Postprocessatore che scrive in formato csv i dati 
+# relativi ad un singolo punto
+# Sinossi:
+# gacsv LON LAT
+
+{
+tmpdir=$(mktemp -d) || exit 1
+outfile=${tmpdir}/out.csv
+
+function cleanup() {
+	local s=$?
+	rm -rf $tmpdir
+	exit $s
+}
+
+trap "cleanup" EXIT
+
+lon=$1
+lat=$2
+
+[[ x$lat != x && x$lon != x ]] || exit 1
+
+cd ${tmpdir}
+
+cat <<EOF > xargs
+#!/bin/bash
+# xargs lon lat outfile infile
+vg6d_transform --a-grid \$4 tmp.grb || exit 1
+vg6d_getpoint --lon=\$1 --lat=\$2 \
+	--trans-type=inter \
+	--sub-type=near \
+	--output-format=grib_api_csv \
+        --output-keys=gacsv:simpledate,gacsv:p1h,gacsv:p2h,gacsv:timerange,gacsv:level1,gacsv:l1,gacsv:l2,gacsv:centre,gacsv:category,gacsv:number,gacsv:npoint,gacsv:lon,gacsv:lat,gacsv:value,editionNumber tmp.grb tmp.gacsv || \
+	exit 1
+tail -n +2 tmp.gacsv >> \$3
+EOF
+chmod ugo+x xargs
+
+touch $outfile
+arki-xargs \
+	--time-interval=day \
+	./xargs $lon $lat \
+	${outfile} || \
+	exit 2
+
+filepts=${tmpdir}/filepts
+filecol=${tmpdir}/filecol 
+filerow=${tmpdir}/filerow
+
+@pkglibexecdir@/gacsv_scan $outfile -p $filepts -c $filecol -r $filerow || exit 2
+@pkglibexecdir@/gacsv2seriet $filepts $filecol $filerow $outfile || exit 3
+} >&2
+cat seriet_001.txt || exit 4
+exit 0
