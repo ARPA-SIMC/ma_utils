@@ -9,7 +9,8 @@ Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: netcdf-devel, grib_api-1.9.9
-Requires: libsim = 4.5
+Requires: libsim >= 5.0, libsim < 6.0
+
 Vendor:	       Enrico Minguzzi <eminguzzi@arpa.emr.it>
 Packager:      Daniele Branchini <dbranchini@arpa.emr.it>
 
