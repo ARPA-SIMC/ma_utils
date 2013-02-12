@@ -48,8 +48,8 @@ filepts=${tmpdir}/filepts
 filecol=${tmpdir}/filecol 
 filerow=${tmpdir}/filerow
 
-@pkglibexecdir@/gacsv_scan $outfile -p $filepts -c $filecol -r $filerow || exit 2
-@pkglibexecdir@/gacsv2seriet $filepts $filecol $filerow $outfile || exit 3
+@pkglibexecdir@/gacsv_scan.exe $outfile -p $filepts -c $filecol -r $filerow || exit 2
+@pkglibexecdir@/gacsv2seriet.exe $filepts $filecol $filerow $outfile || exit 3
 } >&2
 cat seriet_001.txt || exit 4
 exit 0
