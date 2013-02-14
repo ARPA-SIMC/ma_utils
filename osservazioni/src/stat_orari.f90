@@ -13,22 +13,29 @@ PROGRAM stat_orari
 ! - rose dei venti    (wrose): dati per intensita' e quaxdrante
 !
 ! Uso: 
-! stat_orari.exe [-h] [-s/-sx/-q/-t/-r] [-csv] [-liv] [-ndec N] filein
+! stat_orari.exe [-h] [-o/-s/-sx/-d/-t] [-csv] [-liv] [-ndec N] filein
 !
 ! Compilazione:
 ! Usa l'obsolescente modulo per la gestione date date_hander.f90
 !
 ! Note:
+! - Dalla versione 9, viene il tracciato dei files .sta con serie 
+!   storiche (daily, month, SE***) diventa uguale a quello di estraqa con 
+!   dati giornalieri. I nuovi files .sta sono la concatenazione di 4 
+!   estraqa-day, separati da 2 record vuoti; il record dei livelli (se 
+!   presente) e' il 2o di intestazione)
 ! - Il programma ignora le stazioni, e media tutti i dati presenti nel file
 !   relativi a ciascuna data-ora (appendendo opportunamente i files di 
 !   input e' quindi possibile calcolare medie di settore, ecc.).
 ! - Nel file di input, i parametri possono essere in qualsiasi ordine;
 !   solo per il formato condiviso l'ordine e' fisso (ma possono mancare le
 !   ultime colonne)
+! - La stagione "semestre invernale" viene calcolata in 2 modi: win e' il
+!   semestre oct-mar, wi2 l'uninoe dei due trimestri jan-mar e oct-dec. 
 ! - Le stagioni a cavallo di due anni (djf e win) sono attribuite all'anno
 !   in cui iniziano
 !
-!                                        V8.0.0, Enrico & Johnny 07/09/2012
+!                                        V9.0.0, Enrico & Johnny 13/02/2013
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -43,9 +50,8 @@ IMPLICIT NONE
 REAL, PARAMETER :: rmis_hhr = -9999. ! dato mancante, files estra_orari
 REAL, PARAMETER :: rmis_ser = -9999. ! dato mancante, files trasp_seriet
 REAL, PARAMETER :: rmis_sex = -1.E30 ! dato mancante, files trasp_seriet exp
-REAL, PARAMETER :: rmis_qad = -9999. ! dato mancante, files estra_qa giorn.
+REAL, PARAMETER :: rmis_ddy = -9999. ! dato mancante, files estra_qa giorn.
 REAL, PARAMETER :: rmis_tem = -9999. ! dato mancante, files trasp_temp
-REAL, PARAMETER :: rmis_reg = 9999.  ! dato mancante, files regioni
 INTEGER, PARAMETER :: fw = 10        ! ampiezza dei campi nei files I/O
 INTEGER, PARAMETER :: mxbin = 20     ! n.ro max di intervalli (istogrammi)
 INTEGER, PARAMETER :: mxpar = 500    ! n.ro max di parametri in un file
@@ -87,22 +93,11 @@ INTEGER, PARAMETER :: np_mo = 3                           ! 10
 CHARACTER (LEN=fw), PARAMETER :: str_par_mo(np_mo) = &
   (/"        mo","      molm","     modia"/)
 
-! 0.2.2 Elenco dei parametri contenuti nei files 
-!       "condivisione interregionale"
-INTEGER, PARAMETER :: mxpar_r = 6
-CHARACTER (LEN=fw), PARAMETER :: str_par_r(mxpar_r) = (/ &
-  "       prc", &    !1
-  "     T ist", &    !2
-  "    DD ist", &    !3
-  "    FF ist", &    !4
-  "    RH ist", &    !5
-  "      TxTn"/)     !6
+! 0.2.2 Stringhe descrittive delle stagioni
+CHARACTER (LEN=3), PARAMETER :: labsea(8) = (/ &
+  "mam","jja","son","djf","sum","win","yea","wi2"/)
 
-! 0.2.3 Stringhe descrittive delle stagioni
-CHARACTER (LEN=3), PARAMETER :: labsea(7) = (/ &
-  "mam","jja","son","djf","sum","win","yea"/)
-
-! 0.2.4 Stringhe descrittive delle statistiche in output
+! 0.2.3 Stringhe descrittive delle statistiche in output
 CHARACTER (LEN=12), PARAMETER :: title(4) = (/ &
   "Medie       ","Massimi     ","Minimi      ","Dati_validi "/)
 INTEGER, PARAMETER :: idx_stat(4) = (/2,3,4,1/)
@@ -114,8 +109,8 @@ REAL :: dfreq(mxpar,mxbin)       ! distribuz. di frequenza
 REAL,ALLOCATABLE :: ggtyp(:,:,:) ! nok/med/max/min gg tipo (4,mxpar,0:23)
 REAL,ALLOCATABLE :: daily(:,:,:) ! nok/med/max/min giorn. (4,mxpar,ndays)
 REAL,ALLOCATABLE :: month(:,:,:) ! nok/med/max/min mensile (4,mxpar,nmonths)
-REAL,ALLOCATABLE :: season(:,:,:,:)!nok/med/max/min stag. (4,7,mxpar,nyears)
-                                 ! Stagioni: MAM,JJA,SON,DJF,Sum,Win,Yea
+REAL,ALLOCATABLE :: season(:,:,:,:)!nok/med/max/min stag. (4,8,mxpar,nyears)
+                                 ! Stagioni: MAM,JJA,SON,DJF,Sum,Win,Yea,Wi2
 REAL :: wrose(mxbin,mxbin)       ! intervallo (<=); settore (N,NE,E...)
 
 !--------------------------------------------------------------------------
@@ -142,6 +137,7 @@ CHARACTER (LEN=100) :: chpar,file_in,file_root,file_out,file_out2
 CHARACTER (LEN=fw) :: str_par(mxpar),str_par2(mxpar),str_liv(mxpar)
 CHARACTER (LEN=fw) :: chval(mxpar),str_par_dum
 CHARACTER (LEN=17) :: str_data_ser
+CHARACTER (LEN=13) :: str_data_csv
 CHARACTER (LEN=10) :: ch10
 CHARACTER (LEN=8) :: ch_id_staz
 CHARACTER (LEN=4) :: ch4
@@ -166,16 +162,18 @@ DO kp = 1,HUGE(0)
   ELSE IF (TRIM(chdum) == "-h") THEN
     CALL scrive_help
     STOP
+  ELSE IF (TRIM(chdum) == "-o") THEN
+    inp_data = "hhr"
   ELSE IF (TRIM(chdum) == "-s") THEN
     inp_data = "ser"
   ELSE IF (TRIM(chdum) == "-sx") THEN
     inp_data = "sex"
+  ELSE IF (TRIM(chdum) == "-d") THEN
+    inp_data = "ddy"
   ELSE IF (TRIM(chdum) == "-q") THEN
-    inp_data = "qad"
+    inp_data = "ddy"
   ELSE IF (TRIM(chdum) == "-t") THEN
     inp_data = "tem"
-  ELSE IF (TRIM(chdum) == "-r") THEN
-    inp_data = "reg"
   ELSE IF (TRIM(chdum) == "-liv") THEN
     out_liv = .TRUE.
   ELSE IF (TRIM(chdum) == "-csv") THEN
@@ -244,7 +242,7 @@ ELSE IF (inp_data == "ser" .OR. inp_data == "sex") THEN
     fmt_ser_xls = .FALSE.
   ENDIF
 
-ELSE IF (inp_data == "qad") THEN
+ELSE IF (inp_data == "ddy") THEN
   READ (20,*,ERR=9998)
   READ (20,*,ERR=9998)
   READ (20,'(10x,a)', ERR=9997) head_par
@@ -254,14 +252,11 @@ ELSE IF (inp_data == "tem") THEN
   READ (20,*,ERR=9998)
   READ (20,'(19x,a)', ERR=9997) head_par
 
-ELSE IF (inp_data == "reg") THEN
-  READ (20,*)
-
 ENDIF
 
-! Leggo lista parametri: formati estra_orari, seriet, estra_qa, trasp_temp
+! Leggo la lista dei parametri
 IF (inp_data == "hhr" .OR. inp_data == "ser"  .OR. inp_data == "sex" .OR. &
-    inp_data == "qad" .OR. inp_data == "tem") THEN
+    inp_data == "ddy" .OR. inp_data == "tem") THEN
 
   WRITE (chfmt0,'(a,i2,a)'), "(1x,a",fw,")"
   DO k = 1,mxpar
@@ -298,20 +293,6 @@ IF (inp_data == "hhr" .OR. inp_data == "ser"  .OR. inp_data == "sex" .OR. &
   ENDDO
   npar = k - 1
 
-! Leggo lista parametri: formato condivisione
-ELSE IF (inp_data == "reg") THEN
-
-  DO k = 1,mxpar_r
-    READ (20,'(1x,a4)',ADVANCE="NO",IOSTAT=ios) ch4
-    IF (ios /= 0) GOTO 9997
-  ENDDO
-  npar = k - 1
-
-  DO k = 1,npar
-    id_par(k) = k
-    str_par(k) = str_par_r(k)
-  ENDDO
-
 ENDIF
 CLOSE (20)
 
@@ -325,7 +306,7 @@ data1 = date(1,1,9999)
 data2 = date(1,1,0)
 
 OPEN (UNIT=20, FILE=file_in, STATUS= "OLD", ACTION="READ", ERR=9999)
-IF (inp_data == "hhr" .OR. inp_data == "qad" .OR. inp_data == "tem") THEN
+IF (inp_data == "hhr" .OR. inp_data == "ddy" .OR. inp_data == "tem") THEN
   READ (20,*,ERR=9998)
   READ (20,*,ERR=9998)
   READ (20,*,ERR=9998)
@@ -336,11 +317,10 @@ ELSE IF (inp_data == "ser" .OR. inp_data == "sex") THEN
   READ (20,*,ERR=9998)
   READ (20,*,ERR=9998)
   READ (20,*,ERR=9998)
-ELSE IF (inp_data == "reg") THEN
 ENDIF
 
 DO k = 1,HUGE(k)
-  IF (inp_data == "hhr" .OR. inp_data == "qad" .OR. inp_data == "tem") THEN
+  IF (inp_data == "hhr" .OR. inp_data == "ddy" .OR. inp_data == "tem") THEN
     READ (20,'(i4,2i3)',IOSTAT=ios) data_dum%yy,data_dum%mm,data_dum%dd
 
   ELSE IF (inp_data == "ser" .OR. inp_data == "sex") THEN
@@ -350,9 +330,6 @@ DO k = 1,HUGE(k)
       READ (20,'(i2,1x,i2,1x,i4)',IOSTAT=ios) data_dum%dd,data_dum%mm, &
         data_dum%yy
     ENDIF
-
-  ELSE IF (inp_data == "reg") THEN
-    READ (20,'(8x,i4,2i2)',IOSTAT=ios) data_dum%yy,data_dum%mm,data_dum%dd
 
   ENDIF
   IF (ios == eof) EXIT 
@@ -378,7 +355,7 @@ CLOSE(20)
 ! 2.4 Costruisco formato input
 IF (inp_data == "hhr") THEN
   WRITE (chfmt1,'(a,i3,a,i2,a)') "(i4,3i3,",npar,"(1x,a",fw,"))"
-ELSE IF (inp_data == "qad") THEN
+ELSE IF (inp_data == "ddy") THEN
   WRITE (chfmt1,'(a,i3,a,i2,a)') "(i4,2i3,",npar,"(1x,a",fw,"))"
 ELSE IF (inp_data == "tem") THEN
   WRITE (chfmt1,'(a,i3,a,i2,a)') "(i4,3i3,6x",npar,"(1x,a",fw,"))"
@@ -388,8 +365,6 @@ ELSE IF ((inp_data == "ser" .OR. inp_data == "sex") .AND. &
 ELSE IF ((inp_data == "ser" .OR. inp_data == "sex") .AND. &
          fmt_ser_xls .eqv. .TRUE.) THEN
   WRITE (chfmt1,'(a,i3,a,i2,a)') "(i2,1x,i2,1x,i4,i3,4x,",npar,"(1x,a",fw,"))"
-ELSE IF (inp_data == "reg") THEN
-  WRITE (chfmt1,'(a,i3,a,i2,a)') "(8x,i4,2i2,1x,i2,2x,",npar,"(1x,i4))"
 ENDIF
 
 !--------------------------------------------------------------------------
@@ -400,12 +375,10 @@ ELSE IF (inp_data == "ser") THEN
   rmis = rmis_ser
 ELSE IF (inp_data == "sex") THEN
   rmis = rmis_sex
-ELSE IF (inp_data == "qad") THEN
-  rmis = rmis_qad
+ELSE IF (inp_data == "ddy") THEN
+  rmis = rmis_ddy
 ELSE IF (inp_data == "tem") THEN
   rmis = rmis_tem
-ELSE IF (inp_data == "reg") THEN
-  rmis = rmis_reg
 ENDIF
 
 !--------------------------------------------------------------------------
@@ -413,7 +386,7 @@ ENDIF
 ALLOCATE (ggtyp(4,mxpar,0:23))
 ALLOCATE (daily(4,mxpar,ndays))
 ALLOCATE (month(4,mxpar,nmonths))
-ALLOCATE (season(4,7,mxpar,nyears))
+ALLOCATE (season(4,8,mxpar,nyears))
 
 !--------------------------------------------------------------------------
 ! 2.7 Definisco gli intervalli per istogrammi (relativi a ciascun parametro)
@@ -487,16 +460,10 @@ ENDDO
 ! 2.8 Trovo i parametri relativi al vento (se ci sono)
 kpar_dd = -99
 kpar_ff = -99
-IF (inp_data == "hhr" .OR. inp_data == "ser" .OR. inp_data == "sex" .OR. &
-    inp_data == "tem") THEN
-  DO k = 1,npar
-    IF (id_par(k) == 4) kpar_dd = k
-    IF (id_par(k) == 3) kpar_ff = k
-  ENDDO
-ELSE IF (inp_data == "reg") THEN
-  IF (npar >= 3) kpar_dd = 3
-  IF (npar >= 4) kpar_ff = 4
-ENDIF
+DO k = 1,npar
+  IF (id_par(k) == 4) kpar_dd = k
+  IF (id_par(k) == 3) kpar_ff = k
+ENDDO
 
 !--------------------------------------------------------------------------
 ! 2.9 Inizializzo i contatori statistici
@@ -541,7 +508,7 @@ WRITE (*,*)
 OPEN (UNIT=20, FILE=file_in, STATUS= "OLD", ACTION="READ", ERR=9999)
 
 ! 3.1 Skippo header
-IF (inp_data == "hhr" .OR. inp_data == "qad" .OR. inp_data == "tem") THEN
+IF (inp_data == "hhr" .OR. inp_data == "ddy" .OR. inp_data == "tem") THEN
   READ (20,*,ERR=9998)
   READ (20,*,ERR=9998)
   READ (20,*,ERR=9998)
@@ -552,12 +519,11 @@ ELSE IF (inp_data == "ser" .OR. inp_data == "sex") THEN
   READ (20,*,ERR=9998)
   READ (20,*,ERR=9998)
   READ (20,*,ERR=9998)
-ELSE IF (inp_data == "reg") THEN
 ENDIF
 
 DO k = 1,nrep
 
-! 3.2 Leggo un report e se necessario converto le unita' di misura
+! 3.2 Leggo un report
   IF (inp_data == "hhr") THEN
     READ (20,chfmt1,IOSTAT=ios) data_dum%yy,data_dum%mm,data_dum%dd,hrdum,chval(1:npar)
     IF (ios /= 0) GOTO 9995
@@ -565,7 +531,7 @@ DO k = 1,nrep
       READ (chval(kv),*) rval(kv)
     ENDDO
 
-  ELSE IF (inp_data == "qad") THEN
+  ELSE IF (inp_data == "ddy") THEN
     READ (20,chfmt1,IOSTAT=ios) data_dum%yy,data_dum%mm,data_dum%dd,chval(1:npar)
     hrdum = 0
     IF (ios /= 0) GOTO 9995
@@ -591,15 +557,6 @@ DO k = 1,nrep
     DO kv = 1,npar
       READ (chval(kv),*) rval(kv)
     ENDDO
-
-  ELSE IF (inp_data == "reg") THEN
-    READ (20,chfmt1,IOSTAT=ios) data_dum%yy,data_dum%mm,data_dum%dd,hrdum,ival(1:npar)
-    IF (ios /= 0) GOTO 9995
-    rval(1:npar) = REAL(ival(1:npar))
-    IF (rval(1) /= rmis) rval(1) = rval(1) / 10.   ! prc  da mm/10  a mm
-    IF (rval(2) /= rmis) rval(2) = rval(2) / 10.   ! T    da C/10   a C
-    IF (rval(4) /= rmis) rval(4) = rval(4) / 10.   ! FF   da m/s/10 a m/s
-    IF (rval(6) /= rmis) rval(6) = rval(6) / 10.   ! TxTn da C/10   a C
 
   ENDIF
 
@@ -685,6 +642,18 @@ DO k = 1,nrep
     season(4,7,1:npar,kyear12) = &
       MIN (season(4,7,1:npar,kyear12), rval(1:npar))
   ENDWHERE
+
+! Elaboro a parte la stagione wi2 (inverno spezzato)
+  IF (ksea6 == 2) THEN
+    WHERE (rval(1:npar) /= rmis)
+      season(1,8,1:npar,kyear12) = season(1,8,1:npar,kyear12) +1
+      season(2,8,1:npar,kyear12) = season(2,8,1:npar,kyear12) + rval(1:npar)
+      season(3,8,1:npar,kyear12) = &
+        MAX(season(3,8,1:npar,kyear12), rval(1:npar))
+      season(4,8,1:npar,kyear12) = &
+        MIN (season(4,8,1:npar,kyear12), rval(1:npar))
+    ENDWHERE
+  ENDIF  
  
 ! 3.5 Aggiorno dfreq
   DO kpar = 1,npar
@@ -785,13 +754,13 @@ ELSEWHERE
 ENDWHERE
 
 ! season
-WHERE (season(1,1:7,1:npar,1:nyears) > 0)
-  season(2,1:7,1:npar,1:nyears) = season(2,1:7,1:npar,1:nyears) / &
-    season(1,1:7,1:npar,1:nyears)
+WHERE (season(1,1:8,1:npar,1:nyears) > 0)
+  season(2,1:8,1:npar,1:nyears) = season(2,1:8,1:npar,1:nyears) / &
+    season(1,1:8,1:npar,1:nyears)
 ELSEWHERE
-  season(2,1:7,1:npar,1:nyears) = rmis
-  season(3,1:7,1:npar,1:nyears) = rmis
-  season(4,1:7,1:npar,1:nyears) = rmis
+  season(2,1:8,1:npar,1:nyears) = rmis
+  season(3,1:8,1:npar,1:nyears) = rmis
+  season(4,1:8,1:npar,1:nyears) = rmis
 ENDWHERE
 
 ! dfreq: metto a rmis la frequenza dei bin non utilizzati
@@ -1061,18 +1030,21 @@ IF (out_fmt == "txt") THEN
 ELSE IF (out_fmt == "csv") THEN
   WRITE (file_out,'(2a)') TRIM(file_root),"_ggtyp.csv"
 ENDIF
-WRITE (chfmth,'(a,i3,a,i2,a)') "(13x,",npar,"(1x,a",fw,"))"
-WRITE (chfmt2,'(a,i3,3a)') "(i2.2,11x,",npar,"(1x,",TRIM(chfmt4),"))"
-WRITE (chfmt5,'(a,i3,a,i2,a)') "(i2.2,11x,",npar,"(1x,i",fw,"))"
+WRITE (chfmth,'(a,i3,a,i2,a)') "(a10,",npar,"(1x,a",fw,"))"
+WRITE (chfmt2,'(a,i3,3a)') "(i2.2,8x,",npar,"(1x,",TRIM(chfmt4),"))"
+WRITE (chfmt5,'(a,i3,a,i2,a)') "(i2.2,8x,",npar,"(1x,i",fw,"))"
 
 OPEN (UNIT=31, FILE=file_out, STATUS="REPLACE", FORM="FORMATTED")
-DO kk = 1, 4
+DO kk = 1,4
   IF (out_fmt == "txt") THEN
-    WRITE (31,'(a)') TRIM(title(kk))
-    WRITE (31,*)
-    WRITE (31,chfmth) (str_par2(kpar), kpar=1,npar)
-    IF (out_liv) WRITE (31,chfmth) (str_liv(kpar), kpar=1,npar)
-    DO khr = 0,23
+    WRITE (31,'(a)') TRIM(title(kk))                    ! header 1 (staz)
+    IF (out_liv) THEN                                   ! header 2 (liv)
+      WRITE (31,chfmth) "          ",(str_liv(kpar), kpar=1,npar)
+    ELSE
+      WRITE (31,*)
+    ENDIF
+    WRITE (31,chfmth) "hh        ",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
+    DO khr = 0,23                                       ! dati
       IF (kk <= 3) THEN
         WRITE (31,chfmt2) khr,ggtyp(idx_stat(kk),1:npar,khr)
       ELSE
@@ -1084,30 +1056,36 @@ DO kk = 1, 4
 
   ELSE IF (out_fmt == "csv") THEN
 
-!   header: parametri
+!   header 1 (staz)
+    WRITE (31,'(a)') TRIM(title(kk))
+
+!   header 2 (liv)
     CALL init(csvline)
-    CALL csv_record_addfield(csvline,TRIM(title(kk)))
+    CALL csv_record_addfield(csvline,"")
+    DO kpar = 1,npar
+      IF (out_liv) THEN
+        CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_liv(kpar))))
+      ELSE
+        CALL csv_record_addfield(csvline,"")
+      ENDIF
+    ENDDO
+    WRITE (31,'(a)') csv_record_getrecord(csvline)
+    CALL delete(csvline)
+
+!   header 3 (par)
+    CALL init(csvline)
+    CALL csv_record_addfield(csvline,24)
     DO kpar = 1,npar
       CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
     ENDDO
     WRITE (31,'(a)') csv_record_getrecord(csvline)
     CALL delete(csvline)
 
-!   header: livelli
-    IF (out_liv) THEN
-      CALL init(csvline)
-      CALL csv_record_addfield(csvline," ")
-      DO kpar = 1,npar
-        CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_liv(kpar))))
-      ENDDO
-      WRITE (31,'(a)') csv_record_getrecord(csvline)
-      CALL delete(csvline)
-    ENDIF
-
 !   dati
     DO khr = 0,23
       CALL init(csvline)
-      CALL csv_record_addfield(csvline,khr)
+      WRITE (str_data_csv,'(i4.4,2(a1,i2.2),1x,i2.2)') 0,"-",0,"-",0,khr
+      CALL csv_record_addfield(csvline,str_data_csv)
       DO kpar = 1,npar
         CALL csv_record_addfield(csvline,ggtyp(idx_stat(kk),kpar,khr))
       ENDDO
@@ -1177,21 +1155,23 @@ IF (out_fmt == "txt") THEN
 ELSE IF (out_fmt == "csv") THEN
   WRITE (file_out,'(2a)') TRIM(file_root),"_daily.csv"
 ENDIF
-WRITE (chfmth,'(a,i3,a,i2,a)') "(a10,3x,",npar,"(1x,a",fw,"))"
+WRITE (chfmth,'(a,i3,a,i2,a)') "(a10,",npar,"(1x,a",fw,"))"
 WRITE (chfmt2,'(a,i3,3a)') &
-  "(i4.4,2(1x,i2.2),3x,",npar,"(1x,",TRIM(chfmt4),"))"
+  "(i4.4,2(1x,i2.2),",npar,"(1x,",TRIM(chfmt4),"))"
 WRITE (chfmt5,'(a,i3,a,i2,a)') &
-  "(i4.4,2(1x,i2.2),3x,",npar,"(1x,i",fw,"))"
+  "(i4.4,2(1x,i2.2),",npar,"(1x,i",fw,"))"
 
 OPEN (UNIT=31, FILE=file_out, STATUS="REPLACE", FORM="FORMATTED")
 DO kk = 1, 4
   IF (out_fmt == "txt") THEN
-    WRITE (31,'(a)') TRIM(title(kk))
-    WRITE (31,*)
-    WRITE (31,chfmth) "aaaa mm gg",(str_par2(kpar), kpar=1,npar)
-    IF (out_liv) WRITE (31,chfmth) "          ",(str_liv(kpar), kpar=1,npar)
-    IF (out_liv) WRITE (31,*)
-    DO kday = 1,ndays
+    WRITE (31,'(a)') TRIM(title(kk))                    ! header 1 (staz)
+    IF (out_liv) THEN                                   ! header 2 (liv)
+      WRITE (31,chfmth) "          ",(str_liv(kpar), kpar=1,npar)
+    ELSE
+      WRITE (31,*)
+    ENDIF
+    WRITE (31,chfmth) "aaaa mm gg",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
+    DO kday = 1,ndays                                   ! dati
       data_dum = data1 + kday - 1
       IF (kk <= 3) THEN
         WRITE (31,chfmt2) data_dum%yy,data_dum%mm,data_dum%dd, &
@@ -1206,35 +1186,42 @@ DO kk = 1, 4
 
   ELSE IF (out_fmt == "csv") THEN
 
-!   header: parametri
+!   header 1 (staz)
+    WRITE (31,'(a)') TRIM(title(kk))
+
+!   header 2 (liv)
+    CALL init(csvline)
+    CALL csv_record_addfield(csvline,"")
+    DO kpar = 1,npar
+      IF (out_liv) THEN
+        CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_liv(kpar))))
+      ELSE
+        CALL csv_record_addfield(csvline,"")
+      ENDIF
+    ENDDO
+    WRITE (31,'(a)') csv_record_getrecord(csvline)
+    CALL delete(csvline)
+
+!   header 3 (par)
     CALL init(csvline)
     CALL csv_record_addfield(csvline,ndays)
-    CALL csv_record_addfield(csvline,TRIM(title(kk)))
     DO kpar = 1,npar
       CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
     ENDDO
     WRITE (31,'(a)') csv_record_getrecord(csvline)
     CALL delete(csvline)
 
-!   header: livelli
-    IF (out_liv) THEN
-      CALL init(csvline)
-      CALL csv_record_addfield(csvline,"")
-      DO kpar = 1,npar
-        CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_liv(kpar))))
-      ENDDO
-      WRITE (31,'(a)') csv_record_getrecord(csvline)
-      CALL delete(csvline)
-    ENDIF
-
 !   dati
     DO kday = 1,ndays
       data_dum = data1 + kday - 1
       CALL init(csvline)
-      WRITE (ch10,'(2(i2.2,a1),i4.4)') &
-         data_dum%dd,"/",data_dum%mm,"/",data_dum%yy
-      CALL csv_record_addfield(csvline,ch10)
-      CALL csv_record_addfield(csvline,0)
+      WRITE (str_data_csv,'(i4.4,2(a1,i2.2),1x,i2.2)') &
+        data_dum%yy,"-",data_dum%mm,"-",data_dum%dd,0
+      CALL csv_record_addfield(csvline,str_data_csv)
+!     WRITE (ch10,'(2(i2.2,a1),i4.4)') &
+!        data_dum%dd,"/",data_dum%mm,"/",data_dum%yy
+!     CALL csv_record_addfield(csvline,ch10)
+!     CALL csv_record_addfield(csvline,0)
       DO kpar = 1,npar
         CALL csv_record_addfield(csvline,daily(idx_stat(kk),kpar,kday))
       ENDDO
@@ -1320,19 +1307,22 @@ IF (out_fmt == "txt") THEN
 ELSE IF (out_fmt == "csv") THEN
   WRITE (file_out,'(2a)') TRIM(file_root),"_month.csv"
 ENDIF
-WRITE (chfmth,'(a,i3,a,i2,a)') "(a10,3x,",npar,"(1x,a",fw,"))"
+WRITE (chfmth,'(a,i3,a,i2,a)') "(a10,",npar,"(1x,a",fw,"))"
 WRITE (chfmt2,'(a,i3,3a)') &
-  "(i4.4,2(1x,i2.2),3x,",npar,"(1x,",TRIM(chfmt4),"))"
+  "(i4.4,2(1x,i2.2),",npar,"(1x,",TRIM(chfmt4),"))"
 WRITE (chfmt5,'(a,i3,a,i2,a)') &
-  "(i4.4,2(1x,i2.2),3x,",npar,"(1x,i",fw,"))"
+  "(i4.4,2(1x,i2.2),",npar,"(1x,i",fw,"))"
 
 OPEN (UNIT=31, FILE=file_out, STATUS="REPLACE", FORM="FORMATTED")
-DO kk = 1, 4
+DO kk = 1,4
   IF (out_fmt == "txt") THEN
-    WRITE (31,'(a)') TRIM(title(kk))
-    WRITE (31,*)
-    WRITE (31,chfmth) "aaaa mm gg",(str_par2(kpar), kpar=1,npar)
-    IF (out_liv) WRITE (31,chfmth) "          ",(str_liv(kpar), kpar=1,npar)
+    WRITE (31,'(a)') TRIM(title(kk))                    ! header 1 (staz)
+    IF (out_liv) THEN                                   ! header 2 (liv)
+      WRITE (31,chfmth) "          ",(str_liv(kpar), kpar=1,npar)
+    ELSE
+      WRITE (31,*)
+    ENDIF
+    WRITE (31,chfmth) "aaaa mm gg",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
     DO kmonth = 1,nmonths
       month_tot = data1%mm + kmonth -1
       data_dum%yy = data1%yy + (month_tot - 1) / 12
@@ -1351,26 +1341,30 @@ DO kk = 1, 4
 
   ELSE IF (out_fmt == "csv") THEN
 
-!   header: parametri
+!   header 1 (staz)
+    WRITE (31,'(a)') TRIM(title(kk))
+
+!   header 2 (liv)
+    CALL init(csvline)
+    CALL csv_record_addfield(csvline,"")
+    DO kpar = 1,npar
+      IF (out_liv) THEN
+        CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_liv(kpar))))
+      ELSE
+        CALL csv_record_addfield(csvline,"")
+      ENDIF
+    ENDDO
+    WRITE (31,'(a)') csv_record_getrecord(csvline)
+    CALL delete(csvline)
+
+!   header 3 (par)
     CALL init(csvline)
     CALL csv_record_addfield(csvline,nmonths)
-    CALL csv_record_addfield(csvline,TRIM(title(kk)))
     DO kpar = 1,npar
       CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
     ENDDO
     WRITE (31,'(a)') csv_record_getrecord(csvline)
     CALL delete(csvline)
-
-!   header: livelli
-    IF (out_liv) THEN
-      CALL init(csvline)
-      CALL csv_record_addfield(csvline,"")
-      DO kpar = 1,npar
-        CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_liv(kpar))))
-      ENDDO
-      WRITE (31,'(a)') csv_record_getrecord(csvline)
-      CALL delete(csvline)
-    ENDIF
 
 !   dati
     DO kmonth = 1,nmonths
@@ -1379,10 +1373,13 @@ DO kk = 1, 4
       data_dum%mm = MOD(month_tot - 1, 12) + 1
       data_dum%dd = 1
       CALL init(csvline)
-      WRITE (ch10,'(2(i2.2,a1),i4.4)') &
-         data_dum%dd,"/",data_dum%mm,"/",data_dum%yy
-      CALL csv_record_addfield(csvline,ch10)
-      CALL csv_record_addfield(csvline,0)
+      WRITE (str_data_csv,'(i4.4,2(a1,i2.2),1x,i2.2)') &
+        data_dum%yy,"-",data_dum%mm,"-",data_dum%dd,0
+      CALL csv_record_addfield(csvline,str_data_csv)
+!     WRITE (ch10,'(2(i2.2,a1),i4.4)') &
+!        data_dum%dd,"/",data_dum%mm,"/",data_dum%yy
+!     CALL csv_record_addfield(csvline,ch10)
+!     CALL csv_record_addfield(csvline,0)
       DO kpar = 1,npar
         CALL csv_record_addfield(csvline,month(idx_stat(kk),kpar,kmonth))
       ENDDO
@@ -1464,7 +1461,7 @@ CLOSE(33)
 !--------------------------------------------------------------------------
 ! 5.6 files season (ASCII)
 
-DO nsea = 1,7
+DO nsea = 1,8
 
   IF (out_fmt == "txt") THEN
     WRITE (file_out,'(4a)') TRIM(file_root),"_SE",labsea(nsea),".sta"
@@ -1472,11 +1469,11 @@ DO nsea = 1,7
     WRITE (file_out,'(4a)') TRIM(file_root),"_SE",labsea(nsea),".csv"
   ENDIF
 
-  WRITE (chfmth,'(a,i3,a,i2,a)') "(a10,3x,",npar,"(1x,a",fw,"))"
+  WRITE (chfmth,'(a,i3,a,i2,a)') "(a10,",npar,"(1x,a",fw,"))"
   WRITE (chfmt2,'(a,i3,3a)') &
-    "(i4.4,2(1x,i2.2),3x,",npar,"(1x,",TRIM(chfmt4),"))"
+    "(i4.4,2(1x,i2.2),",npar,"(1x,",TRIM(chfmt4),"))"
   WRITE (chfmt5,'(a,i3,a,i2,a)') &
-    "(i4.4,2(1x,i2.2),3x,",npar,"(1x,i",fw,"))"
+    "(i4.4,2(1x,i2.2),",npar,"(1x,i",fw,"))"
 
   data_dum%dd = 1
   SELECT CASE (nsea)
@@ -1493,10 +1490,13 @@ DO nsea = 1,7
   OPEN (UNIT=31, FILE=file_out, STATUS="REPLACE", FORM="FORMATTED")
   DO kk = 1, 4
     IF (out_fmt == "txt") THEN
-      WRITE (31,'(a)') TRIM(title(kk))
-      WRITE (31,*)
-      WRITE (31,chfmth) "aaaa mm gg",(str_par2(kpar), kpar=1,npar)
-      IF (out_liv) WRITE (31,chfmth) "          ",(str_liv(kpar), kpar=1,npar)
+      WRITE (31,'(a)') TRIM(title(kk))                  ! header 1 (staz)
+      IF (out_liv) THEN                                 ! header 2 (liv)
+        WRITE (31,chfmth) "          ",(str_liv(kpar), kpar=1,npar)
+      ELSE
+        WRITE (31,*)
+      ENDIF
+      WRITE (31,chfmth) "aaaa mm gg",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
       DO kyear = 1,nyears
         data_dum%yy = kyear + year1 - 1
         IF (kk <= 3) THEN
@@ -1512,35 +1512,42 @@ DO nsea = 1,7
 
     ELSE IF (out_fmt == "csv") THEN
 
-!     header: parametri
+!     header 1 (staz)
+      WRITE (31,'(a)') TRIM(title(kk))
+
+!     header 2 (liv)
+      CALL init(csvline)
+      CALL csv_record_addfield(csvline,"")
+      DO kpar = 1,npar
+        IF (out_liv) THEN
+          CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_liv(kpar))))
+        ELSE
+          CALL csv_record_addfield(csvline,"")
+        ENDIF
+      ENDDO
+      WRITE (31,'(a)') csv_record_getrecord(csvline)
+      CALL delete(csvline)
+
+!     header 3 (par)
       CALL init(csvline)
       CALL csv_record_addfield(csvline,nyears)
-      CALL csv_record_addfield(csvline,TRIM(title(kk)))
       DO kpar = 1,npar
         CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
       ENDDO
       WRITE (31,'(a)') csv_record_getrecord(csvline)
       CALL delete(csvline)
 
-!     header: livelli
-      IF (out_liv) THEN
-        CALL init(csvline)
-        CALL csv_record_addfield(csvline,"")
-        DO kpar = 1,npar
-          CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_liv(kpar))))
-        ENDDO
-        WRITE (31,'(a)') csv_record_getrecord(csvline)
-        CALL delete(csvline)
-      ENDIF
-
 !     dati
       DO kyear = 1,nyears
         data_dum%yy = kyear + year1 - 1
         CALL init(csvline)
-        WRITE (ch10,'(2(i2.2,a1),i4.4)') &
-          data_dum%dd,"/",data_dum%mm,"/",data_dum%yy
-        CALL csv_record_addfield(csvline,ch10)
-        CALL csv_record_addfield(csvline,0)
+        WRITE (str_data_csv,'(i4.4,2(a1,i2.2),1x,i2.2)') &
+          data_dum%yy,"-",data_dum%mm,"-",data_dum%dd,0
+        CALL csv_record_addfield(csvline,str_data_csv)
+!       WRITE (ch10,'(2(i2.2,a1),i4.4)') &
+!         data_dum%dd,"/",data_dum%mm,"/",data_dum%yy
+!       CALL csv_record_addfield(csvline,ch10)
+!       CALL csv_record_addfield(csvline,0)
         DO kpar = 1,npar
           CALL csv_record_addfield(csvline,season(idx_stat(kk),nsea, &
             kpar,kyear))
@@ -1617,23 +1624,19 @@ WRITE (*,*) "Errore leggendo lista parametri (ADVANCE=NO) ",TRIM(file_in)
 STOP 3
 
 9996 CONTINUE
-IF (inp_data == "hhr" .OR. inp_data == "qad" .OR. inp_data == "tem") THEN
+IF (inp_data == "hhr" .OR. inp_data == "ddy" .OR. inp_data == "tem") THEN
   lline = k + 3
 ELSE IF (inp_data == "ser" .OR. inp_data == "sex") THEN
   lline = k + 6
-ELSE IF (inp_data == "reg") THEN
-  lline = k
 ENDIF
 WRITE (*,*) "Errore leggendo colonna date ",TRIM(file_in)," record ",lline
 STOP 4
 
 9995 CONTINUE
-IF (inp_data == "hhr" .OR. inp_data == "qad" .OR. inp_data == "tem") THEN
+IF (inp_data == "hhr" .OR. inp_data == "ddy" .OR. inp_data == "tem") THEN
   lline = k + 3
 ELSE IF (inp_data == "ser" .OR. inp_data == "sex") THEN
   lline = k + 6
-ELSE IF (inp_data == "reg") THEN
-  lline = k
 ENDIF
 WRITE (*,*) "Errore leggendo i dati ",TRIM(file_in),"record ",lline
 STOP 5
@@ -1726,14 +1729,15 @@ IMPLICIT NONE
 INTEGER :: mxstaz
 
 WRITE (*,*) 
-WRITE (*,*) "stat_orari.exe [-h] [-s/-sx/-q/-t/-r] [-csv] [-liv] [-ndec N] filein"
-WRITE (*,*) "filein   : file con i dati (default: in formato estra_orari = "
-WRITE (*,*) "           estra_qaria con dati orari)"
-WRITE (*,*) " -s      : input nel formato prodotto da trasp_seriet"
-WRITE (*,*) " -sx     : input nel formato prodotto da trasp_seriet, notazione esponenziale"
-WRITE (*,*) " -q      : input nel formato prodotto da estra_qaria, dati giornalieri"
-WRITE (*,*) " -r      : input in formato condivisione regionale"
+WRITE (*,*) "stat_orari.exe [-h] [-o/-s/-sx/-d/-t] [-csv] [-liv] [-ndec N] filein"
+WRITE (*,*) "filein   : file con i dati. Il par. successivo detemina il suo formato:"
+WRITE (*,*) " -o      : estra_orari o estra_qaria con dati orari (default)"
+WRITE (*,*) " -s      : seriet con notazione decimale"
+WRITE (*,*) " -sx     : seriet con notazione esponenziale"
+WRITE (*,*) " -d      : estra_qaria con dati giornalieri o segmento di file .sta "
 WRITE (*,*) " -t      : input nel formato prodotto da trasp_temp"
+WRITE (*,*) " -q      : come -d (per compatibilita' con vecchie procedure)"
+WRITE (*,*)
 WRITE (*,*) " -csv    : scrive i files ASCII in formato csv (default: sep. da spazi)"
 WRITE (*,*) " -liv    : aggiunge un header con le quote dei livelli (solo fmt seriet)"
 WRITE (*,*) " -ndec N : numero di decimali nei files .sta (-1 per notazione exp)"

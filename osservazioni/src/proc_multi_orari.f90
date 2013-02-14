@@ -26,7 +26,7 @@ PROGRAM proc_multi_orari
 ! - gestire il numero di decimali in ouput (ora e' un parametro costante)
 ! - aggiungere diagnostica complessiva (es. dati validi totali in/out)
 !
-!                                                 V2.0.0, Enrico 03/09/2012
+!                                                 V2.0.1, Enrico 06/02/2013
 !--------------------------------------------------------------------------
 
 USE array_utilities
@@ -49,7 +49,8 @@ INTEGER, PARAMETER :: iu0 = 30       ! prima unita' per i files di input
 INTEGER, PARAMETER :: out_dec = 1    ! n.ro di decimali in output
 
 ! Altre variabili del programma
-REAL, ALLOCATABLE :: val_in(:,:),val_out(:),nok(:),val_ok(:),ave(:),ave2(:)
+REAL, ALLOCATABLE :: val_in(:,:),val_out(:),val_ok(:),ave(:),ave2(:)
+INTEGER, ALLOCATABLE :: nok(:)
 REAL :: rmis
 INTEGER :: mand_par,eof,eor,ios,nf,npar,head_len,head_offset,nhead,nld
 INTEGER :: yy,mm,dd,hh,sca,idx
@@ -410,19 +411,19 @@ record: DO kr = 1,HUGE(0)
       IF (nok(kp) > 0) THEN
 
 !       Salvo i dati validi nel vettore val_ok
+        idx = 0
         DO kf = 1,nf
-          idx = 0
           IF (val_in(kf,kp) /= rmis) THEN
             idx = idx + 1
             val_ok(idx) = val_in(kf,kp)
           ENDIF
         ENDDO
         IF (idx /= nok(kp)) WRITE (*,*) &
-          "Errore sorting valori: kf,kp,nok1,nok2 ",kf,kp,nok(kp),idx
+          "Errore sorting valori: kp,nok1,nok2 ",kp,nok(kp),idx
    
 !       Ordino i valori
         CALL sort(val_ok(1:idx))
-   
+
 !       Prendo la mediana
         IF (MOD(idx,2) == 0) THEN
           val_out(kp) = (val_ok(idx/2) + val_ok(idx/2+1)) / 2.

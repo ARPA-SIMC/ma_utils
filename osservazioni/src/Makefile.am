@@ -7,6 +7,7 @@ filtra_anag_dat_exe_SOURCES = filtra_anag_dat.f90
 maskout_orari_exe_SOURCES = maskout_orari.f90
 orari_daily_stat_exe_SOURCES = orari_daily_stat.f90
 orari2grads_exe_SOURCES = orari2grads.f90
+orari2seriet_exe_SOURCES = orari2seriet.f90
 proc_multi_orari_exe_SOURCES = proc_multi_orari.f90
 proc_sodar_moniter_exe_SOURCES = proc_sodar_moniter.f90
 stat_orari_exe_SOURCES = stat_orari.f90

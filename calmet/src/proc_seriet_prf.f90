@@ -1,6 +1,5 @@
 PROGRAM proc_seriet_prf
 !--------------------------------------------------------------------------
-! Programma della catena Calmet
 ! Legge un file in formato seriet e lo riscrive in formato up.dat
 ! Uso: proc_seriet_prf.exe filein fileout stzid orog [-test] [-h] 
 !
@@ -12,6 +11,10 @@ PROGRAM proc_seriet_prf
 ! - Tracciato file di output (up*.dat): 
 !   9999, id_staz, yy, mm, dd, hh, nlev_org, nlev
 !   pp(mb), zz(m-AMSL), tt(K), dd(grd), ff(m/s); livelli ordinati dal basso.
+!
+! - Dal 2008 non fa piu' parte della catena Calmet: viene comunque usato 
+!   per scrivere in formato UP.DAT dati LAMA ceduti all'estreno per 
+!   simulazioni Calpuff.
 !
 ! Todo: gestire la presenza di un livello formato da V10m,T2m,Psup (utile 
 !   per run con dati ECMWF o LAMA ante 2006)
