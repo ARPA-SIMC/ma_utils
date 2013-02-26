@@ -1,7 +1,7 @@
 PROGRAM uniq_grib
 !--------------------------------------------------------------------------
 ! Legge un file con molti grib e lo riscrive saltando i grib consecutivi
-! identici. Richiede che tutti i cmapi abbinao lo stesso numero di punti
+! identici. Richiede che tutti i campi abbiano lo stesso numero di punti
 ! (questa condizione potrebbe essere eliminata...)
 !
 !                                          Versione 1.0.0 Enrico 21/11/2011

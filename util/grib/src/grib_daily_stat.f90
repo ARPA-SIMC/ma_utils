@@ -10,8 +10,12 @@ PROGRAM grib_daily_stat
 ! - I grib devono essere definiti sulla stessa area, riferirsi a un unico
 !   parametro e livello e essere ordinati per istante di validita'.
 ! - Il programma ragiona solo sull'istante di validita': le statistiche
-!   reltive a i campi previsti saranno scritte come analisi relative alla 
+!   reltive ai campi previsti saranno scritte come analisi relative alla 
 !   data di validita'
+! - Per una data giornata, se non trova nessun dato non scrive nulla; se 
+!   nessuno dei punti ha un numero di dati insufficienti, scrive un campo
+!   interamente mancante (questo puo' innescare un bug grib-api, volendo si
+!   potrebbe decidere di non scrivere i campi interamente mancanti...)
 ! - Per rendere piu' leggibile il codice, il programma fa comunque tutti i
 !   calcoli, ma scrive solo gli output richiesti
 !

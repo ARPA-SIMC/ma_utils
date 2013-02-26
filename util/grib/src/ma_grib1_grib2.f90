@@ -10,14 +10,13 @@ PROGRAM ma_grib1_grib2
 ! - opzione -ana (per scrivere i dati previsti come analisi con lo stesso 
 !   verification time)
 !
-!                                         Versione 2.3.2, Enrico 21/08/2012
+!                                         Versione 2.3.3, Enrico 18/03/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
 USE datetime_class
+USE missing_values
 IMPLICIT NONE
-
-REAL, PARAMETER :: rmis = -9999.
 
 ! Variabili locali
 REAL,ALLOCATABLE :: values(:)
@@ -29,7 +28,7 @@ INTEGER :: datah_in(4),datah_ref(4),datah_end(4)
 INTEGER :: scad(4),lev(3),ni,nj
 INTEGER :: cem,sc,par,tab,sortx,togp,igen,gd,topd,dig,uvrtg,sm,pdtn,dd, &
   dt,ft,toffs,sfoffs,svoffs,tosfs,sfosfs,svosfs,toti,lotr,bp,bpv,bmi,bmp, &
-  nv,tosp,ct,drtn,en
+  nv,tosp,ct,drtn,en,nocv,nov
 CHARACTER(LEN=250) :: chpar,filein,fileout
 CHARACTER(LEN=80) :: grid_type
 LOGICAL :: lforc,lmacc
@@ -175,13 +174,24 @@ DO kg = 1,HUGE(0)
     nv = 0
   ENDIF
 
-! 2.3.3 Section 3 (Bit Map)
-  IF (bp /= 0) CALL grib_set(igin,"missingValue",rmis)
+! 2.3.4 Sections 3 (Bit Map) e 4 (Binary Data)
+! Bug grib-api (18/03/2013): se un campo e' interamente mancante, values(:) e'
+! messo a 0 invece che a rmiss, quindi devo gestire questo caso separatamente
 
-! 2.3.4 Section 4 (Binary Data)
   ALLOCATE (values(ni*nj))
+  CALL grib_get(igin,"numberOfValues",nov)
+  CALL grib_get(igin,"numberOfCodedValues",nocv)
   CALL grib_get(igin,"bitsPerValue",bpv)
-  CALL grib_get(igin,"values",values(:))
+  IF (nocv == 0) THEN
+    values(:) = rmiss
+  ELSE IF (nocv < nov .AND. bp /= 0) THEN
+    CALL grib_set(igin,"missingValue",rmiss)
+    CALL grib_get(igin,"values",values(:))
+  ELSE IF (nocv == nov) THEN
+    CALL grib_get(igin,"values",values(:))
+  ELSE
+    GOTO 9995
+  ENDIF
 
 ! 2.4) Se trovo una chiave con un valore non gestito mi fermo
   IF (scad(1)/=1 .OR. &                     ! unit of timernage is not hour
@@ -495,7 +505,7 @@ DO kg = 1,HUGE(0)
 ! 2.2.4 Sections 5-7 (data representation, bitmap, data)
   CALL grib_set(igout,"numberOfValues",ni*nj)
   CALL grib_set(igout,"bitMapIndicator",bmi)
-  CALL grib_set(igout,"missingValue",rmis)
+  CALL grib_set(igout,"missingValue",rmiss)
 
   IF (lmacc) THEN
     CALL grib_set(igout,"dataRepresentationTemplateNumber",4)
@@ -559,6 +569,13 @@ IF (lev(1)/=1 .AND. lev(1)/=105 .AND. lev(1)/=109 .AND. lev(1)/=110) &
 IF (scad(4)/=0 .AND. scad(4)/=10 .AND. scad(2)>scad(3)) WRITE (*,*) &
   "timerange con P1 > P2 ",scad(1:4)
 STOP 5
+
+9995 CONTINUE
+WRITE (*,*) "Errore gestione dati mancanti, grib n.ro ",kg
+WRITE (*,*) "bitmapPresent (1=.T.) ",bp
+WRITE (*,*) "numberOfValues        ",nov
+WRITE (*,*) "numberOfCodedValues   ",nocv
+STOP 6
 
 END PROGRAM ma_grib1_grib2
 
