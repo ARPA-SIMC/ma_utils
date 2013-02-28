@@ -17,7 +17,7 @@ PROGRAM diff_grib
 ! - Gestione dei campi con dati mancanti implementata ma non testata
 ! - Versione 1.* rinominata come diff_gribex.f90
 !
-!                                         Versione 2.0.0, Enrico 01/03/2012
+!                                         Versione 2.0.1, Enrico 27/02/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -34,6 +34,7 @@ REAL :: abs_diff_sig_norm,abs_diff_sig_norm_mx
 REAL :: rva,rvb,stepa,stepb,step,rangea,rangeb
 INTEGER :: ifa,ifb,iga,igb
 INTEGER :: nia,nja,nib,njb,npa,npb,noka,nokb,nok,kp
+INTEGER :: gnova,noma,nocva,gnovb,nomb,nocvb
 INTEGER :: ena,bpva,dsfa,bsfa
 INTEGER :: enb,bpvb,dsfb,bsfb
 CHARACTER (LEN=14) :: str_nok
@@ -140,17 +141,37 @@ DO kg = 1,HUGE(0)
 !--------------------------------------------------------------------------
 ! 2.3 Confronto i campi
  
+  CALL grib_get(iga,"getNumberOfValues",gnova)    ! totale di punti nel grib
+  CALL grib_get(iga,"numberOfMissing",noma)       ! n.ro dati mancanti
+  CALL grib_get(iga,"numberOfCodedValues",nocva)  ! n.ro dati validi
+  CALL grib_get(igb,"getNumberOfValues",gnovb)    ! totale di punti nel grib
+  CALL grib_get(igb,"numberOfMissing",nomb)       ! n.ro dati mancanti
+  CALL grib_get(igb,"numberOfCodedValues",nocvb)  ! n.ro dati validi
+
   ALLOCATE (fielda(npa),fieldb(npb))
-  CALL grib_set(iga,"missingValue",rmiss)
-  CALL grib_set(igb,"missingValue",rmiss)
-  CALL grib_get(iga,"values",fielda)
-  CALL grib_get(igb,"values",fieldb)
+  IF (nocva == 0) THEN
+    fielda(:) = rmiss
+  ELSE
+    CALL grib_set(iga,"missingValue",rmiss)
+    CALL grib_get(iga,"values",fielda)
+  ENDIF
+  IF (nocvb == 0) THEN
+    fieldb(:) = rmiss
+  ELSE
+    CALL grib_set(igb,"missingValue",rmiss)
+    CALL grib_get(igb,"values",fieldb)
+  ENDIF
+
+  IF (noma + nocva /= gnova .OR. &
+      (nocva /= 0 .AND. nocva /= COUNT(fielda(1:npa) /= rmiss))) GOTO 9995
+  IF (nomb + nocvb /= gnovb .OR. &
+      (nocvb /= 0 .AND. nocvb /= COUNT(fieldb(1:npb) /= rmiss))) GOTO 9994
 
 ! Differenze significative (ie. a meno del troncamento GRIB)
 
 ! N.ro punti e valori medi
-  noka = COUNT(fielda(1:npa) /= rmiss)
-  nokb = COUNT(fieldb(1:npb) /= rmiss)
+  noka = nocva
+  nokb = nocvb
 
   IF (noka /= 0) THEN
     avea = SUM(fielda(1:npa), MASK = fielda(1:npa) /= rmiss) / REAL(noka)
@@ -295,6 +316,22 @@ STOP
 
 9996 CONTINUE
 WRITE (*,*) "Errore leggendo ",TRIM(fileb)," grib n.ro " ,kg
+STOP
+
+9995 CONTINUE
+WRITE (*,*) "Errore nelle chiavi relative ai dati mancanti in ",TRIM(filea)
+WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnova
+WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocva
+WRITE (*,*) "Dati mancanti (numberOfMissing):   ",noma
+WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(fielda(1:npa) /= rmiss)
+STOP
+
+9994 CONTINUE
+WRITE (*,*) "Errore nelle chiavi relative ai dati mancanti in ",TRIM(fileb)
+WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnovb
+WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocvb
+WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nomb
+WRITE (*,*) "Dati mancanti (martice grib):      ",COUNT(fieldb(1:npb) /= rmiss)
 STOP
 
 END PROGRAM diff_grib

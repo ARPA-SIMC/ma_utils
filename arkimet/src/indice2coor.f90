@@ -3,22 +3,22 @@ PROGRAM indice2coord
 ! Dato l'indice (vettoriale) di una serie di punti di un'area grib, calcola 
 ! gli indici ij, le coordinate geo e le coordinate UTM 
 ! 
-!                                                 V2.1.0, Enrico 10/12/2012
+!                                                 V2.1.1, Enrico 28/02/2013
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
 
 !
-CHARACTER (LEN=40), PARAMETER :: aree_env = "HOME_MINGUZZI"
-CHARACTER (LEN=40), PARAMETER :: aree_path = "arkimet/dat"
-
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 !
 REAL :: x1,y1,x2,y2,xrot,yrot,dx,dy
 REAL :: xgrid,ygrid,xgeo,ygeo,xutm,yutm
 INTEGER :: nx,ny,utmz,scan(3)
 INTEGER :: k,i,j
 INTEGER :: ios,idum
-CHARACTER (LEN=80) :: nfile,ch80
+CHARACTER (LEN=120) :: nfile
+CHARACTER (LEN=80) :: ch80
 CHARACTER (LEN=78) :: ch78
 CHARACTER (LEN=61) :: ch61
 CHARACTER (LEN=12) :: aree_name
@@ -50,8 +50,10 @@ READ (*,*) grid_area
 
 ! 1.2 Leggo estremi area
 
-CALL GETENV(aree_env,ch80)
-nfile = TRIM(ch80) // "/" // TRIM(aree_path) // "/" // TRIM(aree_name)
+ch80 = ""
+CALL GETENV(aree_path,ch80)
+IF (TRIM(ch80) == "") ch80 = aree_path_def
+nfile = TRIM(ch80) // "/" // TRIM(aree_name)
 
 IF (proj == "utm") THEN
   OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)

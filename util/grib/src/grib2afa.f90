@@ -4,6 +4,8 @@ PROGRAM grib2afa
 ! replicando tutte le convenzioni usate in cong.
 ! Per un'eventuale estensione a GRIB2, bisogna solo gestire le aree 
 ! (eg: drt -> gdtn ....)
+!
+!                                         Versione 1.0.1, Enrico 27/03/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -13,6 +15,7 @@ IMPLICIT NONE
 
 ! Chiavi Grib-API
 INTEGER :: en,yy,mm,dd,hh,min,drt,ni,nj,sm, par(3),lev(3),scad(4),dig
+INTEGER :: gnov,nom,nocv
 REAL :: latofgp,latolgp,lonofgp,lonolgp,dx,dy,lonosp,latosp
 REAL, ALLOCATABLE :: field(:)
 CHARACTER (LEN=3) :: sm_out
@@ -107,9 +110,18 @@ DO kg = 1,HUGE(0)
   ENDIF
 
 ! Sezione 4
+  CALL grib_get(igin,"getNumberOfValues",gnov)    ! totale di punti nel grib
+  CALL grib_get(igin,"numberOfMissing",nom)       ! n.ro dati mancanti
+  CALL grib_get(igin,"numberOfCodedValues",nocv)  ! n.ro dati validi
   ALLOCATE (field(ni*nj))
-  CALL grib_set(igin,"missingValue",rmiss)
-  CALL grib_get(igin,"values",field)
+  IF (nocv == 0) THEN
+    field(:) = rmiss
+  ELSE
+    CALL grib_set(igin,"missingValue",rmiss)
+    CALL grib_get(igin,"values",field(:))
+  ENDIF
+  IF (nom + nocv /= gnov .OR. &
+    (nocv /= 0 .AND. nocv /= COUNT(field(1:ni*nj) /= rmiss))) GOTO 9995
 
 ! 2.3 Scrivo sul file di output
   WRITE (30,'(a)') filein
@@ -147,6 +159,14 @@ STOP
 
 9998 CONTINUE
 WRITE (*,*) "Errore leggendo ",TRIM(filein)," grib n.ro " ,kg
+STOP
+
+9995 CONTINUE
+WRITE (*,*) "Errore nelle chiavi realtive ai dati mancanti"
+WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov
+WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
+WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom
+WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(field(1:ni*nj) /= rmiss)
 STOP
 
 END PROGRAM grib2afa

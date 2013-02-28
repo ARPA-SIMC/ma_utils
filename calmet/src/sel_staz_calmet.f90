@@ -40,8 +40,8 @@ CHARACTER (LEN=40), PARAMETER :: anag_path = "osservazioni/dat"
 CHARACTER (LEN=40), PARAMETER :: anag_name = "db_anagrafica.dat"
 
 ! 0.2 Costanti ecc. relativi al file "aree_utm.dat"
-CHARACTER (LEN=40), PARAMETER :: aree_env = "HOME_MINGUZZI"
-CHARACTER (LEN=40), PARAMETER :: aree_path = "arkimet/dat"
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 CHARACTER (LEN=40), PARAMETER :: aree_name = "aree_utm.dat"
 
 ! 0.3 Costanti ecc. relativi al file "staz_excl.lst"
@@ -66,9 +66,9 @@ INTEGER :: lexcl,nexcl,name_net_out,name_sta_out,track_out,code_out
 INTEGER :: ieof,ieor,cnt_surf,cnt_temp,req_nreti
 CHARACTER (LEN=200) :: chfmt_cp,nfile,header
 CHARACTER (LEN=90) :: chrec
+CHARACTER (LEN=80) :: ch80
 CHARACTER (LEN=61) :: ch61
 CHARACTER (LEN=50) :: an_nome
-CHARACTER (LEN=40) :: ch40
 CHARACTER (LEN=10) :: grid_area,dum_area
 CHARACTER (LEN=8) :: ch8
 CHARACTER (LEN=2) :: str_net
@@ -119,8 +119,10 @@ CLOSE(21)
 ! 1.3 leggo gli estremi dell'area da aree_utm.dat
 CALL get_eof_eor(ieof,ieor)
 
-CALL GETENV(aree_env,ch40)
-nfile = TRIM(ch40) // "/" // TRIM(aree_path) // "/" // TRIM(aree_name)
+ch80 = ""
+CALL GETENV(aree_path,ch80)
+IF (TRIM(ch80) == "") ch80 = aree_path_def
+nfile = TRIM(ch80) // "/" // TRIM(aree_name)
 OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9998)
 
 DO
@@ -211,8 +213,8 @@ OPEN (UNIT=41, FILE= nfile, STATUS="REPLACE", FORM="FORMATTED")
 WRITE (nfile,'(3a)') "marks_",TRIM(grid_area),"_utm.dat"
 OPEN (UNIT=42, FILE= nfile, STATUS="REPLACE", FORM="FORMATTED")
 
-CALL GETENV(anag_env,ch40)
-nfile = TRIM(ch40) // "/" // TRIM(anag_path) // "/" // TRIM(anag_name)
+CALL GETENV(anag_env,ch80)
+nfile = TRIM(ch80) // "/" // TRIM(anag_path) // "/" // TRIM(anag_name)
 OPEN (UNIT=23, FILE=nfile, STATUS= "OLD",ACTION="READ", ERR=9995)
 READ (23,*,ERR=9995)
 READ (23,*,ERR=9995)

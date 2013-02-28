@@ -18,8 +18,8 @@ PROGRAM tinterp_grib
 !   dei reftime (nuovo parametro da riga comando)
 ! - il programma dovrebbe funzionare anche per sfoltire un file, ma in 
 !   questa modalita' potrebbe non essere ottimizzato.
-!a
-!                                           Versione 1.0, Enrico 17/08/2011
+!
+!                                         Versione 1.0.1, Enrico 27/02/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -34,7 +34,8 @@ REAL, ALLOCATABLE :: values1(:),values2(:),valuesout(:)
 REAL :: w1,w2
 INTEGER :: scad1(4),scad2(4)
 INTEGER :: ifin,ifout,igi0=0,igi1=0,igi2=0,igout=0
-INTEGER :: step,delta_2r,delta_r1,delta_21,ni,nj,bp,yy,mm,dd,hh,ft,en
+INTEGER :: step,delta_2r,delta_r1,delta_21,ni,nj,yy,mm,dd,hh
+INTEGER :: ft,en,gnov,nocv,nom
 INTEGER :: kp,cntg,k,cnt_eqt,cnt_int,cnt_unc
 INTEGER :: idp,ios,iret,clret(0:5)
 CHARACTER (LEN=80) :: chdum,filein,fileout
@@ -121,9 +122,17 @@ IF (verbose) THEN
 ENDIF
 
 ! Estraggo i valori e salvo i dati che serviranno in seguito
-CALL grib_get(igi1,"bitmapPresent",bp)
-IF (bp /= 0) CALL grib_set(igi1,"missingValue",rmiss)
-CALL grib_get(igi1,"values",values1(:))
+CALL grib_get(igi1,"getNumberOfValues",gnov)    ! totale di punti nel grib
+CALL grib_get(igi1,"numberOfMissing",nom)       ! n.ro dati mancanti
+CALL grib_get(igi1,"numberOfCodedValues",nocv)  ! n.ro dati validi
+IF (nocv == 0) THEN
+  values1(:) = rmiss
+ELSE
+  CALL grib_set(igi1,"missingValue",rmiss)
+  CALL grib_get(igi1,"values",values1(:))
+ENDIF
+IF (nom + nocv /= gnov .OR. &
+  (nocv /= 0 .AND. nocv /= COUNT(values1(:) /= rmiss))) GOTO 9988
 
 CALL grib_clone(igi1,igi0)
 vtime0 = vtime1
@@ -156,9 +165,17 @@ IF (scad2(4) /= 0) GOTO 9990
 IF (vtime2 == vtime1) cnt_eqt = cnt_eqt + 1
 
 ! Estraggo i valori 
-CALL grib_get(igi2,"bitmapPresent",bp)
-IF (bp /= 0) CALL grib_set(igi2,"missingValue",rmiss)
-CALL grib_get(igi2,"values",values2(:))
+CALL grib_get(igi2,"getNumberOfValues",gnov)    ! totale di punti nel grib
+CALL grib_get(igi2,"numberOfMissing",nom)       ! n.ro dati mancanti
+CALL grib_get(igi2,"numberOfCodedValues",nocv)  ! n.ro dati validi
+IF (nocv == 0) THEN
+  values2(:) = rmiss
+ELSE
+  CALL grib_set(igi2,"missingValue",rmiss)
+  CALL grib_get(igi2,"values",values2(:))
+ENDIF
+IF (nom + nocv /= gnov .OR. &
+  (nocv /= 0 .AND. nocv /= COUNT(values2(:) /= rmiss))) GOTO 9987
 
 !==========================================================================
 ! 2) Ciclo principale (istanti in output)
@@ -208,9 +225,17 @@ main: DO k = 1,HUGE(0)
 !     Estraggo i valori 
 !     NB: se sto sfoltendo un file, il programa potrebbe essere reso piu'
 !     efficiente eseguendo questa operazione solo quando necessario...
-      CALL grib_get(igi2,"bitmapPresent",bp)
-      IF (bp /= 0) CALL grib_set(igi2,"missingValue",rmiss)
-      CALL grib_get(igi2,"values",values2(:))
+      CALL grib_get(igi2,"getNumberOfValues",gnov)    ! totale di punti nel grib
+      CALL grib_get(igi2,"numberOfMissing",nom)       ! n.ro dati mancanti
+      CALL grib_get(igi2,"numberOfCodedValues",nocv)  ! n.ro dati validi
+      IF (nocv == 0) THEN
+        values2(:) = rmiss
+      ELSE
+        CALL grib_set(igi2,"missingValue",rmiss)
+        CALL grib_get(igi2,"values",values2(:))
+      ENDIF
+      IF (nom + nocv /= gnov .OR. &
+        (nocv /= 0 .AND. nocv /= COUNT(values2(:) /= rmiss))) GOTO 9987
 
 !     Se ho raggiunto l'istante richiesto, mi fermo
       IF (vtime2 >= vtime_rq) EXIT
@@ -351,6 +376,22 @@ STOP 3
 9989 CONTINUE
 WRITE (*,*) "Grib edizione 2 gestiti solo in modalita' sfoltimento"
 STOP 3
+
+9988 CONTINUE
+WRITE (*,*) "Errore nelle chiavi realtive ai dati mancanti, campo ",cntg
+WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov
+WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
+WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom
+WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(values1(1:ni*nj) /= rmiss)
+STOP 5
+
+9987 CONTINUE
+WRITE (*,*) "Errore nelle chiavi realtive ai dati mancanti, campo ",cntg
+WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov
+WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
+WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom
+WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(values2(1:ni*nj) /= rmiss)
+STOP 5
 
 END PROGRAM tinterp_grib
 

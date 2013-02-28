@@ -11,7 +11,7 @@ PROGRAM ma_grib2_grib1
 ! 
 ! Uso: utm_grib2_grib1 [-h] [-gribex] filein fileout
 !
-!                                         Versione 2.3.1, Enrico 18/03/2013
+!                                         Versione 2.3.2, Enrico 27/03/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -36,7 +36,7 @@ INTEGER :: cnt_par,kg,kpar,iret,cnt_utm,cnt_geo,cnt_rot,cnt_nok
 INTEGER :: ifin,ifout,igin=0,igout=0,igtemp=0,iu
 INTEGER :: par(3),lev(3),scad(4),datah_ref(4),min,sec,yoc,cortod
 INTEGER :: sc,igen,drt,nv,bp,bp_gbex,bmi,bpv,bpv_gbex,ni,nj,sogd,dig,idig, &
-  jdig,rf,cf,uvrtg,sm,s1f,z,drtn,nov,nocv
+  jdig,rf,cf,uvrtg,sm,s1f,z,drtn,gnov,nocv,nom
 CHARACTER(LEN=250) ::  chpar,filein,fileout
 CHARACTER(LEN=80) :: grid_type
 CHARACTER(LEN=4) :: out_lib
@@ -256,20 +256,19 @@ DO kg = 1,HUGE(0)
   CALL grib_get(igin,"generatingProcessIdentifier",igen)
   CALL grib_get(igin,"bitsPerValue",bpv)
   CALL grib_get(igin,"bitMapIndicator",bmi)
-  CALL grib_get(igin,"numberOfValues",nov)
-  CALL grib_get(igin,"numberOfCodedValues",nocv)
+  CALL grib_get(igin,"getNumberOfValues",gnov)    ! totale di punti nel grib
+  CALL grib_get(igin,"numberOfMissing",nom)       ! n.ro dati mancanti
+  CALL grib_get(igin,"numberOfCodedValues",nocv)  ! n.ro dati validi
 
   ALLOCATE (values(ni*nj))
   IF (nocv == 0) THEN
     values(:) = rmiss
-  ELSE IF (nocv < nov .AND. bp /= 0) THEN
+  ELSE
     CALL grib_set(igin,"missingValue",rmiss)
     CALL grib_get(igin,"values",values(:))
-  ELSE IF (nocv == nov) THEN
-    CALL grib_get(igin,"values",values(:))
-  ELSE
-    GOTO 9995
   ENDIF
+  IF (nom + nocv /= gnov .OR. &
+    (nocv /= 0 .AND. nocv /= COUNT(values(1:ni*nj) /= rmiss))) GOTO 9995
 
   IF (nv /= 0) THEN
     WRITE (*,*) "Vert. Coordinate Values non gestiti (non saranno scritti)"
@@ -447,10 +446,11 @@ WRITE (*,*) "Codifica non gestita nel grib n.ro ",kg
 STOP 5
 
 9995 CONTINUE
-WRITE (*,*) "Errore gestione dati mancanti, grib n.ro ",kg
-WRITE (*,*) "bitmapPresent (1=.T.) ",bp
-WRITE (*,*) "numberOfValues        ",nov
-WRITE (*,*) "numberOfCodedValues   ",nocv
+WRITE (*,*) "Errore nelle chiavi realtive ai dati mancanti"
+WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov
+WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
+WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom
+WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(values(1:ni*nj) /= rmiss)
 STOP 6
 
 ! 9994 CONTINUE

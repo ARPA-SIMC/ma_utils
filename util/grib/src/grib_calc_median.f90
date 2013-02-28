@@ -1,21 +1,21 @@
 PROGRAM grib_calc_median
 !--------------------------------------------------------------------------
 ! Legge molti files grib con campi corrispondenti; scrive un file che ha,
-! per ogni campo e per ogni punto, la mediana sui fiels di input.
+! per ogni campo e per ogni punto, la mediana sui files di input.
 ! Note:
 !
 ! - Non gestisce dati mancanti
-!                                         Versione 1.0.2, Enrico 22/11/2011
+!                                         Versione 1.0.3, Enrico 27/03/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
+USE missing_values
 IMPLICIT NONE
 
-REAL,PARAMETER :: rmis = -9999.
 INTEGER, PARAMETER :: maxfiles=15,pt=1
 INTEGER :: ifin(maxfiles)=0,igin(maxfiles)=0,ifout=0,igout=0
 INTEGER :: ni,nj,dd,p1,iop,lev,ni_sav,nj_sav,dd_sav,p1_sav,iop_sav,lev_sav
-INTEGER :: nfiles,iret,kg,kf,ios,kk,k2
+INTEGER :: nfiles,iret,kg,kf,ios,kk,k2,nom
 CHARACTER(LEN=80) :: filein(maxfiles)
 CHARACTER(LEN=80) :: fileout,chfmt
 LOGICAL :: ldeb = .FALSE.
@@ -97,13 +97,15 @@ fields: DO kg = 1,HUGE(0)
     ENDIF
 
 !   Salvo i valori
+    CALL grib_get(igin(kf),"numberOfMissing",nom)
+    IF (nom > 0) GOTO 9995
     CALL grib_get(igin(kf),"values",field_in(:,kf))
 
   ENDDO
 
 ! 2.2 Calcolo ensamble median ed ensamble mean
   unassigned(:,:) = .TRUE.
-  field_in_sorted(:,:) = rmis
+  field_in_sorted(:,:) = rmiss
   DO kk = 1,nfiles
     field_in_sorted(:,kk) = MINVAL(field_in(:,:), DIM=2, MASK=unassigned(:,:))
     idx_min(:) = MINLOC(field_in(:,:), DIM=2, MASK=unassigned(:,:))
@@ -130,7 +132,7 @@ fields: DO kg = 1,HUGE(0)
   field_ave(:) = SUM(field_in(:,:),DIM=2) / REAL(nfiles)
 
 ! 2.3 Controlli
-  IF (COUNT(field_in_sorted(:,:) == rmis) /= 0) WRITE (*,*) "Errore median (1)"
+  IF (COUNT(field_in_sorted(:,:) == rmiss) /= 0) WRITE (*,*) "Errore median (1)"
   IF (ldeb) THEN
     chfmt = '(a,i3,i4,i5,a,4(1x,e10.3))'
   ELSE
@@ -186,5 +188,10 @@ IF (p1_sav /= p1) WRITE (*,*) "p1,p1_sav ",p1,p1_sav
 IF (iop_sav /= iop) WRITE (*,*) "iop,iop_sav ",iop,iop_sav
 IF (lev_sav /= lev) WRITE (*,*) "lev,lev_sav ",lev,lev_sav
 STOP 3
+
+9995 CONTINUE
+WRITE (*,*) "Trovato un grib con dati mancanti (il programma non li gestisce)"
+WRITE (*,*) "File ",TRIM(filein(kf)),", campo ",kg
+STOP 4
 
 END PROGRAM grib_calc_median

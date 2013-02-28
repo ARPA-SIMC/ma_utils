@@ -4,7 +4,7 @@ PROGRAM sel_punti_grid
 ! nested; scrive gli indici dei punti (sel_punti_grid.pts.csv) e gli
 ! estremi della sottoarea (sel_punti_grid.zoom)
 !
-!                                         Versione 3.0.1, Enrico 05/09/2012
+!                                         Versione 3.0.2, Enrico 28/02/2013
 !--------------------------------------------------------------------------
 USE file_utilities
 USE seriet_utilities
@@ -14,7 +14,8 @@ IMPLICIT NONE
 ! Parametri costanti
 CHARACTER (LEN=80),PARAMETER :: file_out1 = "sel_punti_grid.pts.csv"
 CHARACTER (LEN=80),PARAMETER :: file_out2 = "sel_punti_grid.zoom"
-CHARACTER (LEN=40), PARAMETER :: aree_env = "HOME_MINGUZZI"
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 
 ! Altre variabili del programma
 TYPE (csv_record) :: csvline
@@ -25,7 +26,8 @@ INTEGER :: nx(2),ny(2),scan(2,3),utmz(2)
 INTEGER :: maxp,idskip
 INTEGER :: iif,jjf,iil,jjl,npsel,npcal,nisel,njsel,nitry,njtry,ksk
 INTEGER :: eof,eor,ios,ios2,idum,kpar,cnt_par,kg,i,j,k,cnt_sel
-CHARACTER (LEN=80) :: charg,ch80,aree_path,nfile,chrec
+CHARACTER (LEN=120) :: nfile,chrec
+CHARACTER (LEN=80) :: charg,ch80
 CHARACTER (LEN=78) :: ch78
 CHARACTER (LEN=61) :: ch61
 CHARACTER (LEN=40) :: str_lon,str_lat,label
@@ -105,15 +107,16 @@ ENDIF
 CALL get_eof_eor(eof,eor)
 
 ! Trovo path files aree_geo.dat e aree_utm.dat
-CALL GETENV(aree_env,ch80)
-aree_path = TRIM(ch80) // "/" // "arkimet/dat"
+ch80 = ""
+CALL GETENV(aree_path,ch80)
+IF (TRIM(ch80) == "") ch80 = aree_path_def
 
 !--------------------------------------------------------------------------
 ! 2) Leggo i dati delle griglie
 
 DO kg = 1,2
   IF (proj(kg) == "g") THEN
-    nfile = TRIM(aree_path) // "/aree_geo.dat"
+    nfile = TRIM(ch80) // "/aree_geo.dat"
     OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)
     DO
       READ (22,'(a)',IOSTAT=ios) ch78    
@@ -130,7 +133,7 @@ DO kg = 1,2
     CLOSE(22)
 
   ELSE IF (proj(kg) == "u") THEN
-    nfile = TRIM(aree_path) // "/aree_utm.dat"
+    nfile = TRIM(ch80) // "/aree_utm.dat"
     OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)
     DO
       READ (22,'(a)',IOSTAT=ios) ch61

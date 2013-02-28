@@ -32,7 +32,7 @@ PROGRAM crea_calmet_inp
 ! Con parametro -noobs: ignora filesurf, filetemp e stept_req, non scrive nessun
 !   dato relativo alle osservazioni
 !
-!                                                      V4.2.0, Enrico 03/08/2012
+!                                                      V4.3.0, Enrico 27/03/2013
 !-------------------------------------------------------------------------------
 
 USE date_handler
@@ -43,8 +43,8 @@ INTEGER, PARAMETER :: ibtz = +1, ibtz_old = -ibtz
 CHARACTER (LEN=80), PARAMETER :: fileout = "calmet.inp"
 
 ! Costanti ecc. relativi al file "aree_utm.dat"
-CHARACTER (LEN=40), PARAMETER :: aree_env = "HOME_MINGUZZI"
-CHARACTER (LEN=40), PARAMETER :: aree_path = "arkimet/dat"
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 CHARACTER (LEN=40), PARAMETER :: aree_name = "aree_utm.dat"
 
 ! Parametri da modificate
@@ -76,8 +76,7 @@ INTEGER :: vers_calmet
 INTEGER :: hh1,hh2,hht,stept_req,id_net,id_usr
 INTEGER :: dum_nx,dum_ny,dum_utmz,nusta_req
 CHARACTER (LEN=200) :: chrec,chfmt,rec_out,chxyz
-CHARACTER (LEN=80) :: filemodello,filedate,filesurf,filetemp,nfile
-CHARACTER (LEN=40) :: ch40
+CHARACTER (LEN=120) :: filemodello,filedate,filesurf,filetemp,nfile,ch80
 CHARACTER (LEN=20) :: ch20
 CHARACTER (LEN=10) :: dum_area,id_area
 LOGICAL :: req_obs
@@ -200,8 +199,10 @@ p = INDEX(ADJUSTL(chrec)," ")
 id_area = chrec(1:MIN(p-1,10))
 
 ! Leggo da aree_utm.dat i parametri dell'area richiesta
-CALL GETENV(aree_env,ch40)
-nfile = TRIM(ch40) // "/" // TRIM(aree_path) // "/" // TRIM(aree_name)
+ch80 = ""
+CALL GETENV(aree_path,ch80)
+IF (TRIM(ch80) == "") ch80 = aree_path_def
+nfile = TRIM(ch80) // "/" // TRIM(aree_name)
 OPEN (UNIT=24, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9995)
 
 DO

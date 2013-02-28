@@ -489,8 +489,8 @@ INTEGER, INTENT(OUT) :: zoom_idx(4)
 REAL, INTENT(OUT) :: xutm_grd(niexp,njexp),yutm_grd(niexp,njexp)
 
 ! Parametri relativi al file "aree_utm.dat"
-CHARACTER (LEN=40), PARAMETER :: aree_env = "HOME_MINGUZZI"
-CHARACTER (LEN=40), PARAMETER :: aree_path = "arkimet/dat"
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 CHARACTER (LEN=40), PARAMETER :: aree_name = "aree_utm.dat"
 
 ! Variabili locali
@@ -498,15 +498,18 @@ REAL :: dx,dy,xf,yf,xl,yl
 REAL :: sgx,sgy,i1,j1
 INTEGER :: i,j,ios
 INTEGER :: nx,ny,utmz
-CHARACTER (LEN=80) :: nfile
+CHARACTER (LEN=120) :: nfile
+CHARACTER (LEN=80) :: ch80
 CHARACTER (LEN=61) :: ch61
-CHARACTER (LEN=40) :: dum_area,ch40
+CHARACTER (LEN=40) :: dum_area
 
 !--------------------------------------------------------------------------
 ! 1) Leggo gli estremi dell'area da aree_utm.dat
 
-CALL GETENV(aree_env,ch40)
-nfile = TRIM(ch40) // "/" // TRIM(aree_path) // "/" // TRIM(aree_name)
+ch80 = ""
+CALL GETENV(aree_path,ch80)
+IF (TRIM(ch80) == "") ch80 = aree_path_def
+nfile = TRIM(ch80) // "/" // TRIM(aree_name)
 OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)
 
 DO
@@ -597,8 +600,8 @@ INTEGER, INTENT(OUT) :: zoom_idx(4)
 REAL, INTENT(OUT) :: xgeo_grd(niexp,njexp),ygeo_grd(niexp,njexp)
 
 ! Parametri relativi al file "aree_geo.dat"
-CHARACTER (LEN=40), PARAMETER :: aree_env = "HOME_MINGUZZI"
-CHARACTER (LEN=40), PARAMETER :: aree_path = "arkimet/dat"
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 CHARACTER (LEN=40), PARAMETER :: aree_name = "aree_geo.dat"
 
 ! variabili locali
@@ -607,15 +610,18 @@ REAL :: sgx,sgy,i1,j1
 REAL :: xrot,yrot,xgeo_rot,ygeo_rot,xgeo_grd_rot,ygeo_grd_rot
 INTEGER :: nx,ny,scan(3)
 INTEGER :: i,j,ios
-CHARACTER (LEN=80) :: nfile
+CHARACTER (LEN=120) :: nfile
+CHARACTER (LEN=80) :: ch80
 CHARACTER (LEN=78) :: ch78
 CHARACTER (LEN=40) :: dum_area,ch40
 
 !--------------------------------------------------------------------------
 ! 1) Leggo gli estremi dell'area da aree_geo.dat
 
-CALL GETENV(aree_env,ch40)
-nfile = TRIM(ch40) // "/" // TRIM(aree_path) // "/" // TRIM(aree_name)
+ch80 = ""
+CALL GETENV(aree_path,ch80)
+IF (TRIM(ch80) == "") ch80 = aree_path_def
+nfile = TRIM(ch80) // "/" // TRIM(aree_name)
 OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)
 
 DO
@@ -749,7 +755,7 @@ INTEGER :: net(mxstaz),id(mxstaz),net_dum,usr_dum
 INTEGER :: k,kpt,kst,kcl,kdis,cclass,idum
 INTEGER :: ios,eof,eor,nstaz
 CHARACTER (LEN=200) :: chrec
-CHARACTER (LEN=80) :: file_out,nfile
+CHARACTER (LEN=120) :: file_out,nfile
 CHARACTER (LEN=40) :: ch40
 CHARACTER (LEN=20) :: nome(mxstaz),nome_dum,nomi_out(nclass)
 

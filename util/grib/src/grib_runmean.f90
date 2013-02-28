@@ -35,13 +35,13 @@ PROGRAM grib_runmean
 USE grib_api
 USE datetime_class
 USE grib2_utilities
+USE missing_values
 
 IMPLICIT NONE
 
 !==========================================================================
 ! 0) Dichiarazioni
 
-REAL, PARAMETER :: rmis = -9999.
 INTEGER, PARAMETER :: igmiss = 0              ! Handler di un grib mancante
 
 ! Variabili locali
@@ -50,6 +50,7 @@ INTEGER, ALLOCATABLE :: igin(:)
 INTEGER :: ifin,ifout,ig_read,ig_first,ig_write
 INTEGER :: nhr,nreq,hrout,nhincr,nx,ny,np,ibm,en,fstep,kdeb
 INTEGER :: ios(3),cnt_par,cnt_out,kpar,kg,ksk,iret,ier,idata,ihr,clret(0:5)
+INTEGER :: gnov,nom,nocv
 CHARACTER(LEN=80) :: filein,fileout,chpar
 CHARACTER (LEN=12) :: ch12,ch12b
 CHARACTER (LEN=10) :: ch10
@@ -62,7 +63,7 @@ TYPE(datetime) :: rtime_read,rtime_first
 !==========================================================================
 ! 1) Preliminari
 
-ldeb = .TRUE.
+ldeb = .FALSE.
 kdeb = 10095
 
 ! 1.1 Parametri da riga comando
@@ -153,7 +154,6 @@ DO kg = 1,HUGE(0)
   CALL get_grib_time(ig_read, RTIME=rtime_read, VTIME=vtime_read, IRET=ier)
 
   CALL grib_get(ig_read,"bitmapPresent",ibm)
-  IF (ibm /= 0) CALL grib_set(ig_read,"missingValue",rmis)
 
 ! 2.1.2 Primo grib
   IF (kg == 1) THEN
@@ -171,7 +171,7 @@ DO kg = 1,HUGE(0)
 
 !   Inizializzo buffer di handler e dati, contatori, etc.
     igin(:) = igmiss
-    values(:,:) = rmis
+    values(:,:) = rmiss
     vtime_curr = vtime_read - timedelta_new(HOUR=1)
     nhincr = 1
 
@@ -217,18 +217,31 @@ DO kg = 1,HUGE(0)
     values(1:np,1:nhr-1) = values(1:np,2:nhr)
     IF (ksk == nhincr) THEN
       igin(nhr) = ig_read
-      CALL grib_get(ig_read,"values",values(1:np,nhr))
+
+      CALL grib_get(ig_read,"getNumberOfValues",gnov)    ! totale di punti nel grib
+      CALL grib_get(ig_read,"numberOfMissing",nom)       ! n.ro dati mancanti
+      CALL grib_get(ig_read,"numberOfCodedValues",nocv)  ! n.ro dati validi
+      IF (nocv == 0) THEN
+        values(1:np,nhr) = rmiss
+      ELSE
+        CALL grib_set(ig_read,"missingValue",rmiss)
+        CALL grib_get(ig_read,"values",values(1:np,nhr))
+      ENDIF
+      IF (nom + nocv /= gnov .OR. &
+        (nocv /= 0 .AND. nocv /= COUNT(values(1:np,nhr) /= rmiss))) GOTO 9994
+
     ELSE
       igin(nhr) = igmiss
-      values(1:np,nhr) = rmis
+      values(1:np,nhr) = rmiss
+
     ENDIF
 
 !   2.2.2 Calcolo la media, mascherando i punti che non hanno abbastanza dati
-    nok(1:np) = COUNT(values(1:np,1:nhr) /= rmis, DIM=2)
+    nok(1:np) = COUNT(values(1:np,1:nhr) /= rmiss, DIM=2)
     WHERE (nok(1:np) >= nreq)
-      mean(1:np) = SUM(values(1:np,1:nhr), DIM=2, MASK=values(1:np,1:nhr) /= rmis) / REAL(nok(1:np))
+      mean(1:np) = SUM(values(1:np,1:nhr), DIM=2, MASK=values(1:np,1:nhr) /= rmiss) / REAL(nok(1:np))
     ELSEWHERE
-      mean(1:np) = rmis
+      mean(1:np) = rmiss
     ENDWHERE
 
 !   2.2.3 Codifico il nuovo grib e lo scrivo sul file di output
@@ -238,7 +251,7 @@ DO kg = 1,HUGE(0)
       CALL getval(vtime_curr, SIMPLEDATE=ch12)
       CALL getval(vtime_out, SIMPLEDATE=ch12b)
       WRITE (*,'(5a,i6,a,f12.5)') "  VT fine periodo media: ",ch12,"   VT output: ", &
-        ch12b,"    nok ",COUNT(mean(1:np) /= rmis)," valore ",mean(kdeb)
+        ch12b,"    nok ",COUNT(mean(1:np) /= rmiss)," valore ",mean(kdeb)
     ENDIF
 
     CALL grib_clone(ig_read,ig_write)
@@ -267,7 +280,7 @@ DO kg = 1,HUGE(0)
       ENDIF
 
       CALL grib_set(ig_write,"bitmapPresent",1)
-      CALL grib_set(ig_write,"missingValue",rmis)
+      CALL grib_set(ig_write,"missingValue",rmiss)
       CALL grib_set(ig_write,"values",mean(1:np))
 
 !   Output con timerange = analisi istantanea
@@ -291,7 +304,7 @@ DO kg = 1,HUGE(0)
       ENDIF
 
       CALL grib_set(ig_write,"bitmapPresent",1)
-      CALL grib_set(ig_write,"missingValue",rmis)
+      CALL grib_set(ig_write,"missingValue",rmiss)
       CALL grib_set(ig_write,"values",mean(1:np))
 
     ENDIF
@@ -340,6 +353,14 @@ CALL getval(rtime_first,SIMPLEDATE=ch10)
 WRITE (*,*) "Grib ",1," reference time ",ch10
 STOP 5
 
+9994 CONTINUE
+WRITE (*,*) "Errore nelle chiavi realtive ai dati mancanti"
+WRITE (*,*) "Campo ",kg
+WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov
+WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
+WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom
+WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(values(1:np,nhr) /= rmiss)
+STOP 6
 
 END PROGRAM grib_runmean
 

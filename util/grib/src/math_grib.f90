@@ -4,7 +4,7 @@ PROGRAM math_grib
 ! in due files grib. 
 ! Sostituisce ed integra somma_grib.f90 e moltiplica_grib.f90
 !
-!                                         Versione 1.0.1, Enrico 13/02/2012
+!                                         Versione 1.0.2, Enrico 27/02/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -17,7 +17,7 @@ REAL, ALLOCATABLE :: valuesa(:),valuesb(:),valuesout(:)
 REAL :: coeffa,coeffb
 INTEGER :: ifa,ifb,ifout,iga=0,igb=0,igout=0
 INTEGER :: idp,kp,ios1,ios2,ier,iret,kga,k
-INTEGER :: clret(0:6),cllog(0:6),nmiss,ni,nj,ni_sav,nj_sav,bp,en
+INTEGER :: clret(0:6),cllog(0:6),nmiss,ni,nj,ni_sav,nj_sav,en,gnov,nom,nocv
 CHARACTER (LEN=80) :: filea,fileb,fileout,chdum,check_list
 CHARACTER (LEN=5) :: oper
 LOGICAL :: cl_grid,cl_time,cl_vtime,cl_lev,cl_var,lbconst,lforce,lverbose
@@ -140,13 +140,30 @@ DO kga = 1,HUGE(0)
   ENDIF
 
 ! Leggo i campi
-  CALL grib_get(iga,"bitmapPresent",bp)
-  IF (bp /= 0) CALL grib_set(iga,"missingValue",rmiss)
-  CALL grib_get(iga,"values",valuesa(:))
+  CALL grib_get(iga,"getNumberOfValues",gnov)    ! totale di punti nel grib
+  CALL grib_get(iga,"numberOfMissing",nom)       ! n.ro dati mancanti
+  CALL grib_get(iga,"numberOfCodedValues",nocv)  ! n.ro dati validi
+  IF (nocv == 0) THEN
+    valuesa(:) = rmiss
+  ELSE
+    CALL grib_set(iga,"missingValue",rmiss)
+    CALL grib_get(iga,"values",valuesa(:))
+  ENDIF
+  IF (nom + nocv /= gnov .OR. &
+    (nocv /= 0 .AND. nocv /= COUNT(valuesa(:) /= rmiss))) GOTO 9994
+
   IF (kga == 1 .OR. .NOT. lbconst) THEN
-    CALL grib_get(igb,"bitmapPresent",bp)
-    IF (bp /= 0) CALL grib_set(igb,"missingValue",rmiss)
-    CALL grib_get(igb,"values",valuesb(:))
+    CALL grib_get(igb,"getNumberOfValues",gnov)    ! totale di punti nel grib
+    CALL grib_get(igb,"numberOfMissing",nom)       ! n.ro dati mancanti
+    CALL grib_get(igb,"numberOfCodedValues",nocv)  ! n.ro dati validi
+    IF (nocv == 0) THEN
+      valuesb(:) = rmiss
+    ELSE
+      CALL grib_set(igb,"missingValue",rmiss)
+      CALL grib_get(igb,"values",valuesb(:))
+    ENDIF
+    IF (nom + nocv /= gnov .OR. &
+      (nocv /= 0 .AND. nocv /= COUNT(valuesb(:) /= rmiss))) GOTO 9993
   ENDIF
 
 ! Eseguo l'operazione aritmetica richiesta
@@ -241,6 +258,22 @@ DO k = 0,5
   IF (clret(k) == 1)  WRITE (*,*) cllab(k),": test non passato"
 ENDDO
 STOP 3
+
+9994 CONTINUE
+WRITE (*,*) "Errore nelle chiavi realtive ai dati mancanti, file ",TRIM(filea)
+WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov
+WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
+WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom
+WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(valuesa(:) /= rmiss)
+STOP 4
+
+9993 CONTINUE
+WRITE (*,*) "Errore nelle chiavi realtive ai dati mancanti, file ",TRIM(fileb)
+WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov
+WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
+WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom
+WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(valuesb(:) /= rmiss)
+STOP 4
 
 END PROGRAM math_grib
 

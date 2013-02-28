@@ -28,7 +28,7 @@ INTEGER :: datah_in(4),datah_ref(4),datah_end(4)
 INTEGER :: scad(4),lev(3),ni,nj
 INTEGER :: cem,sc,par,tab,sortx,togp,igen,gd,topd,dig,uvrtg,sm,pdtn,dd, &
   dt,ft,toffs,sfoffs,svoffs,tosfs,sfosfs,svosfs,toti,lotr,bp,bpv,bmi,bmp, &
-  nv,tosp,ct,drtn,en,nocv,nov
+  nv,tosp,ct,drtn,en,gnov,nocv,nom
 CHARACTER(LEN=250) :: chpar,filein,fileout
 CHARACTER(LEN=80) :: grid_type
 LOGICAL :: lforc,lmacc
@@ -178,20 +178,20 @@ DO kg = 1,HUGE(0)
 ! Bug grib-api (18/03/2013): se un campo e' interamente mancante, values(:) e'
 ! messo a 0 invece che a rmiss, quindi devo gestire questo caso separatamente
 
-  ALLOCATE (values(ni*nj))
-  CALL grib_get(igin,"numberOfValues",nov)
-  CALL grib_get(igin,"numberOfCodedValues",nocv)
   CALL grib_get(igin,"bitsPerValue",bpv)
+  CALL grib_get(igin,"getNumberOfValues",gnov)    ! totale di punti nel grib
+  CALL grib_get(igin,"numberOfMissing",nom)       ! n.ro dati mancanti
+  CALL grib_get(igin,"numberOfCodedValues",nocv)  ! n.ro dati validi
+
+  ALLOCATE (values(ni*nj))
   IF (nocv == 0) THEN
     values(:) = rmiss
-  ELSE IF (nocv < nov .AND. bp /= 0) THEN
+  ELSE
     CALL grib_set(igin,"missingValue",rmiss)
     CALL grib_get(igin,"values",values(:))
-  ELSE IF (nocv == nov) THEN
-    CALL grib_get(igin,"values",values(:))
-  ELSE
-    GOTO 9995
   ENDIF
+  IF (nom + nocv /= gnov .OR. &
+    (nocv /= 0 .AND. nocv /= COUNT(values(1:ni*nj) /= rmiss))) GOTO 9995
 
 ! 2.4) Se trovo una chiave con un valore non gestito mi fermo
   IF (scad(1)/=1 .OR. &                     ! unit of timernage is not hour
@@ -571,10 +571,11 @@ IF (scad(4)/=0 .AND. scad(4)/=10 .AND. scad(2)>scad(3)) WRITE (*,*) &
 STOP 5
 
 9995 CONTINUE
-WRITE (*,*) "Errore gestione dati mancanti, grib n.ro ",kg
-WRITE (*,*) "bitmapPresent (1=.T.) ",bp
-WRITE (*,*) "numberOfValues        ",nov
-WRITE (*,*) "numberOfCodedValues   ",nocv
+WRITE (*,*) "Errore nelle chiavi relative ai dati mancanti"
+WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov
+WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
+WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom
+WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(values(1:ni*nj) /= rmiss)
 STOP 6
 
 END PROGRAM ma_grib1_grib2

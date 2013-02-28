@@ -45,6 +45,8 @@ END INTERFACE
 INTEGER, PARAMETER :: maxdim = 100000  ! dimensione massima dei GRIB
 INTEGER, PARAMETER :: maxspc = 200     ! n.ro max specie
 REAL, PARAMETER :: fc = 287*7.2868e16 / 9.81
+CHARACTER (LEN=40), PARAMETER :: tab_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: tab_path = "MA_UTILS_DATA"
 
 ! Profilo standard dell'atmosfera (da Holton); valori ogni km
 REAL, PARAMETER :: pstd(0:10) = (/101325.,89874.,79495.,70108.,61640., &
@@ -72,9 +74,9 @@ INTEGER :: hhr,hhr_sav,sca,sca1,sca2
 INTEGER :: idata,hhc,hh_tot,cem,data(3),ora(2),scad(4),level(3),var(3)
 INTEGER :: np,nz,nt,nspc
 INTEGER :: k,kz,kt,ks,kp,ios,eof,eor,ier,cnt_rew,p1,p2,p3,l1,l2,t1,t2
-CHARACTER(LEN=100) :: file_tab(ntab)
-CHARACTER (LEN=80) :: filein,fileout,filespc,fileor,filevc,chdum,arg(4)
-CHARACTER (LEN=30) :: home_minguzzi
+CHARACTER(LEN=120) :: file_tab(ntab)
+CHARACTER (LEN=120) :: filein,fileout,filespc,fileor,filevc,chdum,arg(4)
+CHARACTER (LEN=80) :: ch80
 CHARACTER (LEN=8) :: dum_spc
 CHARACTER (LEN=2) :: next_arg,idscad
 LOGICAL :: spc_pres(maxspc),first,lroz,req_ro,req_zz
@@ -84,10 +86,13 @@ LOGICAL :: spc_pres(maxspc),first,lroz,req_ro,req_zz
 
 !--------------------------------------------------------------------------
 ! 1.0 Variabili d'ambiente
-CALL GETENV('HOME_MINGUZZI',home_minguzzi)
+ch80 = ""
+CALL GETENV(tab_path,ch80)
+IF (TRIM(ch80) == "") ch80 = tab_path_def
+
 DO kt = 1,ntab
-  WRITE (file_tab(kt),'(2a,i3.3,a4)') TRIM(home_minguzzi), &
-    "/util/grib/dat/tabella_",id_tab(kt),".txt"
+  WRITE (file_tab(kt),'(2a,i3.3,a4)') TRIM(ch80), &
+    "/tabella_",id_tab(kt),".txt"
 ENDDO
 
 !--------------------------------------------------------------------------
