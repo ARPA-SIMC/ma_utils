@@ -4,7 +4,10 @@ PROGRAM tfill_seriet
 ! mancanti con l'ultimo record con tutti dati validi relativo alla stessa 
 ! ora
 !
-!                                           Versione 1.0, Enrico 03/12/2013
+! Note:
+! Per ora gestisce solo files di analisi (sca = 0)
+!
+!                                         Versione 1.0.1, Enrico 01/03/2013
 !--------------------------------------------------------------------------
 
 USE datetime_class
@@ -19,7 +22,7 @@ REAL, PARAMETER :: rmis_sex = -1.E30
 ! Variabili locali
 TYPE (datetime) :: datahc
 REAL, ALLOCATABLE :: val(:)
-INTEGER :: idp,kp,eof,eor,ios,k,yy,mm,dd,hh,ncol,cnt_ok,cnt_mod
+INTEGER :: idp,kp,eof,eor,ios,k,yy,mm,dd,hh,sca,ncol,cnt_ok,cnt_mod
 CHARACTER (LEN=10000) :: rec,rec_stored(0:23)
 CHARACTER (LEN=250) :: filein,fileout,chdum
 
@@ -75,13 +78,14 @@ DO k = 1,HUGE(0)
   READ (30,'(a)',IOSTAT=ios) rec
   IF (ios == eof) EXIT
   IF (ios /= 0) GOTO 9997
-  READ (rec,'(i2,1x,i2,1x,i4,1x,i2)') dd,mm,yy,hh
+  READ (rec,'(i2,1x,i2,1x,i4,1x,i2,1x,i3)') dd,mm,yy,hh,sca
   READ (rec(chhead+1:),*) val(1:ncol)
+  IF (sca /= 0 ) GOTO 9995
 
   IF (ANY(val(1:ncol) == rmis_ser) .OR. ANY(val(1:ncol) == rmis_sex)) THEN
     IF (TRIM(rec_stored(hh)) == "") GOTO 9996
-    WRITE (31,'(i2.2,a1,i2.2,a1,i4.4,1x,i2.2,a)') dd,"/",mm,"/",yy,hh, &
-      TRIM(rec_stored(hh))
+    WRITE (31,'(i2.2,a1,i2.2,a1,i4.4,1x,i2.2,1x,i3.3,a)') &
+      dd,"/",mm,"/",yy,hh,0,TRIM(rec_stored(hh))
     cnt_mod = cnt_mod + 1
 
   ELSE
@@ -114,6 +118,11 @@ STOP 3
 WRITE (*,*)  "Errore: presenti dati mancanti nel primo record relativo alle ore ",hh
 STOP 4
 
+9995 CONTINUE
+WRITE (*,*) "Trovata scadenza diversa da 0 (",sca,")"
+WRITE (*,*) "Questo programma gestisce solo le analisi"
+STOP 5
+
 END PROGRAM tfill_seriet
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -124,9 +133,9 @@ SUBROUTINE write_help
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 WRITE (*,*)
 WRITE (*,*) "Uso: tfill_sereit.exe [-h] filein fileout" 
-WRITE (*,*) "Legge un file seriet e lo riscrive sostituendo i record che hanno valori"
-WRITE (*,*) "  mancanti con l'ultimo record con tutti dati validi relativo alla stessa ora"
-WRITE (*,*)
+WRITE (*,*) "Legge un file seriet di analisi (sca = 0) e lo riscrive sostituendo "
+WRITE (*,*) "  i record che hanno valori mancanti con l'ultimo record con tutti dati "
+WRITE (*,*) "  validi relativo alla stessa ora"
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 
 RETURN

@@ -105,9 +105,9 @@ grib: DO
   IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
 
 ! 2.3) Diagnostica sulla compatibilita' dei campi
-  IF (ANY(ksec2a(:) /= ksec2b(:)) .OR. (ksec4a(1) /= ksec4b(1))) THEN
+  IF (ANY(ksec2a(1:14) /= ksec2b(1:14)) .OR. (ksec4a(1) /= ksec4b(1))) THEN
     WRITE (*,*) "T e Td definiti su griglie diverse, skip (progr. ",ngrib + 1,")"
-    DO k = 1,1024 
+    DO k = 1,14 
       IF (ksec2a(k) /= ksec2b(k)) WRITE (*,'(a,i4,a,2i12)') &
         "    ksec2(",k,"): ",ksec2a(k),ksec2b(k)
     ENDDO

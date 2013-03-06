@@ -12,7 +12,7 @@ PROGRAM proc_seriet_surf
 !   staz,net,anno,mese,giorno,ora, ff, dd, ceil,  tcc, tt, rh, prs,cod_prc 
 !                                 [m/s grd ft*100 10i  K   %   mb  Calmet ]
 !
-!                                         Versione 2.0.0, Enrico 28/12/2012
+!                                         Versione 2.0.1, Enrico 01/03/2013
 !--------------------------------------------------------------------------
 IMPLICIT NONE
 
@@ -105,7 +105,11 @@ idf_in(:) = -9999
 DO kp = 1,npar_tot
   lev_lab = ADJUSTL(header_lev((kp-1)*(fw+1)+1:kp*(fw+1)))
   par_lab = ADJUSTL(header_par((kp-1)*(fw+1)+1:kp*(fw+1)))
-  READ (lev_lab,*,ERR=9998) levid
+  IF (INDEX(lev_lab,".") == 0) THEN         ! livello intero
+    READ (lev_lab,*,ERR=9998) levid
+  ELSE                                      ! livello reale - non gestito
+    levid = -999
+  ENDIF
 
   DO k2 = 1,10
     IF (TRIM(par_lab) == TRIM(reqlab(k2)) .AND. levid == reqlev(k2)) &
