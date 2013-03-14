@@ -12,30 +12,29 @@ PROGRAM stat_orari
 ! - medie stagionali  (SE???): per ogni stagione: ave, max, min, nok
 ! - rose dei venti    (wrose): dati per intensita' e quaxdrante
 !
-! Uso: 
-! stat_orari.exe [-h] [-o/-s/-sx/-d/-t] [-csv] [-liv] [-ndec N] filein
-!
-! Compilazione:
-! Usa l'obsolescente modulo per la gestione date date_hander.f90
 !
 ! Note:
-! - Dalla versione 9, viene il tracciato dei files .sta con serie 
-!   storiche (daily, month, SE***) diventa uguale a quello di estraqa con 
-!   dati giornalieri. I nuovi files .sta sono la concatenazione di 4 
-!   estraqa-day, separati da 2 record vuoti; il record dei livelli (se 
-!   presente) e' il 2o di intestazione)
+! - Dalla versione 9, il tracciato dei files .sta con serie storiche
+!   (daily, month, SE***) diventa uguale a quello di estraqa con dati
+!   giornalieri. I nuovi files .sta sono la concatenazione di 5 estraqa-day
+!   (ave, max, min, nox, extra), separati da 2 record vuoti; il record dei
+!   livelli (se presente) e' il 2o di intestazione.
+! - Dalla versione 10 e' stat implementata la possibiliita' di aggiungere 
+!   ad alcuni files sta un 5o blocco con un'elaborazione extra, richiesta
+!   da riga comando (es: rank; mdoficare anche split_sta.ksh)
 ! - Il programma ignora le stazioni, e media tutti i dati presenti nel file
 !   relativi a ciascuna data-ora (appendendo opportunamente i files di 
 !   input e' quindi possibile calcolare medie di settore, ecc.).
 ! - Nel file di input, i parametri possono essere in qualsiasi ordine;
-!   solo per il formato condiviso l'ordine e' fisso (ma possono mancare le
-!   ultime colonne)
-! - La stagione "semestre invernale" viene calcolata in 2 modi: win e' il
-!   semestre oct-mar, wi2 l'uninoe dei due trimestri jan-mar e oct-dec. 
-! - Le stagioni a cavallo di due anni (djf e win) sono attribuite all'anno
-!   in cui iniziano
+! - Le stagioni invernali vengono calcolate in 2 modi: win/djf si 
+!   riferiscono all'inverno "continuo" a cavallo di due anni 
+!   (oct-mar/dec-feb), wi2/jfd sono divise in due segmenti e restano all'
+!   interno dell'anno solare (jan-mar+oct-dec/jan,feb,dec)
+! - Le stagioni invenrali continue (djf e win) sono attribuite all'anno
+!   in cui iniziano.
+! - Usa il modulo per la gestione date date_hander.f90 (obsoleto)
 !
-!                                        V9.0.0, Enrico & Johnny 13/02/2013
+!                                       V10.0.0, Enrico & Johnny 13/03/2013
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -94,23 +93,23 @@ CHARACTER (LEN=fw), PARAMETER :: str_par_mo(np_mo) = &
   (/"        mo","      molm","     modia"/)
 
 ! 0.2.2 Stringhe descrittive delle stagioni
-CHARACTER (LEN=3), PARAMETER :: labsea(8) = (/ &
-  "mam","jja","son","djf","sum","win","yea","wi2"/)
+CHARACTER (LEN=3), PARAMETER :: labsea(9) = (/ &
+  "mam","jja","son","djf","sum","win","yea","wi2","jfd"/)
 
-! 0.2.3 Stringhe descrittive delle statistiche in output
-CHARACTER (LEN=12), PARAMETER :: title(4) = (/ &
-  "Medie       ","Massimi     ","Minimi      ","Dati_validi "/)
-INTEGER, PARAMETER :: idx_stat(4) = (/2,3,4,1/)
+! 0.2.3 Ordine delle statistiche nei files .sta (relative agli array dei
+!       conatatori statistici)
+INTEGER, PARAMETER :: idx_stat(5) = (/2,3,4,1,5/)
 
 !--------------------------------------------------------------------------
 ! 0.3 Contatori statistici
 REAL :: stats(6,mxpar)           ! statistiche (nok/sum/max/min/sum2/ave)
 REAL :: dfreq(mxpar,mxbin)       ! distribuz. di frequenza
-REAL,ALLOCATABLE :: ggtyp(:,:,:) ! nok/med/max/min gg tipo (4,mxpar,0:23)
-REAL,ALLOCATABLE :: daily(:,:,:) ! nok/med/max/min giorn. (4,mxpar,ndays)
-REAL,ALLOCATABLE :: month(:,:,:) ! nok/med/max/min mensile (4,mxpar,nmonths)
-REAL,ALLOCATABLE :: season(:,:,:,:)!nok/med/max/min stag. (4,8,mxpar,nyears)
-                                 ! Stagioni: MAM,JJA,SON,DJF,Sum,Win,Yea,Wi2
+REAL,ALLOCATABLE :: ggtyp(:,:,:) ! nok/med/max/min gg tipo (4,npar,0:23)
+REAL,ALLOCATABLE :: daily(:,:,:) ! nok/med/max/min/(ext) giorn. (5,npar,ndays)
+REAL,ALLOCATABLE :: month(:,:,:) ! nok/med/max/min/(ext) mensile (5,npar,nmonths)
+REAL,ALLOCATABLE :: season(:,:,:,:)!nok/med/max/min/(ext) stag. (5,9,npar,nyears)
+                                 ! Stagioni: MAM,JJA,SON,DJF,SUM,WIN,YEA,WI2,JFD
+REAL,ALLOCATABLE :: yeatv(:,:,:) ! valori piu' alti nell'anno (req_rank,npar,nyears)
 REAL :: wrose(mxbin,mxbin)       ! intervallo (<=); settore (N,NE,E...)
 
 !--------------------------------------------------------------------------
@@ -126,11 +125,11 @@ TYPE (csv_record) :: csvline
 TYPE(date) :: data_dum,data1,data2
 REAL :: rval(mxpar),rmis,ff_calm
 INTEGER :: npar,nrep,ndays,nmonths,nyears,id_par(mxpar),ival(mxpar)
-INTEGER :: kp,kpar_dd,kpar_ff,fint,dsect,ncalm,nsect,ndec_out
+INTEGER :: kp,kpar_dd,kpar_ff,fint,dsect,ncalm,nsect,ndec_out,req_rank
 INTEGER :: cnt_miss,cnt_nodd,cnt_noff,cnt_ok
-INTEGER :: k,kk,k2,kv,kpar,kbin,khr
+INTEGER :: k,kk,k2,kv,kr,kpar,kbin,khr
 INTEGER :: kyear3,kyear6,kyear12,kyear,nsea,ksea3,ksea6,kmonth,kday,year1
-INTEGER :: eof,eor,ios,idum,hrdum,p1,p2,irec,month_tot,lline
+INTEGER :: eof,eor,ios,idum,hrdum,p1,p2,irec,month_tot,lline,out_grp
 CHARACTER (LEN=mxpar*(fw+1)+20) :: chdum,chdum2,head_par,head_liv
 CHARACTER (LEN=500) :: chfmt0,chfmt1,chfmt2,chfmt3,chfmt4,chfmt5,chfmth
 CHARACTER (LEN=100) :: chpar,file_in,file_root,file_out,file_out2
@@ -138,11 +137,12 @@ CHARACTER (LEN=fw) :: str_par(mxpar),str_par2(mxpar),str_liv(mxpar)
 CHARACTER (LEN=fw) :: chval(mxpar),str_par_dum
 CHARACTER (LEN=17) :: str_data_ser
 CHARACTER (LEN=13) :: str_data_csv
+CHARACTER (LEN=12) :: title(5)
 CHARACTER (LEN=10) :: ch10
 CHARACTER (LEN=8) :: ch_id_staz
 CHARACTER (LEN=4) :: ch4
 CHARACTER (LEN=3) :: inp_data,out_fmt,next_arg
-LOGICAL :: fmt_ser_xls,out_liv
+LOGICAL :: fmt_ser_xls,out_liv,lrank,miss0
 
 !--------------------------------------------------------------------------
 ! 1) Parametri da riga comandi
@@ -150,6 +150,8 @@ LOGICAL :: fmt_ser_xls,out_liv
 out_fmt = "txt"
 inp_data = "hhr"
 out_liv = .FALSE.
+lrank = .FALSE.
+miss0 = .FALSE.
 file_in = ""
 ndec_out = 1
 
@@ -174,12 +176,20 @@ DO kp = 1,HUGE(0)
     inp_data = "ddy"
   ELSE IF (TRIM(chdum) == "-t") THEN
     inp_data = "tem"
+  ELSE IF (TRIM(chdum) == "-rank") THEN
+    lrank = .TRUE.
+    next_arg = "rnk"
   ELSE IF (TRIM(chdum) == "-liv") THEN
     out_liv = .TRUE.
   ELSE IF (TRIM(chdum) == "-csv") THEN
     out_fmt = "csv"
+  ELSE IF (TRIM(chdum) == "-miss0") THEN
+    miss0 = .TRUE.
   ELSE IF (TRIM(chdum) == "-ndec") THEN
     next_arg = "ndc"
+  ELSE IF (next_arg == "rnk") THEN
+    READ (chdum,*,IOSTAT=ios) req_rank
+    next_arg = ""
   ELSE IF (next_arg == "ndc") THEN
     READ (chdum,*,IOSTAT=ios) ndec_out
     next_arg = ""
@@ -200,6 +210,12 @@ IF (ios /= 0 .OR. ndec_out > fw-3) THEN
   WRITE (*,*) "Errore nei parametri (ndec illegale o troppo alto)"
   STOP
 ENDIF
+
+title(1) = "Medie"
+title(2) = "Massimi"
+title(3) = "Minimi"
+title(4) = "Dati_validi"
+IF (lrank) WRITE (title(5),'(a5,i3)') "Rank ",req_rank
 
 !--------------------------------------------------------------------------
 ! 2) Elaborazioni preliminari sul file input: lista parametri, date estreme
@@ -383,10 +399,11 @@ ENDIF
 
 !--------------------------------------------------------------------------
 ! 2.6 Alloco arrays
-ALLOCATE (ggtyp(4,mxpar,0:23))
-ALLOCATE (daily(4,mxpar,ndays))
-ALLOCATE (month(4,mxpar,nmonths))
-ALLOCATE (season(4,8,mxpar,nyears))
+ALLOCATE (ggtyp(4,npar,0:23))
+ALLOCATE (daily(5,npar,ndays))
+ALLOCATE (month(5,npar,nmonths))
+ALLOCATE (season(5,9,npar,nyears))
+IF (lrank) ALLOCATE(yeatv(req_rank,npar,nyears))
 
 !--------------------------------------------------------------------------
 ! 2.7 Definisco gli intervalli per istogrammi (relativi a ciascun parametro)
@@ -479,18 +496,22 @@ ggtyp(3,:,:) = -HUGE(0.)
 ggtyp(4,:,:) = HUGE(0.)
 daily(3,:,:) = -HUGE(0.)
 daily(4,:,:) = HUGE(0.)
+daily(5,:,:) = rmis
 month(1:2,:,:) = 0.
 month(3,:,:) = -HUGE(0.)
 month(4,:,:) = HUGE(0.)
+month(5,:,:) = rmis
 season(1:2,:,:,:) = 0.
 season(3,:,:,:) = -HUGE(0.)
 season(4,:,:,:) = HUGE(0.)
+season(5,:,:,:) = rmis
 wrose(:,:) = 0.
 ncalm = 0
 cnt_ok = 0
 cnt_miss = 0
 cnt_nodd = 0
 cnt_noff = 0
+IF (lrank) yeatv(:,:,:) = -HUGE(0.)
 
 WRITE (*,*) "Contenuto file di input:"
 WRITE (*,*) "  - parametri:   ",npar
@@ -498,7 +519,7 @@ WRITE (*,*) "  - n.ro report: ",nrep
 WRITE (*,*) "  - giornate:    ",ndays
 WRITE (*,*) "  - mesi:        ",nmonths
 WRITE (*,*) "  - anni:        ",nyears
-IF (kpar_dd /= -99 .AND. kpar_ff /= 99) &
+IF (kpar_dd /= -99 .AND. kpar_ff /= -99) &
   WRITE (*,*) "  - sono presenti dati di vento"
 WRITE (*,*)
 
@@ -560,12 +581,21 @@ DO k = 1,nrep
 
   ENDIF
 
-! tappo la dir. vento 370 dei Metar, per far tornare i conti del n.ro dati 
+! Tappo la dir. vento 370 dei Metar, per far tornare i conti del n.ro dati 
 ! in wrose (dovrebbe essere gia' stata tappata da estra_orari)
-  IF (rval(kpar_dd) > 360.) rval(kpar_dd) = rmis
+  IF (kpar_dd /= -99) THEN
+    IF (rval(kpar_dd) > 360.) rval(kpar_dd) = rmis
+  ENDIF
 
+! Se richiesto, metto a 0 i dati mancanti
+  IF (miss0) THEN
+    WHERE (rval(1:npar) == rmis)
+      rval(1:npar) = 0.
+    ENDWHERE
+  ENDIF
+ 
 ! 3.3 Calcolo il numero progressivo di giorno, mese e anno correnti
-! - gli indici ksea* rappresnetnao la staigone a cui appartiene la data
+! - gli indici ksea* rappresentano la stagione a cui appartiene la data
 !   corrente
 ! - gli indici kyear* (statistiche stagionali) rappresentano l'anno della
 !   stagione a cui appartiene la data corrente; sono contati a partire da 
@@ -621,11 +651,13 @@ DO k = 1,nrep
     month(3,1:npar,kmonth) = MAX (month(3,1:npar,kmonth), rval(1:npar))
     month(4,1:npar,kmonth) = MIN (month(4,1:npar,kmonth), rval(1:npar))
 
+!   Stagioni trimestrali continue
     season(1,ksea3,1:npar,kyear3) = season(1,ksea3,1:npar,kyear3) + 1
     season(2,ksea3,1:npar,kyear3) = season(2,ksea3,1:npar,kyear3) + rval(1:npar)
     season(3,ksea3,1:npar,kyear3) = MAX (season(3,ksea3,1:npar,kyear3), rval(1:npar))
     season(4,ksea3,1:npar,kyear3) = MIN (season(4,ksea3,1:npar,kyear3), rval(1:npar))
 
+!   Semestri estivo/invernale continui
     season(1,ksea6+4,1:npar,kyear6) = &
       season(1,ksea6+4,1:npar,kyear6) + 1
     season(2,ksea6+4,1:npar,kyear6) = &
@@ -635,6 +667,7 @@ DO k = 1,nrep
     season(4,ksea6+4,1:npar,kyear6) = &
       MIN (season(4,ksea6+4,1:npar,kyear6), rval(1:npar))
 
+!   Anno solare
     season(1,7,1:npar,kyear12) = season(1,7,1:npar,kyear12) +1
     season(2,7,1:npar,kyear12) = season(2,7,1:npar,kyear12) + rval(1:npar)
     season(3,7,1:npar,kyear12) = &
@@ -643,7 +676,7 @@ DO k = 1,nrep
       MIN (season(4,7,1:npar,kyear12), rval(1:npar))
   ENDWHERE
 
-! Elaboro a parte la stagione wi2 (inverno spezzato)
+! Semestre invernale spezzato
   IF (ksea6 == 2) THEN
     WHERE (rval(1:npar) /= rmis)
       season(1,8,1:npar,kyear12) = season(1,8,1:npar,kyear12) +1
@@ -655,6 +688,31 @@ DO k = 1,nrep
     ENDWHERE
   ENDIF  
  
+! Trimestre invernale spezzato
+  IF (ksea3 == 4) THEN
+    WHERE (rval(1:npar) /= rmis)
+      season(1,9,1:npar,kyear12) = season(1,9,1:npar,kyear12) +1
+      season(2,9,1:npar,kyear12) = season(2,9,1:npar,kyear12) + rval(1:npar)
+      season(3,9,1:npar,kyear12) = &
+        MAX(season(3,9,1:npar,kyear12), rval(1:npar))
+      season(4,9,1:npar,kyear12) = &
+        MIN (season(4,9,1:npar,kyear12), rval(1:npar))
+    ENDWHERE
+  ENDIF  
+ 
+! Rank N (SEyea)
+  IF (lrank) THEN
+    DO kv = 1,npar
+      IF (rval(kv) == rmis .OR. rval(kv) <= yeatv(req_rank,kv,kyear12)) CYCLE
+      DO kr = 1,req_rank
+        IF (rval(kv) > yeatv(kr,kv,kyear12)) EXIT
+      ENDDO
+      IF (kr > req_rank) GOTO 9993
+      yeatv(kr+1:req_rank,kv,kyear12) = yeatv(kr:req_rank-1,kv,kyear12)
+      yeatv(kr,kv,kyear12) = rval(kv)
+    ENDDO
+  ENDIF
+
 ! 3.5 Aggiorno dfreq
   DO kpar = 1,npar
     IF (rval(kpar) == rmis) CYCLE
@@ -754,13 +812,13 @@ ELSEWHERE
 ENDWHERE
 
 ! season
-WHERE (season(1,1:8,1:npar,1:nyears) > 0)
-  season(2,1:8,1:npar,1:nyears) = season(2,1:8,1:npar,1:nyears) / &
-    season(1,1:8,1:npar,1:nyears)
+WHERE (season(1,1:9,1:npar,1:nyears) > 0)
+  season(2,1:9,1:npar,1:nyears) = season(2,1:9,1:npar,1:nyears) / &
+    season(1,1:9,1:npar,1:nyears)
 ELSEWHERE
-  season(2,1:8,1:npar,1:nyears) = rmis
-  season(3,1:8,1:npar,1:nyears) = rmis
-  season(4,1:8,1:npar,1:nyears) = rmis
+  season(2,1:9,1:npar,1:nyears) = rmis
+  season(3,1:9,1:npar,1:nyears) = rmis
+  season(4,1:9,1:npar,1:nyears) = rmis
 ENDWHERE
 
 ! dfreq: metto a rmis la frequenza dei bin non utilizzati
@@ -773,6 +831,20 @@ ENDWHERE
 IF (kpar_dd /= -99 .AND. kpar_ff /= -99) THEN
   wrose(1:nbin(kpar_ff),1) = wrose(1:nbin(kpar_ff),1) + & 
     wrose(1:nbin(kpar_ff),nbin(kpar_dd))
+ENDIF
+
+! rank: metto a rmis i valori negli anni che non hanno abbastanza dati validi
+IF (lrank) THEN
+  IF (ANY(season(1,7,1:npar,1:nyears) < req_rank .AND. &
+      yeatv(req_rank,1:npar,1:nyears) /= -HUGE(0.)) .OR. &
+      ANY(season(1,7,1:npar,1:nyears) >= req_rank .AND. &
+      yeatv(req_rank,1:npar,1:nyears) == -HUGE(0.))) GOTO 9993
+  
+  WHERE (season(1,7,1:npar,1:nyears) < req_rank)
+    season(5,7,1:npar,1:nyears) = rmis
+  ELSEWHERE
+    season(5,7,1:npar,1:nyears) = yeatv(req_rank,1:npar,1:nyears)
+  ENDWHERE
 ENDIF
 
 !--------------------------------------------------------------------------
@@ -1037,7 +1109,7 @@ WRITE (chfmt5,'(a,i3,a,i2,a)') "(i2.2,8x,",npar,"(1x,i",fw,"))"
 OPEN (UNIT=31, FILE=file_out, STATUS="REPLACE", FORM="FORMATTED")
 DO kk = 1,4
   IF (out_fmt == "txt") THEN
-    WRITE (31,'(a)') TRIM(title(kk))                    ! header 1 (staz)
+    WRITE (31,'(a)') TRIM(title(kk))                    ! header 1 (metric)
     IF (out_liv) THEN                                   ! header 2 (liv)
       WRITE (31,chfmth) "          ",(str_liv(kpar), kpar=1,npar)
     ELSE
@@ -1056,7 +1128,7 @@ DO kk = 1,4
 
   ELSE IF (out_fmt == "csv") THEN
 
-!   header 1 (staz)
+!   header 1 (metric)
     WRITE (31,'(a)') TRIM(title(kk))
 
 !   header 2 (liv)
@@ -1164,7 +1236,7 @@ WRITE (chfmt5,'(a,i3,a,i2,a)') &
 OPEN (UNIT=31, FILE=file_out, STATUS="REPLACE", FORM="FORMATTED")
 DO kk = 1, 4
   IF (out_fmt == "txt") THEN
-    WRITE (31,'(a)') TRIM(title(kk))                    ! header 1 (staz)
+    WRITE (31,'(a)') TRIM(title(kk))                    ! header 1 (metric)
     IF (out_liv) THEN                                   ! header 2 (liv)
       WRITE (31,chfmth) "          ",(str_liv(kpar), kpar=1,npar)
     ELSE
@@ -1186,7 +1258,7 @@ DO kk = 1, 4
 
   ELSE IF (out_fmt == "csv") THEN
 
-!   header 1 (staz)
+!   header 1 (metric)
     WRITE (31,'(a)') TRIM(title(kk))
 
 !   header 2 (liv)
@@ -1316,7 +1388,7 @@ WRITE (chfmt5,'(a,i3,a,i2,a)') &
 OPEN (UNIT=31, FILE=file_out, STATUS="REPLACE", FORM="FORMATTED")
 DO kk = 1,4
   IF (out_fmt == "txt") THEN
-    WRITE (31,'(a)') TRIM(title(kk))                    ! header 1 (staz)
+    WRITE (31,'(a)') TRIM(title(kk))                    ! header 1 (metric)
     IF (out_liv) THEN                                   ! header 2 (liv)
       WRITE (31,chfmth) "          ",(str_liv(kpar), kpar=1,npar)
     ELSE
@@ -1341,7 +1413,7 @@ DO kk = 1,4
 
   ELSE IF (out_fmt == "csv") THEN
 
-!   header 1 (staz)
+!   header 1 (metric)
     WRITE (31,'(a)') TRIM(title(kk))
 
 !   header 2 (liv)
@@ -1461,7 +1533,7 @@ CLOSE(33)
 !--------------------------------------------------------------------------
 ! 5.6 files season (ASCII)
 
-DO nsea = 1,8
+DO nsea = 1,9
 
   IF (out_fmt == "txt") THEN
     WRITE (file_out,'(4a)') TRIM(file_root),"_SE",labsea(nsea),".sta"
@@ -1488,9 +1560,11 @@ DO nsea = 1,8
   END SELECT
 
   OPEN (UNIT=31, FILE=file_out, STATUS="REPLACE", FORM="FORMATTED")
-  DO kk = 1, 4
+  out_grp = 4
+  IF (nsea == 7 .AND. lrank) out_grp = 5
+  DO kk = 1,out_grp
     IF (out_fmt == "txt") THEN
-      WRITE (31,'(a)') TRIM(title(kk))                  ! header 1 (staz)
+      WRITE (31,'(a)') TRIM(title(kk))                  ! header 1 (metric)
       IF (out_liv) THEN                                 ! header 2 (liv)
         WRITE (31,chfmth) "          ",(str_liv(kpar), kpar=1,npar)
       ELSE
@@ -1499,12 +1573,12 @@ DO nsea = 1,8
       WRITE (31,chfmth) "aaaa mm gg",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
       DO kyear = 1,nyears
         data_dum%yy = kyear + year1 - 1
-        IF (kk <= 3) THEN
-          WRITE (31,chfmt2) data_dum%yy,data_dum%mm,data_dum%dd, &
-            season(idx_stat(kk),nsea,1:npar,kyear)
-        ELSE
+        IF (kk == 4) THEN
           WRITE (31,chfmt5) data_dum%yy,data_dum%mm,data_dum%dd, &
             NINT(season(idx_stat(kk),nsea,1:npar,kyear))
+        ELSE
+          WRITE (31,chfmt2) data_dum%yy,data_dum%mm,data_dum%dd, &
+            season(idx_stat(kk),nsea,1:npar,kyear)
         ENDIF
       ENDDO
       WRITE (31,*)
@@ -1512,7 +1586,7 @@ DO nsea = 1,8
 
     ELSE IF (out_fmt == "csv") THEN
 
-!     header 1 (staz)
+!     header 1 (metric)
       WRITE (31,'(a)') TRIM(title(kk))
 
 !     header 2 (liv)
@@ -1657,6 +1731,10 @@ IF (kyear12 < 1 .OR. kyear12 > nyears) &
   WRITE (*,*) "kyear12 ",kyear12," (1-",nyears,")"
 STOP 6
 
+9993 CONTINUE
+WRITE (*,*) "Erroraccio nel calcolo del rank"
+STOP 7
+
 END PROGRAM stat_orari
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -1728,8 +1806,11 @@ SUBROUTINE scrive_help
 IMPLICIT NONE
 INTEGER :: mxstaz
 
+!            1234567890123456789012345678901234567890123456789012345678901234567890
 WRITE (*,*) 
-WRITE (*,*) "stat_orari.exe [-h] [-o/-s/-sx/-d/-t] [-csv] [-liv] [-ndec N] filein"
+WRITE (*,*) "stat_orari.exe [-h] [-o/-s/-sx/-d/-t] filein"
+WRITE (*,*) "           [-rank N] [-csv] [-liv] [-miss0] [-ndec N]"
+WRITE (*,*)
 WRITE (*,*) "filein   : file con i dati. Il par. successivo detemina il suo formato:"
 WRITE (*,*) " -o      : estra_orari o estra_qaria con dati orari (default)"
 WRITE (*,*) " -s      : seriet con notazione decimale"
@@ -1738,8 +1819,11 @@ WRITE (*,*) " -d      : estra_qaria con dati giornalieri o segmento di file .sta
 WRITE (*,*) " -t      : input nel formato prodotto da trasp_temp"
 WRITE (*,*) " -q      : come -d (per compatibilita' con vecchie procedure)"
 WRITE (*,*)
-WRITE (*,*) " -csv    : scrive i files ASCII in formato csv (default: sep. da spazi)"
-WRITE (*,*) " -liv    : aggiunge un header con le quote dei livelli (solo fmt seriet)"
+WRITE (*,*) " -rank N : aggiunge al file SEyea.sta un gruppo relativo all'N-mo"
+WRITE (*,*) "           valore piu' alto"
+WRITE (*,*) " -csv    : scrive i files ASCII in formato csv (def: sep. da spazi)"
+WRITE (*,*) " -liv    : aggiunge header con le quote dei livelli (solo fmt seriet)"
+WRITE (*,*) " -miss0  : considera i dati mancanti come se fossero zeri"
 WRITE (*,*) " -ndec N : numero di decimali nei files .sta (-1 per notazione exp)"
 WRITE (*,*) " -h      : visualizza questo help"
 WRITE (*,*) 
@@ -1752,6 +1836,5 @@ WRITE (*,*)
 RETURN
 
 END SUBROUTINE scrive_help
-
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
