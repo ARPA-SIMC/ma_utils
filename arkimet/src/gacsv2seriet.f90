@@ -8,7 +8,6 @@ PROGRAM gacsv2seriet
 ! - una colonna per ciascuna combinazione var-liv richiesta in filecol
 !
 ! Note:
-! - Attualmente vuole in input un gacsv senza header
 ! - vg6d_getpoint puo' sicuramente ritornare il valore della stessa cella 
 !   del modello per due punti distinti, ma se vegono richieste due volte le 
 !   stesse coordinate le restituisce una volta sola. 
@@ -34,7 +33,7 @@ PROGRAM gacsv2seriet
 !   sarebbero comunque ordinati per reftime e trange, ie. non e' garantito
 !   che i verification times siano consecutivi)
 !
-!                                         Versione 1.6.4 Enrico 31/10/2012
+!                                          Versione 1.6.5 Enrico 22/03/2013
 !--------------------------------------------------------------------------
 
 
@@ -166,7 +165,8 @@ IF (ios /= 0) THEN
 
 ELSE
   READ (20, NML=param, IOSTAT = ios)
-  IF (ios /= 0 .OR. out_form < 1 .OR. out_form > 6 .OR. &
+! IF (ios /= 0 .OR. out_form < 1 .OR. out_form > 6 .OR. &
+  IF (ios /= 0 .OR. out_form < 1 .OR. out_form > 2 .OR. &
     qcont < 0 .OR. qcont > 3) GOTO 9984
 
   IF (.NOT. libsim) convert = .FALSE.
@@ -473,14 +473,14 @@ DO k = 1,nvl
   ELSE IF (tem_cel .AND. cp2(k) == -1) THEN             ! Temperatura
     varname(k) = "Temp (C)" 
     ndec(k) = 1
-    vmax(k) = -80.
-    vmin(k) = +50.
+    vmax(k) = +50.
+    vmin(k) = -80.
   
   ELSE IF (mo_rec .AND. cp2(k) == -2) THEN              ! Monin-Obukov
     varname(k) = "1/MO"
     ndec(k) = 3
-    vmax(k) = -10000.
-    vmin(k) = 10000.
+    vmax(k) = 1000.
+    vmin(k) = -1000.
                                                         ! flussi cal. ADMS
   ELSE IF (flx_rev .AND. out_form == 3 .AND. cp2(k) == -5) THEN
     vmax(k) = 60.
@@ -756,7 +756,7 @@ DO ksc = 1, nsc
 ! 2.4) Elaboro i dati trovati per la data-scad richiesta
 
 
-! 2.4.1 Compensazionedei cambiamenti delle unita' di misura fatti da LibSIM
+! 2.4.1 Compensazione dei cambiamenti delle unita' di misura fatti da LibSIM
   DO kvl = 1,nvl
     IF (convert .AND. cp2(kvl) == -6) THEN        ! AQ: Kg/m3 -> ug/m3
       WHERE (val_in(:,kvl) /= rmiss)
@@ -774,10 +774,10 @@ DO ksc = 1, nsc
 
     ELSE IF (mo_rec .AND. cp2(kvl) == -2) THEN   ! MO -> 1/MO
       WHERE (val_in(:,kvl) /= rmiss .AND. val_in(:,kvl) /=0)
-        val_in(:,kvl) = val_in(:,kvl) - 273.16
+        val_in(:,kvl) = 1. / val_in(:,kvl)
       ENDWHERE
       WHERE (val_in(:,kvl) == 0.)
-        val_in(:,kvl) = vmax(k)
+        val_in(:,kvl) = rmiss
       ENDWHERE
   
     ELSE IF (flx_rev .AND. cp2(kvl) == -5) THEN  ! SHF, LHF -> -SHF, -LHF
@@ -1730,7 +1730,7 @@ WRITE (20,9) "step_yy_mm   = T,"
 WRITE (20,9) "lab3d        = 2,"
 WRITE (20,9) "lab3ddec     = 1,"
 WRITE (20,9) "xls_dec_sep  = '.',"
-WRITE (20,9) "add_albedo   = F,"
+!WRITE (20,9) "add_albedo   = F,"
 WRITE (20,9) "dir_int      = T,"
 WRITE (20,9) "tem_cel      = F,"
 WRITE (20,9) "mo_rec       = F,"
@@ -1744,10 +1744,12 @@ WRITE (20,9) ""
 !  123456789012345678901234567890123456789012345678901234567890123456789012345
 WRITE (20,9) &
   "Opzioni generali:"
+!WRITE (20,9) &
+!  "out_form    : 1 = ASCII del. spazi (seriet); 2 = CSV; 3 = ADMS meteo"
+!WRITE (20,9) &
+!  "              4 = ADMS background;  5 = ISC"
 WRITE (20,9) &
-  "out_form    : 1 = ASCII del. spazi (seriet); 2 = CSV; 3 = ADMS meteo  "
-WRITE (20,9) &
-  "              4 = ADMS background;  5 = ISC"
+  "out_form    : 1 = ASCII del. spazi (seriet); 2 = CSV"
 WRITE (20,9) &
   "out_ndec    : numero di decimali in output (solo con out_form = 1)"
 WRITE (20,9) &
@@ -1775,10 +1777,10 @@ WRITE (20,9) &
   "              lab3d = 1 o 2): 0 mai, 1 solo se necessario, 2 sempre"
 WRITE (20,9) &
   "xls_dec_sep : imposta il separtore decimale in output (solo formato seriet)"
-WRITE (20,9) &
-  "add_albedo  : aggiunge all'output il campo albedo (solo formato ADMS e solo"
-WRITE (20,9) &
-  "              se l'albedo non e' tra i parametri estatti)"
+!WRITE (20,9) &
+!  "add_albedo  : aggiunge all'output il campo albedo (solo formato ADMS e solo"
+!WRITE (20,9) &
+!  "              se l'albedo non e' tra i parametri estatti)"
 WRITE (20,9)
 WRITE (20,9) &
   "Opzioni che vengono sovrascritte se richiedo ISC o ADMS:"
