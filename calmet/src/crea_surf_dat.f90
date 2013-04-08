@@ -27,7 +27,14 @@ PROGRAM crea_surf_dat
 !     ff, dd, ceil,  tcc, tt, rh, prs,cod_prc 
 !    [m/s grd ft*100 10i  K   %   mb  Calmet ]
 !
-!                                         Versione 1.0.1, Enrico 03/02/2013
+! - A partire dalla versione 5.8 di Calmet il formato dei file UP.DAT e 
+!   SURF.DAT e' cambiato (versioni di formato 2.0 e succ.). 
+!   Nel codice di calmet, il tipo di formati e' gestito dalle variabili 
+!   dataver?, che sono lette direttamente dai files (sub. rdhd)
+!   A quanto sembra, le versioni recenti di Calmet (6.3 e succ.) possono 
+!   leggere tutti i formati da 2.0, ma non il vecchio formato
+!
+!                                         Versione 1.1.0, Enrico 08/04/2013
 !--------------------------------------------------------------------------
 USE date_handler
 
@@ -50,11 +57,13 @@ INTEGER, ALLOCATABLE :: id_out(:)  ! codici stazione scritti in surf.dat
 TYPE(date) :: data1,data2,data_cal1,data_cal2,data_req,data_fil,data_out
 REAL :: rdum(8)
 INTEGER :: ibyr,ibjul,ibhr,ieyr,iejul,iehr
-INTEGER :: k,kstaz,khr,kpar,ios,ios2,eof,eor,idum,idum2
+INTEGER :: k,kstaz,khr,kpar,ios,ios2,eof,eor,idum,idum2,cnt_par
 INTEGER :: hr1,hr2,hr_req,hr_fil,hr_out,jul_out,yea_out,dh1,dh2
 INTEGER :: id_rete,id_user,ndays,nhr,nstaz
 CHARACTER (LEN=200) :: chrec
-CHARACTER(LEN=80) :: filein,chpar1,chpar2,filedate,filesurf
+CHARACTER(LEN=80) :: filein,chpar,filedate,filesurf
+CHARACTER(LEN=4) :: next_arg
+CHARACTER(LEN=3) :: out_ver
 
 !--------------------------------------------------------------------------
 ! 1: Preliminari
@@ -63,16 +72,30 @@ CHARACTER(LEN=80) :: filein,chpar1,chpar2,filedate,filesurf
 CALL get_eof_eor(eof,eor)
 
 ! 1.1 Parametri da riga comandi
-CALL getarg(1,chpar1)
-CALL getarg(2,chpar2)
+out_ver = "1.0"
+next_arg = ""
+cnt_par = 0
+DO kpar = 1,HUGE(0)
+  CALL getarg(kpar,chpar)
+  IF (chpar == "") THEN
+    EXIT
+  ELSE IF (TRIM(chpar) == "-h") THEN
+    CALL scrive_help
+    STOP 1
+  ELSE IF (TRIM(chpar) == "-outver") THEN
+    next_arg = "outv"
+  ELSE IF (next_arg == "outv") THEN
+    next_arg = ""
+    out_ver = chpar
+  ELSE IF (cnt_par == 0) THEN
+    cnt_par = 1
+    filedate = chpar
+  ELSE IF (cnt_par == 1) THEN
+    cnt_par = 2
+    filesurf = chpar
+  ENDIF
 
-IF (TRIM(chpar1)=="" .OR. TRIM(chpar2)=="" .OR. TRIM(chpar1)=="-h" ) THEN
-  WRITE (*,*) "Uso: crea_surf_dat.exe filedate filesurf"
-  STOP
-ENDIF
-
-filedate = TRIM(chpar1)
-filesurf = TRIM(chpar2)
+ENDDO
 
 ! 1.2 Leggo da filedate le date richieste
 OPEN (UNIT=30, FILE=filedate, STATUS="OLD", ACTION="READ",ERR=9999)
@@ -211,10 +234,23 @@ ibyr = MOD(data_cal1%yy, 100)
 ibjul = jul(data_cal1)
 ieyr = MOD(data_cal2%yy, 100)
 iejul = jul(data_cal2)
+  
+IF (out_ver == "1.0") THEN
+  WRITE (40,'(2(i2.2,1x,i3.3,1x,i2.2,5x),i3,5x,i5)') &
+    ibyr,ibjul,ibhr,ieyr,iejul,iehr,ibtz,nstaz
 
-WRITE (40,'(2(i2.2,1x,i3.3,1x,i2.2,5x),i3,5x,i5)') &
-  ibyr,ibjul,ibhr,ieyr,iejul,iehr,ibtz,nstaz
-WRITE (40,'(10(i5.5,1x))') id_out(1:nstaz)
+ELSE IF (out_ver == "2.1") THEN    ! calmet: datavers=2.1, subroutine rdhd
+  WRITE (40,'(a8,8x,a3,13x,a)') "SURF.DAT",out_ver,"Hour Start and End Times with Seconds"
+  WRITE (40,*) 1                   ! n.ro di righe di commento che seguono"
+  WRITE (40,'(a)') "Produced by CREA_SURF_DAT version 1.1.0"
+  WRITE (40,'(a)') "NONE"
+  WRITE (40,'(a)') "UTC+0100"      ! -ibtz (calmet.for, sub. rdhd, riga 14339)
+  WRITE (40,'(2(2x,3i4,i6),i5)') &
+    data_cal1%yy,ibjul,ibhr,0,data_cal2%yy,iejul,iehr,0,nstaz
+  
+ENDIF
+
+WRITE (40,'(i5.5)') id_out(1:nstaz)
 
 ! Scrivo i dati
 DO khr = 1,nhr
@@ -225,7 +261,13 @@ DO khr = 1,nhr
   yea_out = MOD(data_out%yy,100)
   jul_out = jul(data_out)
 
-  WRITE (40,'(i2.2,1x,i3.3,1x,i2.2)') yea_out,jul_out,hr_out
+  IF (out_ver == "1.0") THEN
+    WRITE (40,'(i2.2,1x,i3.3,1x,i2.2)') yea_out,jul_out,hr_out
+  ELSE IF (out_ver == "2.1") THEN  ! calmet: datavers=2.1, subroutine rdsn
+    WRITE (40,'(3i4,i6,2x,3i4,i6)') &
+      data_out%yy,jul_out,hr_out,0,data_out%yy,jul_out,hr_out,0
+  ENDIF
+
   DO kstaz = 1,nstaz 
     WRITE (40,'(2(f7.1,1x),2(i7,1x),f7.1,1x,i7,1x,f7.1,1x,i7)') &
       par(kstaz,1,khr),par(kstaz,2,khr),NINT(par(kstaz,3,khr)), &
@@ -256,6 +298,23 @@ WRITE (*,*) "Errore aprendo ",TRIM(filein)
 STOP
 
 END PROGRAM crea_surf_dat
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+SUBROUTINE scrive_help
+!
+! Scrive a schermo un breve help
+!
+IMPLICIT NONE
+
+WRITE (*,*) "Uso: [-h] crea_surf_dat filedate filesurf [-outver X.Y]"
+WRITE (*,*) "filedate: in formato date_calmet"
+WRITE (*,*) "filesurf: in formato surf_req.dat"
+WRITE (*,*) "-outver: scrive il file di output (surf.dat) nel formato versione X.Y;"
+WRITE (*,*) "          valori gestiti: 2.1 (calmet 6.3); default calmet <= 5.5"
+
+RETURN
+END SUBROUTINE scrive_help
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 

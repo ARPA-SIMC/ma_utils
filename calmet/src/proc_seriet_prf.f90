@@ -9,17 +9,25 @@ PROGRAM proc_seriet_prf
 !     non e' richiesta, e viene sostituita con valori inventati)
 !   . L'intestazione deve contenere le quote dalla superficie
 ! - Tracciato file di output (up*.dat): 
-!   9999, id_staz, yy, mm, dd, hh, nlev_org, nlev
+!   V1.0: 9999, id_staz, yy, mm, dd, hh, nlev_org, nlev
+!   V2.1: 9999, id_staz, yy, mm, dd, hh, nlev_org, nlev
 !   pp(mb), zz(m-AMSL), tt(K), dd(grd), ff(m/s); livelli ordinati dal basso.
 !
 ! - Dal 2008 non fa piu' parte della catena Calmet: viene comunque usato 
 !   per scrivere in formato UP.DAT dati LAMA ceduti all'estreno per 
 !   simulazioni Calpuff.
 !
+! - A partire dalla versione 5.8 di Calmet il formato dei file UP.DAT e 
+!   SURF.DAT e' cambiato (versioni di formato 2.0 e succ.). 
+!   Nel codice di calmet, il tipo di formati e' gestito dalle variabili 
+!   dataver?, che sono lette direttamente dai files (sub. rdhd)
+!   A quanto sembra, le versioni recenti di Calmet (6.3 e succ.) possono 
+!   leggere tutti i formati da 2.0, ma non il vecchio formato
+!
 ! Todo: gestire la presenza di un livello formato da V10m,T2m,Psup (utile 
 !   per run con dati ECMWF o LAMA ante 2006)
 !
-!                                         Versione 2.0.3, Enrico 28/01/2013
+!                                         Versione 2.1.0, Enrico 05/04/2013
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -43,7 +51,9 @@ INTEGER :: cnt_par,k,k1,k2,krec,kpar,kp,kl,kl2
 INTEGER :: eof,eor,ios
 CHARACTER(LEN=10000) :: header_lev,header_par,chrec
 CHARACTER(LEN=120) :: filein,fileout,chpar,chfmt
-CHARACTER(LEN=5) :: stzid,next_arg
+CHARACTER(LEN=5) :: stzid
+CHARACTER(LEN=4) :: next_arg
+CHARACTER(LEN=3) :: out_ver
 CHARACTER(LEN=fw) :: lev_lab,par_lab
 
 LOGICAL :: ltest,lcalmet,is_sorted(maxlev),ldeb
@@ -59,6 +69,7 @@ LOGICAL :: ltest,lcalmet,is_sorted(maxlev),ldeb
 ldeb = .FALSE.
 ltest = .FALSE.
 lcalmet = .FALSE.
+out_ver = "1.0"
 next_arg = ""
 cnt_par = 0
 DO kpar = 1,HUGE(0)
@@ -70,10 +81,15 @@ DO kpar = 1,HUGE(0)
     STOP 1
   ELSE IF (TRIM(chpar) == "-test") THEN
     ltest = .TRUE.
+  ELSE IF (TRIM(chpar) == "-outver") THEN
+    next_arg = "outv"
   ELSE IF (TRIM(chpar) == "-calmet") THEN
     lcalmet = .TRUE.
-    next_arg = "prsup"
-  ELSE IF (next_arg == "prsup") THEN
+    next_arg = "psup"
+  ELSE IF (next_arg == "outv") THEN
+    next_arg = ""
+    out_ver = chpar
+  ELSE IF (next_arg == "psup") THEN
     next_arg = ""
     READ (chpar,*,IOSTAT=ios) psup
     IF (ios /= 0) THEN
@@ -103,11 +119,11 @@ DO kpar = 1,HUGE(0)
   ENDIF
 ENDDO
 
-IF (cnt_par /= 4 .OR. ios /= 0) THEN
+IF (cnt_par /= 4 .OR. ios /= 0 .OR. &
+    (out_ver /= "1.0" .AND. out_ver /= "2.1")) THEN
   CALL scrive_help
   STOP 1
 ENDIF  
-
 IF (lcalmet) THEN
   npar_req = 3
   ptop = 700.
@@ -270,9 +286,23 @@ WRITE (*,'(a,2(i4.4,1x,3(i2.2,1x),3x),a,i8)') "Date estreme: ",&
 
 ! Apro fileout e scrivo header
 OPEN (UNIT=31, FILE=fileout, STATUS="REPLACE", FORM="FORMATTED")
-WRITE (31,'(1x,6i5,f5.0)') MOD(data1%yy,100),jul(data1),hh1, &
-  MOD(data2%yy,100),jul(data2),hh2,ptop
-WRITE (31,'(a)') "     F    F    F    F"
+IF (out_ver == "1.0") THEN
+  WRITE (31,'(1x,6i5,f5.0)') MOD(data1%yy,100),jul(data1),hh1, &
+    MOD(data2%yy,100),jul(data2),hh2,ptop
+  WRITE (31,'(a)') "     F    F    F    F"
+
+ELSE IF (out_ver == "2.1") THEN  ! calmet: dataveru=2.1, subroutine rdhdu
+  WRITE (31,'(a6,10x,a3,13x,a)') "UP.DAT",out_ver,"Hour Start and End Times with Seconds"
+  WRITE (31,*) 1                 ! n.ro di righe di commento che seguono"
+  WRITE (31,'(a)') "Produced by PROC_SERIET_PRF version 2.1.0"
+  WRITE (31,'(a)') "NONE"
+  WRITE (31,'(a)') "UTC+0000"
+  WRITE (31,'(1x,8i5,f5.0,2i5)') &
+    data1%yy,jul(data1),hh1,0,data2%yy,jul(data2),hh2,0,ptop, &
+    3,1   ! 3: origine dei dati sconosciuta (jdat), 1: slash-delimited format (ifmt)
+  WRITE (31,'(a)') "     F    F    F    F"
+
+ENDIF
 
 ! Ri-apro filein e skip header
 OPEN (UNIT=30, FILE=filein, STATUS="OLD", ACTION="READ", IOSTAT=ios)
@@ -343,9 +373,15 @@ DO k = 1,HUGE(0)
   ENDIF
 
 ! Scrivo su fileout
-  WRITE (31,'(3x,i4,5x,a5,5x,4i2,5x,i2,t69,i2)') & 
-    9999,stzid,MOD(datac%yy,100),datac%mm,datac%dd,hhc, &
-    nlev_out,nlev_out
+  IF (out_ver == "1.0") THEN
+    WRITE (31,'(3x,i4,5x,a5,5x,4i2,5x,i2,t69,i2)') & 
+      9999,stzid,MOD(datac%yy,100),datac%mm,datac%dd,hhc, &
+      nlev_out,nlev_out
+  ELSE IF (out_ver == "2.1") THEN   ! calmet: dataveru=2.1, subroutine rdupn
+    WRITE (31,'(3x,i4,5x,a5,2(4x,i4,i4,i3,i3,i5),i5,3x,i5)') &
+      9999,stzid,datac%yy,datac%mm,datac%dd,hhc,0, &
+      datac%yy,datac%mm,datac%dd,hhc,0,nlev_out,nlev_out
+  ENDIF
 
   l1out = 1
   DO krec = 1, nlev_out/4
@@ -424,11 +460,13 @@ SUBROUTINE scrive_help
 IMPLICIT NONE
 
 WRITE (*,*) "Uso: proc_seriet_prf.exe filein fileout stzid orog"
-WRITE (*,*) "  [-calmet PSUP][-test]"
-WRITE (*,*) "Filein:  in formato seriet"
-WRITE (*,*) "Fileout: in formato UP*.DAT"
+WRITE (*,*) "  [-outver X.Y] [-calmet PSUP] [-test]"
+WRITE (*,*) "filein:  in formato seriet"
+WRITE (*,*) "fileout: in formato UP*.DAT"
 WRITE (*,*) "stzid:   codice stazione (CH*5; per headers fileout)"
 WRITE (*,*) "orog:    quota stazione (i.e. quota punto LM)"
+WRITE (*,*) "-outver: scrive fileout nel formato versione X.Y; valori gestiti:"
+WRITE (*,*) "         2.1 (calmet 6.3); default calmet <= 5.5"
 WRITE (*,*) "-calmet: non legge i dati di pressione, ma li calcola a partire dalla"
 WRITE (*,*) "         pressione alla superficie (PSUP, hPa) e dal profilo di T"
 WRITE (*,*) "         (usare se i dati di input sono l'ouptut di Calmet)"
