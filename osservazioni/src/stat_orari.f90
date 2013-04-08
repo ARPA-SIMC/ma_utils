@@ -7,6 +7,7 @@ PROGRAM stat_orari
 ! - statistiche base  (stats): ndati,ave,max,min,std
 ! - distr.di frequenza(dfreq): n.ro dati con valori raggruppati in interv.
 ! - giorno tipo       (ggtyp): per ogni ora del giorno: ave, max, min, nok
+! - anno tipo         (yrtyp): per ogni mese dell'anno: ave, max, min, nok
 ! - medie giornaliere (daily): per ogni giorno: ave, max, min, nok
 ! - medie mensili     (month): per ogni mese: ave, max, min, nok
 ! - medie stagionali  (SE???): per ogni stagione: ave, max, min, nok
@@ -34,7 +35,7 @@ PROGRAM stat_orari
 !   in cui iniziano.
 ! - Usa il modulo per la gestione date date_hander.f90 (obsoleto)
 !
-!                                       V10.0.0, Enrico & Johnny 13/03/2013
+!                                       V10.1.0, Enrico & Johnny 05/04/2013
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -96,8 +97,12 @@ CHARACTER (LEN=fw), PARAMETER :: str_par_mo(np_mo) = &
 CHARACTER (LEN=3), PARAMETER :: labsea(9) = (/ &
   "mam","jja","son","djf","sum","win","yea","wi2","jfd"/)
 
-! 0.2.3 Ordine delle statistiche nei files .sta (relative agli array dei
-!       conatatori statistici)
+! 0.2.3 Stringhe descrittive dei prodotti
+CHARACTER (LEN=5), PARAMETER :: labprod(8) = (/ &
+  "stats","dfreq","ggtyp","yrtyp","daily","month","seaso","wrose"/)
+
+! 0.2.4 Ordine delle statistiche nei files .sta (relative agli array dei
+!       contatori statistici)
 INTEGER, PARAMETER :: idx_stat(5) = (/2,3,4,1,5/)
 
 !--------------------------------------------------------------------------
@@ -105,6 +110,7 @@ INTEGER, PARAMETER :: idx_stat(5) = (/2,3,4,1,5/)
 REAL :: stats(6,mxpar)           ! statistiche (nok/sum/max/min/sum2/ave)
 REAL :: dfreq(mxpar,mxbin)       ! distribuz. di frequenza
 REAL,ALLOCATABLE :: ggtyp(:,:,:) ! nok/med/max/min gg tipo (4,npar,0:23)
+REAL,ALLOCATABLE :: yrtyp(:,:,:) ! nok/med/max/min anno tipo (4,npar,1:12)
 REAL,ALLOCATABLE :: daily(:,:,:) ! nok/med/max/min/(ext) giorn. (5,npar,ndays)
 REAL,ALLOCATABLE :: month(:,:,:) ! nok/med/max/min/(ext) mensile (5,npar,nmonths)
 REAL,ALLOCATABLE :: season(:,:,:,:)!nok/med/max/min/(ext) stag. (5,9,npar,nyears)
@@ -125,9 +131,9 @@ TYPE (csv_record) :: csvline
 TYPE(date) :: data_dum,data1,data2
 REAL :: rval(mxpar),rmis,ff_calm
 INTEGER :: npar,nrep,ndays,nmonths,nyears,id_par(mxpar),ival(mxpar)
-INTEGER :: kp,kpar_dd,kpar_ff,fint,dsect,ncalm,nsect,ndec_out,req_rank
+INTEGER :: kp,kpr,kpar_dd,kpar_ff,fint,dsect,ncalm,nsect,ndec_out,req_rank
 INTEGER :: cnt_miss,cnt_nodd,cnt_noff,cnt_ok
-INTEGER :: k,kk,k2,kv,kr,kpar,kbin,khr
+INTEGER :: k,kk,k2,kv,kr,kpar,kbin,khr,kmm
 INTEGER :: kyear3,kyear6,kyear12,kyear,nsea,ksea3,ksea6,kmonth,kday,year1
 INTEGER :: eof,eor,ios,idum,hrdum,p1,p2,irec,month_tot,lline,out_grp
 CHARACTER (LEN=mxpar*(fw+1)+20) :: chdum,chdum2,head_par,head_liv
@@ -142,7 +148,7 @@ CHARACTER (LEN=10) :: ch10
 CHARACTER (LEN=8) :: ch_id_staz
 CHARACTER (LEN=4) :: ch4
 CHARACTER (LEN=3) :: inp_data,out_fmt,next_arg
-LOGICAL :: fmt_ser_xls,out_liv,lrank,miss0
+LOGICAL :: fmt_ser_xls,out_liv,lrank,miss0,req_prod(8)
 
 !--------------------------------------------------------------------------
 ! 1) Parametri da riga comandi
@@ -152,6 +158,7 @@ inp_data = "hhr"
 out_liv = .FALSE.
 lrank = .FALSE.
 miss0 = .FALSE.
+req_prod(:) = .TRUE.
 file_in = ""
 ndec_out = 1
 
@@ -179,12 +186,17 @@ DO kp = 1,HUGE(0)
   ELSE IF (TRIM(chdum) == "-rank") THEN
     lrank = .TRUE.
     next_arg = "rnk"
+  ELSE IF (TRIM(chdum) == "-miss0") THEN
+    miss0 = .TRUE.
+  ELSE IF (chdum(1:5) == "-prod") THEN
+    req_prod(:) = .FALSE.
+    DO kpr = 1,8
+      IF (INDEX(chdum,labprod(kpr)) /= 0) req_prod(kpr) = .TRUE.
+    ENDDO
   ELSE IF (TRIM(chdum) == "-liv") THEN
     out_liv = .TRUE.
   ELSE IF (TRIM(chdum) == "-csv") THEN
     out_fmt = "csv"
-  ELSE IF (TRIM(chdum) == "-miss0") THEN
-    miss0 = .TRUE.
   ELSE IF (TRIM(chdum) == "-ndec") THEN
     next_arg = "ndc"
   ELSE IF (next_arg == "rnk") THEN
@@ -400,6 +412,7 @@ ENDIF
 !--------------------------------------------------------------------------
 ! 2.6 Alloco arrays
 ALLOCATE (ggtyp(4,npar,0:23))
+ALLOCATE (yrtyp(4,npar,1:12))
 ALLOCATE (daily(5,npar,ndays))
 ALLOCATE (month(5,npar,nmonths))
 ALLOCATE (season(5,9,npar,nyears))
@@ -494,6 +507,9 @@ dfreq(:,:) = 0.
 ggtyp(1:2,:,:) = 0.
 ggtyp(3,:,:) = -HUGE(0.)
 ggtyp(4,:,:) = HUGE(0.)
+yrtyp(1:2,:,:) = 0.
+yrtyp(3,:,:) = -HUGE(0.)
+yrtyp(4,:,:) = HUGE(0.)
 daily(3,:,:) = -HUGE(0.)
 daily(4,:,:) = HUGE(0.)
 daily(5,:,:) = rmis
@@ -628,7 +644,7 @@ DO k = 1,nrep
       kyear12 < 1 .OR. kyear3 < 1 .OR. kyear6 < 1 .OR. &
       kyear12 > nyears .OR. kyear3 > nyears .OR. kyear6 > nyears) GOTO 9994
 
-! 3.4 Aggiorno stats, ggtyp, daily, month, season
+! 3.4 Aggiorno stats, ggtyp, yrtyp, daily, month, season
   WHERE (rval(1:npar) /= rmis)
     stats(1,1:npar) = stats(1,1:npar) + 1
     stats(2,1:npar) = stats(2,1:npar) + rval(1:npar)
@@ -640,6 +656,11 @@ DO k = 1,nrep
     ggtyp(2,1:npar,hrdum) = ggtyp(2,1:npar,hrdum) + rval(1:npar)
     ggtyp(3,1:npar,hrdum) = MAX (ggtyp(3,1:npar,hrdum), rval(1:npar))
     ggtyp(4,1:npar,hrdum) = MIN (ggtyp(4,1:npar,hrdum), rval(1:npar))
+
+    yrtyp(1,1:npar,data_dum%mm) = yrtyp(1,1:npar,data_dum%mm) + 1
+    yrtyp(2,1:npar,data_dum%mm) = yrtyp(2,1:npar,data_dum%mm) + rval(1:npar)
+    yrtyp(3,1:npar,data_dum%mm) = MAX (yrtyp(3,1:npar,data_dum%mm), rval(1:npar))
+    yrtyp(4,1:npar,data_dum%mm) = MIN (yrtyp(4,1:npar,data_dum%mm), rval(1:npar))
 
     daily(1,1:npar,kday) = daily(1,1:npar,kday) + 1
     daily(2,1:npar,kday) = daily(2,1:npar,kday) + rval(1:npar)
@@ -791,6 +812,15 @@ ELSEWHERE
   ggtyp(4,1:npar,0:23) = rmis
 ENDWHERE
 
+! yrtyp
+WHERE (yrtyp(1,1:npar,1:12) > 0)
+  yrtyp(2,1:npar,1:12) = yrtyp(2,1:npar,1:12) / yrtyp(1,1:npar,1:12) 
+ELSEWHERE
+  yrtyp(2,1:npar,1:12) = rmis
+  yrtyp(3,1:npar,1:12) = rmis
+  yrtyp(4,1:npar,1:12) = rmis
+ENDWHERE
+
 ! daily
 WHERE (daily(1,1:npar,1:ndays) > 0)
   daily(2,1:npar,1:ndays) = daily(2,1:npar,1:ndays) / &
@@ -880,6 +910,8 @@ ENDIF
 
 !--------------------------------------------------------------------------
 ! 5.1 File stats (ASCII)
+
+IF (req_prod(1)) THEN
 
 IF (out_fmt == "txt") THEN
   WRITE (file_out,'(2a)') TRIM(file_root),"_stats.sta"
@@ -985,8 +1017,12 @@ ELSE IF (out_fmt == "csv") THEN
 ENDIF
 CLOSE(31)
 
+ENDIF
+
 !--------------------------------------------------------------------------
 ! 5.2 File dfreq (ASCII)
+
+IF (req_prod(2)) THEN
 
 IF (out_fmt == "txt") THEN
   WRITE (file_out,'(2a)') TRIM(file_root),"_dfreq.sta"
@@ -1094,8 +1130,12 @@ ELSE IF (out_fmt == "csv") THEN
 ENDIF
 CLOSE(31)
 
+ENDIF
+
 !--------------------------------------------------------------------------
 ! 5.3.1 File ggtyp (ASCII)
+
+IF (req_prod(3)) THEN
 
 IF (out_fmt == "txt") THEN
   WRITE (file_out,'(2a)') TRIM(file_root),"_ggtyp.sta"
@@ -1169,8 +1209,12 @@ DO kk = 1,4
 ENDDO
 CLOSE(31)
 
+ENDIF
+
 !--------------------------------------------------------------------------
 ! 5.3.2 File ggtyp (GRADS)
+
+IF (req_prod(3)) THEN
 
 ! File dat
 WRITE (file_out,'(2a)') TRIM(file_root),"_ggtyp.dat"
@@ -1219,8 +1263,145 @@ WRITE (33,'(a)')                 "ENDVARS"
 
 CLOSE(33)
 
+ENDIF
+
 !--------------------------------------------------------------------------
-! 5.4.1 File daily (ASCII)
+! 5.4.1 File yrtyp (ASCII)
+
+IF (req_prod(4)) THEN
+
+IF (out_fmt == "txt") THEN
+  WRITE (file_out,'(2a)') TRIM(file_root),"_yrtyp.sta"
+ELSE IF (out_fmt == "csv") THEN
+  WRITE (file_out,'(2a)') TRIM(file_root),"_yrtyp.csv"
+ENDIF
+WRITE (chfmth,'(a,i3,a,i2,a)') "(a10,",npar,"(1x,a",fw,"))"
+WRITE (chfmt2,'(a,i3,3a)') "(i2.2,8x,",npar,"(1x,",TRIM(chfmt4),"))"
+WRITE (chfmt5,'(a,i3,a,i2,a)') "(i2.2,8x,",npar,"(1x,i",fw,"))"
+
+OPEN (UNIT=31, FILE=file_out, STATUS="REPLACE", FORM="FORMATTED")
+DO kk = 1,4
+  IF (out_fmt == "txt") THEN
+    WRITE (31,'(a)') TRIM(title(kk))                    ! header 1 (metric)
+    IF (out_liv) THEN                                   ! header 2 (liv)
+      WRITE (31,chfmth) "          ",(str_liv(kpar), kpar=1,npar)
+    ELSE
+      WRITE (31,*)
+    ENDIF
+    WRITE (31,chfmth) "mm        ",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
+    DO kmm = 1,12                                       ! dati
+      IF (kk <= 3) THEN
+        WRITE (31,chfmt2) kmm,yrtyp(idx_stat(kk),1:npar,kmm)
+      ELSE
+        WRITE (31,chfmt5) kmm,NINT(yrtyp(idx_stat(kk),1:npar,kmm))
+      ENDIF
+    ENDDO
+    WRITE (31,*)
+    WRITE (31,*)
+
+  ELSE IF (out_fmt == "csv") THEN
+
+!   header 1 (metric)
+    WRITE (31,'(a)') TRIM(title(kk))
+
+!   header 2 (liv)
+    CALL init(csvline)
+    CALL csv_record_addfield(csvline,"")
+    DO kpar = 1,npar
+      IF (out_liv) THEN
+        CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_liv(kpar))))
+      ELSE
+        CALL csv_record_addfield(csvline,"")
+      ENDIF
+    ENDDO
+    WRITE (31,'(a)') csv_record_getrecord(csvline)
+    CALL delete(csvline)
+
+!   header 3 (par)
+    CALL init(csvline)
+    CALL csv_record_addfield(csvline,24)
+    DO kpar = 1,npar
+      CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
+    ENDDO
+    WRITE (31,'(a)') csv_record_getrecord(csvline)
+    CALL delete(csvline)
+
+!   dati
+    DO kmm = 1,12
+      CALL init(csvline)
+      WRITE (str_data_csv,'(i4.4,2(a1,i2.2),1x,i2.2)') 0,"-",0,"-",0,kmm
+      CALL csv_record_addfield(csvline,str_data_csv)
+      DO kpar = 1,npar
+        CALL csv_record_addfield(csvline,yrtyp(idx_stat(kk),kpar,kmm))
+      ENDDO
+      WRITE (31,'(a)') csv_record_getrecord(csvline)
+      CALL delete(csvline)
+    ENDDO
+ 
+  ENDIF
+ENDDO
+CLOSE(31)
+
+ENDIF
+
+!--------------------------------------------------------------------------
+! 5.4.2 File yrtyp (GRADS)
+
+IF (req_prod(4)) THEN
+
+! File dat
+WRITE (file_out,'(2a)') TRIM(file_root),"_yrtyp.dat"
+OPEN (32, FILE=file_out, FORM='UNFORMATTED', STATUS="REPLACE", &
+  ACCESS='DIRECT', RECL=4)
+
+irec = 1
+DO kmm = 1,12
+DO kpar = 1,npar
+  WRITE (32, REC=irec) yrtyp(2,kpar,kmm)          ! valori
+  irec = irec + 1
+ENDDO
+DO kpar = 1,npar
+  WRITE (32, REC=irec) yrtyp(1,kpar,kmm)          ! n.ro di dati
+  irec = irec + 1
+ENDDO
+ENDDO
+
+CLOSE(32)
+
+! File ctl
+WRITE (file_out2,'(2a)') TRIM(file_root),"_yrtyp.ctl"
+OPEN (UNIT=33, FILE=file_out2, STATUS="REPLACE", FORM="FORMATTED")
+
+WRITE (33,'(3a)')                "DSET   ","^",TRIM(file_out)
+WRITE (33,'(a,2(a,2i2.2,i4.4))') "TITLE  ","stats from ",data1,"to",data2
+IF (ABS(rmis) < 1.E5) THEN
+  WRITE (33,'(a,f10.3)')         "UNDEF  ",rmis   
+ELSE
+  WRITE (33,'(a,e10.3)')         "UNDEF  ",rmis   
+ENDIF
+WRITE (33,'(2a)')                "XDEF   ","1 linear 1 1"
+WRITE (33,'(2a)')                "YDEF   ","1 linear 1 1"
+WRITE (33,'(2a)')                "ZDEF   ","1 linear 1 1"
+WRITE (33,'(2a)')                "TDEF   ","12 linear 00Z01Jan1900 01mo"
+WRITE (33,'(a,i3)')              "VARS   ",npar*2
+DO kpar = 1,npar
+  WRITE (33,'(a,1x,2i4,1x,2a)') ADJUSTL(str_par2(kpar)), &
+    0,99,"anno tipo",ADJUSTL(str_par(kpar))
+ENDDO
+DO kpar = 1,npar
+  WRITE (33,'(2a,1x,2i4,1x,2a)') "nr_",ADJUSTL(str_par2(kpar)), &
+    0,99,"n.ro dati valdi: ",ADJUSTL(str_par2(kpar))
+ENDDO
+WRITE (33,'(a)')                 "ENDVARS"
+
+CLOSE(33)
+
+ENDIF
+
+!--------------------------------------------------------------------------
+! 5.5.1 File daily (ASCII)
+
+IF (req_prod(5)) THEN
 
 IF (out_fmt == "txt") THEN
   WRITE (file_out,'(2a)') TRIM(file_root),"_daily.sta"
@@ -1305,8 +1486,12 @@ DO kk = 1, 4
 ENDDO
 CLOSE(31)
 
+ENDIF
+
 !--------------------------------------------------------------------------
-! 5.4.2 File daily (GRADS)
+! 5.5.2 File daily (GRADS)
+
+IF (req_prod(5)) THEN
 
 ! File dat
 WRITE (file_out,'(2a)') TRIM(file_root),"_daily.dat"
@@ -1371,8 +1556,13 @@ ENDDO
 WRITE (33,'(a)')                 "ENDVARS"
 
 CLOSE(33)
+
+ENDIF
+
 !--------------------------------------------------------------------------
-! 5.5.1 File month (ASCII)
+! 5.6.1 File month (ASCII)
+
+IF (req_prod(6)) THEN
 
 IF (out_fmt == "txt") THEN
   WRITE (file_out,'(2a)') TRIM(file_root),"_month.sta"
@@ -1463,8 +1653,12 @@ DO kk = 1,4
 ENDDO
 CLOSE(31)
 
+ENDIF
+
 !--------------------------------------------------------------------------
-! 5.5.2 File month (GRADS)
+! 5.6.2 File month (GRADS)
+
+IF (req_prod(6)) THEN
 
 ! File dat
 WRITE (file_out,'(2a)') TRIM(file_root),"_month.dat"
@@ -1530,8 +1724,12 @@ WRITE (33,'(a)')                 "ENDVARS"
 
 CLOSE(33)
 
+ENDIF
+
 !--------------------------------------------------------------------------
-! 5.6 files season (ASCII)
+! 5.7 files season (ASCII)
+
+IF (req_prod(7)) THEN
 
 DO nsea = 1,9
 
@@ -1636,8 +1834,12 @@ DO nsea = 1,9
 
 ENDDO
 
+ENDIF
+
 !--------------------------------------------------------------------------
-! 5.7 file wrose (ASCII; solo se c'e' il vento!)
+! 5.8 file wrose (ASCII; solo se c'e' il vento!)
+
+IF (req_prod(8)) THEN
 
 IF (kpar_dd /= -99 .AND. kpar_ff /= -99) THEN
   WRITE (file_out,'(2a)') TRIM(file_root),"_wrose.sta"
@@ -1676,6 +1878,8 @@ IF (kpar_dd /= -99 .AND. kpar_ff /= -99) THEN
   WRITE (31,'(a13,1x,f10.1)') "Manca dd+ff: ",REAL(cnt_miss)
 
   CLOSE(31)
+ENDIF
+
 ENDIF
 
 WRITE (*,*) "Scritte statistiche"
@@ -1809,7 +2013,7 @@ INTEGER :: mxstaz
 !            1234567890123456789012345678901234567890123456789012345678901234567890
 WRITE (*,*) 
 WRITE (*,*) "stat_orari.exe [-h] [-o/-s/-sx/-d/-t] filein"
-WRITE (*,*) "           [-rank N] [-csv] [-liv] [-miss0] [-ndec N]"
+WRITE (*,*) "           [-rank N] [-miss0]  [-prod=LIST] [-csv] [-liv] [-ndec N]"
 WRITE (*,*)
 WRITE (*,*) "filein   : file con i dati. Il par. successivo detemina il suo formato:"
 WRITE (*,*) " -o      : estra_orari o estra_qaria con dati orari (default)"
@@ -1818,12 +2022,17 @@ WRITE (*,*) " -sx     : seriet con notazione esponenziale"
 WRITE (*,*) " -d      : estra_qaria con dati giornalieri o segmento di file .sta "
 WRITE (*,*) " -t      : input nel formato prodotto da trasp_temp"
 WRITE (*,*) " -q      : come -d (per compatibilita' con vecchie procedure)"
-WRITE (*,*)
+WRITE (*,*) ""
 WRITE (*,*) " -rank N : aggiunge al file SEyea.sta un gruppo relativo all'N-mo"
 WRITE (*,*) "           valore piu' alto"
+WRITE (*,*) " -miss0  : considera i dati mancanti come se fossero zeri"
+WRITE (*,*) ""
+WRITE (*,*) " -prod   : scrive solo i files relativi alle elaborazioni specificate;"
+WRITE (*,*) "           LIST e' un elenco di campi (stats,dfreq,ggtyp,yrtyp,daily,"
+WRITE (*,*) "           month,seaso,wrose) separati da virgole e senza spazi."
+WRITE (*,*) "           Default: li scrive tutti"
 WRITE (*,*) " -csv    : scrive i files ASCII in formato csv (def: sep. da spazi)"
 WRITE (*,*) " -liv    : aggiunge header con le quote dei livelli (solo fmt seriet)"
-WRITE (*,*) " -miss0  : considera i dati mancanti come se fossero zeri"
 WRITE (*,*) " -ndec N : numero di decimali nei files .sta (-1 per notazione exp)"
 WRITE (*,*) " -h      : visualizza questo help"
 WRITE (*,*) 

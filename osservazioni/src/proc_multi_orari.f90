@@ -46,18 +46,19 @@ INTEGER, PARAMETER :: iusta = 26     ! unit' per filesta
 INTEGER, PARAMETER :: iu0 = 30       ! prima unita' per i files di input
 
 ! Altre variabili del programma
-REAL, ALLOCATABLE :: val_in(:,:),val_out(:),val_ok(:),ave(:),ave2(:)
+REAL, ALLOCATABLE :: val_in(:,:),val_out(:),val_ok(:),ave(:),ave2(:),yrtyp(:,:)
 REAL :: rmis
 INTEGER, ALLOCATABLE :: nok(:),prvidx(:)
 INTEGER :: mand_par,eof,eor,ios,nf,npar,nprv,head_len,head_offset,nhead,nld
 INTEGER :: yy,mm,dd,hh,sca,idx,out_dec
-INTEGER :: kp,kpr,kr,kf,p1,p2,k2
+INTEGER :: kp,kpr,kr,kf,p1,p2,k2,km
 
 CHARACTER (LEN=mxpar*(fw+1)+20) :: head_par,head_liv,head_par1,head_liv1
-CHARACTER (LEN=mxpar*(fw+1)+20) :: head_par_out,head_liv_out
+CHARACTER (LEN=mxpar*(fw+1)+20) :: head_par_out,head_liv_out,head_par_sta
+CHARACTER (LEN=mxpar*(fw+1)+20) :: head_staz,head_model,head_staz_out,head_model_out
 CHARACTER (LEN=fw), ALLOCATABLE :: chval(:)
 CHARACTER (LEN=fw) :: idpar(mxpar)
-CHARACTER (LEN=250) :: filelst,chdum,filein,fileout,filesta,chfmt1,chfmt2
+CHARACTER (LEN=250) :: filelst,chdum,filein,fileout,filesta,chfmt1,chfmt2,chfmt3
 CHARACTER (LEN=10), ALLOCATABLE :: prvlab(:)
 CHARACTER (LEN=10) :: ch10
 CHARACTER (LEN=3) :: stat,inp_data,next_arg
@@ -122,15 +123,15 @@ DO kp = 1,HUGE(0)
   ENDIF
 ENDDO
 
-IF ((stat /= "pex" .AND. mand_par /= 3) .OR. &
-    (stat == "pex" .AND. mand_par /= 4) .OR. &
+IF ((stat /= "pex" .AND. stat /= "dst" .AND. mand_par /= 3) .OR. &
+    ((stat == "pex" .OR. stat == "dst") .AND. mand_par /= 4) .OR. &
      inp_data == "nil") THEN
   CALL scrive_help
   STOP
 ENDIF
 IF (stat/="ave" .AND. stat/="max" .AND. stat/="min" .AND. &
     stat/="std" .AND. stat/="mdn" .AND. &
-    stat/="tke" .AND. stat/="pex") THEN
+    stat/="tke" .AND. stat/="pex" .AND. stat/="dst") THEN
   CALL scrive_help
   STOP
 ENDIF
@@ -184,22 +185,22 @@ DO kf = 1,nf
 
 ! Leggo gli header
   IF (inp_data == "hhr") THEN
-    READ (iu0+kf,*,ERR=9997)
+    READ (iu0+kf,'(a)',ERR=9997) head_staz
     READ (iu0+kf,*,ERR=9997)
     READ (iu0+kf,'(a)', ERR=9997) head_par
     head_liv = ""
   
   ELSE IF (inp_data == "ser" .OR. inp_data == "sex") THEN
+    READ (iu0+kf,'(a)',ERR=9997) head_staz
     READ (iu0+kf,*,ERR=9997)
-    READ (iu0+kf,*,ERR=9997)
-    READ (iu0+kf,*,ERR=9997)
+    READ (iu0+kf,'(a)',ERR=9997) head_model
     READ (iu0+kf,'(a)',ERR=9997) head_liv
     READ (iu0+kf,*,ERR=9997)
     READ (iu0+kf,'(a)',ERR=9997) head_par
   
   
   ELSE IF (inp_data == "ddy") THEN
-    READ (iu0+kf,*,ERR=9997)
+    READ (iu0+kf,'(a)',ERR=9997) head_staz
     READ (iu0+kf,*,ERR=9997)
     READ (iu0+kf,'(a)', ERR=9997) head_par
     head_liv = ""
@@ -227,6 +228,21 @@ DO kf = 1,nf
   ENDIF
 
 ENDDO
+
+! Costruisco gli header stazione e modello per il file in ouput
+IF (nf == 1) THEN
+  head_staz_out = head_staz
+ELSE
+  head_staz_out = ""
+ENDIF
+
+IF (inp_data == "ser" .OR. inp_data == "sex") THEN
+  IF (nf == 1) THEN
+    head_model_out = head_model
+  ELSE
+    head_model_out = ""
+  ENDIF
+ENDIF
 
 ! Calcolo il numero dei parametri
 head_len = LEN(TRIM(head_par1))
@@ -270,10 +286,16 @@ IF (stat =="tke") THEN
   ENDDO
 ENDIF
 
+IF (stat =="dst" .AND. nf /= 1) THEN
+  WRITE (*,*) "La statistica ""dst"" richiede un solo file in input"
+  GOTO 9991
+ENDIF
+
 !--------------------------------------------------------------------------
 ! 1.6 Se necessario, leggo il file con i dati di supporto per la statistica 
 !     richiesta
 
+! Frazione di province con superamenti (pex)
 IF (stat == "pex") THEN
   ALLOCATE (prvidx(nf),prvlab(nf))
   OPEN (UNIT=iulst, FILE=filesta, STATUS="OLD", FORM="FORMATTED", ERR=9988)
@@ -307,6 +329,35 @@ IF (stat == "pex") THEN
   DO kpr = 1,nprv
     WRITE (*,'(3x,a10,1x,i3)') prvlab(kpr),COUNT(prvidx(1:nf)==kpr)
   ENDDO
+ENDIF
+
+! Andamento de-stagionalizzato
+IF (stat == "dst") THEN
+  ALLOCATE (yrtyp(12,npar))  
+
+! Per ogni parametro, leggo da filesta le medie relative a ciascun mese
+  WRITE (chfmt3,'(a,2(i3.3,a))') "(10x,",npar,"(1x,f",fw,".1))"
+  OPEN (UNIT=iulst, FILE=filesta, STATUS="OLD", FORM="FORMATTED", ERR=9988)
+  READ (iulst,*)
+  READ (iulst,*)
+  READ (iulst,'(a)') head_par_sta
+  IF (head_par_sta(11:10+fw*npar) /= &
+      head_par(head_offset+1:head_offset+fw*npar)) GOTO 9984
+  DO km = 1,12
+    READ (iulst,chfmt3) yrtyp(km,1:npar)
+  ENDDO
+  CLOSE (iulst)
+
+!! Per ogni parametro, calcolo le anomalie mensili (differenze tra la media
+!! di ciascun mese e la media totale) 
+!  DO kp = 1,npar
+!    IF (ALL(yrtyp(1:12,kp) /= rmis)) THEN
+!      yrtyp(1:12,kp) = yrtyp(1:12,kp) - SUM(yrtyp(1:12,kp))/12.
+!    ELSE
+!      yrtyp(1:12,kp) = rmis
+!    ENDIF
+!  ENDDO
+
 ENDIF
 
 !--------------------------------------------------------------------------
@@ -353,21 +404,21 @@ ALLOCATE (val_out(npar),chval(npar),nok(npar),ave(npar),ave2(npar))
 OPEN (UNIT=iuout, FILE=fileout, STATUS="REPLACE", FORM="FORMATTED")
 
 IF (inp_data == "hhr") THEN
-  WRITE (iuout,*)
+  WRITE (iuout,'(a)') TRIM(head_staz_out)
   WRITE (iuout,*)
   WRITE (iuout,'(a)') TRIM(head_par_out)
   head_liv = ""
 
 ELSE IF (inp_data == "ser" .OR. inp_data == "sex") THEN
+  WRITE (iuout,'(a)') TRIM(head_staz_out)
   WRITE (iuout,*)
-  WRITE (iuout,*)
-  WRITE (iuout,*)
+  WRITE (iuout,'(a)') TRIM(head_model_out)
   WRITE (iuout,'(a)')  TRIM(head_liv_out)
   WRITE (iuout,*)
   WRITE (iuout,'(a)')  TRIM(head_par_out)
 
 ELSE IF (inp_data == "ddy") THEN
-  WRITE (iuout,*)
+  WRITE (iuout,'(a)') TRIM(head_staz_out)
   WRITE (iuout,*)
   WRITE (iuout,'(a)')  TRIM(head_par_out)
   head_liv = ""
@@ -514,6 +565,13 @@ record: DO kr = 1,HUGE(0)
       val_out(1:npar) = rmis
     ENDWHERE
 
+  ELSE IF (stat == "dst") THEN
+    WHERE (nok(1:npar) > 0 .AND. yrtyp(mm,1:npar) /= rmis)
+      val_out(1:npar) = val_in(1,1:npar) - yrtyp(mm,1:npar)
+    ELSEWHERE
+      val_out(1:npar) = rmis
+    ENDWHERE
+
 ! Elaborazione pex: il valore in output e' mancante solo se sono mancanti 
 ! tutti i dati in input e non e' stata specificata la flag -miss0. In tutti
 ! i casi, il dato viene diviso per il numero totale di province, anche se
@@ -532,6 +590,7 @@ record: DO kr = 1,HUGE(0)
     ELSEWHERE
       val_out(1:npar) = rmis
     ENDWHERE
+
   ENDIF
 
 !--------------------------------------------------------------------------
@@ -638,6 +697,12 @@ STOP 10
 WRITE (*,*) "Errore: riga vuota in ",TRIM(filesta)
 STOP 10
 
+9984 CONTINUE
+WRITE (*,*) "Errore: header parametri diversi in filein e filesta"
+WRITE (*,'(a)') head_par(head_offset+1:head_offset+fw*npar)
+WRITE (*,'(a)') head_par_sta(11:10+fw*npar)
+STOP 11
+
 END PROGRAM proc_multi_orari
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -732,10 +797,13 @@ WRITE (*,*) "           - tke: un solo file in input, passa da SQRT(2*TKE) a TKE
 WRITE (*,*) "           - pex: calcola la frazione di province in cui almeno un punto e' >50"
 WRITE (*,*) "               filesta ha le stesse righe di filelst, e contiene l'id provincia"
 WRITE (*,*) "               (stringa, max 10 char) di ciascuno dei punti"
+WRITE (*,*) "           - dst: un solo file di input, toglie a tutti i dati validi un valore"
+WRITE (*,*) "               climatologico mensile; filesta e' in formato yrtyp.sta, e ha le "
+WRITE (*,*) "               stesse colonne del file di input"
 WRITE (*,*) ""
 WRITE (*,*) "filesta  : file di appoggio per l'elaborazione statstica (se richiesto)"
 WRITE (*,*) "fileout  : file di output"
-WRITE (*,*) "-nedc N  : numero di decimali in ouptup (def: 1; con input sex sempre 3)"
+WRITE (*,*) "-nedc N  : numero di decimali in output (def: 2; con input sex sempre 3)"
 WRITE (*,*) "-ld      : non controlla la corrispondenza dei livelli nei files di input"
 WRITE (*,*) "           (utile per elaborare dati sui model layers COSMO)"
 WRITE (*,*) "-miss0   : Considera i dati mancanti come se fossero 0 (utile per il calcolo"
