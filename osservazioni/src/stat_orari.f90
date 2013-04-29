@@ -35,7 +35,7 @@ PROGRAM stat_orari
 !   in cui iniziano.
 ! - Usa il modulo per la gestione date date_hander.f90 (obsoleto)
 !
-!                                       V10.1.0, Enrico & Johnny 05/04/2013
+!                                       V10.2.0, Enrico & Johnny 09/04/2013
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -109,11 +109,11 @@ INTEGER, PARAMETER :: idx_stat(5) = (/2,3,4,1,5/)
 ! 0.3 Contatori statistici
 REAL :: stats(6,mxpar)           ! statistiche (nok/sum/max/min/sum2/ave)
 REAL :: dfreq(mxpar,mxbin)       ! distribuz. di frequenza
-REAL,ALLOCATABLE :: ggtyp(:,:,:) ! nok/med/max/min gg tipo (4,npar,0:23)
-REAL,ALLOCATABLE :: yrtyp(:,:,:) ! nok/med/max/min anno tipo (4,npar,1:12)
-REAL,ALLOCATABLE :: daily(:,:,:) ! nok/med/max/min/(ext) giorn. (5,npar,ndays)
-REAL,ALLOCATABLE :: month(:,:,:) ! nok/med/max/min/(ext) mensile (5,npar,nmonths)
-REAL,ALLOCATABLE :: season(:,:,:,:)!nok/med/max/min/(ext) stag. (5,9,npar,nyears)
+REAL,ALLOCATABLE :: ggtyp(:,:,:) ! nok/med/max/min/(ext) giorno tipo (5,npar,0:23)
+REAL,ALLOCATABLE :: yrtyp(:,:,:) ! nok/med/max/min/(ext) anno tipo (5,npar,1:12)
+REAL,ALLOCATABLE :: daily(:,:,:) ! nok/med/max/min/(ext) giornalieri (5,npar,ndays)
+REAL,ALLOCATABLE :: month(:,:,:) ! nok/med/max/min/(ext) mensili (5,npar,nmonths)
+REAL,ALLOCATABLE :: season(:,:,:,:)!nok/med/max/min/(ext) stagionali (5,9,npar,nyears)
                                  ! Stagioni: MAM,JJA,SON,DJF,SUM,WIN,YEA,WI2,JFD
 REAL,ALLOCATABLE :: yeatv(:,:,:) ! valori piu' alti nell'anno (req_rank,npar,nyears)
 REAL :: wrose(mxbin,mxbin)       ! intervallo (<=); settore (N,NE,E...)
@@ -148,7 +148,7 @@ CHARACTER (LEN=10) :: ch10
 CHARACTER (LEN=8) :: ch_id_staz
 CHARACTER (LEN=4) :: ch4
 CHARACTER (LEN=3) :: inp_data,out_fmt,next_arg
-LOGICAL :: fmt_ser_xls,out_liv,lrank,miss0,req_prod(8)
+LOGICAL :: fmt_ser_xls,out_liv,lrank,lstd,miss0,req_prod(8)
 
 !--------------------------------------------------------------------------
 ! 1) Parametri da riga comandi
@@ -157,6 +157,7 @@ out_fmt = "txt"
 inp_data = "hhr"
 out_liv = .FALSE.
 lrank = .FALSE.
+lstd = .FALSE.
 miss0 = .FALSE.
 req_prod(:) = .TRUE.
 file_in = ""
@@ -170,7 +171,7 @@ DO kp = 1,HUGE(0)
     EXIT
   ELSE IF (TRIM(chdum) == "-h") THEN
     CALL scrive_help
-    STOP
+    STOP 1
   ELSE IF (TRIM(chdum) == "-o") THEN
     inp_data = "hhr"
   ELSE IF (TRIM(chdum) == "-s") THEN
@@ -186,6 +187,8 @@ DO kp = 1,HUGE(0)
   ELSE IF (TRIM(chdum) == "-rank") THEN
     lrank = .TRUE.
     next_arg = "rnk"
+  ELSE IF (TRIM(chdum) == "-std") THEN
+    lstd = .TRUE.
   ELSE IF (TRIM(chdum) == "-miss0") THEN
     miss0 = .TRUE.
   ELSE IF (chdum(1:5) == "-prod") THEN
@@ -216,18 +219,26 @@ IF (out_liv .AND. inp_data /= "ser" .AND. inp_data /= "sex") THEN
 ENDIF
 IF (TRIM(file_in) == "") THEN
   WRITE (*,*) "Errore nei parametri (specificare filein)"
-  STOP
+  STOP 1
 ENDIF
 IF (ios /= 0 .OR. ndec_out > fw-3) THEN
   WRITE (*,*) "Errore nei parametri (ndec illegale o troppo alto)"
-  STOP
+  STOP 1
+ENDIF
+IF (lrank .AND. lstd) THEN
+  WRITE (*,*) "Le opzioni -rank e -std sono incompatibili"
+  STOP 1
 ENDIF
 
 title(1) = "Medie"
 title(2) = "Massimi"
 title(3) = "Minimi"
 title(4) = "Dati_validi"
-IF (lrank) WRITE (title(5),'(a5,i3)') "Rank ",req_rank
+IF (lrank) THEN
+  WRITE (title(5),'(a5,i3)') "Rank ",req_rank
+ELSE IF (lstd) THEN
+  title(5) = "Dev_standard"
+ENDIF
 
 !--------------------------------------------------------------------------
 ! 2) Elaborazioni preliminari sul file input: lista parametri, date estreme
@@ -411,8 +422,8 @@ ENDIF
 
 !--------------------------------------------------------------------------
 ! 2.6 Alloco arrays
-ALLOCATE (ggtyp(4,npar,0:23))
-ALLOCATE (yrtyp(4,npar,1:12))
+ALLOCATE (ggtyp(5,npar,0:23))
+ALLOCATE (yrtyp(5,npar,1:12))
 ALLOCATE (daily(5,npar,ndays))
 ALLOCATE (month(5,npar,nmonths))
 ALLOCATE (season(5,9,npar,nyears))
@@ -450,7 +461,7 @@ DO k = 1,npar
           191.25,213.75,236.25,258.75,281.25,303.75,326.25,348.75,360./)
     ELSE 
       WRITE (*,*) "N.ro di settori illegale, modificare nsect nel sorgente"
-      STOP
+      STOP 99
     ENDIF
 
   CASE (5)                                                  !Temperatura C
@@ -510,6 +521,7 @@ ggtyp(4,:,:) = HUGE(0.)
 yrtyp(1:2,:,:) = 0.
 yrtyp(3,:,:) = -HUGE(0.)
 yrtyp(4,:,:) = HUGE(0.)
+yrtyp(5,:,:) = 0.
 daily(3,:,:) = -HUGE(0.)
 daily(4,:,:) = HUGE(0.)
 daily(5,:,:) = rmis
@@ -734,6 +746,13 @@ DO k = 1,nrep
     ENDDO
   ENDIF
 
+! Sum2 (per deviazione standard; yrtyp)
+  IF (lstd) THEN
+    WHERE (rval(1:npar) /= rmis)
+      yrtyp(5,1:npar,data_dum%mm) = yrtyp(5,1:npar,data_dum%mm) + rval(1:npar)**2
+    ENDWHERE
+  ENDIF
+
 ! 3.5 Aggiorno dfreq
   DO kpar = 1,npar
     IF (rval(kpar) == rmis) CYCLE
@@ -820,6 +839,14 @@ ELSEWHERE
   yrtyp(3,1:npar,1:12) = rmis
   yrtyp(4,1:npar,1:12) = rmis
 ENDWHERE
+IF (lstd) THEN
+  WHERE (yrtyp(1,1:npar,1:12) > 0)
+    yrtyp(5,1:npar,1:12) = SQRT(MAX(0., &
+      yrtyp(5,1:npar,1:12)/yrtyp(1,1:npar,1:12) - yrtyp(2,1:npar,1:12)**2 ))
+  ELSEWHERE
+    yrtyp(2,1:npar,1:12) = rmis
+  ENDWHERE
+ENDIF
 
 ! daily
 WHERE (daily(1,1:npar,1:ndays) > 0)
@@ -1157,10 +1184,10 @@ DO kk = 1,4
     ENDIF
     WRITE (31,chfmth) "hh        ",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
     DO khr = 0,23                                       ! dati
-      IF (kk <= 3) THEN
-        WRITE (31,chfmt2) khr,ggtyp(idx_stat(kk),1:npar,khr)
-      ELSE
+      IF (kk == 4) THEN
         WRITE (31,chfmt5) khr,NINT(ggtyp(idx_stat(kk),1:npar,khr))
+      ELSE
+        WRITE (31,chfmt2) khr,ggtyp(idx_stat(kk),1:npar,khr)
       ENDIF
     ENDDO
     WRITE (31,*)
@@ -1280,7 +1307,9 @@ WRITE (chfmt2,'(a,i3,3a)') "(i2.2,8x,",npar,"(1x,",TRIM(chfmt4),"))"
 WRITE (chfmt5,'(a,i3,a,i2,a)') "(i2.2,8x,",npar,"(1x,i",fw,"))"
 
 OPEN (UNIT=31, FILE=file_out, STATUS="REPLACE", FORM="FORMATTED")
-DO kk = 1,4
+out_grp = 4
+IF (lstd) out_grp = 5
+DO kk = 1,out_grp
   IF (out_fmt == "txt") THEN
     WRITE (31,'(a)') TRIM(title(kk))                    ! header 1 (metric)
     IF (out_liv) THEN                                   ! header 2 (liv)
@@ -1290,10 +1319,10 @@ DO kk = 1,4
     ENDIF
     WRITE (31,chfmth) "mm        ",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
     DO kmm = 1,12                                       ! dati
-      IF (kk <= 3) THEN
-        WRITE (31,chfmt2) kmm,yrtyp(idx_stat(kk),1:npar,kmm)
-      ELSE
+      IF (kk == 4) THEN
         WRITE (31,chfmt5) kmm,NINT(yrtyp(idx_stat(kk),1:npar,kmm))
+      ELSE
+        WRITE (31,chfmt2) kmm,yrtyp(idx_stat(kk),1:npar,kmm)
       ENDIF
     ENDDO
     WRITE (31,*)
@@ -1356,14 +1385,20 @@ OPEN (32, FILE=file_out, FORM='UNFORMATTED', STATUS="REPLACE", &
 
 irec = 1
 DO kmm = 1,12
-DO kpar = 1,npar
-  WRITE (32, REC=irec) yrtyp(2,kpar,kmm)          ! valori
-  irec = irec + 1
-ENDDO
-DO kpar = 1,npar
-  WRITE (32, REC=irec) yrtyp(1,kpar,kmm)          ! n.ro di dati
-  irec = irec + 1
-ENDDO
+  DO kpar = 1,npar
+    WRITE (32, REC=irec) yrtyp(2,kpar,kmm)          ! valori
+    irec = irec + 1
+  ENDDO
+  DO kpar = 1,npar
+    WRITE (32, REC=irec) yrtyp(1,kpar,kmm)          ! n.ro di dati
+    irec = irec + 1
+  ENDDO
+  IF (lstd) THEN
+    DO kpar = 1,npar
+      WRITE (32, REC=irec) yrtyp(5,kpar,kmm)        ! dev. standard
+      irec = irec + 1
+    ENDDO
+  ENDIF
 ENDDO
 
 CLOSE(32)
@@ -1383,7 +1418,11 @@ WRITE (33,'(2a)')                "XDEF   ","1 linear 1 1"
 WRITE (33,'(2a)')                "YDEF   ","1 linear 1 1"
 WRITE (33,'(2a)')                "ZDEF   ","1 linear 1 1"
 WRITE (33,'(2a)')                "TDEF   ","12 linear 00Z01Jan1900 01mo"
-WRITE (33,'(a,i3)')              "VARS   ",npar*2
+IF (lstd) THEN
+  WRITE (33,'(a,i3)')              "VARS   ",npar*3
+ELSE
+  WRITE (33,'(a,i3)')              "VARS   ",npar*2
+ENDIF
 DO kpar = 1,npar
   WRITE (33,'(a,1x,2i4,1x,2a)') ADJUSTL(str_par2(kpar)), &
     0,99,"anno tipo",ADJUSTL(str_par(kpar))
@@ -1392,6 +1431,12 @@ DO kpar = 1,npar
   WRITE (33,'(2a,1x,2i4,1x,2a)') "nr_",ADJUSTL(str_par2(kpar)), &
     0,99,"n.ro dati valdi: ",ADJUSTL(str_par2(kpar))
 ENDDO
+IF (lstd) THEN
+  DO kpar = 1,npar
+    WRITE (33,'(2a,1x,2i4,1x,2a)') "std_",ADJUSTL(str_par2(kpar)), &
+      0,99,"n.ro dati valdi: ",ADJUSTL(str_par2(kpar))
+  ENDDO
+ENDIF
 WRITE (33,'(a)')                 "ENDVARS"
 
 CLOSE(33)
@@ -1426,12 +1471,12 @@ DO kk = 1, 4
     WRITE (31,chfmth) "aaaa mm gg",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
     DO kday = 1,ndays                                   ! dati
       data_dum = data1 + kday - 1
-      IF (kk <= 3) THEN
-        WRITE (31,chfmt2) data_dum%yy,data_dum%mm,data_dum%dd, &
-          daily(idx_stat(kk),1:npar,kday)
-      ELSE
+      IF (kk == 4) THEN
         WRITE (31,chfmt5) data_dum%yy,data_dum%mm,data_dum%dd, &
           NINT(daily(idx_stat(kk),1:npar,kday))
+      ELSE
+        WRITE (31,chfmt2) data_dum%yy,data_dum%mm,data_dum%dd, &
+          daily(idx_stat(kk),1:npar,kday)
       ENDIF
     ENDDO
     WRITE (31,*)
@@ -1590,12 +1635,12 @@ DO kk = 1,4
       data_dum%yy = data1%yy + (month_tot - 1) / 12
       data_dum%mm = MOD(month_tot - 1, 12) + 1
       data_dum%dd = 1
-      IF (kk <= 3) THEN
-        WRITE (31,chfmt2) data_dum%yy,data_dum%mm,data_dum%dd, &
-          month(idx_stat(kk),1:npar,kmonth)
-      ELSE
+      IF (kk == 4) THEN
         WRITE (31,chfmt5) data_dum%yy,data_dum%mm,data_dum%dd, &
           NINT(month(idx_stat(kk),1:npar,kmonth))
+      ELSE
+        WRITE (31,chfmt2) data_dum%yy,data_dum%mm,data_dum%dd, &
+          month(idx_stat(kk),1:npar,kmonth)
       ENDIF
     ENDDO
     WRITE (31,*)
@@ -1891,15 +1936,15 @@ STOP
 
 9999 CONTINUE
 WRITE (*,*) "Errore aprendo ",TRIM(file_in)
-STOP 1
+STOP 2
 
 9998 CONTINUE
 WRITE (*,*) "Errore leggendo headers ",TRIM(file_in)
-STOP 2
+STOP 3
 
 9997 CONTINUE
 WRITE (*,*) "Errore leggendo lista parametri (ADVANCE=NO) ",TRIM(file_in)
-STOP 3
+STOP 4
 
 9996 CONTINUE
 IF (inp_data == "hhr" .OR. inp_data == "ddy" .OR. inp_data == "tem") THEN
@@ -1908,7 +1953,7 @@ ELSE IF (inp_data == "ser" .OR. inp_data == "sex") THEN
   lline = k + 6
 ENDIF
 WRITE (*,*) "Errore leggendo colonna date ",TRIM(file_in)," record ",lline
-STOP 4
+STOP 5
 
 9995 CONTINUE
 IF (inp_data == "hhr" .OR. inp_data == "ddy" .OR. inp_data == "tem") THEN
@@ -1917,7 +1962,7 @@ ELSE IF (inp_data == "ser" .OR. inp_data == "sex") THEN
   lline = k + 6
 ENDIF
 WRITE (*,*) "Errore leggendo i dati ",TRIM(file_in),"record ",lline
-STOP 5
+STOP 6
 
 9994 CONTINUE
 WRITE (*,*) "Trovata data/ora illegale, mi fermo ",data_dum,hrdum
@@ -1933,11 +1978,11 @@ IF (kyear6 < 1 .OR. kyear6 > nyears) &
   WRITE (*,*) "kyear6 ",kyear6," (1-",nyears,")"
 IF (kyear12 < 1 .OR. kyear12 > nyears) &
   WRITE (*,*) "kyear12 ",kyear12," (1-",nyears,")"
-STOP 6
+STOP 7
 
 9993 CONTINUE
 WRITE (*,*) "Erroraccio nel calcolo del rank"
-STOP 7
+STOP 98
 
 END PROGRAM stat_orari
 
@@ -2013,7 +2058,7 @@ INTEGER :: mxstaz
 !            1234567890123456789012345678901234567890123456789012345678901234567890
 WRITE (*,*) 
 WRITE (*,*) "stat_orari.exe [-h] [-o/-s/-sx/-d/-t] filein"
-WRITE (*,*) "           [-rank N] [-miss0]  [-prod=LIST] [-csv] [-liv] [-ndec N]"
+WRITE (*,*) "           [-rank N] [-std] [-miss0]  [-prod=LIST] [-csv] [-liv] [-ndec N]"
 WRITE (*,*)
 WRITE (*,*) "filein   : file con i dati. Il par. successivo detemina il suo formato:"
 WRITE (*,*) " -o      : estra_orari o estra_qaria con dati orari (default)"
@@ -2025,7 +2070,8 @@ WRITE (*,*) " -q      : come -d (per compatibilita' con vecchie procedure)"
 WRITE (*,*) ""
 WRITE (*,*) " -rank N : aggiunge al file SEyea.sta un gruppo relativo all'N-mo"
 WRITE (*,*) "           valore piu' alto"
-WRITE (*,*) " -miss0  : considera i dati mancanti come se fossero zeri"
+WRITE (*,*) " -std    : aggiunge al file yrtyp.sta un gruppo relativo alla deviazione"
+WRITE (*,*) "           standard dei valori"
 WRITE (*,*) ""
 WRITE (*,*) " -prod   : scrive solo i files relativi alle elaborazioni specificate;"
 WRITE (*,*) "           LIST e' un elenco di campi (stats,dfreq,ggtyp,yrtyp,daily,"
@@ -2036,7 +2082,7 @@ WRITE (*,*) " -liv    : aggiunge header con le quote dei livelli (solo fmt serie
 WRITE (*,*) " -ndec N : numero di decimali nei files .sta (-1 per notazione exp)"
 WRITE (*,*) " -h      : visualizza questo help"
 WRITE (*,*) 
-WRITE (*,*) "Calcola alcune statisitche sui dati osservati presenti in filein."
+WRITE (*,*) "Calcola alcune statistiche sui dati osservati presenti in filein."
 WRITE (*,*) "Il programma ignora le stazioni, e media tutti i dati relativi a "
 WRITE (*,*) "ciascuna data-ora (appendendo opportunamente i files di input e'"
 WRITE (*,*) "quindi ossibile calcolare medie di settore, ecc.)"

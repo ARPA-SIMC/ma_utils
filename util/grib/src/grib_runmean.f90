@@ -11,7 +11,8 @@ PROGRAM grib_runmean
 ! Note:
 ! - Programma usato dalla catena Chimere
 ! - Il programma scrive in output un campo per ogni ora compresa tra il
-!   primo e l'ultimo verification time in input
+!   primo e l'ultimo verification time in input, calcolando le medie sugli
+!   intervalli che terminano in ciascuno di questi.
 ! - I dati in input non istantanei sono considerati istantanei all'istante
 !   finale del periodo di elaborazione.
 ! - I dati in output hanno timerange "analisi istantantea"; se viene 
@@ -29,7 +30,7 @@ PROGRAM grib_runmean
 !   Eventualmente si potrebbero tenere in memoria i campi corripondenti al 
 !   vettore igin (in modo da decodificare i grib una volta sola)
 !
-!                                                 V3.0.2, Enrico 14/01/2013
+!                                                 V3.0.3, Enrico 17/04/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -45,8 +46,8 @@ IMPLICIT NONE
 INTEGER, PARAMETER :: igmiss = 0              ! Handler di un grib mancante
 
 ! Variabili locali
-REAL, ALLOCATABLE :: values(:,:),mean(:),nok(:),val_deb(:)
-INTEGER, ALLOCATABLE :: igin(:)
+REAL, ALLOCATABLE :: values(:,:),mean(:),val_deb(:)
+INTEGER, ALLOCATABLE :: igin(:),nok(:)
 INTEGER :: ifin,ifout,ig_read,ig_first,ig_write
 INTEGER :: nhr,nreq,hrout,nhincr,nx,ny,np,ibm,en,fstep,kdeb
 INTEGER :: ios(3),cnt_par,cnt_out,kpar,kg,ksk,iret,ier,idata,ihr,clret(0:5)
@@ -250,8 +251,8 @@ DO kg = 1,HUGE(0)
     IF (ldeb) THEN
       CALL getval(vtime_curr, SIMPLEDATE=ch12)
       CALL getval(vtime_out, SIMPLEDATE=ch12b)
-      WRITE (*,'(5a,i6,a,f12.5)') "  VT fine periodo media: ",ch12,"   VT output: ", &
-        ch12b,"    nok ",COUNT(mean(1:np) /= rmiss)," valore ",mean(kdeb)
+      WRITE (*,'(5a,i6,a,f12.5,a,i6)') "  VT fine periodo media: ",ch12,"   VT output: ", &
+        ch12b,"    nok ",COUNT(mean(1:np) /= rmiss)," valore ",mean(kdeb)," dati usati ",nok(kdeb)
     ENDIF
 
     CALL grib_clone(ig_read,ig_write)
