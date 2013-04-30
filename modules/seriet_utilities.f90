@@ -30,7 +30,7 @@ MODULE seriet_utilities
 ! Una soluzione migliore sarebbe modificare vg6d_getpoint in modo da 
 ! elaborare ogni punto separatamente, e poi appendere i risultati.
 !
-!                                         Versione 1.1.2, Enrico 23/01/2012
+!                                         Versione 1.1.3, Enrico 30/04/2013
 !--------------------------------------------------------------------------
 
 USE datetime_class
@@ -704,7 +704,7 @@ END FUNCTION datascad_le_datascad
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-SUBROUTINE var2spec(var,ndec,vmin,vmax,str,cp2,ier,tab_path)
+SUBROUTINE var2spec(var,ndec,vmin,vmax,str,cp2,ier)
 !--------------------------------------------------------------------------
 ! Data la codifica GRIB1 di una variabile (cem,tab,var), cerca nel file
 ! tabella_xxx_ser.txt corrispondente una serie di informazioni:
@@ -723,15 +723,13 @@ SUBROUTINE var2spec(var,ndec,vmin,vmax,str,cp2,ier,tab_path)
 !     negli altri casi       =  0
 !
 ! Note:
-! - cerca tabella_xxx_ser.txt in tab_path (se presente), o in 
-!   $HOME_MINGUZZI/util/grib/dat; se non la trova, usa valori di defualt.
+! - cerca la tabella_xxx_ser.txt in $MA_UTILS_DAT (se asseganto), o in 
+!   /usr/share/ma_utils; se non la trova, usa valori di defualt.
 ! - Codici d'errore (se /= 0 la subroutine ritorna dei valori di dafault):
 !   0 = tutto ok
 !   -1 = parametro non presente in tabella
 !   -2 = file tabella_xxx_ser.txt non trovato
 !   -3 = errore lettura dal file tabella_xxx_ser.txt 
-!
-!                                           Versione 2.0, Enrico 19/04/2011
 !--------------------------------------------------------------------------
 USE file_utilities
 IMPLICIT NONE
@@ -741,18 +739,17 @@ INTEGER, INTENT(IN) :: var(3)
 REAL, INTENT(OUT) :: vmin,vmax
 INTEGER, INTENT(OUT) :: ndec,cp2,ier
 CHARACTER (*), INTENT(OUT) :: str
-CHARACTER (LEN=*), INTENT(IN), OPTIONAL :: tab_path
 
 ! tab_path di default
-CHARACTER (LEN=40), PARAMETER :: tab_env_def = "HOME_MINGUZZI"
-CHARACTER (LEN=40) :: tab_path_def = "util/grib/dat"
+CHARACTER (LEN=40) :: tab_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
 
 ! Variabili locali
 REAL :: vmin_t,vmax_t
 INTEGER :: ndec_t,cp2_t,var_t
 INTEGER :: ios,ios2,iu
 CHARACTER (LEN=256) :: tab_file
-CHARACTER (LEN=80) :: ch80
+CHARACTER (LEN=80) :: ch80,tab_path
 CHARACTER (LEN=8) :: ch8
 CHARACTER (LEN=3) :: ch3
 
@@ -766,14 +763,10 @@ WRITE (str,'(i3.3,a1,i3.3)') var(2),"_",var(3)
 cp2 = 0
 
 ! Apro la tabella richiesta
-IF (PRESENT(tab_path)) THEN
-  WRITE (tab_file,'(3a,i3.3,a)') &
-    TRIM(tab_path),"/","tabella_",var(2),"_ser.txt"
-ELSE  
-  CALL GETENV(tab_env_def,ch80)
-  WRITE (tab_file,'(5a,i3.3,a)') &
-    TRIM(ch80),"/",TRIM(tab_path_def),"/","tabella_",var(2),"_ser.txt"
-ENDIF
+tab_path = ""
+CALL GETENV(tab_env,tab_path)
+IF (TRIM(tab_path) == "") tab_path = tab_path_def
+WRITE (tab_file,'(3a,i3.3,a)') TRIM(tab_path),"/","tabella_",var(2),"_ser.txt"
 
 iu = getunit()
 OPEN (UNIT=iu, FILE=tab_file, STATUS="OLD", ACTION="READ", IOSTAT=ios)

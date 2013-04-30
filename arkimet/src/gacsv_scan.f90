@@ -21,7 +21,7 @@ PROGRAM gacsv_scan
 !      programma  da' un warning, e non sara' possibile convertire i dati
 !      in formato seriet.
 !
-!                                         Versione 1.2.0, Enrico 17/01/2012
+!                                         Versione 1.3.0, Enrico 30/04/2013
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -48,11 +48,12 @@ INTEGER :: yy,mm,dd,hh,minute,tdh,ndec,cp2,p1_max,p1_min,p1_step
 INTEGER :: cnt_seg,cnt_dat_seg,cnt_dat_ok,ntr,nvl,nvltr,npt
 INTEGER :: tr(3),vl(6),trange(3,maxtr),varliv(6,maxvl),dltr(maxtr)
 INTEGER :: varlivtr(9,maxvltr),pts_list(maxpt)
-CHARACTER (LEN=500) :: chrec,filein,filepts,filecol,filerow,dir_tab,chdum
+CHARACTER (LEN=500) :: chrec,filein,filepts,filecol,filerow,chdum
 CHARACTER (LEN=10) :: str_model,str_var,chfmt
+CHARACTER (LEN=20) :: ch20
 CHARACTER (LEN=10) :: ch10
 CHARACTER (LEN=1) :: next_arg
-LOGICAL :: out_pts,out_col,out_row,force_tab,lseriet,ltdelta,verbose
+LOGICAL :: out_pts,out_col,out_row,lseriet,ltdelta,verbose
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
@@ -63,13 +64,11 @@ next_arg = ""
 out_pts = .FALSE.
 out_col = .FALSE.
 out_row = .FALSE.
-force_tab = .FALSE.
 verbose=.FALSE.
 filein = ""
 filepts = ""
 filecol = ""
 filerow = ""
-dir_tab = ""
 str_model = "arkimet"
 
 DO kp = 1,HUGE(0)
@@ -90,9 +89,6 @@ DO kp = 1,HUGE(0)
   ELSE IF (TRIM(chdum) == "-r") THEN
     next_arg = "r"
     CYCLE
-  ELSE IF (TRIM(chdum) == "-t") THEN
-    next_arg = "t"
-    CYCLE
   ELSE IF (TRIM(chdum) == "-m") THEN
     next_arg = "m"
     CYCLE
@@ -107,10 +103,6 @@ DO kp = 1,HUGE(0)
   ELSE IF (next_arg == "r") THEN
     filerow = chdum
     out_row = .TRUE.
-    next_arg = ""
-  ELSE IF (next_arg == "t") THEN
-    dir_tab = chdum
-    force_tab = .TRUE.
     next_arg = ""
   ELSE IF (next_arg == "m") THEN
     str_model = ADJUSTL(chdum)
@@ -228,81 +220,17 @@ DO k = 1,HUGE(0)
 ENDDO
 
 !--------------------------------------------------------------------------
-! 3) Elaborazioni sui dati trovati in filein
+! 3) Elaborazioni relative a timerange e reference time
 
-! 3.1) Punti
-IF (out_pts) THEN
-  WRITE (chfmt,'(a,i2,a,i2,a)') "(f",coo_ndec+5,".",coo_ndec,")"
-  OPEN (UNIT=30, FILE=filepts, STATUS="REPLACE")
-  chrec = ""
-  CALL build_header("lspts",chrec)
-  WRITE (30,'(a)') TRIM(chrec)
-
-  DO kpt = 1,npt
-    CALL init(ptscsv)
-    WRITE (ch10,'(f9.4)') pts_lon(kpt)
-    CALL csv_record_addfield(ptscsv,TRIM(ADJUSTL(ch10)))
-    WRITE (ch10,'(f9.4)') pts_lat(kpt)
-    CALL csv_record_addfield(ptscsv,TRIM(ADJUSTL(ch10)))
-    WRITE (ch10,'(a6,i3.3)') "punto_",kpt
-    CALL csv_record_addfield(ptscsv,TRIM(ADJUSTL(ch10)))
-    WRITE (30,'(a)') csv_record_getrecord(ptscsv)
-    CALL delete(ptscsv)
-  ENDDO
-  CLOSE(30)
+! Se c'e' un solo reference time, metto tdelta a 0
+IF (ltdelta) THEN
+  CALL getval(tdelta_min,AHOUR=tdh)
+ELSE
+  tdh = 0
 ENDIF
 
-! 3.2) Variabili e livelli (colonne) 
-
-IF (out_col) THEN
-  CALL sort_tab_i(varliv(:,1:nvl))
-
-  OPEN (UNIT=31, FILE=filecol, STATUS="REPLACE")
-  chrec = ""
-  CALL build_header("lscol",chrec)
-  WRITE (31,'(a)') TRIM(chrec)
-
-  ndef = 0
-  DO kvl = 1,nvl
-
-!   leggo dalle tabelle i parametri aggiuntivi per seriet.
-    IF (force_tab) THEN
-      CALL var2spec(varliv(1:3,kvl),ndec,vmin,vmax,str_var,cp2,iret, &
-        tab_path=dir_tab)
-    ELSE
-      CALL var2spec(varliv(1:3,kvl),ndec,vmin,vmax,str_var,cp2,iret)
-    ENDIF
-
-    IF (iret /= 0) ndef = ndef + 1
-
-    CALL init(colcsv)
-    CALL csv_record_addfield(colcsv,varliv(1,kvl))    
-    CALL csv_record_addfield(colcsv,varliv(2,kvl))    
-    CALL csv_record_addfield(colcsv,varliv(3,kvl))    
-    CALL csv_record_addfield(colcsv,cp2)
-    CALL csv_record_addfield(colcsv,varliv(4,kvl))    
-    CALL csv_record_addfield(colcsv,varliv(5,kvl))    
-    CALL csv_record_addfield(colcsv,varliv(6,kvl))    
-    CALL csv_record_addfield(colcsv,ndec)
-    CALL csv_record_addfield(colcsv,vmin)
-    CALL csv_record_addfield(colcsv,vmax)    
-    CALL csv_record_addfield(colcsv,TRIM(ADJUSTL(str_model)))
-    CALL csv_record_addfield(colcsv,TRIM(ADJUSTL(str_var)))
-    WRITE (31,'(a)') csv_record_getrecord(colcsv)
-    CALL delete(colcsv)
-  ENDDO
-  CLOSE(31)
-ENDIF
-
-! 3.3) Timerange e reference time (righe)
-IF (out_row .AND. ntr > 0) THEN
-
-! Se c'e' un solo refernce time, metto tdelta a 0
-  IF (ltdelta) THEN
-    CALL getval(tdelta_min,AHOUR=tdh)
-  ELSE
-    tdh = 0
-  ENDIF
+! Se il file non e' vuoto, elaboro i timerange
+IF (ntr > 0) THEN
 
 ! Verifico se e' possibile scrivere l'output in formato seriet (bisogna che
 ! le n-ple Var-Liv-P1 siano uniche)
@@ -332,8 +260,73 @@ IF (out_row .AND. ntr > 0) THEN
       p1_step = MINVAL(trange(1,2:ntr)-trange(1,1:ntr-1), &
          MASK = trange(1,2:ntr)/=trange(1,1:ntr-1))
     ENDIF
+  ENDIF
 
-!   Scrivo filerow
+ENDIF
+
+!--------------------------------------------------------------------------
+! 4) Scrittura output
+
+! 4.1) Punti
+IF (out_pts) THEN
+  WRITE (chfmt,'(a,i2,a,i2,a)') "(f",coo_ndec+5,".",coo_ndec,")"
+  OPEN (UNIT=30, FILE=filepts, STATUS="REPLACE")
+  chrec = ""
+  CALL build_header("lspts",chrec)
+  WRITE (30,'(a)') TRIM(chrec)
+
+  DO kpt = 1,npt
+    CALL init(ptscsv)
+    WRITE (ch20,chfmt) pts_lon(kpt)
+    CALL csv_record_addfield(ptscsv,TRIM(ADJUSTL(ch20)))
+    WRITE (ch20,chfmt) pts_lat(kpt)
+    CALL csv_record_addfield(ptscsv,TRIM(ADJUSTL(ch20)))
+    WRITE (ch10,'(a6,i3.3)') "punto_",kpt
+    CALL csv_record_addfield(ptscsv,TRIM(ADJUSTL(ch10)))
+    WRITE (30,'(a)') csv_record_getrecord(ptscsv)
+    CALL delete(ptscsv)
+  ENDDO
+  CLOSE(30)
+ENDIF
+
+! 4.2) Variabili e livelli (colonne) 
+IF (out_col) THEN
+  CALL sort_tab_i(varliv(:,1:nvl))
+
+  OPEN (UNIT=31, FILE=filecol, STATUS="REPLACE")
+  chrec = ""
+  CALL build_header("lscol",chrec)
+  WRITE (31,'(a)') TRIM(chrec)
+
+  ndef = 0
+  DO kvl = 1,nvl
+
+!   leggo dalle tabelle i parametri aggiuntivi per seriet.
+    CALL var2spec(varliv(1:3,kvl),ndec,vmin,vmax,str_var,cp2,iret)
+    IF (iret /= 0) ndef = ndef + 1
+
+    CALL init(colcsv)
+    CALL csv_record_addfield(colcsv,varliv(1,kvl))    
+    CALL csv_record_addfield(colcsv,varliv(2,kvl))    
+    CALL csv_record_addfield(colcsv,varliv(3,kvl))    
+    CALL csv_record_addfield(colcsv,cp2)
+    CALL csv_record_addfield(colcsv,varliv(4,kvl))    
+    CALL csv_record_addfield(colcsv,varliv(5,kvl))    
+    CALL csv_record_addfield(colcsv,varliv(6,kvl))    
+    CALL csv_record_addfield(colcsv,ndec)
+    CALL csv_record_addfield(colcsv,vmin)
+    CALL csv_record_addfield(colcsv,vmax)    
+    CALL csv_record_addfield(colcsv,TRIM(ADJUSTL(str_model)))
+    CALL csv_record_addfield(colcsv,TRIM(ADJUSTL(str_var)))
+    WRITE (31,'(a)') csv_record_getrecord(colcsv)
+    CALL delete(colcsv)
+  ENDDO
+  CLOSE(31)
+ENDIF
+
+! 4.3) Timerange e reference time (righe)
+IF (out_row) THEN
+  IF (ntr > 0 .AND. lseriet) THEN
     OPEN (UNIT=32, FILE=filerow, STATUS="REPLACE")
     chrec = ""
     CALL build_header("lsrow",chrec)
@@ -352,19 +345,18 @@ IF (out_row .AND. ntr > 0) THEN
     CALL delete(rowcsv)
     CLOSE(32)
 
-  ELSE
-    WRITE (*,*) "I dati non possono essere scritti in formato seriet"
+  ELSE IF (ntr > 0 .AND. .NOT. lseriet) THEN
+    WRITE (*,*) "I dati non possono essere scritti in formato seriet "
+    WRITE (*,*) "file ",TRIM(filerow)," non scritto"
+
+  ELSE IF (ntr == 0) THEN               ! sto elaborando un file vuoto
+    OPEN (UNIT=32, FILE=filerow, STATUS="REPLACE")
+    chrec = ""
+    CALL build_header("lsrow",chrec)
+    WRITE (32,'(a)') TRIM(chrec)
+    CLOSE(32)
 
   ENDIF
-
-ELSE IF (out_row .AND. ntr == 0) THEN   ! sto elaborando un file vuoto
-
-  OPEN (UNIT=32, FILE=filerow, STATUS="REPLACE")
-  chrec = ""
-  CALL build_header("lsrow",chrec)
-  WRITE (32,'(a)') TRIM(chrec)
-  CLOSE(32)
-
 ENDIF
 
 ! 3.4) Log a schermo
@@ -497,17 +489,16 @@ SUBROUTINE write_help
 
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 WRITE (*,*) "Uso: gacsv_scan.exe filein [-p filepts] [-c filecol] [-r filerow] "
-WRITE (*,*) "    [-t tab_dir] [-m model] [-h] [-verbose]" 
+WRITE (*,*) "    [-m model] [-h] [-verbose]" 
 WRITE (*,*) "Analizza un file grib_api_cvs col tracciato per estazioni arkimet su punto"
 WRITE (*,*) "-p filepts: scrive su filepts elenco e coordinate dei punti"
 WRITE (*,*) "-c filecol: scrive su filecol min max e step di ref.time e timerange"
 WRITE (*,*) "-r filerow: scrive su filerow le combianzioni par/lev"
 WRITE (*,*)
-WRITE (*,*) "-t tab_dir: cerca i files tabella_xxx_ser.txt nella dir. tab_dir"
 WRITE (*,*) "-m model: stringa identificativa del modello (per header files seriet)"
-WRITE (*,*)
 WRITE (*,*) "-h: visualizza questo help" 
 WRITE (*,*) "-verbose: visualizza informazioni aggiuntive per debug"
+WRITE (*,*) "Cerca le tabelle seriet in $MA_UTILS_DAT (default: /usr/share/ma_utils)"
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 
 RETURN
