@@ -9,7 +9,7 @@ PROGRAM indice2coord
 IMPLICIT NONE
 
 !
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
 CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 !
 REAL :: x1,y1,x2,y2,xrot,yrot,dx,dy

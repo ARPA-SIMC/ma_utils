@@ -489,7 +489,7 @@ INTEGER, INTENT(OUT) :: zoom_idx(4)
 REAL, INTENT(OUT) :: xutm_grd(niexp,njexp),yutm_grd(niexp,njexp)
 
 ! Parametri relativi al file "aree_utm.dat"
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
 CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 CHARACTER (LEN=40), PARAMETER :: aree_name = "aree_utm.dat"
 
@@ -600,7 +600,7 @@ INTEGER, INTENT(OUT) :: zoom_idx(4)
 REAL, INTENT(OUT) :: xgeo_grd(niexp,njexp),ygeo_grd(niexp,njexp)
 
 ! Parametri relativi al file "aree_geo.dat"
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
 CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 CHARACTER (LEN=40), PARAMETER :: aree_name = "aree_geo.dat"
 

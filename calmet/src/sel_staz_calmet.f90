@@ -40,7 +40,7 @@ CHARACTER (LEN=40), PARAMETER :: anag_path = "osservazioni/dat"
 CHARACTER (LEN=40), PARAMETER :: anag_name = "db_anagrafica.dat"
 
 ! 0.2 Costanti ecc. relativi al file "aree_utm.dat"
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
 CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 CHARACTER (LEN=40), PARAMETER :: aree_name = "aree_utm.dat"
 

@@ -14,7 +14,7 @@ IMPLICIT NONE
 ! Parametri costanti
 CHARACTER (LEN=80),PARAMETER :: file_out1 = "sel_punti_grid.pts.csv"
 CHARACTER (LEN=80),PARAMETER :: file_out2 = "sel_punti_grid.zoom"
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
 CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 
 ! Altre variabili del programma

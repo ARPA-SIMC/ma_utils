@@ -191,7 +191,7 @@ INTEGER, INTENT(OUT) :: ndec,cp2,ier
 CHARACTER (*), INTENT(OUT) :: str
 
 ! Parametri relativi ai files "tabella_xxx_ser.txt"
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
 CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 
 ! Variabili locali

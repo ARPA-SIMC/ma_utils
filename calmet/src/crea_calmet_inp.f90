@@ -43,7 +43,7 @@ INTEGER, PARAMETER :: ibtz = +1, ibtz_old = -ibtz
 CHARACTER (LEN=80), PARAMETER :: fileout = "calmet.inp"
 
 ! Costanti ecc. relativi al file "aree_utm.dat"
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
 CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
 CHARACTER (LEN=40), PARAMETER :: aree_name = "aree_utm.dat"
 

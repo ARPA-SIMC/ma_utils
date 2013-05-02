@@ -45,7 +45,7 @@ END INTERFACE
 INTEGER, PARAMETER :: maxdim = 100000  ! dimensione massima dei GRIB
 INTEGER, PARAMETER :: maxspc = 200     ! n.ro max specie
 REAL, PARAMETER :: fc = 287*7.2868e16 / 9.81
-CHARACTER (LEN=40), PARAMETER :: tab_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40), PARAMETER :: tab_path_def = PKGDATAROOTDIR
 CHARACTER (LEN=40), PARAMETER :: tab_path = "MA_UTILS_DATA"
 
 ! Profilo standard dell'atmosfera (da Holton); valori ogni km

@@ -741,7 +741,7 @@ INTEGER, INTENT(OUT) :: ndec,cp2,ier
 CHARACTER (*), INTENT(OUT) :: str
 
 ! tab_path di default
-CHARACTER (LEN=40) :: tab_path_def = "/usr/share/ma_utils"
+CHARACTER (LEN=40) :: tab_path_def = PKGDATAROOTDIR
 CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
 
 ! Variabili locali
