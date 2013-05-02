@@ -1,7 +1,7 @@
 Summary: Utilities area Meteorologia Ambientale SIMC
 Name: ma_utils
 Version: 0.2
-Release: 26%{dist}
+Release: 41%{dist}
 License: GPL
 Group: Applications/Meteo
 URL: http://www.arpa.emr.it/sim
@@ -59,9 +59,12 @@ GRIB to seriet postprocessor for arkimet
 %{_libdir}/arkimet/seriet
 
 %changelog
+* Thu May 02 2013 Emanuele Di Giacomo <edigiacomo@arpa.emr.it> - 0.1-41
+- Rebuild to reflect upstream changes
+
 * Tue Feb 12 2013 Emanuele Di Giacomo <edigiacomo@arpa.emr.it> - 0.1-26
-  - Changed program dir to pkglibexecdir
-  - arkimet-postprocess-seriet
+- Changed program dir to pkglibexecdir
+- arkimet-postprocess-seriet
 
 * Mon Feb 4 2013 Daniele Branchini <dbranchini@arpa.emr.it> - 0.1-23
 - Initial build.
