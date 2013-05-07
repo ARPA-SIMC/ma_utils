@@ -47,7 +47,7 @@ rm -rf %{buildroot}
 %package -n arkimet-postprocess-seriet
 Summary: GRIB to seriet postprocessor for arkimet
 BuildArch: noarch
-Requires: arkimet, ma_utils
+Requires: arkimet, ma_utils = %{version}-%{release}
 Obsoletes: arkimet-postprocess-gacsv
 
 
