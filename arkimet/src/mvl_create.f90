@@ -1,10 +1,12 @@
 PROGRAM mvl_create
 !-------------------------------------------------------------------------------
-! Legge un file in formato short summary e lo riscrive in formato .mvl,accedendo
-! alle tabelle seriet. Programma della catena ak_seriet.
+! Legge un file in formato short summary e lo riscrive in formato .mvl,
+! accedendo alle tabelle seriet.
 !
-!                                             Versione 1.0.1, Enrico, 28/02/2013
+!                                             Versione 1.0.2, Enrico, 02/05/2013
 !-------------------------------------------------------------------------------
+
+USE seriet_utilities
 
 IMPLICIT NONE
 
@@ -111,7 +113,7 @@ DO
     CYCLE
   ENDIF
 
-  CALL var2spec(var,iu_tab,ndec,vmin,vmax,str_var,cp2,ier)
+  CALL var2spec(var,ndec,vmin,vmax,str_var,cp2,ier)
   WRITE(ch3(1),'(i3)') cp2
   WRITE(ch3(2),'(i3)') ndec
   WRITE(ch10(1),'(f10.2)') vmin
@@ -155,113 +157,6 @@ WRITE (*,*) "Troppi files in input, aumentare paramero mxfiles"
 STOP
 
 END PROGRAM mvl_create
-
-!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-SUBROUTINE var2spec(var,iu_tab,ndec,vmin,vmax,str,cp2,ier)
-!--------------------------------------------------------------------------
-! Data la codifica gribarch di una variabile (terna cem,tab,var), cerca nel
-! file tabella_xxx_ser.txt corrispondente una serie di informazioni:
-!
-! - il n.ro di decimali piu' appropriato per rappresentarla (-1 indica
-!   notazione esponenziale)
-! - i valori minimo e massimo accettabili (quality control)
-! - una stringa identificativa della variabile
-! - un codice del tipo di varibile (comp2), che vale:
-!     se var e' comp. vento  = il codice dell'altra componente
-!     se e' temperatura      = -1
-!     se e' Monin-Obukov     = -2
-!     se e' SW Budget        = -3
-!     se e' cloud cover      = -4
-!     se e' flusso di calore = -5
-!     negli altri casi       =  0
-!
-! Codici d'errore (se /= 0 la subrotunie ritorna dei valori di dafault):
-! 0 = tutto ok
-! -1 = parametro non presente in tabella
-! -2 = file tabella_xxx_ser.txt non trovato
-! -3 = errore lettura dal file tabella_xxx_ser.txt 
-!--------------------------------------------------------------------------
-IMPLICIT NONE
-
-! Argomenti della subroutine
-INTEGER, INTENT(IN) :: var(3),iu_tab
-REAL, INTENT(OUT) :: vmin,vmax
-INTEGER, INTENT(OUT) :: ndec,cp2,ier
-CHARACTER (*), INTENT(OUT) :: str
-
-! Parametri relativi ai files "tabella_xxx_ser.txt"
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
-CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
-
-! Variabili locali
-REAL :: vmin_t,vmax_t
-INTEGER :: ndec_t,cp2_t,var_t
-INTEGER :: ios,ios2
-CHARACTER (LEN=120) :: nfile
-CHARACTER (LEN=80) :: ch80
-CHARACTER (LEN=8) :: ch8
-CHARACTER (LEN=3) :: ch3
-!--------------------------------------------------------------------------
-
-! Assegno valori di default
-ndec = 3
-vmin = -1.e03
-vmax = +1.e04
-WRITE (ch8,'(1x,a4,i3.3)') "var_",var(3)
-str = ADJUSTR(ch8)
-cp2 = 0
-
-! Apro la tabella richiesta
-ch80 = ""
-CALL GETENV(aree_path,ch80)
-IF (TRIM(ch80) == "") ch80 = aree_path_def
-WRITE (nfile,'(5a,i3.3,a)') &
-  TRIM(ch80),"/","tabella_",var(2),"_ser.txt"
-
-OPEN (UNIT=iu_tab, FILE=nfile, STATUS="OLD", ACTION="READ", IOSTAT=ios)
-IF (ios /= 0) THEN
-  ier = -2
-  RETURN
-ENDIF
-
-! Cerco il parametro richiesto
-DO
-  READ (iu_tab,'(a)',IOSTAT=ios) ch80  
-  IF (ios /= 0) EXIT
-  IF (TRIM(ch80) == "" .OR. ch80(1:1) == "!") CYCLE
-
-  READ (ch80,'(1x,i3,2x,a8,2x,a3,2(2x,f10.2),2x,i3)',IOSTAT=ios) &
-    var_t,ch8,ch3,vmin_t,vmax_t,cp2_t
-
-  IF (ch3 == "exp") THEN
-    ndec_t = 999
-  ELSE
-    READ (ch3,*,IOSTAT=ios2) ndec_t
-  ENDIF
-
-  IF (ios /= 0 .OR. ios2 /= 0) THEN
-    ier = -3
-    RETURN
-  ENDIF
-  
-  IF (var_t /= var(3)) CYCLE
-
-  str = ADJUSTR(ch8)
-  ndec = ndec_t
-  vmin = vmin_t
-  vmax = vmax_t
-  cp2 = cp2_t
-  ier = 0
-  CLOSE (iu_tab)
-  RETURN
-
-ENDDO
-
-ier = -1
-RETURN
-
-END SUBROUTINE var2spec
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 

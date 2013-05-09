@@ -52,6 +52,7 @@ INTEGER, PARAMETER :: coo_ndec = 5
 DOUBLE PRECISION, PARAMETER :: coo_eps = 0.000015
 DOUBLE PRECISION, PARAMETER :: coo_eps_shift = 1.e-10
 
+
 ! Dimensionamenti massimi relativi a un'estrazione Arkimet
 INTEGER, PARAMETER :: maxvl = 1000    ! coppie var-liv
 INTEGER, PARAMETER :: maxtr = 500     ! timerange
@@ -740,7 +741,10 @@ REAL, INTENT(OUT) :: vmin,vmax
 INTEGER, INTENT(OUT) :: ndec,cp2,ier
 CHARACTER (*), INTENT(OUT) :: str
 
-! tab_path di default
+! Path di default delle tabelle seriet
+! PKGDATAROOTDIR viene sostituito in fase di compilazione con il path delle
+! tabelle seriet (di solito /usr/share/ma_utils). La sostituzione sfrutta 
+! il comando gfortran -D; vedi Makefile.am nelle singole dir.
 CHARACTER (LEN=40) :: tab_path_def = PKGDATAROOTDIR
 CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
 
@@ -766,8 +770,7 @@ cp2 = 0
 tab_path = ""
 CALL GETENV(tab_env,tab_path)
 IF (TRIM(tab_path) == "") tab_path = tab_path_def
-WRITE (tab_file,'(3a,i3.3,a)') TRIM(tab_path),"/","tabella_",var(2),"_ser.txt"
-
+WRITE (tab_file,'(2a,i3.3,a)') TRIM(tab_path),"/tabella_",var(2),"_ser.txt"
 iu = getunit()
 OPEN (UNIT=iu, FILE=tab_file, STATUS="OLD", ACTION="READ", IOSTAT=ios)
 IF (ios /= 0) THEN

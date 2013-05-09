@@ -36,7 +36,6 @@ PROGRAM gacsv2seriet
 !                                          Versione 1.6.5 Enrico 22/03/2013
 !--------------------------------------------------------------------------
 
-
 USE file_utilities
 USE datetime_class
 USE missing_values

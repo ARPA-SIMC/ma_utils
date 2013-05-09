@@ -488,10 +488,12 @@ INTEGER, INTENT(OUT) :: igrd(niexp,njexp),jgrd(niexp,njexp),kgrd(niexp,njexp)
 INTEGER, INTENT(OUT) :: zoom_idx(4)
 REAL, INTENT(OUT) :: xutm_grd(niexp,njexp),yutm_grd(niexp,njexp)
 
-! Parametri relativi al file "aree_utm.dat"
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
-CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
-CHARACTER (LEN=40), PARAMETER :: aree_name = "aree_utm.dat"
+! Path di default delle tabelle seriet
+! PKGDATAROOTDIR viene sostituito in fase di compilazione con il path delle
+! tabelle seriet (di solito /usr/share/ma_utils). La sostituzione sfrutta 
+! il comando gfortran -D; vedi Makefile.am nelle singole dir.
+CHARACTER (LEN=40) :: tab_path_def = PKGDATAROOTDIR
+CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
 
 ! Variabili locali
 REAL :: dx,dy,xf,yf,xl,yl
@@ -499,23 +501,23 @@ REAL :: sgx,sgy,i1,j1
 INTEGER :: i,j,ios
 INTEGER :: nx,ny,utmz
 CHARACTER (LEN=120) :: nfile
-CHARACTER (LEN=80) :: ch80
+CHARACTER (LEN=80) :: tab_path
 CHARACTER (LEN=61) :: ch61
 CHARACTER (LEN=40) :: dum_area
 
 !--------------------------------------------------------------------------
 ! 1) Leggo gli estremi dell'area da aree_utm.dat
 
-ch80 = ""
-CALL GETENV(aree_path,ch80)
-IF (TRIM(ch80) == "") ch80 = aree_path_def
-nfile = TRIM(ch80) // "/" // TRIM(aree_name)
+tab_path = ""
+CALL GETENV(tab_env,tab_path)
+IF (TRIM(tab_path) == "") tab_path = tab_path_def
+WRITE (nfile,'(2a)') TRIM(tab_path),"/aree_utm.dat"
 OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)
 
 DO
   READ (22,'(a)',IOSTAT=ios) ch61    
   IF (ios /= 0) THEN
-    WRITE (*,*) "Area ",TRIM(grid_area)," non trovata in ",TRIM(aree_name)
+    WRITE (*,*) "Area ",TRIM(grid_area)," non trovata in ",TRIM(nfile)
     RETURN
   ENDIF
 
@@ -524,7 +526,7 @@ DO
   READ (ch61,'(a10,2(1x,i4),4(1x,f8.3),1x,i4)',IOSTAT=ios) &
     dum_area,nx,ny,xf,yf,xl,yl,utmz
   IF (ios /= 0) THEN
-    WRITE (*,*) "Record illegale in ",TRIM(aree_name)
+    WRITE (*,*) "Record illegale in ",TRIM(nfile)
     WRITE (*,'(a)') ch61
     RETURN
   ENDIF
@@ -599,10 +601,12 @@ INTEGER, INTENT(OUT) :: igrd(niexp,njexp),jgrd(niexp,njexp),kgrd(niexp,njexp)
 INTEGER, INTENT(OUT) :: zoom_idx(4)
 REAL, INTENT(OUT) :: xgeo_grd(niexp,njexp),ygeo_grd(niexp,njexp)
 
-! Parametri relativi al file "aree_geo.dat"
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
-CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
-CHARACTER (LEN=40), PARAMETER :: aree_name = "aree_geo.dat"
+! Path di default delle tabelle seriet
+! PKGDATAROOTDIR viene sostituito in fase di compilazione con il path delle
+! tabelle seriet (di solito /usr/share/ma_utils). La sostituzione sfrutta 
+! il comando gfortran -D; vedi Makefile.am nelle singole dir.
+CHARACTER (LEN=40) :: tab_path_def = PKGDATAROOTDIR
+CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
 
 ! variabili locali
 REAL :: dx,dy,xf,yf,xl,yl
@@ -611,23 +615,23 @@ REAL :: xrot,yrot,xgeo_rot,ygeo_rot,xgeo_grd_rot,ygeo_grd_rot
 INTEGER :: nx,ny,scan(3)
 INTEGER :: i,j,ios
 CHARACTER (LEN=120) :: nfile
-CHARACTER (LEN=80) :: ch80
+CHARACTER (LEN=80) :: tab_path
 CHARACTER (LEN=78) :: ch78
 CHARACTER (LEN=40) :: dum_area,ch40
 
 !--------------------------------------------------------------------------
 ! 1) Leggo gli estremi dell'area da aree_geo.dat
 
-ch80 = ""
-CALL GETENV(aree_path,ch80)
-IF (TRIM(ch80) == "") ch80 = aree_path_def
-nfile = TRIM(ch80) // "/" // TRIM(aree_name)
+tab_path = ""
+CALL GETENV(tab_env,tab_path)
+IF (TRIM(tab_path) == "") tab_path = tab_path_def
+WRITE (nfile,'(3a)') TRIM(tab_path),"/","aree_geo.dat"
 OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)
 
 DO
   READ (22,'(a)',IOSTAT=ios) ch78    
   IF (ios /= 0) THEN
-    WRITE (*,*) "Area ",TRIM(grid_area)," non trovata in ",TRIM(aree_name)
+    WRITE (*,*) "Area ",TRIM(grid_area)," non trovata in ",TRIM(nfile)
     RETURN
   ENDIF
 
@@ -636,7 +640,7 @@ DO
   READ (ch78,'(a10,2(1x,i4),6(1x,f8.3),1x,3i1)',IOSTAT=ios) &
     dum_area,nx,ny,xf,yf,xl,yl,xrot,yrot,scan(1:3)
   IF (ios /= 0) THEN
-    WRITE (*,*) "Record illegale in ",TRIM(aree_name)
+    WRITE (*,*) "Record illegale in ",TRIM(nfile)
     WRITE (*,'(a)') ch78
     RETURN
   ENDIF

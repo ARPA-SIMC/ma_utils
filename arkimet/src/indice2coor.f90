@@ -3,22 +3,26 @@ PROGRAM indice2coord
 ! Dato l'indice (vettoriale) di una serie di punti di un'area grib, calcola 
 ! gli indici ij, le coordinate geo e le coordinate UTM 
 ! 
-!                                                 V2.1.1, Enrico 28/02/2013
+!                                                 V2.1.2, Enrico 02/05/2013
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
 
-!
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
-CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
-!
+! Path di default delle tabelle seriet
+! PKGDATAROOTDIR viene sostituito in fase di compilazione con il path delle
+! tabelle seriet (di solito /usr/share/ma_utils). La sostituzione sfrutta 
+! il comando gfortran -D; vedi Makefile.am nelle singole dir.
+CHARACTER (LEN=40) :: tab_path_def = PKGDATAROOTDIR
+CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
+
+! Altre variabili del programma
 REAL :: x1,y1,x2,y2,xrot,yrot,dx,dy
 REAL :: xgrid,ygrid,xgeo,ygeo,xutm,yutm
 INTEGER :: nx,ny,utmz,scan(3)
 INTEGER :: k,i,j
 INTEGER :: ios,idum
 CHARACTER (LEN=120) :: nfile
-CHARACTER (LEN=80) :: ch80
+CHARACTER (LEN=80) :: tab_path
 CHARACTER (LEN=78) :: ch78
 CHARACTER (LEN=61) :: ch61
 CHARACTER (LEN=12) :: aree_name
@@ -45,15 +49,14 @@ CASE DEFAULT
   GOTO 9000
 END SELECT
 
-WRITE (*,*) "Nome area (deve essere inclusa in aree_geo.dat)"
+WRITE (*,'(3a)') "Nome area (deve essere inclusa in ",TRIM(aree_name),")"
 READ (*,*) grid_area
 
 ! 1.2 Leggo estremi area
-
-ch80 = ""
-CALL GETENV(aree_path,ch80)
-IF (TRIM(ch80) == "") ch80 = aree_path_def
-nfile = TRIM(ch80) // "/" // TRIM(aree_name)
+tab_path = ""
+CALL GETENV(tab_env,tab_path)
+IF (TRIM(tab_path) == "") tab_path = tab_path_def
+WRITE (nfile,'(3a)') TRIM(tab_path),"/",TRIM(aree_name)
 
 IF (proj == "utm") THEN
   OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)

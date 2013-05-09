@@ -32,7 +32,7 @@ PROGRAM crea_calmet_inp
 ! Con parametro -noobs: ignora filesurf, filetemp e stept_req, non scrive nessun
 !   dato relativo alle osservazioni
 !
-!                                                      V4.3.0, Enrico 27/03/2013
+!                                                      V4.3.1, Enrico 02/05/2013
 !-------------------------------------------------------------------------------
 
 USE date_handler
@@ -42,10 +42,12 @@ IMPLICIT NONE
 INTEGER, PARAMETER :: ibtz = +1, ibtz_old = -ibtz
 CHARACTER (LEN=80), PARAMETER :: fileout = "calmet.inp"
 
-! Costanti ecc. relativi al file "aree_utm.dat"
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
-CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
-CHARACTER (LEN=40), PARAMETER :: aree_name = "aree_utm.dat"
+! Path di default delle tabelle seriet
+! PKGDATAROOTDIR viene sostituito in fase di compilazione con il path delle
+! tabelle seriet (di solito /usr/share/ma_utils). La sostituzione sfrutta 
+! il comando gfortran -D; vedi Makefile.am nelle singole dir.
+CHARACTER (LEN=40) :: tab_path_def = PKGDATAROOTDIR
+CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
 
 ! Parametri da modificate
 REAL, ALLOCATABLE :: ss_x(:),ss_y(:),ss_anh(:),ss_ibtz(:)
@@ -76,7 +78,8 @@ INTEGER :: vers_calmet
 INTEGER :: hh1,hh2,hht,stept_req,id_net,id_usr
 INTEGER :: dum_nx,dum_ny,dum_utmz,nusta_req
 CHARACTER (LEN=200) :: chrec,chfmt,rec_out,chxyz
-CHARACTER (LEN=120) :: filemodello,filedate,filesurf,filetemp,nfile,ch80
+CHARACTER (LEN=120) :: filemodello,filedate,filesurf,filetemp,nfile
+CHARACTER (LEN=80) :: tab_path
 CHARACTER (LEN=20) :: ch20
 CHARACTER (LEN=10) :: dum_area,id_area
 LOGICAL :: req_obs
@@ -199,16 +202,15 @@ p = INDEX(ADJUSTL(chrec)," ")
 id_area = chrec(1:MIN(p-1,10))
 
 ! Leggo da aree_utm.dat i parametri dell'area richiesta
-ch80 = ""
-CALL GETENV(aree_path,ch80)
-IF (TRIM(ch80) == "") ch80 = aree_path_def
-nfile = TRIM(ch80) // "/" // TRIM(aree_name)
+CALL GETENV(tab_env,tab_path)
+IF (TRIM(tab_path) == "") tab_path = tab_path_def
+WRITE (nfile,'(2a)') TRIM(tab_path),"/aree_utm.dat"
 OPEN (UNIT=24, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9995)
 
 DO
   READ (24,'(a)',IOSTAT=ios) chrec
   IF (ios == eof) THEN
-    WRITE (*,*) "Area ",TRIM(id_area)," non trovata in aree_utm.dat"
+    WRITE (*,*) "Area ",TRIM(id_area)," non trovata in ",TRIM(nfile)
     STOP
   ELSE IF (ios /= 0) THEN
     GOTO 9995

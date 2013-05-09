@@ -26,7 +26,7 @@ PROGRAM sel_staz_calmet
 ! verificato/modificato manualmente e poi convertito nel formato giusto 
 ! (con i codici ORACLE dei vari parametri) dal programma conv_srq_surf.
 !
-!                                                  V2.1.1 Enrico 05/11/2012
+!                                                  V2.1.2 Enrico 02/05/2013
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -39,10 +39,12 @@ CHARACTER (LEN=40), PARAMETER :: anag_env = "HOME_BONAFE"
 CHARACTER (LEN=40), PARAMETER :: anag_path = "osservazioni/dat"
 CHARACTER (LEN=40), PARAMETER :: anag_name = "db_anagrafica.dat"
 
-! 0.2 Costanti ecc. relativi al file "aree_utm.dat"
-CHARACTER (LEN=40), PARAMETER :: aree_path_def = PKGDATAROOTDIR
-CHARACTER (LEN=40), PARAMETER :: aree_path = "MA_UTILS_DATA"
-CHARACTER (LEN=40), PARAMETER :: aree_name = "aree_utm.dat"
+! 0.2 Path di default delle tabelle seriet
+! PKGDATAROOTDIR viene sostituito in fase di compilazione con il path delle
+! tabelle seriet (di solito /usr/share/ma_utils). La sostituzione sfrutta 
+! il comando gfortran -D; vedi Makefile.am nelle singole dir.
+CHARACTER (LEN=40) :: tab_path_def = PKGDATAROOTDIR
+CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
 
 ! 0.3 Costanti ecc. relativi al file "staz_excl.lst"
 INTEGER, PARAMETER :: max_excl = 500   ! n.ro max di stazioni escludibili
@@ -66,7 +68,7 @@ INTEGER :: lexcl,nexcl,name_net_out,name_sta_out,track_out,code_out
 INTEGER :: ieof,ieor,cnt_surf,cnt_temp,req_nreti
 CHARACTER (LEN=200) :: chfmt_cp,nfile,header
 CHARACTER (LEN=90) :: chrec
-CHARACTER (LEN=80) :: ch80
+CHARACTER (LEN=80) :: ch80,tab_path
 CHARACTER (LEN=61) :: ch61
 CHARACTER (LEN=50) :: an_nome
 CHARACTER (LEN=10) :: grid_area,dum_area
@@ -119,16 +121,16 @@ CLOSE(21)
 ! 1.3 leggo gli estremi dell'area da aree_utm.dat
 CALL get_eof_eor(ieof,ieor)
 
-ch80 = ""
-CALL GETENV(aree_path,ch80)
-IF (TRIM(ch80) == "") ch80 = aree_path_def
-nfile = TRIM(ch80) // "/" // TRIM(aree_name)
+tab_path = ""
+CALL GETENV(tab_env,tab_path)
+IF (TRIM(tab_path) == "") tab_path = tab_path_def
+WRITE (nfile,'(2a)') TRIM(tab_path),"/aree_utm.dat"
 OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9998)
 
 DO
   READ (22,'(a)',IOSTAT=ios) ch61    
   IF (ios /= 0) THEN
-    WRITE (*,*) "Area ",TRIM(grid_area)," non trovata in ",TRIM(aree_name)
+    WRITE (*,*) "Area ",TRIM(grid_area)," non trovata in ",TRIM(nfile)
     RETURN
   ENDIF
 
@@ -137,7 +139,7 @@ DO
   READ (ch61,'(a10,2(1x,i4),4(1x,f8.3),1x,i4)',IOSTAT=ios) &
     dum_area,nx,ny,x1,y1,x2,y2,utmz
   IF (ios /= 0) THEN
-    WRITE (*,*) "Record illegale in ",TRIM(aree_name)
+    WRITE (*,*) "Record illegale in ",TRIM(nfile)
     WRITE (*,'(a)') ch61
     RETURN
   ENDIF
@@ -410,8 +412,8 @@ WRITE (*,*) "sel_staz_calmet.exe [-h] [-c] area"
 WRITE (*,*) "area     : codice dell'aera richiesta (in aree_utm.dat)"
 WRITE (*,*) " -h      : visualizza questo help"
 WRITE (*,*) " -c      : crea file sel_staz_calmet.inp di esempio"
-WRITE (*,*) "NB: si appoggia ai files aree_utm.dat e aree_geo.dat; devono essere definite le"
-WRITE (*,*) "    variabili d'ambiente HOME_MINGUZZI e HOME_BONAFE"
+WRITE (*,*) "NB: si appoggia ai files aree_utm.dat (in $MA_UTILS_DAT) e db_anagrafica.dat"
+WRITE (*,*) "   (in $HOME_BONAFE/osservazioni/dat)"
 WRITE (*,*) 
 
 RETURN

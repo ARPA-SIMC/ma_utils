@@ -19,12 +19,12 @@ PROGRAM grib2chimere
 ! - Mette a 0 le specie richieste in output e non presenti in input
 ! - Gestisce solo lo scanning flag 64 (010)
 !
-!                                           Versione 3.0, Enrico 16/11/2011
+!                                         Versione 3.0.1, Enrico 02/05/2013
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
 
-! Interface per funzioni uppercase e lowercase
+! 0.1 Interface per funzioni uppercase e lowercase
 INTERFACE
 
   FUNCTION lowercase(chin) RESULT (chout)
@@ -41,34 +41,40 @@ INTERFACE
 
 END INTERFACE
 
-! Parametri costanti
+! 0.2 Parametri costanti
 INTEGER, PARAMETER :: maxdim = 100000  ! dimensione massima dei GRIB
 INTEGER, PARAMETER :: maxspc = 200     ! n.ro max specie
 REAL, PARAMETER :: fc = 287*7.2868e16 / 9.81
-CHARACTER (LEN=40), PARAMETER :: tab_path_def = PKGDATAROOTDIR
-CHARACTER (LEN=40), PARAMETER :: tab_path = "MA_UTILS_DATA"
 
-! Profilo standard dell'atmosfera (da Holton); valori ogni km
+! 0.3 Tabelle con la codifica GRIB delle specie
+
+! Path di default delle tabelle seriet
+! PKGDATAROOTDIR viene sostituito in fase di compilazione con il path delle
+! tabelle seriet (di solito /usr/share/ma_utils). La sostituzione sfrutta 
+! il comando gfortran -D; vedi Makefile.am nelle singole dir.
+CHARACTER (LEN=40), PARAMETER :: tab_path_def = PKGDATAROOTDIR
+CHARACTER (LEN=40), PARAMETER :: tab_env = "MA_UTILS_DAT"
+
+! Tabelle in cui cercare i parametri Chimere
+INTEGER, PARAMETER :: ntab=3              
+INTEGER :: id_tab(ntab) = (/200,199,196/) 
+
+! 0.4 Profilo standard dell'atmosfera (da Holton); valori ogni km
 REAL, PARAMETER :: pstd(0:10) = (/101325.,89874.,79495.,70108.,61640., &
   54019.,47181.,41060.,35599.,30742.,26436./)
 
-! Dichiarazioni per GRIBEX.
+! 0.5 Dichiarazioni per GRIBEX.
 INTEGER :: ksec2_first(1024)
 INTEGER :: ksec0(2),ksec1(1024),ksec2(1024),ksec3(2),ksec4(512)
 INTEGER :: kbuffer(maxdim),klen,kret
 REAL    :: psec2(512),psec3(2)
 REAL    :: field(maxdim)
 
-! Dichiarazioni per le tabelle con la codifica GRIB delle specie
-INTEGER, PARAMETER :: ntab=3           ! n.ro di tabelle in cui cercare
-INTEGER :: id_tab(ntab) = (/200,199,196/)
-INTEGER :: req_tab(maxspc),req_var(maxspc)
-CHARACTER(LEN=8) :: req_spc(maxspc)
-
-! Altre variabili del programma
+! 0.6 Altre variabili del programma
 TYPE(date) :: data1,data2,datac,datar,datar_sav
 REAL, ALLOCATABLE :: conc(:,:,:),zz(:,:),ro(:,:),ac(:),bc(:),pp(:)
 REAL :: orog(maxdim),lnpstd(0:10),w1,w2,lnps,ps,lnpp
+INTEGER :: req_tab(maxspc),req_var(maxspc)
 INTEGER :: idp,iu1,iu2,iu3,hh1,hh2,hh,dum_var,fok,nfs(maxspc)
 INTEGER :: hhr,hhr_sav,sca,sca1,sca2
 INTEGER :: idata,hhc,hh_tot,cem,data(3),ora(2),scad(4),level(3),var(3)
@@ -76,8 +82,8 @@ INTEGER :: np,nz,nt,nspc
 INTEGER :: k,kz,kt,ks,kp,ios,eof,eor,ier,cnt_rew,p1,p2,p3,l1,l2,t1,t2
 CHARACTER(LEN=120) :: file_tab(ntab)
 CHARACTER (LEN=120) :: filein,fileout,filespc,fileor,filevc,chdum,arg(4)
-CHARACTER (LEN=80) :: ch80
-CHARACTER (LEN=8) :: dum_spc
+CHARACTER (LEN=80) :: tab_path
+CHARACTER (LEN=8) :: req_spc(maxspc),dum_spc
 CHARACTER (LEN=2) :: next_arg,idscad
 LOGICAL :: spc_pres(maxspc),first,lroz,req_ro,req_zz
 
@@ -86,12 +92,12 @@ LOGICAL :: spc_pres(maxspc),first,lroz,req_ro,req_zz
 
 !--------------------------------------------------------------------------
 ! 1.0 Variabili d'ambiente
-ch80 = ""
-CALL GETENV(tab_path,ch80)
-IF (TRIM(ch80) == "") ch80 = tab_path_def
+tab_path = ""
+CALL GETENV(tab_env,tab_path)
+IF (TRIM(tab_path) == "") tab_path = tab_path_def
 
 DO kt = 1,ntab
-  WRITE (file_tab(kt),'(2a,i3.3,a4)') TRIM(ch80), &
+  WRITE (file_tab(kt),'(2a,i3.3,a4)') TRIM(tab_path), &
     "/tabella_",id_tab(kt),".txt"
 ENDDO
 
