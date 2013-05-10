@@ -1,14 +1,14 @@
 Summary: Utilities area Meteorologia Ambientale SIMC
 Name: ma_utils
 Version: 0.2
-Release: 43%{dist}
+Release: 47%{dist}
 License: GPL
 Group: Applications/Meteo
 URL: http://www.arpa.emr.it/sim
 Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
-BuildRequires: netcdf-devel, grib_api-1.9.9
+BuildRequires: netcdf-devel, grib_api-devel >= 1.10
 Requires: libsim >= 5.0, libsim < 6.0
 
 Vendor:	       Enrico Minguzzi <eminguzzi@arpa.emr.it>
@@ -47,7 +47,7 @@ rm -rf %{buildroot}
 %package -n arkimet-postprocess-seriet
 Summary: GRIB to seriet postprocessor for arkimet
 BuildArch: noarch
-Requires: arkimet, ma_utils = %{version}-%{release}
+Requires: arkimet, ma_utils
 Obsoletes: arkimet-postprocess-gacsv
 
 
@@ -59,6 +59,9 @@ GRIB to seriet postprocessor for arkimet
 %{_libdir}/arkimet/seriet
 
 %changelog
+* Fri May 10 2013 Daniele Branchini <dbranchini@arpa.emr.it> - 0.2-46
+- Rebuild on dballe 6 and to reflect upstream changes
+
 * Tue May 07 2013 Emanuele Di Giacomo <edigiacomo@arpa.emr.it> - 0.2-43
 - Rebuild to reflect upstream changes
 
