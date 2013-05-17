@@ -10,7 +10,7 @@ PROGRAM post_wind_lm
 !   scritta come griglia H (i.e. spostati di mezza cella verso NE)
 ! - Con l'opzione -antir antiruota le componenti
 !
-!                                         Versione 1.1.2, Enrico 17/04/2013
+!                                         Versione 1.1.3, Enrico 16/05/2013
 !--------------------------------------------------------------------------
 
 USE grid_handler
@@ -162,8 +162,20 @@ grib: DO
 ! 2.3) Controlli sulle intestazioni dei grib
 
   IF (ANY(ksec1v(:5) /= ksec1u(:5)) .OR. ANY(ksec1v(7:21) /= ksec1u(7:21)) .OR. &
-      ANY(ksec2v(1:14) /= ksec2u(1:14)) .OR. ANY(psec2v(:) /= psec2u(:)) ) THEN
+      ANY(ksec2v(1:14) /= ksec2u(1:14)) ) THEN
     WRITE (*,*) "Trovati grib con sezioni diverse, ngrib = ",ngrib+1
+    DO kp = 1,5
+      IF (ksec1v(kp) /= ksec1u(kp)) WRITE (*,*) &
+        "sez 1 (k,u,v): ",kp,ksec1u(kp),ksec1v(kp)
+    ENDDO
+    DO kp = 7,21
+      IF (ksec1v(kp) /= ksec1u(kp)) WRITE (*,*) &
+        "sez 1 (k,u,v): ",kp,ksec1u(kp),ksec1v(kp)
+    ENDDO
+    DO kp = 1,14
+      IF (ksec2v(kp) /= ksec2u(kp)) WRITE (*,*) &
+        "sez 2 (k,u,v): ",kp,ksec2u(kp),ksec2v(kp)
+    ENDDO
     STOP
   ENDIF
 

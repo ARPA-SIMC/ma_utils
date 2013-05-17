@@ -4,7 +4,7 @@ PROGRAM math_grib
 ! in due files grib. 
 ! Sostituisce ed integra somma_grib.f90 e moltiplica_grib.f90
 !
-!                                         Versione 1.0.2, Enrico 27/02/2013
+!                                         Versione 1.0.3, Enrico 16/05/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -19,6 +19,7 @@ INTEGER :: ifa,ifb,ifout,iga=0,igb=0,igout=0
 INTEGER :: idp,kp,ios1,ios2,ier,iret,kga,k
 INTEGER :: clret(0:6),cllog(0:6),nmiss,ni,nj,ni_sav,nj_sav,en,gnov,nom,nocv
 CHARACTER (LEN=80) :: filea,fileb,fileout,chdum,check_list
+CHARACTER(LEN=40) :: gta
 CHARACTER (LEN=5) :: oper
 LOGICAL :: cl_grid,cl_time,cl_vtime,cl_lev,cl_var,lbconst,lforce,lverbose
 
@@ -130,8 +131,14 @@ DO kga = 1,HUGE(0)
 ! 2.3) Calcoli
 
 ! Alloco gli array per i campi
-  CALL grib_get(iga,"numberOfPointsAlongAParallel",ni)
-  CALL grib_get(iga,"numberOfPointsAlongAMeridian",nj)
+  CALL grib_get(iga,"gridType",gta)
+  IF (gta == "regular_ll" .OR. gta == "rotated_ll") THEN
+    CALL grib_get(iga,"numberOfPointsAlongAParallel",ni)
+    CALL grib_get(iga,"numberOfPointsAlongAMeridian",nj)
+  ELSE
+    CALL grib_get(iga,"Ni",ni)
+    CALL grib_get(iga,"Nj",nj)
+  ENDIF
   IF (kga == 1 .OR. ni /= ni_sav .OR. nj /= nj_sav) THEN
     IF (kga > 1) DEALLOCATE (valuesa,valuesb,valuesout)
     ALLOCATE (valuesa(ni*nj),valuesb(ni*nj),valuesout(ni*nj))

@@ -2,7 +2,7 @@ MODULE grib2_utilities
 !--------------------------------------------------------------------------
 ! Utilita' per la getione dei GRIB2 in logica GRIB1
 !
-!                                         Versione 1.1.4, Enrico 14/01/2013
+!                                         Versione 1.1.5, Enrico 16/05/2013
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -396,12 +396,25 @@ ENDIF
 ! 2) Test
 
 !--------------------------------------------------------------------------
-! 2.1) Test 0: forma della griglia (viene sempre controllata)
+! 2.0) Test 0: forma della griglia (viene sempre controllata)
 
-CALL grib_get(iga,"numberOfPointsAlongAParallel",nia)
-CALL grib_get(iga,"numberOfPointsAlongAMeridian",nja)
-CALL grib_get(igb,"numberOfPointsAlongAParallel",nib)
-CALL grib_get(igb,"numberOfPointsAlongAMeridian",njb)
+CALL grib_get(iga,"gridType",gta)
+IF (gta == "regular_ll" .OR. gta == "rotated_ll") THEN
+  CALL grib_get(iga,"numberOfPointsAlongAParallel",nia)
+  CALL grib_get(iga,"numberOfPointsAlongAMeridian",nja)
+ELSE
+  CALL grib_get(iga,"Ni",nia)
+  CALL grib_get(iga,"Nj",nja)
+ENDIF
+
+CALL grib_get(igb,"gridType",gtb)
+IF (gtb == "regular_ll" .OR. gtb == "rotated_ll") THEN
+  CALL grib_get(igb,"numberOfPointsAlongAParallel",nib)
+  CALL grib_get(igb,"numberOfPointsAlongAMeridian",njb)
+ELSE
+  CALL grib_get(igb,"Ni",nib)
+  CALL grib_get(igb,"Nj",njb)
+ENDIF
 
 IF (nia == nib .AND. nja == njb) THEN
   clret(0) = 0
@@ -410,10 +423,10 @@ ELSE
   clret(0) = 1
 ENDIF
 
-! Test 1: griglia
+!--------------------------------------------------------------------------
+! 2.1) Test 1: griglia
+
 IF (cl_grid) THEN
-  CALL grib_get(iga,"gridType",gta)
-  CALL grib_get(iga,"gridType",gtb)
   
   IF (gta /= gtb) THEN
     ier = 1
@@ -478,7 +491,7 @@ IF (cl_grid) THEN
       IF (lverbose .AND. sma /= smb) WRITE (*,*) "sm ",sma,smb
     ENDIF
     
-  ELSE IF (gta == "utm") THEN
+  ELSE IF (gta == "UTM") THEN
     CALL grib_get(iga,"zone",za)
     CALL grib_get(iga,"falseEasting",fea)
     CALL grib_get(iga,"eastingOfFirstGridPoint",xia)
@@ -511,8 +524,8 @@ IF (cl_grid) THEN
     ENDIF
     
   ELSE
-    ier = 2
     WRITE (*,*) "check_list: proiezione non gestita ",TRIM(gta)
+    ier = 2
   ENDIF
 ENDIF
 
