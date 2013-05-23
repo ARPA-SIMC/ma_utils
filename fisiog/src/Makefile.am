@@ -1,5 +1,5 @@
 AM_FCFLAGS = -I/usr/lib64/gfortran/modules -I$(top_builddir)/modules
-AM_LDFLAGS = $(top_builddir)/modules/libmautils.la
+LDADD = $(top_builddir)/modules/libmautils.la
 
 pkglibexec_PROGRAMS = proc_fisiog.exe calc_tpi.exe
 

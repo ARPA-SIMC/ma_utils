@@ -1,5 +1,5 @@
 AM_FCFLAGS = -I/usr/lib64/gfortran/modules -I$(top_builddir)/modules
-AM_LDFLAGS = $(top_builddir)/modules/libmautils.la
+LDADD = $(top_builddir)/modules/libmautils.la
 
 pkglibexec_PROGRAMS = filtra_anag_dat.exe maskout_orari.exe orari_daily_stat.exe orari2grads.exe orari2seriet.exe proc_multi_orari.exe proc_sodar_moniter.exe stat_orari.exe trasp_temp.exe
 

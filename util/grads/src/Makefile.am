@@ -1,5 +1,5 @@
 AM_FCFLAGS = -I/usr/lib64/gfortran/modules -I$(top_builddir)/modules
-AM_LDFLAGS = $(top_builddir)/modules/libmautils.la
+LDADD = $(top_builddir)/modules/libmautils.la
 
 pkglibexec_PROGRAMS = adjust_ctl.exe convert_shape.exe grib_utm_scale.exe coord2marks.exe
 
