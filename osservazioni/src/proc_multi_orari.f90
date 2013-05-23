@@ -23,10 +23,11 @@ PROGRAM proc_multi_orari
 ! TODO:
 ! - aggiungere diagnostica complessiva (es. dati validi totali in/out)
 !
-!                                                 V2.2.0, Enrico 10/04/2013
+!                                                 V2.3.0, Enrico 22/05/2013
 !--------------------------------------------------------------------------
 
 USE array_utilities
+USE datetime_class
 IMPLICIT NONE
 
 !==========================================================================
@@ -47,12 +48,13 @@ INTEGER, PARAMETER :: iulog = 27     ! unit' per filelog
 INTEGER, PARAMETER :: iu0 = 30       ! prima unita' per i files di input
 
 ! Altre variabili del programma
+TYPE(datetime) :: dtr_t0,datac
 REAL, ALLOCATABLE :: val_in(:,:),val_out(:),val_ok(:),ave(:),ave2(:)
 REAL, ALLOCATABLE :: yrtyp(:,:),yrtypstd(:,:),cli_max_diff(:,:)
-REAL :: rmis,qcx,qcy,qcz,sp_sum,sp_sum2,sp_ave,sp_std,sp_max_diff
+REAL :: rmis,qcx,qcy,qcz,sp_sum,sp_sum2,sp_ave,sp_std,sp_max_diff,dtr_slope
 INTEGER, ALLOCATABLE :: nok(:),prvidx(:)
 INTEGER :: mand_par,eof,eor,ios,nf,npar,nprv,head_len,head_offset,nhead,nld
-INTEGER :: yy,mm,dd,hh,sca,idx,out_dec,req_par,sp_nok
+INTEGER :: yy,mm,dd,hh,sca,idx,out_dec,req_par,sp_nok,dth
 INTEGER :: kp,kpr,kr,kf,p1,p2,k2,km,ksk
 
 CHARACTER (LEN=mxpar*(fw+1)+20) :: head_par,head_liv,head_par1,head_liv1
@@ -85,6 +87,8 @@ miss0 = .FALSE.
 qcx = 3.
 qcy = 1.
 qcz = 0.
+dtr_slope = HUGE(0.)
+dtr_t0 = datetime_miss
 
 next_arg = ""
 DO kp = 1,HUGE(0)
@@ -106,6 +110,12 @@ DO kp = 1,HUGE(0)
   ELSE IF (next_arg == "qcz" ) THEN
     next_arg = ""
     READ (chdum,*) qcz
+  ELSE IF (next_arg == "dtm" ) THEN
+    next_arg = "dtt"
+    READ (chdum,*) dtr_slope
+  ELSE IF (next_arg == "dtt" ) THEN
+    next_arg = ""
+    dtr_t0 = datetime_new(simpledate=TRIM(chdum))
   ELSE IF (TRIM(chdum) == "-o") THEN
     inp_data = "hhr"
   ELSE IF (TRIM(chdum) == "-s") THEN
@@ -122,6 +132,8 @@ DO kp = 1,HUGE(0)
     next_arg = "ndc"
   ELSE IF (TRIM(chdum) == "-qcpar") THEN
     next_arg = "qcx"
+  ELSE IF (TRIM(chdum) == "-dtpar") THEN
+    next_arg = "dtm"
   ELSE IF (TRIM(chdum) == "-ld") THEN
     ld = .TRUE.
   ELSE IF (TRIM(chdum) == "-miss0") THEN
@@ -142,8 +154,8 @@ ENDDO
 
 IF (stat=="pex" .OR. stat=="dst" .OR. stat=="qcc") THEN
   req_par = 4
-ELSE IF (stat=="ave" .OR. stat=="max" .OR. stat/="min" .OR. &
-  stat=="std" .OR. stat=="mdn" .OR. stat=="tke" .OR. stat=="qcs") THEN
+ELSE IF (stat=="ave" .OR. stat=="max" .OR. stat=="min" .OR. stat=="std" .OR. &
+         stat=="mdn" .OR. stat=="tke" .OR. stat=="qcs" .OR. stat=="dtr") THEN
   req_par = 3
 ELSE
   CALL scrive_help
@@ -155,6 +167,10 @@ IF (mand_par /= req_par) THEN
 ENDIF
 IF (qcx<0. .OR. qcy<0. .OR. qcz<0.) THEN
   CALL scrive_help
+  STOP 1
+ENDIF
+IF (stat=="dtr" .AND. (.NOT. c_e(dtr_t0) .OR. dtr_slope==HUGE(0.))) THEN
+  WRITE (*,*) "La statistica dtr richiede il parametro -dtpar"
   STOP 1
 ENDIF
 
@@ -284,7 +300,8 @@ ENDDO
 head_par_out = head_par1
 head_liv_out = head_liv1
 
-IF ((stat=="tke" .OR. stat=="dst" .OR. stat=="qcc") .AND. nf/=1) THEN
+IF ((stat=="tke" .OR. stat=="dst" .OR. stat=="qcc" .OR. stat=="dtr") .AND. &
+     nf/=1) THEN
   WRITE (*,'(3a)') "La statistica ",stat," richiede un solo file in input"
   GOTO 9991
 ENDIF
@@ -541,6 +558,8 @@ record: DO kr = 1,HUGE(0)
     ENDIF
   ENDDO
 
+  datac = datetime_new(YEAR=yy, MONTH=mm, DAY=dd, HOUR=hh)
+
 !--------------------------------------------------------------------------
 ! 2.2 Eseguo l'eleborazione statistica richiesta
 
@@ -682,6 +701,14 @@ record: DO kr = 1,HUGE(0)
 
     WHERE (nok(1:npar) > 0)
       val_out(1:npar) = REAL(COUNT(pexc(1:nprv,1:npar),DIM=1)) / REAL(nprv)
+    ELSEWHERE
+      val_out(1:npar) = rmis
+    ENDWHERE
+
+  ELSE IF (stat == "dtr") THEN
+    CALL getval(datac - dtr_t0, AHOUR=dth)
+    WHERE (val_in(1,1:npar) /= rmis)
+      val_out(1:npar) = val_in(1,1:npar) - dtr_slope * (dth / (24*365.25))
     ELSEWHERE
       val_out(1:npar) = rmis
     ENDWHERE
@@ -869,7 +896,7 @@ INTEGER :: mxstaz
 
 !            12345678901234567890123456789012345678901234567890123456789012345678901234567890
 WRITE (*,*) "proc_multi_orari.exe [-h] -o/-s/-sx/-d/-t filelst stat fileout [filesta]"
-WRITE (*,*) "   [-nedc N] [-ld] [-miss0] [-qcpar X Y Z]"
+WRITE (*,*) "   [-nedc N] [-ld] [-miss0] [-qcpar X Y Z] [-dtpar m t0]"
 WRITE (*,*) "Legge un insieme di files relativi a serie storiche su punto"
 WRITE (*,*) "Scrive un file con lo stesso formato, che per ogni data/parametro contiene"
 WRITE (*,*) "  il risultato di una statistica sui files di input."
@@ -900,6 +927,9 @@ WRITE (*,*) "               filesta e' un file yrtyp.sta prodotto con l'opzione 
 WRITE (*,*) "           - qcs: riscrive i dati del primo file, mettendo mancanti i dati che"
 WRITE (*,*) "               differiscono dalla media degli altri per piu' di"
 WRITE (*,*) "               max(X*stdev, Y*|media|, Z); X,Y,Z>=0; default: X=3., Y=1., Z=0."
+WRITE (*,*) "           - dtr: un solo file di input, lo riscrive sottraendo a tutti i valori"
+WRITE (*,*) "               un trend lineare: Vout = Vinp - m*(t-t0), dove m e' il trend"
+WRITE (*,*) "               (unita'/anno) e t0 l'istante con correzione nulla (YYYYMMDDHH)"
 WRITE (*,*) ""
 WRITE (*,*) "filesta  : file di appoggio per l'elaborazione statstica (se richiesto)"
 WRITE (*,*) "fileout  : file di output"
@@ -909,6 +939,7 @@ WRITE (*,*) "           (utile per elaborare dati sui model layers COSMO)"
 WRITE (*,*) "-miss0   : Considera i dati mancanti come se fossero 0 (utile per il calcolo"
 WRITE (*,*) "           dei superamenti PM10)"
 WRITE (*,*) "-qcpar X Y Z: modifica i parametri del controllo di qualita' (stat = qcc o qcs)"
+WRITE (*,*) "-dtpar m t0 : assegna i parametri del de-trending (stat=dtr)"
 WRITE (*,*) "-h       : visualizza questo help"
 WRITE (*,*) 
 

@@ -4,7 +4,7 @@ PROGRAM correct_lamaz
 ! Scrive sui files gbex_fop.grb e gbex_sop.grb
 ! Uso: correct_lamaz.exe [-h] filein
 !
-!                                         Versione 2.0.0, Enrico 20/08/2012
+!                                         Versione 2.1.0, Enrico 20/05/2013
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -21,7 +21,7 @@ REAL    :: psec2(512),psec3(2)
 REAL    :: field(maxdim)
 
 ! Altre variabili del programma
-TYPE(datetime) :: dt_lay40_first,dt_bad_first,dt_bad_last,datahc
+TYPE(datetime) :: dt_lay40_first,dt_cineca_first,dt_bad_first,dt_bad_last,datahc
 TYPE (csv_record) :: out_rec
 INTEGER :: iuin,iuout1,iuout2,cnt,cnt_sop,cnt_u,cnt_v,cnt_bad,cnt_12h,yy,mm,dd,hh
 CHARACTER (LEN=80) :: filein,fileout1,fileout2
@@ -52,6 +52,7 @@ CALL PBOPEN (iuout2,fileout2,'W',kret)
 
 ! Date rilevanti del dataset LAMA
 dt_lay40_first = datetime_new(year=2006, month=1, day=26, hour=1)
+dt_cineca_first = datetime_new(year=2013, month=5, day=12, hour=1)
 dt_bad_first = datetime_new(year=2009, month=3, day=25, hour=1)
 dt_bad_last = datetime_new(year=2009, month=3, day=30, hour=0)
 
@@ -121,10 +122,12 @@ DO cnt = 1,HUGE(cnt)
   ENDIF
 
 ! 2.2.5 metto igen=30 per le date con 35 livelli, 32 per quelle con 40 
- IF (datahc < dt_lay40_first) THEN
+  IF (datahc < dt_lay40_first) THEN
     ksec1(3) = 30
-  ELSE
+  ELSE IF (datahc < dt_cineca_first) THEN
     ksec1(3) = 32
+  ELSE
+    IF (ksec1(3) /= 34) WRITE (*,*) "igen atteso 34, trovato ",ksec1(3)
   ENDIF
 
 ! 2.3 Scrivo

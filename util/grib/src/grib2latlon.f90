@@ -35,7 +35,7 @@ CALL getarg(2,fileout)
 IF (filein == "" .OR. fileout == "" .OR. TRIM(filein) == "-h") THEN
   WRITE (*,*) "Uso: grib2latlon.exe [-h] filein fileout" 
   WRITE (*,*) "Legge il primo campo di filein"
-  WRITE (*,*) "scrive su fileout lat e lon dei punti griglia"
+  WRITE (*,*) "scrive su fileout i campi lat e lon dei punti griglia (formato grib)"
   STOP
 ENDIF
 
