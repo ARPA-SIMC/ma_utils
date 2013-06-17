@@ -36,24 +36,24 @@ PROGRAM sel_punti
 !          sel_punti.inp, label Land/Sea nei dati Calmet operativi),, 
 !          resa oblligatoria la presenza delle coordinate nelle labels.
 ! V6:      Aggiunto output .pts.csv
+! V7:      Aggiunte opzioni: input coordiante da riga comando, lettura
+!          parametri griglia da file grib. Di default non cerca stazioni
+!          vicine. Eliminata opzione per vecchio formato condivisione.
 !
-!                                                 V6.0.1, Enrico 05/09/2012
+!                                                 V7.0.0, Enrico 13/06/2013
 !                               (versioni <3.0: vedi crea_punti_seriet.f90)
 !--------------------------------------------------------------------------
+
 USE file_utilities
 USE char_utilities
 USE seriet_utilities
+USE grib_api
 
 IMPLICIT NONE
 
 ! Parametri costanti
 INTEGER, PARAMETER :: mxpunti = 500
 INTEGER, PARAMETER :: iz0 = 32     ! zona UTM per coord. punti (32=calmet)
-
-! Gestione parametri e assegnazione path espliciti.
-INTEGER, PARAMETER :: req_par = 0
-INTEGER :: kpar,cnt_par
-CHARACTER (LEN=100) :: chpar
 
 ! Altre variabili del programma
 TYPE (csv_record) :: csvline
@@ -62,39 +62,69 @@ REAL,ALLOCATABLE :: xutm_grd(:,:,:),yutm_grd(:,:,:)
 REAL :: xread(mxpunti),yread(mxpunti)
 REAL :: xutm(mxpunti),yutm(mxpunti),xgeo(mxpunti),ygeo(mxpunti)
 INTEGER, ALLOCATABLE :: igrd(:,:,:),jgrd(:,:,:),kgrd(:,:,:),zoom_idx(:,:)
-INTEGER :: i,j,k,kc,eof,eor,ios,ier,iz,ll
+INTEGER :: i,j,k,kc,eof,eor,ios,ios1,ios2,ier,iz,ll,kpar
+INTEGER :: iret,ifil,ig,en,yf,yl
 INTEGER :: pts_inp,pts_coor,n_list_stz,grid_coor,npunti
 INTEGER :: niexp,njexp,nskipexp
-CHARACTER (LEN=80) :: file_out,chrec
-CHARACTER (LEN=40) :: progetto,pts_file,grid_area
+CHARACTER (LEN=120) :: file_out,chrec,file_grb,chpar,str_xread,str_yread
+CHARACTER (LEN=40) :: progetto,pts_file,grid_area,gt
 CHARACTER (LEN=40) :: pts_coor_unit,pts_coor_str,str,str_lon,str_lat
 CHARACTER (LEN=30) :: label_out
 CHARACTER (LEN=20) :: label(mxpunti)
 CHARACTER (LEN=10) :: strx,stry,chfmt
 CHARACTER (LEN=9) :: ch9
-CHARACTER (LEN=4) :: land_sea(mxpunti),ch4
+CHARACTER (LEN=3) :: grid_proj
+CHARACTER (LEN=1) :: next_arg
+LOGICAL :: cl_coo,cl_grd
 
 !--------------------------------------------------------------------------
 ! 1: Preliminari
 
-! Parametro da riga comandi
-cnt_par = 0
-DO kpar = 1,HUGE(kpar)
+! 1.1 Parametri da riga comandi
+cl_coo = .FALSE.
+cl_grd = .FALSE.
+file_grb = ""
+str_xread = ""
+str_yread = ""
+next_arg = ""
+DO kpar = 1,HUGE(0)
   CALL getarg(kpar,chpar)
 
-  SELECT CASE (TRIM(chpar))
-  CASE ("")
+  IF (TRIM(chpar) == "") THEN
     EXIT
-  CASE ("-h")
+
+  ELSE IF (TRIM(chpar) == "-h") THEN
     CALL scrive_help
     STOP
-  CASE ("-c")
+
+  ELSE IF (TRIM(chpar) == "-c") THEN
     CALL scrive_esempio
     STOP
-  END SELECT
+
+  ELSE IF (TRIM(chpar) == "-xy") THEN
+    cl_coo = .TRUE.
+    next_arg = "x"
+
+  ELSE IF (TRIM(chpar) == "-f") THEN
+    cl_grd = .TRUE.
+    next_arg = "f"
+
+  ELSE IF (next_arg == "x") THEN
+    str_xread = TRIM(ADJUSTL(chpar))
+    next_arg = "y"
+
+  ELSE IF (next_arg == "y") THEN
+    str_yread = TRIM(ADJUSTL(chpar))
+    next_arg = ""
+
+  ELSE IF (next_arg == "f") THEN
+    file_grb = TRIM(ADJUSTL(chpar))
+    next_arg = ""
+
+  ENDIF
 ENDDO
 
-! Leggo l'elenco dei dati richiesti da sel_punti.inp
+! 1.2 Leggo l'elenco dei dati richiesti da sel_punti.inp
 
 OPEN (UNIT=30, FILE="sel_punti.inp", STATUS="OLD", ACTION="READ",ERR=9996)
 READ (30,'(a)',ERR=9999) str
@@ -129,15 +159,58 @@ READ (30,*,ERR=9999) n_list_stz
 
 CLOSE(30)
 
+! 1.3 Se richiesto, apro file_grb e trovo la sua proiezione geografica
+IF (cl_grd) THEN
+  CALL grib_open_file(ifil,file_grb,"r",iret)
+  IF (iret /= GRIB_SUCCESS) GOTO 9991
+  ig = 0
+  CALL grib_new_from_file(ifil,ig,iret)
+  IF (iret /= GRIB_SUCCESS) GOTO 9991
+  CALL grib_get(ig,"editionNumber",en)
+  CALL grib_get(ig,"gridType",gt)
+
+  IF (gt == "regular_ll" .AND. en == 1) THEN
+    CALL grib_get(ig,"latitudeOfFirstGridPointInDegrees",yf)
+    CALL grib_get(ig,"latitudeOfLastGridPointInDegrees",yl)
+    IF (yf>90. .OR. yl>90.) THEN
+      grid_coor = 0              ! UTM
+      grid_proj = "UTM"
+    ELSE
+      grid_coor = 1              ! GEO
+      grid_proj = "GEO"
+    ENDIF
+  ELSE IF (gt == "regular_ll" .AND. en == 2) THEN
+    grid_coor = 1
+    grid_proj = "GEO"
+  ELSE IF (gt == "rotated_ll") THEN 
+    grid_coor = 1                ! ROT
+    grid_proj = "ROT"
+  ELSE IF (gt == "UTM") THEN
+    grid_coor = 0
+    grid_proj = "UTM"
+  ELSE
+    GOTO 9992
+  ENDIF
+
+  WRITE (*,'(4a)') "File ",TRIM(file_grb)," in proiezione ",TRIM(grid_proj)
+ENDIF
+
+! 1.4 Controlli
 IF ((pts_inp /= 0 .AND. pts_inp /= 1 .AND. pts_inp /= 2 .AND. pts_inp /= 3) .OR. &
     (pts_coor /= 0 .AND. pts_coor /= 1 .AND. pts_coor /= 2) .OR. &
     (niexp < 1 .OR. njexp < 1 .OR. nskipexp < 1) .OR. &
-    (grid_coor /= 0 .AND. grid_coor /= 1)) &
+    (.NOT. cl_grd .AND. grid_coor /= 0 .AND. grid_coor /= 1)) &
   GOTO 9995
 
-IF (pts_inp == 1) pts_coor = 0
+IF (cl_coo .AND. pts_inp /= 1) THEN
+  WRITE (*,*) "Warning: tipo_input_punti /= 1, ma uso comunque le coordinate specificate"
+  pts_inp = 1
+ELSE IF (.NOT. cl_coo .AND. pts_inp == 1 ) THEN
+  WRITE (*,*) "Errore, con tipo_input_punti = 1 specificare le coord. da riga comando"
+  STOP 1
+ENDIF
 
-! Parametri dipendenti dai dati richiesti; inizializzazioni
+! 1.4 Parametri dipendenti dai dati richiesti, inizializzazioni
 IF (pts_coor == 0) THEN
   pts_coor_str = "Geo"
   pts_coor_unit = "gradi.decimi"
@@ -150,66 +223,49 @@ ELSE IF (pts_coor == 2) THEN
 ENDIF
 
 label(:) = ""
-land_sea(:) = ""
 
-! Trovo codice EOF
+! 1.5 Trovo codice EOF
 CALL get_eof_eor(eof,eor)
 
 !--------------------------------------------------------------------------
-! 2: Leggo le coordinate e le label dei punti richiesti
+! 2: Leggo le coordinate e le label dei punti richiesti (se non sono state
+!    specificate da riga comando)
 
 IF (pts_inp == 0) THEN                   ! input interattivo (default)
 
-2 WRITE (*,*) "N.ro di punti richiesti"
-  READ (*,*,ERR=2) npunti
-
+  WRITE (*,*) "N.ro di punti richiesti"
+  READ (*,*) npunti
   IF (npunti > mxpunti) THEN
-    WRITE (*,*) "Richiesti troppi punti, modificare mxpunti nel sorgente"
-    STOP
+    GOTO 9994
   ENDIF
 
   DO k = 1, npunti
-3   WRITE (*,'(a,i3,5a)') "Punto ",k," inserire coordinate ",& 
-      TRIM(pts_coor_str)," (x,y; in ",TRIM(pts_coor_unit),")"
-
-    IF (pts_coor == 0 .OR. pts_coor == 1) THEN
-      READ (*,*,ERR=3) xread(k),yread(k)
-    ELSE IF (pts_coor == 2) THEN
-      READ (*,*,ERR=3) strx,stry
-      CALL gps2gd(strx,stry,xread(k),yread(k),ier)
-      IF (ier /= 0) GOTO 3
-    ENDIF
-
+    DO 
+      WRITE (*,'(a,i3,5a)') "Punto ",k," inserire coordinate ",& 
+        TRIM(pts_coor_str)," (x,y; in ",TRIM(pts_coor_unit),")"
+      IF (pts_coor == 0 .OR. pts_coor == 1) THEN
+        READ (*,*,IOSTAT=ios) xread(k),yread(k)
+        ier = 0
+      ELSE IF (pts_coor == 2) THEN
+        READ (*,*,IOSTAT=ios) strx,stry
+        CALL gps2gd(strx,stry,xread(k),yread(k),ier)
+      ENDIF
+      IF (ier==0 .AND. ios==0) EXIT
+    ENDDO
+  
     WRITE (*,'(a,i2,5a)') "Punto ",k," inserire label (facoltativa)"
     READ (*,'(a)',IOSTAT=ios) label(k)
-    IF (ios /= 0 .OR. label(k) == "") & 
-      WRITE (label(k),'(a6,i3.3)') "Punto ",k
+    IF (ios /= 0 .OR. label(k) == "") WRITE (label(k),'(a6,i3.3)') "Punto ",k
   ENDDO
 
-ELSE IF (pts_inp == 1) THEN              ! input da anagrafica regioni
-
-  OPEN (UNIT=10, FILE=pts_file, STATUS="OLD", ACTION="READ", ERR=9998)
-  READ (10,*)
-
-  npunti = 0
-  DO k= 1,mxpunti
-    READ (10,'(a2,a5,1x,a11,9x,2(1x,f8.3))',IOSTAT=ios) &
-      label(k)(1:2),label(k)(4:8),label(k)(10:20),yread(k),xread(k)
-    IF (ios == eof) EXIT
-    IF (ios /= 0) GOTO 9997
-    npunti = npunti + 1
-  ENDDO
-
-  WRITE (*,*) "Lette le coordinate di ",npunti," punti"
-  IF (npunti == mxpunti) THEN
-    READ (10,*,IOSTAT=ios)
-    IF (ios /= eof) WRITE (*,*) &
-      "Warning: il file ",TRIM(pts_file)," contiene altri dati"
-  ENDIF   
-  CLOSE (10)
+ELSE IF (pts_inp == 1) THEN              ! input da riga comando
+  npunti = 1
+  label(1) = "Punto_001"
+  READ (str_xread,*,IOSTAT=ios1) xread(1)
+  READ (str_yread,*,IOSTAT=ios2) yread(1)
+  IF (ios1/=0 .OR. ios2 /=0) GOTO 9993
 
 ELSE IF (pts_inp == 2) THEN              ! input da liste vecchio formato
-
   OPEN (UNIT=10, FILE=pts_file, STATUS="OLD", ACTION="READ", ERR=9998)
 
   npunti = 0
@@ -252,7 +308,7 @@ ELSE IF (pts_inp == 3) THEN              ! input da lista coord. (x,y)
 
     IF (ios == eof) EXIT
     IF (ios /= 0) GOTO 9997
-    WRITE (label(k),'(a,i3.3)') "Punto ",k
+    WRITE (label(k),'(a,i3.3)') "Punto_",k
     npunti = npunti + 1
   ENDDO
 
@@ -299,9 +355,11 @@ ENDIF
 ! 4: Trovo le stazioni piu vicine e scrivo le informazioni relative sul 
 !    file .stz
 
-WRITE (*,*) "Trovo stazioni piu' vicine"
-CALL find_staz(xutm(1:npunti),yutm(1:npunti),xgeo(1:npunti),ygeo(1:npunti),&
-  label(1:npunti),npunti,n_list_stz,progetto,iz0)
+IF (n_list_stz > 0) THEN
+  WRITE (*,*) "Trovo stazioni piu' vicine"
+  CALL find_staz(xutm(1:npunti),yutm(1:npunti),xgeo(1:npunti),ygeo(1:npunti),&
+    label(1:npunti),npunti,n_list_stz,progetto,iz0)
+ENDIF
 
 !--------------------------------------------------------------------------
 ! 5: Per ciascuno dei punti richiesti, trovo indici e coordinate dei punti
@@ -314,9 +372,9 @@ WRITE (*,*) "Trovo punti griglia piu' vicini"
 DO k = 1, npunti
 
   IF (grid_coor == 0) THEN
-    CALL find_cell_utm(xutm(k),yutm(k),grid_area,niexp,njexp,nskipexp, &
-      igrd(k,:,:),jgrd(k,:,:),kgrd(k,:,:),xutm_grd(k,:,:),yutm_grd(k,:,:), &
-      zoom_idx(k,:))
+    CALL find_cell_utm(xutm(k),yutm(k),cl_grd,grid_area,ig, &
+      niexp,njexp,nskipexp,igrd(k,:,:),jgrd(k,:,:),kgrd(k,:,:), &
+      xutm_grd(k,:,:),yutm_grd(k,:,:),zoom_idx(k,:))
     DO i = 1,niexp
     DO j = 1,njexp
       CALL utm2ll(xutm_grd(k,i,j),yutm_grd(k,i,j),iz0,.FALSE., &
@@ -325,9 +383,9 @@ DO k = 1, npunti
     ENDDO
 
   ELSE IF (grid_coor == 1) THEN
-    CALL find_cell_geo(xgeo(k),ygeo(k),grid_area,niexp,njexp,nskipexp, &
-      igrd(k,:,:),jgrd(k,:,:),kgrd(k,:,:),xgeo_grd(k,:,:),ygeo_grd(k,:,:), &
-      zoom_idx(k,:))
+    CALL find_cell_geo(xgeo(k),ygeo(k),cl_grd,grid_area,ig, &
+      niexp,njexp,nskipexp,igrd(k,:,:),jgrd(k,:,:),kgrd(k,:,:), &
+      xgeo_grd(k,:,:),ygeo_grd(k,:,:),zoom_idx(k,:))
     DO i = 1,niexp
     DO j = 1,njexp
       CALL ll2utm(ygeo_grd(k,i,j),xgeo_grd(k,i,j),iz0, &
@@ -448,41 +506,61 @@ STOP
 
 9999 CONTINUE
 WRITE (*,*) "Errore leggendo sel_punti.inp"
-STOP
+STOP 3
 
 9998 CONTINUE
 WRITE (*,*) "Errore aprendo ",TRIM(pts_file)
-STOP
+STOP 4
 
 9997 CONTINUE
 WRITE (*,*) "Errore leggendo ",TRIM(pts_file)," riga ",k
-STOP
+STOP 4
 
 9996 CONTINUE
 WRITE (*,*) "Errore aprendo sel_punti.inp"
 WRITE (*,*) "Costruirlo (sel_punti.exe -c) e rilanciare il programma."
-STOP
+STOP 3
 
 9995 CONTINUE
 WRITE (*,*) "Parametri illegali in sel_punti.inp"
-STOP
+STOP 3
+
+9994 CONTINUE
+WRITE (*,*) "Richiesti troppi punti, modificare mxpunti nel sorgente"
+STOP 2
+
+9993 CONTINUE
+WRITE (*,*) "Errore leggendo coordinate da rica comando"
+WRITE (*,'(a)') TRIM(str_xread)
+WRITE (*,'(a)') TRIM(str_yread)
+STOP 1
+
+9992 CONTINUE
+WRITE (*,*) "Tipo griglia non gestito ",TRIM(gt)
+STOP 2
+
+9991 CONTINUE
+WRITE (*,*) "Errore leggendo ",TRIM(file_grb)
+STOP 2
 
 END PROGRAM sel_punti
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-SUBROUTINE find_cell_utm(xutm,yutm,grid_area,niexp,njexp,nskipexp, &
-  igrd,jgrd,kgrd,xutm_grd,yutm_grd,zoom_idx)
+SUBROUTINE find_cell_utm(xutm,yutm,cl_grd,grid_area,ig, &
+  niexp,njexp,nskipexp,igrd,jgrd,kgrd,xutm_grd,yutm_grd,zoom_idx)
 !--------------------------------------------------------------------------
 ! Date le coord. UTM di un punto, trova indici e coord. della sottogriglia
 ! di ampiezza richiesta centrata nel punto.
 !--------------------------------------------------------------------------
+USE grib_api
 IMPLICIT NONE
 
 ! Parametri della subroutine
 REAL, INTENT(IN) :: xutm,yutm
+LOGICAL, INTENT(IN) :: cl_grd
 CHARACTER (LEN=40), INTENT(IN) :: grid_area
-INTEGER, INTENT(IN) :: niexp,njexp,nskipexp
+INTEGER, INTENT(IN) :: ig,niexp,njexp,nskipexp
 !
 INTEGER, INTENT(OUT) :: igrd(niexp,njexp),jgrd(niexp,njexp),kgrd(niexp,njexp)
 INTEGER, INTENT(OUT) :: zoom_idx(4)
@@ -498,7 +576,7 @@ CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
 ! Variabili locali
 REAL :: dx,dy,xf,yf,xl,yl
 REAL :: sgx,sgy,i1,j1
-INTEGER :: i,j,ios
+INTEGER :: i,j,ios,if,en
 INTEGER :: nx,ny,utmz
 CHARACTER (LEN=120) :: nfile
 CHARACTER (LEN=80) :: tab_path
@@ -506,34 +584,60 @@ CHARACTER (LEN=61) :: ch61
 CHARACTER (LEN=40) :: dum_area
 
 !--------------------------------------------------------------------------
-! 1) Leggo gli estremi dell'area da aree_utm.dat
+! 1) Trovo gli estremi della griglia
 
-tab_path = ""
-CALL GETENV(tab_env,tab_path)
-IF (TRIM(tab_path) == "") tab_path = tab_path_def
-WRITE (nfile,'(2a)') TRIM(tab_path),"/aree_utm.dat"
-OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)
+! 1.1 Li leggo dal file grib
+IF (cl_grd) THEN
+  CALL grib_get(ig,"editionNumber",en)
+  CALL grib_get(ig,"Ni",nx)
+  CALL grib_get(ig,"Nj",ny)
 
-DO
-  READ (22,'(a)',IOSTAT=ios) ch61    
-  IF (ios /= 0) THEN
-    WRITE (*,*) "Area ",TRIM(grid_area)," non trovata in ",TRIM(nfile)
-    RETURN
+  IF (en == 1) THEN
+    CALL grib_get(ig,"longitudeOfFirstGridPointInDegrees",xf)
+    CALL grib_get(ig,"longitudeOfLastGridPointInDegrees",xl)
+    CALL grib_get(ig,"latitudeOfFirstGridPointInDegrees",yf)
+    CALL grib_get(ig,"latitudeOfLastGridPointInDegrees",yl)
+  ELSE IF (en == 2) THEN
+    CALL grib_get(ig,"eastingOfFirstGridPoint",xf)
+    CALL grib_get(ig,"eastingOfLastGridPoint",xl)
+    CALL grib_get(ig,"northingOfFirstGridPoint",yf)
+    CALL grib_get(ig,"northingOfLastGridPoint",yl)
+    xf = xf / 1000.
+    xl = xl / 1000.
+    yf = yf / 1000.
+    yl = yl / 1000.
   ENDIF
 
-  IF (TRIM(ch61) == "" .OR. ch61(1:1) == "!") CYCLE
+! 1.2 Li leggo da aree_utm.dat
+ELSE 
+  tab_path = ""
+  CALL GETENV(tab_env,tab_path)
+  IF (TRIM(tab_path) == "") tab_path = tab_path_def
+  WRITE (nfile,'(2a)') TRIM(tab_path),"/aree_utm.dat"
+  OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)
+  
+  DO
+    READ (22,'(a)',IOSTAT=ios) ch61    
+    IF (ios /= 0) THEN
+      WRITE (*,*) "Area ",TRIM(grid_area)," non trovata in ",TRIM(nfile)
+      RETURN
+    ENDIF
+  
+    IF (TRIM(ch61) == "" .OR. ch61(1:1) == "!") CYCLE
+  
+    READ (ch61,'(a10,2(1x,i4),4(1x,f8.3),1x,i4)',IOSTAT=ios) &
+      dum_area,nx,ny,xf,yf,xl,yl,utmz
+    IF (ios /= 0) THEN
+      WRITE (*,*) "Record illegale in ",TRIM(nfile)
+      WRITE (*,'(a)') ch61
+      RETURN
+    ENDIF
+  
+    IF (TRIM(dum_area) == TRIM(grid_area)) EXIT
+  ENDDO
+  CLOSE(22)
 
-  READ (ch61,'(a10,2(1x,i4),4(1x,f8.3),1x,i4)',IOSTAT=ios) &
-    dum_area,nx,ny,xf,yf,xl,yl,utmz
-  IF (ios /= 0) THEN
-    WRITE (*,*) "Record illegale in ",TRIM(nfile)
-    WRITE (*,'(a)') ch61
-    RETURN
-  ENDIF
-
-  IF (TRIM(dum_area) == TRIM(grid_area)) EXIT
-ENDDO
-CLOSE(22)
+ENDIF
 
 dx = (xl-xf) / REAL(nx-1)
 dy = (yl-yf) / REAL(ny-1)
@@ -584,18 +688,21 @@ END SUBROUTINE find_cell_utm
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-SUBROUTINE find_cell_geo(xgeo,ygeo,grid_area,niexp,njexp,nskipexp, &
-  igrd,jgrd,kgrd,xgeo_grd,ygeo_grd,zoom_idx)
+SUBROUTINE find_cell_geo(xgeo,ygeo,cl_grd,grid_area,ig, &
+  niexp,njexp,nskipexp,igrd,jgrd,kgrd,xgeo_grd,ygeo_grd,zoom_idx)
 !--------------------------------------------------------------------------
 ! Date le coord. GEO di un punto, trova indici e coord. della sottogriglia
 ! di ampiezza richiesta centrata nel punto.
 !--------------------------------------------------------------------------
+
+USE grib_api
 IMPLICIT NONE
 
 ! Parametri della subroutine
 REAL, INTENT(IN) :: xgeo,ygeo
+LOGICAL, INTENT(IN) :: cl_grd
 CHARACTER (LEN=40), INTENT(IN) :: grid_area
-INTEGER, INTENT(IN) :: niexp,njexp,nskipexp
+INTEGER, INTENT(IN) :: ig,niexp,njexp,nskipexp
 !
 INTEGER, INTENT(OUT) :: igrd(niexp,njexp),jgrd(niexp,njexp),kgrd(niexp,njexp)
 INTEGER, INTENT(OUT) :: zoom_idx(4)
@@ -611,43 +718,67 @@ CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
 ! variabili locali
 REAL :: dx,dy,xf,yf,xl,yl
 REAL :: sgx,sgy,i1,j1
-REAL :: xrot,yrot,xgeo_rot,ygeo_rot,xgeo_grd_rot,ygeo_grd_rot
+REAL :: xrot,yrot,xgeo_rot,ygeo_rot,xgeo_grd_rot,ygeo_grd_rot,rdum
 INTEGER :: nx,ny,scan(3)
 INTEGER :: i,j,ios
 CHARACTER (LEN=120) :: nfile
-CHARACTER (LEN=80) :: tab_path
+CHARACTER (LEN=80) :: tab_path,grid_type
 CHARACTER (LEN=78) :: ch78
 CHARACTER (LEN=40) :: dum_area,ch40
 
 !--------------------------------------------------------------------------
-! 1) Leggo gli estremi dell'area da aree_geo.dat
+! 1) Trovo gli estremi della griglia
 
-tab_path = ""
-CALL GETENV(tab_env,tab_path)
-IF (TRIM(tab_path) == "") tab_path = tab_path_def
-WRITE (nfile,'(3a)') TRIM(tab_path),"/","aree_geo.dat"
-OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)
-
-DO
-  READ (22,'(a)',IOSTAT=ios) ch78    
-  IF (ios /= 0) THEN
-    WRITE (*,*) "Area ",TRIM(grid_area)," non trovata in ",TRIM(nfile)
-    RETURN
+IF (cl_grd) THEN
+  CALL grib_get(ig,"gridType",grid_type)
+  CALL grib_get(ig,"Ni",nx)
+  CALL grib_get(ig,"Nj",ny)
+  CALL grib_get(ig,"longitudeOfFirstGridPointInDegrees",xf)
+  CALL grib_get(ig,"longitudeOfLastGridPointInDegrees",xl)
+  CALL grib_get(ig,"latitudeOfFirstGridPointInDegrees",yf)
+  CALL grib_get(ig,"latitudeOfLastGridPointInDegrees",yl)
+  IF (grid_type == "rotated_ll") THEN
+    CALL grib_get(ig,"longitudeOfSouthernPoleInDegrees",xrot)
+    CALL grib_get(ig,"latitudeOfSouthernPoleInDegrees",rdum)
+    yrot = rdum + 90.
+  ELSE
+    xrot = 0.
+    yrot = 0.
   ENDIF
+  CALL grib_get(ig,"iScansNegatively",scan(1))
+  CALL grib_get(ig,"jScansPositively",scan(2))
+  CALL grib_get(ig,"alternativeRowScanning",scan(3))
 
-  IF (TRIM(ch78) == "" .OR. ch78(1:1) == "!") CYCLE
+! 1.2 Li leggo da aree_utm.dat
+ELSE 
+  tab_path = ""
+  CALL GETENV(tab_env,tab_path)
+  IF (TRIM(tab_path) == "") tab_path = tab_path_def
+  WRITE (nfile,'(3a)') TRIM(tab_path),"/","aree_geo.dat"
+  OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)
+  
+  DO
+    READ (22,'(a)',IOSTAT=ios) ch78    
+    IF (ios /= 0) THEN
+      WRITE (*,*) "Area ",TRIM(grid_area)," non trovata in ",TRIM(nfile)
+      RETURN
+    ENDIF
+  
+    IF (TRIM(ch78) == "" .OR. ch78(1:1) == "!") CYCLE
+  
+    READ (ch78,'(a10,2(1x,i4),6(1x,f8.3),1x,3i1)',IOSTAT=ios) &
+      dum_area,nx,ny,xf,yf,xl,yl,xrot,yrot,scan(1:3)
+    IF (ios /= 0) THEN
+      WRITE (*,*) "Record illegale in ",TRIM(nfile)
+      WRITE (*,'(a)') ch78
+      RETURN
+    ENDIF
+  
+    IF (TRIM(dum_area) == TRIM(grid_area)) EXIT
+  ENDDO
+  CLOSE(22)
 
-  READ (ch78,'(a10,2(1x,i4),6(1x,f8.3),1x,3i1)',IOSTAT=ios) &
-    dum_area,nx,ny,xf,yf,xl,yl,xrot,yrot,scan(1:3)
-  IF (ios /= 0) THEN
-    WRITE (*,*) "Record illegale in ",TRIM(nfile)
-    WRITE (*,'(a)') ch78
-    RETURN
-  ENDIF
-
-  IF (TRIM(dum_area) == TRIM(grid_area)) EXIT
-ENDDO
-CLOSE(22)
+ENDIF
 
 dx = (xl-xf) / REAL(nx-1)
 dy = (yl-yf) / REAL(ny-1)
@@ -954,49 +1085,34 @@ IMPLICIT NONE
 OPEN (UNIT=20, FILE="sel_punti.inp", STATUS="REPLACE", &
   FORM="FORMATTED")
 
-WRITE (20,'(a)')            "punti      ! nome del progetto"
-WRITE (20,'(a)')            "0          ! tipo input per lista punti "
-WRITE (20,'(a)')            "           ! nome file lista punti"
-WRITE (20,'(a)')            "0          ! tipo coordinate punti"
-WRITE (20,'(a)')            "1 1 1      ! parametri sottogriglia (Ni,Nj,Nskip)"
-WRITE (20,'(a)')            "1          ! tipo di grigliato modello"
-WRITE (20,'(a)')            "lamaz      ! nome area del modello"
-WRITE (20,'(2a)')           "5          ! n.ro di stazioni piu' vicin", &
-                            "e"
+WRITE (20,'(a)') "punti      ! nome del progetto"
+WRITE (20,'(a)') "0          ! tipo di input per la lista dei punti richiesti"
+WRITE (20,'(a)') "           ! nome file lista punti"
+WRITE (20,'(a)') "0          ! tipo coordinate punti"
+WRITE (20,'(a)') "1 1 1      ! parametri sottogriglia (Ni,Nj,Nskip)"
+WRITE (20,'(a)') "1          ! tipo di grigliato modello"
+WRITE (20,'(a)') "lamaz      ! nome area del modello"
+WRITE (20,'(a)') "0          ! n.ro di stazioni piu' vicine"
 WRITE (20,*)
-!                            1234567890123456789012345678901234567890
-WRITE (20,'(a)')            "DOCUMENTAZIONE PARAMETRI:"
+!                  12345678901234567890123456789012345678901234567890123456789012345678901234567890
+WRITE (20,'(a)')  "DOCUMENTAZIONE PARAMETRI:"
 WRITE (20,*)
-WRITE (20,'(2a)')           "- nome progetto: usato solo per costruir", &
-                            "e i nomi dei files di output" 
-WRITE (20,'(2a)')           "- input punti:   0 = da tastiera; 1 = da", &
-                            " anagrafica in formato condivisione"
-WRITE (20,'(2a)')           "                 2 = lista 'label',x,y; ", &
-                            "3 = lista x,y"
-WRITE (20,'(2a)')           "- file lista:    non usato se input punt", &
-                            "i e' da tastiera"
-WRITE (20,'(2a)')           "- tipo coor.pti: 0 = gradi.decimi; 1 = U", &
-                            "TM (km); 2 = gradi.primi.secondi"
-WRITE (20,'(2a)')           "- param. sottogriglia (NX,NY,NSKIP): per", &
-                            " gestire estrazioni di punti contigui."
-WRITE (20,'(2a)')           "                 Permette di selezionare", &
-                            " una sottogriglia NXxNY centrata in cia-"
-WRITE (20,'(2a)')           "                 scuno dei punti richies", &
-                            "ti. (1,1,1) per selez. un singolo punto"
-WRITE (20,'(2a)')           "                 Con NSKIP>1 seleziona d", &
-                            "al grigliato modello un punto ogni NSKIP"
-WRITE (20,*)
-WRITE (20,'(2a)')           "- tipo griglia:  0=UTM (Calmet); 1=Geo (", &
-                            "modelli)"
-WRITE (20,'(2a)')           "- nome area:     nome del grigliato ric" , &
-                            "hiesto; deve essere contenuto in "
-WRITE (20,'(2a)')           "                 aree_utm.dat o aree_geo", &
-                            ".dat"
-WRITE (20,*)
-WRITE (20,'(2a)')           "- n.ro stazioni: lunghezza delle liste d", &
-                            "i stazioni piu' vicine calcolate, per"
-WRITE (20,'(2a)')           "                 ciascun punto e per cia", &
-                            "scuna rete"
+WRITE (20,'(a)') "nome progetto:     usato solo per costruire i nomi dei files di output" 
+WRITE (20,'(a)') "tipo input punti:  0 = interattivo; 1 = da riga comando (un solo punto)"
+WRITE (20,'(a)') "                   2 = file con tracciato: 'label',x,y ; 3 = file con tracciato: x,y"
+WRITE (20,'(a)') "file lista punti:  file con l'elenco dei punti richiesti [solo se tipo input = 2 o 3]"
+WRITE (20,'(a)') "tipo coordinate:   0 = gradi.decimi; 1 = UTM-32 (km); 2 = gradi.primi.secondi"
+WRITE (20,'(a)') "par. sottogriglia: per ciascuna delle coordinate richieste, seleziona una"
+WRITE (20,'(a)') "                   sottogriglia di Ni x Nj punti contigui. Con (1,1,1) seleziona"
+WRITE (20,'(a)') "                   un singolo punto; con Nskip > 1 selziona un punto ogni Nskip"
+WRITE (20,'(a)') "tipo di griglia:   0 = UTM-32 ; 1 = Geografiche o ruotate"
+WRITE (20,'(a)') "                   [con opzione -f usa la griglia del grib]"
+WRITE (20,'(a)') "nome area:         nome del grigliato richiesto; deve essere incluso nei files"
+WRITE (20,'(a)') "                   aree_*.dat (/usr/share/ma_utils $MA_UTILS_DAT)"
+WRITE (20,'(a)') "                   [con opzione -f usa la griglia del grib]"
+WRITE (20,'(a)') "n.ro stazioni:     se /= 0, scrive un file con nome e coordinate delle stazioni "
+WRITE (20,'(a)') "                   SIMC piu' vicine ai punti richiesti. Legge il file:"
+WRITE (20,'(a)') "                   $HOME_BONAFE/osservazioni/dat/db_anagrafica.dat"
 CLOSE(20)
 RETURN
 
@@ -1011,14 +1127,14 @@ SUBROUTINE scrive_help
 IMPLICIT NONE
 
 !            12345678901234567890123456789012345678901234567890123456789012345678901234567890
-WRITE (*,*) 
-WRITE (*,*) "sel_punti.exe [-h] [-c]"
-WRITE (*,*) " -h      : visualizza questo help"
-WRITE (*,*) " -c      : crea file sel_punti.inp di esempio"
-WRITE (*,*) "NB: legge le opzioni da sel_punti.inp"
-WRITE (*,*) "    Si appoggia ai files aree_utm.dat e aree_geo.dat"
-WRITE (*,*) "    Devono essere definite le variabili d'ambiente HOME_MINGUZZI e HOME_BONAFE"
-
+WRITE (*,*) "sel_punti.exe [-h] [-c] [-xy X Y] [-f file]"
+WRITE (*,*) "Seleziona da una griglia i punti piu' vicini a una lista di coordinate"
+WRITE (*,*) "Nella dir di esecuzione deve essere presente il file sel_punti.inp"
+WRITE (*,*)
+WRITE (*,*) "-h      : visualizza questo help"
+WRITE (*,*) "-c      : crea file un file sel_punti.inp"
+WRITE (*,*) "-xy X Y : coordinate richieste"
+WRITE (*,*) "-f file : legge i parametri della griglia dal primo campo di un file grib/grib2"
 RETURN
 
 END SUBROUTINE scrive_help
