@@ -2,7 +2,7 @@ MODULE grib2_utilities
 !--------------------------------------------------------------------------
 ! Utilita' per la getione dei GRIB2 in logica GRIB1
 !
-!                                         Versione 1.1.5, Enrico 16/05/2013
+!                                         Versione 1.1.6, Enrico 02/09/2013
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -97,7 +97,7 @@ IF (PRESENT(par)) THEN
       END SELECT
 
     ELSE
-      WRITE (*,'(a,i4,a)') "Grib2 con pdtn = ",pdtn," non gestiti"
+      WRITE (*,'(a,i4,a)') "Grib2 con pdtn = ",pdtn," non gestito"
       ier = 1
     ENDIF
   ENDIF
@@ -179,7 +179,6 @@ ENDIF
 
 IF (PRESENT(scad)) THEN
   scad(:) = imiss
-
   IF (en == 1) THEN
     CALL grib_get(gaid,"unitOfTimeRange",scad(1))
     CALL grib_get(gaid,"P1",scad(2))
@@ -189,6 +188,7 @@ IF (PRESENT(scad)) THEN
   ELSE IF (en == 2) THEN 
     CALL grib_get(gaid,"significanceOfReferenceTime",sort)
     CALL grib_get(gaid,"typeOfProcessedData",topd)
+    CALL grib_get(gaid,"productDefinitionTemplateNumber",pdtn)
     CALL grib_get(gaid,"typeOfGeneratingProcess",togp)
     CALL grib_get(gaid,"forecastTime",ft)
     CALL grib_get(gaid,"indicatorOfUnitOfTimeRange",iouotr)
@@ -197,12 +197,16 @@ IF (PRESENT(scad)) THEN
       CALL grib_get(gaid,"typeOfStatisticalProcessing",tosp)
       CALL grib_get(gaid,"indicatorOfUnitForTimeRange",iouftr)
       CALL grib_get(gaid,"lengthOfTimeRange",lotr)
+    ELSE
+      toti = imiss
+      tosp = imiss
+      iouftr = imiss
+      lotr = imiss
     ENDIF
     IF (iouotr/=1 .OR. (pdtn==8 .AND. iouftr/=1)) THEN
       WRITE (*,*) "Unit of timerange is not hour"
       ier = 3
     ENDIF
-
     IF (sort==0 .AND. topd==0 .AND. pdtn==0 .AND. togp==0 .AND. &
         ft==0) THEN                  ! Analisi istantanea
       scad(1) = iouotr
@@ -239,7 +243,7 @@ IF (PRESENT(scad)) THEN
       scad(3) = 0
       scad(4) = 0
     ELSE
-      WRITE (*,'(2a,6i8)') "Timerange non gestito; ", &
+      WRITE (*,'(2a,6i8)') "[get_grib1_header] Timerange non gestito; ", &
         "sort,topd,pdtn,togp,ft,toti ",sort,topd,pdtn,togp,ft,toti
       ier = 4
     ENDIF
@@ -345,8 +349,8 @@ SUBROUTINE check_consistency(iga,igb,cl_grid,cl_time,cl_vtime,cl_lev, &
 !--------------------------------------------------------------------------
 ! Verifica se due grib rispettano i criteri di consistenza richiesti 
 ! Ritorna:
-! ier   : 0 se i grib pasano tutti i test, 1 se qualche test e' fallito,
-!         2 in caso di errore
+! ier   : 0 se i grib pasano tutti i test richiesti, 1 se qualche test e' 
+!         fallito, 2 in caso di errore
 ! clret : ogni elemento contine il risultato di un test: -1=non effettuato,
 !         0=passato, 1=non passato. 
 !         Gli elementi del vattore si riferiscono a: 0: ni-nj; 1: griglia; 

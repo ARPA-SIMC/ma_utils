@@ -33,7 +33,7 @@ PROGRAM gacsv2seriet
 !   sarebbero comunque ordinati per reftime e trange, ie. non e' garantito
 !   che i verification times siano consecutivi)
 !
-!                                          Versione 1.6.5 Enrico 22/03/2013
+!                                          Versione 1.6.6 Enrico 25/07/2013
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -995,11 +995,12 @@ WRITE (*,*) TRIM(chrec)
 IF (tdh(nrrow) < 0) WRITE (*,*) "tdh <0"
 IF (reftime_max(nrrow) < reftime_min(nrrow)) &
   WRITE (*,*) "reftime_max < reftime_min"
-IF (reftime_max(nrrow)==reftime_min(nrrow) .AND. tdh(nrrow)/=0) &
+IF (reftime_max(nrrow)==reftime_min(nrrow) .AND. tdh(nrrow)/=0) THEN
   WRITE (*,*) "reftime_max = reftime_min e step /= 0"
   WRITE (*,'(5a,i4)') "max ",to_char(reftime_max(nrrow)), &
     " min ",to_char(reftime_min(nrrow)), &
     " tdh ",tdh(nrrow)
+ENDIF
 IF (reftime_max(nrrow)>reftime_min(nrrow) .AND. tdh(nrrow)==0) &
   WRITE (*,*) "reftime_max /= reftime_min e step = 0"
 IF (p1_step(nrrow) < 0) WRITE (*,*) "p1_step < 0"

@@ -4,7 +4,7 @@ PROGRAM math_grib
 ! in due files grib. 
 ! Sostituisce ed integra somma_grib.f90 e moltiplica_grib.f90
 !
-!                                         Versione 1.0.3, Enrico 16/05/2013
+!                                         Versione 1.0.4, Enrico 29/08/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -18,7 +18,7 @@ REAL :: coeffa,coeffb
 INTEGER :: ifa,ifb,ifout,iga=0,igb=0,igout=0
 INTEGER :: idp,kp,ios1,ios2,ier,iret,kga,k
 INTEGER :: clret(0:6),cllog(0:6),nmiss,ni,nj,ni_sav,nj_sav,en,gnov,nom,nocv
-CHARACTER (LEN=80) :: filea,fileb,fileout,chdum,check_list
+CHARACTER (LEN=250) :: filea,fileb,fileout,chdum,check_list
 CHARACTER(LEN=40) :: gta
 CHARACTER (LEN=5) :: oper
 LOGICAL :: cl_grid,cl_time,cl_vtime,cl_lev,cl_var,lbconst,lforce,lverbose
@@ -293,7 +293,7 @@ SUBROUTINE parse_check_list(check_list,cl_grid,cl_time,cl_vtime,cl_lev, &
 !
 IMPLICIT NONE
 
-CHARACTER (LEN=80), INTENT(IN) :: check_list
+CHARACTER (LEN=250), INTENT(IN) :: check_list
 LOGICAL, INTENT(OUT) :: cl_grid,cl_time,cl_vtime,cl_lev,cl_var
 INTEGER, INTENT(OUT) :: ier
 

@@ -3,7 +3,8 @@ PROGRAM grib2up_dat
 ! Programma della catena Calmet
 ! Estrae da un pacco grib i files up*.dat richiesti per un run calmet di
 ! un giorno
-! Uso: grib2up_dat.exe grib_3d file_pts file_srq [-10m grib_10m] [-test]
+! Uso: grib2up_dat.exe grib_3d grib_z file_pts file_srq nlayb nlayt datah1 nh 
+!      [-10m grib_10m] [-test] [-h]
 !
 ! Note:
 ! - Al momento, il programma gestisce solo le analisi LAMA
