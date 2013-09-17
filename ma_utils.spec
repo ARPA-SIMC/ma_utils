@@ -1,7 +1,7 @@
 Summary: Utilities area Meteorologia Ambientale SIMC
 Name: ma_utils
-Version: 0.2
-Release: 47%{dist}
+Version: 0.4
+Release: 55%{dist}
 License: GPL
 Group: Applications/Meteo
 URL: http://www.arpa.emr.it/sim
