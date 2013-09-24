@@ -4,7 +4,7 @@ PROGRAM sel_punti_grid
 ! nested; scrive gli indici dei punti (sel_punti_grid.pts.csv) e gli
 ! estremi della sottoarea (sel_punti_grid.zoom)
 !
-!                                         Versione 3.0.3, Enrico 02/05/2013
+!                                         Versione 3.0.4, Enrico 24/09/2013
 !--------------------------------------------------------------------------
 USE file_utilities
 USE seriet_utilities
@@ -47,6 +47,8 @@ buffer = 0.
 maxp = 0
 cnt_par = 0
 next_arg = ""
+ios = 0
+ios2 = 0
 
 DO kpar = 1,HUGE(kpar)
   CALL getarg(kpar,charg)
@@ -84,7 +86,7 @@ DO kpar = 1,HUGE(kpar)
         proj(1) = "u"
       ELSE
         CALL write_help
-        STOP
+        STOP 1
       ENDIF 
     CASE (3)
       area(2) = charg
@@ -95,7 +97,7 @@ DO kpar = 1,HUGE(kpar)
         proj(2) = "u"
       ELSE
         CALL write_help
-        STOP
+        STOP 1
       ENDIF 
     END SELECT
 
@@ -105,7 +107,7 @@ ENDDO
 IF (cnt_par /= 4 .OR. TRIM(area(1)) == "" .OR. TRIM(area(2)) == "" .OR. &
     ios /= 0 .OR. ios2 /= 0 .OR. (maxp /= 0 .AND. maxp < 4)) THEN
   CALL write_help
-  STOP
+  STOP 1
 ENDIF  
 
 ! Trovo codice EOF
@@ -138,7 +140,7 @@ DO kg = 1,2
     CLOSE(22)
 
   ELSE IF (proj(kg) == "u") THEN
-    WRITE (nfile,'(2a,i3.3,a)') TRIM(tab_path),"/","aree_utm.dat"
+    WRITE (nfile,'(2a)') TRIM(tab_path),"/aree_utm.dat"
     OPEN (UNIT=22, FILE=nfile, STATUS="OLD", ACTION="READ", ERR=9999)
     DO
       READ (22,'(a)',IOSTAT=ios) ch61

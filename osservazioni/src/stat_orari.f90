@@ -2060,7 +2060,7 @@ WRITE (*,*)
 WRITE (*,*) "stat_orari.exe [-h] [-o/-s/-sx/-d/-t] filein"
 WRITE (*,*) "           [-rank N] [-std] [-miss0]  [-prod=LIST] [-csv] [-liv] [-ndec N]"
 WRITE (*,*)
-WRITE (*,*) "filein   : file con i dati. Il par. successivo detemina il suo formato:"
+WRITE (*,*) "filein   : file con i dati. Il par. successivo determina il suo formato:"
 WRITE (*,*) " -o      : estra_orari o estra_qaria con dati orari (default)"
 WRITE (*,*) " -s      : seriet con notazione decimale"
 WRITE (*,*) " -sx     : seriet con notazione esponenziale"
