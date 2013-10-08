@@ -752,8 +752,8 @@ CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
 REAL :: vmin_t,vmax_t
 INTEGER :: ndec_t,cp2_t,var_t
 INTEGER :: ios,ios2,iu
-CHARACTER (LEN=256) :: tab_file
-CHARACTER (LEN=80) :: ch80,tab_path
+CHARACTER (LEN=250) :: tab_file
+CHARACTER (LEN=250) :: ch80,tab_path
 CHARACTER (LEN=8) :: ch8
 CHARACTER (LEN=3) :: ch3
 

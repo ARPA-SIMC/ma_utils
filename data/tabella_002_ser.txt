@@ -12,7 +12,8 @@
 ! cp2:     codice 2a componente (se vento U); 
 !          500 + codice 1a componente (se vento V);
 !          -1 (se temperatura); -2 (se lugh.MO); -3 (se sw budget); 
-!          -4 (se cloud cover); -5 (se flussi di calore); 0 (altri casi)
+!          -4 (se cloud cover); -5 (se flussi di calore); 
+!          -6 (se specie chimiche); 0 (altri casi)
 !
 !                                          Ultimo aggiornamento: 26/03/2012
 !--------------------------------------------------------------------------
