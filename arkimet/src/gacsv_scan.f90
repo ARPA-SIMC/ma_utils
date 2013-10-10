@@ -21,7 +21,7 @@ PROGRAM gacsv_scan
 !      programma  da' un warning, e non sara' possibile convertire i dati
 !      in formato seriet.
 !
-!                                         Versione 1.3.0, Enrico 30/04/2013
+!                                         Versione 1.3.1, Enrico 10/10/2013
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -304,6 +304,7 @@ IF (out_col) THEN
 !   leggo dalle tabelle i parametri aggiuntivi per seriet.
     CALL var2spec(varliv(1:3,kvl),ndec,vmin,vmax,str_var,cp2,iret)
     IF (iret /= 0) ndef = ndef + 1
+    
 
     CALL init(colcsv)
     CALL csv_record_addfield(colcsv,varliv(1,kvl))    
@@ -322,6 +323,9 @@ IF (out_col) THEN
     CALL delete(colcsv)
   ENDDO
   CLOSE(31)
+
+  IF (ndef >0) WRITE (*,'(a,i3,a)') "Uso default per ",ndef, &
+    " parametri non trovati nelle tabelle"
 ENDIF
 
 ! 4.3) Timerange e reference time (righe)

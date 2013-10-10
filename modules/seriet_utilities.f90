@@ -30,7 +30,7 @@ MODULE seriet_utilities
 ! Una soluzione migliore sarebbe modificare vg6d_getpoint in modo da 
 ! elaborare ogni punto separatamente, e poi appendere i risultati.
 !
-!                                         Versione 1.1.3, Enrico 30/04/2013
+!                                         Versione 1.1.4, Enrico 10/10/2013
 !--------------------------------------------------------------------------
 
 USE datetime_class
@@ -721,6 +721,7 @@ SUBROUTINE var2spec(var,ndec,vmin,vmax,str,cp2,ier)
 !     se e' SW Budget        = -3
 !     se e' cloud cover      = -4
 !     se e' flusso di calore = -5
+!     se e' specie chimica   = -6
 !     negli altri casi       =  0
 !
 ! Note:
@@ -751,15 +752,17 @@ CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
 ! Variabili locali
 REAL :: vmin_t,vmax_t
 INTEGER :: ndec_t,cp2_t,var_t
-INTEGER :: ios,ios2,iu
-CHARACTER (LEN=250) :: tab_file
-CHARACTER (LEN=250) :: ch80,tab_path
+INTEGER :: ios,ios2,iu,k
+CHARACTER (LEN=250) :: tab_file,tab_path
+CHARACTER (LEN=80) :: ch80
 CHARACTER (LEN=8) :: ch8
 CHARACTER (LEN=3) :: ch3
+LOGICAL :: verbose
 
 !--------------------------------------------------------------------------
 
 ! Assegno valori di default
+verbose = .TRUE.
 ndec = -1
 vmin = -HUGE(0.)
 vmax = HUGE(0.)
@@ -774,12 +777,13 @@ WRITE (tab_file,'(2a,i3.3,a)') TRIM(tab_path),"/tabella_",var(2),"_ser.txt"
 iu = getunit()
 OPEN (UNIT=iu, FILE=tab_file, STATUS="OLD", ACTION="READ", IOSTAT=ios)
 IF (ios /= 0) THEN
+  IF (verbose) WRITE (*,*) "(var2spec) Tabella seriet non trovata: ",TRIM(tab_file)
   ier = -2
   RETURN
 ENDIF
 
 ! Cerco il parametro richiesto
-DO
+DO k = 1,HUGE(0)
   READ (iu,'(a)',IOSTAT=ios) ch80  
   IF (ios /= 0) EXIT
   IF (TRIM(ch80) == "" .OR. ch80(1:1) == "!") CYCLE
@@ -794,6 +798,8 @@ DO
   ENDIF
 
   IF (ios /= 0 .OR. ios2 /= 0) THEN
+    IF (verbose) WRITE (*,'(4a,i3)') "(var2spec) ", &
+      "Errore di lettura tabella seriet: ",TRIM(tab_file)," riga ",k
     ier = -3
     RETURN
   ENDIF
@@ -812,6 +818,8 @@ DO
 ENDDO
 
 ier = -1
+IF (verbose) WRITE (*,'(a,i3,2a)') "(var2spec) Parametro",var(3), &
+  " non trovato in ",TRIM(tab_file)
 RETURN
 
 END SUBROUTINE var2spec
