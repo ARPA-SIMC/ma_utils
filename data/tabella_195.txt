@@ -36,8 +36,9 @@
   30  p10tsoa   Total secondary organic in PM10 (ug/m3)   15221
   31  p10tpri   Total primary part. in PM10 (ug/m3)       15222
   32  p10tsec   Total secondary part. in PM10 (ug/m3)     15223
-  33  p10ant    Total anthrop. part. in PM10 (ug/m3)
-  34  p10bio    Total biogenic part. in PM10 (ug/m3)
-  44  p25bio    Total biogenic part. in PM2.5 (ug/m3)
+  33  p10ant    Total anthrop. part. in PM10 (ug/m3)      15237
+  34  p10bio    Total biogenic part. in PM10 (ug/m3)      15238
+  43  p10ant    Total anthrop. part. in PM2.5 (ug/m3)     15239
+  44  p25bio    Total biogenic part. in PM2.5 (ug/m3)     15240
 
 !123--12345678--1234567890123456789012345678901234567890

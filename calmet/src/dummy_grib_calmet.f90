@@ -8,7 +8,7 @@ PROGRAM dummy_grib_calmet
 !
 ! Uso: dummy_grib_calmet fileinp igen fileout
 !
-!                                           Versione 3.2, Enrico 29/09/2010
+!                                         Versione 3.2.1, Enrico 17/10/2013
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -72,7 +72,7 @@ CALL PBOPEN (iuout,fileout,'W',kret)
 !--------------------------------------------------------------------------
 ! 2) Leggo da fileinp i parametri del run calmet
 
-OPEN (UNIT=30, FILE=fileinp, STATUS="OLD", ACTION="READ")
+OPEN (UNIT=30, FILE=fileinp, STATUS="OLD", ACTION="READ", ERR=9999)
 
 ! 2.0.1 run title e gruppo 0a (nulla)
 DO 

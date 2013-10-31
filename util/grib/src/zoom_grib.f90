@@ -309,8 +309,8 @@ DO cnt = 1,HUGE(cnt)
                field_in,maxdim,kbuffer,maxdim,klen,'D',kret)
   IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
 
-  IF (ANY(ksec2(:) /= ksec2_in(:))) THEN
-    WRITE (*,*) "Errore, i grib hanno aree diverse"
+  IF (ANY(ksec2(1:19) /= ksec2_in(1:19))) THEN
+    WRITE (*,*) "Errore, i grib in input hanno aree diverse"
     STOP
   ENDIF
 

@@ -117,8 +117,8 @@ grb: DO kg = 1,HUGE(0)
       ALLOCATE (qrs(np),tt(np),qr(np),qs(np),idcl(np))
     ENDIF
 
-!   Controlli su scadenza, livello e area
-    IF (ANY(ksec2(:) /= ksec2_sav(:)) .OR. ksec4(1) /= np) GOTO 9997
+!   Controlli su griglia, scadenza, livello e area
+    IF (ANY(ksec2(1:19) /= ksec2_sav(1:19)) .OR. ksec4(1) /= np) GOTO 9997
 
     IF (kfin == 1) THEN
       ksec1_sav(:) = ksec1(:)
@@ -247,14 +247,14 @@ WRITE(*,'(2a,4i4)') "Scadenza non gestita in ",TRIM(filein(kfin)), &
   ksec1(15:18)
 STOP
 
-9995 CONTINUE
-WRITE(*,*) "Data/livello/scadenza disallineata in ",TRIM(filein(kfin)), &
-  " campo ",kg
-WRITE(*,'(a,3i4,5x,6i5,5x,4i4)') "Richiesto: ", &
-  ksec1_sav(7:9),ksec1_sav(10:14),ksec1_sav(21),ksec1_sav(15:18)
-WRITE(*,'(a,3i4,5x,6i5,5x,4i4)') "Trovato:   ", &
-  ksec1(7:9),ksec1(10:14),ksec1(21),ksec1(15:18)
-STOP
+!9995 CONTINUE
+!WRITE(*,*) "Data/livello/scadenza disallineata in ",TRIM(filein(kfin)), &
+!  " campo ",kg
+!WRITE(*,'(a,3i4,5x,6i5,5x,4i4)') "Richiesto: ", &
+!  ksec1_sav(7:9),ksec1_sav(10:14),ksec1_sav(21),ksec1_sav(15:18)
+!WRITE(*,'(a,3i4,5x,6i5,5x,4i4)') "Trovato:   ", &
+!  ksec1(7:9),ksec1(10:14),ksec1(21),ksec1(15:18)
+!STOP
 
 9994 CONTINUE
 WRITE(*,'(3a,3i4)') "Parametro errato in ",TRIM(filein(kfin)), &

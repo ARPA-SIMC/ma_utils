@@ -83,13 +83,12 @@ TYPE(datascad) :: datascad_req,datascad_sav
 
 DOUBLE PRECISION :: req_lon(maxpt),req_lat(maxpt)
 REAL :: vmin(maxvl),vmax(maxvl)
-REAL :: albedof,pct_ok
+REAL :: pct_ok
 INTEGER :: varliv_req(6,maxvl),cp2(maxvl),ndec(maxvl)
-INTEGER :: trange(3,maxtr)
 INTEGER :: tdh(maxqry),p1_min(maxqry),p1_max(maxqry),p1_step(maxqry)
 INTEGER :: id_vl_alb,id_vl_z0
-INTEGER :: idp,k,k2,krt,ksc,kp,kpt,kf,kvl,kuv,nht,nargs,nfilein
-INTEGER :: ios,iret,ier(12),idum(2),iu,nvl_out
+INTEGER :: k,k2,krt,ksc,kp,kpt,kf,kvl,kuv,nht,nargs,nfilein
+INTEGER :: ios,iret,ier(12),iu,nvl_out
 INTEGER :: cnt_read,cnt_xyz_ok,cnt_ok,nok,cnt_qc(5),cnt_head
 INTEGER :: nf,npt,nvl,nrrow,nrt,nsc,nuv
 INTEGER :: gtdh,gp1_min,gp1_max,gp1_step,p1_req,special_gtd,mm1,mm2,yy1,yy2
@@ -97,8 +96,7 @@ CHARACTER (LEN=50+maxvl*9) :: chfmt_seriet
 CHARACTER (LEN=500) :: filein(maxqry)
 CHARACTER (LEN=500) :: chrec,filepts,filerow,filecol,filefis,chdum
 CHARACTER (LEN=20) :: req_label(maxpt)
-CHARACTER (LEN=10) :: model(maxvl),varname(maxvl),str_lev(maxvl),ch10(3)
-CHARACTER (LEN=3) :: reft
+CHARACTER (LEN=10) :: model(maxvl),varname(maxvl),ch10(3)
 CHARACTER (LEN=1) :: next_arg,cheor
 LOGICAL :: tvar_alb,tvar_z0,convert
 
@@ -807,7 +805,7 @@ DO ksc = 1, nsc
   ENDDO
 
 ! 2.4.3 Elaborazioni che dipendono da piu' di un paramtero
-  IF (dir_int) THEN
+  IF (dir_int) THEN                              ! U,V -> DD,FF
     DO kuv = 1,nuv
       CALL uv2dirint(npt,val_in(:,id_vl_uu(kuv)),val_in(:,id_vl_vv(kuv)), &
         dir(:),ff(:))

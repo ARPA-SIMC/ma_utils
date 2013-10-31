@@ -13,7 +13,7 @@ PROGRAM pres_ecmwf
 ! Output:
 ! PRES_3D:  pressione sui livelli richiesti (Pa)
 !
-!                                           Versione 1.0, Enrico 01/07/2004
+!                                         Versione 1.0.1, Enrico 17/10/2013
 !--------------------------------------------------------------------------
 IMPLICIT NONE
 
@@ -115,7 +115,7 @@ DO k = 1,HUGE(k)
 ! Leggo Ps
   READ (20,IOSTAT=ios) idata,(ps(kp),kp=1,np)
   IF (ios == eof) EXIT  
-  IF (ios /= 0) GOTO 9997  
+  IF (ios /= 0) GOTO 9998  
  
 ! Calcolo P
   DO kz = 1,nz

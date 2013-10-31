@@ -121,7 +121,7 @@ IF (ios /= 0) THEN
     ncdd = 5
   ENDIF
 ELSE
-  READ (40, NML=param)
+  READ (40, NML=param, ERR=9999)
 ENDIF
 
 IF (ncff <= 0 .OR. ncdd <= 0) THEN

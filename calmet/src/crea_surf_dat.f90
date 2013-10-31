@@ -34,7 +34,7 @@ PROGRAM crea_surf_dat
 !   A quanto sembra, le versioni recenti di Calmet (6.3 e succ.) possono 
 !   leggere tutti i formati da 2.0, ma non il vecchio formato
 !
-!                                         Versione 1.1.0, Enrico 08/04/2013
+!                                         Versione 1.1.1, Enrico 30/10/2013
 !--------------------------------------------------------------------------
 USE date_handler
 
@@ -54,12 +54,12 @@ REAL, ALLOCATABLE :: par(:,:,:)
 INTEGER, ALLOCATABLE :: id_out(:)  ! codici stazione scritti in surf.dat
  
 ! Altre variabili del programma
-TYPE(date) :: data1,data2,data_cal1,data_cal2,data_req,data_fil,data_out
+TYPE(date) :: data1,data2,data_cal1,data_cal2,data_req,data_fil,data_out,data_out2
 REAL :: rdum(8)
-INTEGER :: ibyr,ibjul,ibhr,ieyr,iejul,iehr
-INTEGER :: k,kstaz,khr,kpar,ios,ios2,eof,eor,idum,idum2,cnt_par
-INTEGER :: hr1,hr2,hr_req,hr_fil,hr_out,jul_out,yea_out,dh1,dh2
-INTEGER :: id_rete,id_user,ndays,nhr,nstaz
+INTEGER :: ibyr,ibjul,ibhr,ieyr,iejul,iehr,hr1,hr2,hr_req,hr_fil
+INTEGER :: kstaz,khr,kpar,ios,ios2,eof,eor,idum,idum2,cnt_par
+INTEGER :: hr_out,jul_out,yea_out,hr_out2,jul_out2,dh1,dh2
+INTEGER :: id_rete,id_user,ndays,ndays2,nhr,nstaz
 CHARACTER (LEN=200) :: chrec
 CHARACTER(LEN=80) :: filein,chpar,filedate,filesurf
 CHARACTER(LEN=4) :: next_arg
@@ -261,11 +261,16 @@ DO khr = 1,nhr
   yea_out = MOD(data_out%yy,100)
   jul_out = jul(data_out)
 
+  ndays2 = (ibhr + khr) / 24
+  data_out2 = data_cal1 + ndays2
+  hr_out2 = MOD(ibhr + khr, 24)
+  jul_out2 = jul(data_out2)
+
   IF (out_ver == "1.0") THEN
     WRITE (40,'(i2.2,1x,i3.3,1x,i2.2)') yea_out,jul_out,hr_out
   ELSE IF (out_ver == "2.1") THEN  ! calmet: datavers=2.1, subroutine rdsn
     WRITE (40,'(3i4,i6,2x,3i4,i6)') &
-      data_out%yy,jul_out,hr_out,0,data_out%yy,jul_out,hr_out,0
+      data_out%yy,jul_out,hr_out,0,data_out2%yy,jul_out2,hr_out2,0
   ENDIF
 
   DO kstaz = 1,nstaz 
@@ -291,10 +296,6 @@ STOP
 
 9998 CONTINUE
 WRITE (*,*) "Errore leggendo ",TRIM(filesurf)
-STOP
-
-9997 CONTINUE
-WRITE (*,*) "Errore aprendo ",TRIM(filein)
 STOP
 
 END PROGRAM crea_surf_dat

@@ -2,7 +2,7 @@ MODULE grib2_utilities
 !--------------------------------------------------------------------------
 ! Utilita' per la getione dei GRIB2 in logica GRIB1
 !
-!                                         Versione 1.1.6, Enrico 02/09/2013
+!                                         Versione 1.1.7, Enrico 17/10/2013
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -285,7 +285,8 @@ TYPE(datetime), INTENT(OUT), OPTIONAL :: rtime,vtime
 INTEGER, INTENT(OUT), OPTIONAL :: iret
 
 ! Variabili locali
-INTEGER :: scad(4),rdate(4),ier,dd,dt
+INTEGER :: scad(4),rdate(4),ier
+!INTEGER :: dd,dt,dda
 TYPE(datetime) :: rtime_work,vtime_work
 
 !--------------------------------------------------------------------------
@@ -368,7 +369,7 @@ INTEGER, INTENT(OUT) :: clret(0:5),ier
 ! tolleranza per l'uguaglianza delle griglie (gradi)
 REAL, PARAMETER :: eps = 0.0015
 
-TYPE(datetime) :: reftimea,vtimea,reftimeb,vtimeb
+TYPE(datetime) :: vtimea,vtimeb
 REAL :: xia,yia,xfa,yfa,xrota,yrota,fea
 REAL :: xib,yib,xfb,yfb,xrotb,yrotb,feb
 INTEGER :: nia,nja,sma,za,dda,dta

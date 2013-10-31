@@ -749,10 +749,6 @@ STOP
 !==========================================================================
 ! 4) Gestione errori
 
-9000 CONTINUE
-WRITE (*,*) "Il file di input e quello di maschera devono avere lo stesso step temporale"
-STOP 10
-
 9999 CONTINUE
 WRITE (*,*) "Errore aprendo ",TRIM(filelst)
 STOP 1

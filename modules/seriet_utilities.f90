@@ -30,7 +30,7 @@ MODULE seriet_utilities
 ! Una soluzione migliore sarebbe modificare vg6d_getpoint in modo da 
 ! elaborare ogni punto separatamente, e poi appendere i risultati.
 !
-!                                         Versione 1.1.4, Enrico 10/10/2013
+!                                         Versione 1.1.5, Enrico 17/10/2013
 !--------------------------------------------------------------------------
 
 USE datetime_class
@@ -61,8 +61,8 @@ INTEGER, PARAMETER :: maxpt = 1000    ! punti richiesti
 INTEGER, PARAMETER :: maxqry = 20     ! sotto-query rettangolari
 
 ! Dimensionamenti massimi relativi agli archivi COSMO
-INTEGER, PARAMETER :: maxaklay = 40  ! model layers
-INTEGER, PARAMETER :: maxaklev = 41  ! model levels
+INTEGER, PARAMETER :: maxaklay = 45  ! model layers
+INTEGER, PARAMETER :: maxaklev = 46  ! model levels
 
 ! Tipo derivato "data e scadenza"
 TYPE datascad
@@ -356,7 +356,7 @@ INTEGER, INTENT(OUT) :: iret
 
 TYPE(csv_record) :: csvline
 TYPE(datetime) :: reftime
-INTEGER :: nf,yy,mm,dd,hh,minute,p1,ier(nf_gacsv),ier2
+INTEGER :: yy,mm,dd,hh,minute,p1,ier(nf_gacsv),ier2
 CHARACTER(LEN=12) :: ch12
 !
 CALL init(csvline, RECORD=chrecord)
@@ -409,9 +409,6 @@ IMPLICIT NONE
 TYPE(gacsv_report), INTENT(INOUT) :: report
 CHARACTER(LEN=3), INTENT(IN), OPTIONAL :: reft
 !
-TYPE(datetime) :: dtime
-!
-
 IF (PRESENT(reft)) THEN
   IF (reft == "min") THEN
     report%datascad = datascad_new(datetime_min,0)

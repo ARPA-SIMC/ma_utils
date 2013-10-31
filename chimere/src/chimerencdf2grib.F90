@@ -1234,14 +1234,10 @@ end if
            WRITE (*,*) "Errore leggendo ",TRIM(filein)
            STOP
 
-9993       CONTINUE
-           WRITE (*,'(3a,i3,a)') "Numero specie illegale in ",TRIM(fileinfo), &
-                " (attese ",nvar2d+nvar3d,")"
-           STOP
-
-9992       CONTINUE
-           WRITE (*,*) "Date inconsistenti in ",TRIM(filein)
-           STOP
+!9993       CONTINUE
+!           WRITE (*,'(3a,i3,a)') "Numero specie illegale in ",TRIM(fileinfo), &
+!                " (attese ",nvar2d+nvar3d,")"
+!           STOP
 
          END PROGRAM chimerencdf2grib_completo
 

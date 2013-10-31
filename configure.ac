@@ -23,6 +23,18 @@ AM_PROG_LIBTOOL
 #AC_CHECK_LIB([grib_api],[grib_values_check])
 LIBS="-lgrib_api -lgrib_api_f90 -lgrib_util -lemos -lsim_base -lsim_volgrid6d  -lsim_vol7d -lnetcdf -lnetcdff"
 
+# Debug mode for fortran condes
+AC_ARG_ENABLE(debug-mode, AC_HELP_STRING([--enable-debug-mode],
+  [enable debug mode]), , [enableval=no])dnl default disable
+if test "x$enableval" = "xyes"; then
+if test "x$FC" = "xgfortran"; then
+FCFLAGS="$FCFLAGS -g -fbounds-check -O0 -fexceptions -Wall"
+else
+FCFLAGS="$FCFLAGS -g -C"
+fi
+AC_DEFINE(DEBUG, 1, [Enable debugging mode])
+fi
+
 AC_CONFIG_FILES([Makefile
 		modules/Makefile
 		arkimet/src/Makefile

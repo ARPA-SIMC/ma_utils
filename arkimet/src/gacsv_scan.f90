@@ -21,7 +21,7 @@ PROGRAM gacsv_scan
 !      programma  da' un warning, e non sara' possibile convertire i dati
 !      in formato seriet.
 !
-!                                         Versione 1.3.1, Enrico 10/10/2013
+!                                         Versione 1.3.2, Enrico 17/10/2013
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -165,8 +165,8 @@ DO k = 1,HUGE(0)
       npt = npt + 1
       IF (npt > maxpt) GOTO 9995
       pts_list(npt) = report%np
-      pts_lon(npt) = report%lon
-      pts_lat(npt) = report%lat
+      pts_lon(npt) = REAL(report%lon)
+      pts_lat(npt) = REAL(report%lat)
     ENDIF
 
 !   Controllo se ho trovato un nuovo var-liv

@@ -519,9 +519,9 @@ STOP
 WRITE (*,*) "Errore leggendo headers ",TRIM(file)
 STOP
 
-9996 CONTINUE
-WRITE (*,*) "Errore contando i campi ",TRIM(file)
-STOP
+!9996 CONTINUE
+!WRITE (*,*) "Errore contando i campi ",TRIM(file)
+!STOP
 
 9995 CONTINUE
 WRITE (*,*) "Errore in subroutine inq_file_smr"

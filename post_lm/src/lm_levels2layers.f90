@@ -8,7 +8,7 @@ IMPLICIT NONE
 
 ! Parametri costanti
 REAL, PARAMETER :: rmis = -9999.           ! valore per dati mancanti
-INTEGER, PARAMETER :: maxdim = 100000      ! dimensione massima dei GRIB
+INTEGER, PARAMETER :: maxdim = 300000      ! dimensione massima dei GRIB
 INTEGER, PARAMETER :: maxlev = 100         ! max n.ro di liveli LM
 
 ! Dichiarazioni per GRIBEX.

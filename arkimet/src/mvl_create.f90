@@ -3,7 +3,7 @@ PROGRAM mvl_create
 ! Legge un file in formato short summary e lo riscrive in formato .mvl,
 ! accedendo alle tabelle seriet.
 !
-!                                             Versione 1.0.2, Enrico, 02/05/2013
+!                                             Versione 1.0.3, Enrico, 17/10/2013
 !-------------------------------------------------------------------------------
 
 USE seriet_utilities
@@ -150,10 +150,6 @@ STOP
 
 9998 CONTINUE
 WRITE (*,*) "Errore leggendo ",TRIM(filein)
-STOP
-
-9997 CONTINUE
-WRITE (*,*) "Troppi files in input, aumentare paramero mxfiles"
 STOP
 
 END PROGRAM mvl_create

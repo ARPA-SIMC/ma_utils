@@ -18,11 +18,12 @@ PROGRAM grb_chimere2netcdf
 ! Sviluppi:
 !   - nome e unita' di misura letta da tabelle (sez. 2.2)
 !
-!                                           Versione 1.2, Enrico 07/11/2006
+!                                         Versione 1.3.0, Enrico 31/10/2013
 !--------------------------------------------------------------------------
 
 USE netcdf
 USE date_handler
+USE seriet_utilities
 IMPLICIT NONE
 
 ! Parametri costanti
@@ -47,9 +48,9 @@ TYPE(date) :: data1,data2,datac
 REAL (kind=8) :: t1
 REAL (kind=8), ALLOCATABLE :: arr_1d_dble(:)
 REAL, ALLOCATABLE :: arr_2d(:,:),arr_1d(:)
-REAL :: dx,dy
+REAL :: dx,dy,vmin,vmax
 INTEGER :: nx,ny,nz,nt,nscad_forc,nvar
-INTEGER :: var_grb(3,maxvar),hh1,hh2,hhc
+INTEGER :: var_grb(3,maxvar),hh1,hh2,hhc,ndec,cp2
 INTEGER :: iu,ncid,idp,k,kp,kv,kg,kl,ist,ier
 CHARACTER (LEN=80) :: filein,fileout,chdum
 CHARACTER (LEN=40) :: var_name(maxvar),strcdf_dt,strcdf_t0
@@ -162,27 +163,21 @@ DO kg = 1,HUGE(0)
     var_grb(1:3,nvar) = ksec1((/2,1,6/))
 
 !   Nome
-    IF (ksec1(1) == 200 .AND. ksec1(6) == 151) THEN
-      var_name(kv)="o3"
-    ELSE IF (ksec1(1) == 200 .AND. ksec1(6) == 153) THEN
-      var_name(kv)="no2"
-    ELSE IF (ksec1(1) == 200 .AND. ksec1(6) == 220) THEN
-      var_name(kv)="pm10"
-    ELSE IF (ksec1(1) == 200 .AND. ksec1(6) == 221) THEN
-      var_name(kv)="pm25"
-    ELSE
-      var_name(kv)="unknown"
-    ENDIF
+    CALL var2spec(var_grb(1:3,kv),ndec,vmin,vmax,var_name(kv),cp2,ier)
 
 !   Unita' di misura
-!   IF (ksec1(1) == 199 .OR. (ksec1(1) == 200 .AND. ksec1(6) >= 220)) THEN
-!     unit(kv) = "ug/m3"
-!   ELSE IF (ksec1(1) == 200 .AND. ksec1(6) > 150) THEN
-!     unit(kv) = "ppb"
-!   ELSE
-!     unit(kv) = "unknown"
-!   ENDIF
-    unit(kv) = "ug/m3"
+    IF (ksec1(1)==195 .OR. &
+        (ksec1(1)==200 .AND. (ksec1(6)==220 .OR. ksec1(6)==221 .OR. ksec1(6)>=225))&
+        ) THEN
+      unit(kv) = "ug/m3"
+    ELSE IF (ksec1(1)==199 .OR. ksec1(1)==196 .OR. &
+        (ksec1(1)==200 .AND. ksec1(6)>=151 .AND. ksec1(6)<=221)) THEN
+      unit(kv) = "ppb"
+    ELSE
+      unit(kv) = "unknown"
+    ENDIF
+!   unit(kv) = "ug/m3"
+
   ENDIF
 
 ! 2.3) Cerco il livello piu' alto presente nel file
@@ -323,6 +318,7 @@ DO kv = 1,nvar
   IF (ier /= NF90_NOERR) CALL netcdf_err(ier)
 ENDDO
 
+print *,"6"
 ier = NF90_ENDDEF(ncid)
 IF (ier /= NF90_NOERR) CALL netcdf_err(ier)
 

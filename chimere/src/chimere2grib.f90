@@ -832,10 +832,6 @@ WRITE (*,'(3a,i3,a)') "Numero specie illegale in ",TRIM(fileinfo), &
   " (attese ",nvar2d+nvar3d,")"
 STOP
 
-9992 CONTINUE
-WRITE (*,*) "Date inconsistenti in ",TRIM(filein)
-STOP
-
 END PROGRAM chimere2grib
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

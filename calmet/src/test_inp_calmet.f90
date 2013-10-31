@@ -504,11 +504,6 @@ CLOSE (30)
 CLOSE (31)
 
 STOP
-
-9998 CONTINUE
-WRITE (*,*) 
-STOP
-
 END PROGRAM test_inp_calmet
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

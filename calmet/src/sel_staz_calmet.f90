@@ -4,8 +4,7 @@ PROGRAM sel_staz_calmet
 ! un'area specificata.
 !
 ! Legge gli estremi dell'area richiesta (di cui deve essere specificato il
-! codice) da aree_utm.dat, l'anagrafica da db_anagrafica.dat e i codici
-! oracle dei parametri da code_parametri.dat
+! codice) da aree_utm.dat e l'anagrafica da db_anagrafica.dat
 ! E'possibile selezionare tutte le stazioni che cadono nell'area, oppure 
 ! applicare alcuni criteri di selezione (vedi file .inp).
 ! Scrive  i files srq_surf_AREA.lst e srq_temp_AREA.lst, nel formato della 
@@ -26,7 +25,7 @@ PROGRAM sel_staz_calmet
 ! verificato/modificato manualmente e poi convertito nel formato giusto 
 ! (con i codici ORACLE dei vari parametri) dal programma conv_srq_surf.
 !
-!                                                  V2.1.2 Enrico 02/05/2013
+!                                                  V2.1.3 Enrico 17/10/2013
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -381,10 +380,6 @@ STOP
 
 9998 CONTINUE
 WRITE (*,*) "Errore leggendo ",TRIM(nfile)
-STOP
-
-9997 CONTINUE
-WRITE (*,*) "Errore leggendo code_parametri.dat"
 STOP
 
 9996 CONTINUE

@@ -410,10 +410,6 @@ WRITE (*,*) "Ora illegale in input: ",TRIM(filein),hhc
 9993 CONTINUE
 WRITE (*,*) "Errore nel calcolo timerange!!!"
 
-9992 CONTINUE
-WRITE (*,*) "Date inconsistenti in ",TRIM(filein)
-STOP
-
 END PROGRAM chimeredep2grib
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

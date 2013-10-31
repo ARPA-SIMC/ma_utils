@@ -206,10 +206,10 @@ STOP
 WRITE (*,*) "Errore aprendo ",TRIM(filein)
 STOP
 
-9998 CONTINUE
-WRITE (*,'(a,2i6,a,2i4)') "Errore selezione punti interni: attesi, trovati ", &
-  ncircle,nok," punto ",i,j
-STOP
+!9998 CONTINUE
+!WRITE (*,'(a,2i6,a,2i4)') "Errore selezione punti interni: attesi, trovati ", &
+!  ncircle,nok," punto ",i,j
+!STOP
 
 9997 CONTINUE
 WRITE (*,*) "Scanning mode non gestito! ",ksec2(11)

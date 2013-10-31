@@ -33,7 +33,7 @@ PROGRAM trasp_temp
 !   Se i dati in input usano l'altro riferimento, vengono convertiti al
 !   momento della lettura (tlev_in)
 !
-!                                                 V6.0.0, Enrico 12/09/2013
+!                                                 V6.0.1, Enrico 17/10/2013
 !--------------------------------------------------------------------------
 
 USE datetime_class
@@ -189,7 +189,7 @@ ALLOCATE (val_ii(ntemp_out),ff_ave(ntemp_out),rad_csky(ntemp_out))
 ALLOCATE (field_out(4,mxlev_out,ntemp_out),t_invers(ntemp_out),z_invers(ntemp_out))
 
 !==========================================================================
-! 2) Ciclo sui radiosondaggi richiesti in output
+! 2) Ciclo sui radiosondaggi richiesti in input
 
 ! 2.0 Inizializzazioni
 
@@ -938,11 +938,6 @@ STOP 3
 WRITE (*,*) "Troppi livelli in input(",nlev_in, &
   "), aumentare il parametro mxlev_in (",mxlev_in,")"
 STOP 4
-
-9994 CONTINUE
-WRITE (*,*) "Errore, i temp contengono parametri diversi: "
-WRITE (*,*) "rilanciare l'estrazione temp usando le stesse opzioni"
-STOP 5
 
 9993 CONTINUE
 WRITE (*,*) "Tipo di livelli in input sconosciuto in ",TRIM(filein)

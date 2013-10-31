@@ -373,10 +373,6 @@ STOP 3
 WRITE (*,*) "Il campo ",cntg," ha un timerange non istantaneo: ",scad1(4)
 STOP 3
 
-9989 CONTINUE
-WRITE (*,*) "Grib edizione 2 gestiti solo in modalita' sfoltimento"
-STOP 3
-
 9988 CONTINUE
 WRITE (*,*) "Errore nelle chiavi realtive ai dati mancanti, campo ",cntg
 WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov

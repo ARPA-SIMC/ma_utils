@@ -975,7 +975,7 @@ TYPE (grid), INTENT(INOUT) :: grid_2u,grid_2v
 
 ! local variables
 REAL :: cyrot1,syrot1,cyrot2,syrot2
-REAL :: xgrid1,ygrid1,xgrid2,ygrid2
+REAL :: xgrid1,ygrid1
 REAL :: xgeo,ygeo,geou(maxdim),geov(maxdim)
 INTEGER :: i,j,k
 
@@ -1522,7 +1522,7 @@ END FUNCTION uround
 !
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-      SUBROUTINE TLLD(ALO1,ALA1,TLM0D,CTPH0,STPH0,ALO2,ALA2)
+SUBROUTINE TLLD(ALO1,ALA1,TLM0D,CTPH0,STPH0,ALO2,ALA2)
 !
 ! Trasforma le coordinate geografiche lat lon in coordinate nel 
 ! sistema ruotato tipico dei modelli meteo LAMBO e LOKAL.
@@ -1547,26 +1547,25 @@ END FUNCTION uround
 !  ALA2       real     latitudine nel sistema ruotato (rapp. decimale)
 !
 !-----------------------------------------------------------------------01700000
-        REAL alo1,ala1,tlm0d,ctph0,stph0,alo2,ala2
-        REAL relm,srlm,crlm,sph,cph,cc,anum,denom
-!
-	relm = (alo1-tlm0d)
-	srlm = SIN(relm / dtr)           
-	crlm = COS(relm / dtr)           
-!                              
-	sph = SIN(ala1 / dtr)             
-	cph = COS(ala1 / dtr)             
-!                              
-	cc = cph * crlm              
-	anum = cph * srlm            
-	denom = ctph0*cc + stph0*sph 
-!
-        alo2 = dtr * ATAN2(anum,denom)       
-        ala2 = dtr * ASIN(ctph0*sph - stph0*cc)
-!
-	RETURN             
-	END SUBROUTINE tlld
+REAL alo1,ala1,tlm0d,ctph0,stph0,alo2,ala2
+REAL relm,srlm,crlm,sph,cph,cc,anum,denom
 
+relm = (alo1-tlm0d)
+srlm = SIN(relm / dtr)           
+crlm = COS(relm / dtr)           
+!                       
+sph = SIN(ala1 / dtr)             
+cph = COS(ala1 / dtr)             
+!                      
+cc = cph * crlm              
+anum = cph * srlm            
+denom = ctph0*cc + stph0*sph 
+!
+alo2 = dtr * ATAN2(anum,denom)       
+ala2 = dtr * ASIN(ctph0*sph - stph0*cc)
+!
+RETURN             
+END SUBROUTINE tlld
 
 ! **************************************************************
       SUBROUTINE RTLLD(ALO1,ALA1,TLM0D,CTPH0,STPH0,ALO2,ALA2)    
@@ -1594,21 +1593,21 @@ END FUNCTION uround
 !  ALO2       real      longitudine sistema geografico (rapp. decimale)
 !  ALA2       real      latitudine sistema geografico (rapp. decimale)
 !
-      real alo1,ala1,tlm0d,ctph0,stph0,alo2,ala2
-      real stph,ctph,stlm,ctlm,cph
+real alo1,ala1,tlm0d,ctph0,stph0,alo2,ala2
+real stph,ctph,stlm,ctlm,cph
 !
-      stph = SIN(ala1 / dtr)                     
-      ctph = COS(ala1 / dtr)                     
-      ctlm = COS(alo1 / dtr)                      
-      stlm = SIN(alo1 / dtr)                      
+stph = SIN(ala1 / dtr)                     
+ctph = COS(ala1 / dtr)                     
+ctlm = COS(alo1 / dtr)                      
+stlm = SIN(alo1 / dtr)                      
 !                                          
-      ala2 = dtr * ASIN(stph0*ctph*ctlm + ctph0*stph)
-      cph = COS(ala2 / dtr)                        
+ala2 = dtr * ASIN(stph0*ctph*ctlm + ctph0*stph)
+cph = COS(ala2 / dtr)                        
 !                                          
-      alo2 = tlm0d + dtr*ASIN(stlm*ctph/cph)      
+alo2 = tlm0d + dtr*ASIN(stlm*ctph/cph)      
 !             
-      RETURN  
-      END SUBROUTINE rtlld
+RETURN  
+END SUBROUTINE rtlld
 
 ! **************************************************************
       SUBROUTINE rltlwd(almd,aphd,tpus,tpvs,tlm0d,ctph0,stph0,pus,pvs)
@@ -1641,31 +1640,31 @@ END FUNCTION uround
 !  pus          real     componente u nel sistema geografico
 !  pvs          real     componente v nel sistema geografico
 !
-      REAL :: almd,aphd,tpus,tpvs,tlm0d,ctph0,stph0,pus,pvs
-      REAL :: relm,srlm,crlm,sph,cph,cc,tph,rctph,cray,dray,dc
+REAL :: almd,aphd,tpus,tpvs,tlm0d,ctph0,stph0,pus,pvs
+REAL :: relm,srlm,crlm,sph,cph,cc,tph,rctph,cray,dray,dc
 !
-      relm = (almd-tlm0d)                                         
-      srlm = SIN(relm / dtr)                                           
-      crlm = COS(relm / dtr)                                           
-!                                                               
-      sph = SIN(aphd / dtr)                                              
-      cph = COS(aphd / dtr)                                              
-!                                                               
-      cc = cph*crlm                                               
-      tph = ASIN(ctph0*sph-stph0*cc)                              
-!                                                               
-      rctph = 1./COS(tph)                                         
-      cray = stph0*srlm*rctph                                     
-      dray = (ctph0*cph+stph0*sph*crlm)*rctph                     
-      dc = dray*dray+cray*cray                                    
-      pus = (dray*tpus+cray*tpvs)/dc                              
-      pvs = (dray*tpvs-cray*tpus)/dc                              
-!                                                               
-      RETURN                                                    
-      END SUBROUTINE rltlwd
+relm = (almd-tlm0d)                                         
+srlm = SIN(relm / dtr)                                           
+crlm = COS(relm / dtr)                                           
+!                                                          
+sph = SIN(aphd / dtr)                                              
+cph = COS(aphd / dtr)                                              
+!                                                          
+cc = cph*crlm                                               
+tph = ASIN(ctph0*sph-stph0*cc)                              
+!                                                          
+rctph = 1./COS(tph)                                         
+cray = stph0*srlm*rctph                                     
+dray = (ctph0*cph+stph0*sph*crlm)*rctph                     
+dc = dray*dray+cray*cray                                    
+pus = (dray*tpus+cray*tpvs)/dc                              
+pvs = (dray*tpvs-cray*tpus)/dc                              
+!                                                          
+RETURN                                                    
+END SUBROUTINE rltlwd
 
 ! **************************************************************
-      SUBROUTINE ltlwd(almd,aphd,u,v,tlm0d,ctph0,stph0,tu,tv)
+SUBROUTINE ltlwd(almd,aphd,u,v,tlm0d,ctph0,stph0,tu,tv)
 ! **************************************************************
 !
 ! Trasforma le componeti u,v espresse nel sistema geografico
@@ -1696,53 +1695,53 @@ END FUNCTION uround
 !  tu         real     componente u nel sistema ruotato
 !  tv         real     componente v nel sistema ruotato
 !
-      REAL :: almd,aphd,u,v,tlm0d,ctph0,stph0,tu,tv
-      REAL :: cray,dray
+REAL :: almd,aphd,u,v,tlm0d,ctph0,stph0,tu,tv
+REAL :: cray,dray
 !
-      CALL ltlw1(almd,aphd,tlm0d,ctph0,stph0,dray,cray)
-      CALL ltlw2(u,v,tu,tv,dray,cray)
-
-      RETURN
-      END SUBROUTINE ltlwd
-
-! **************************************************************
-      SUBROUTINE ltlw1(almd,aphd,tlm0d,ctph0,stph0,dray,cray)
+CALL ltlw1(almd,aphd,tlm0d,ctph0,stph0,dray,cray)
+CALL ltlw2(u,v,tu,tv,dray,cray)
 !
-      REAL :: almd,aphd,tlm0d,ctph0,stph0,dray,cray
-      REAL :: relm,srlm,crlm,sph,cph,cc,tph,rctph
-!
-      relm = (almd-tlm0d)
-      srlm = SIN(relm / dtr)
-      crlm = COS(relm / dtr)
-!
-      sph = SIN(aphd / dtr)
-      cph = COS(aphd / dtr)
-!
-      cc=cph*crlm
-!
-      tph = ASIN(ctph0*sph-stph0*cc)
-!
-      rctph = 1./COS(tph)
-!
-      cray = stph0*srlm*rctph
-      dray = (ctph0*cph+stph0*sph*crlm)*rctph
-!
-      RETURN
-      END SUBROUTINE ltlw1
+RETURN
+END SUBROUTINE ltlwd
 
 ! **************************************************************
-      SUBROUTINE ltlw2(pus,pvs,tpus,tpvs,dray,cray)
+SUBROUTINE ltlw1(almd,aphd,tlm0d,ctph0,stph0,dray,cray)
 !
-      REAL :: pus,pvs,tpus,tpvs,dray,cray
+REAL :: almd,aphd,tlm0d,ctph0,stph0,dray,cray
+REAL :: relm,srlm,crlm,sph,cph,cc,tph,rctph
 !
-      tpus = dray*pus-cray*pvs
-      tpvs = cray*pus+dray*pvs
+relm = (almd-tlm0d)
+srlm = SIN(relm / dtr)
+crlm = COS(relm / dtr)
 !
-      RETURN
-      END SUBROUTINE ltlw2
+sph = SIN(aphd / dtr)
+cph = COS(aphd / dtr)
+!
+cc=cph*crlm
+!
+tph = ASIN(ctph0*sph-stph0*cc)
+!
+rctph = 1./COS(tph)
+!
+cray = stph0*srlm*rctph
+dray = (ctph0*cph+stph0*sph*crlm)*rctph
+!
+RETURN
+END SUBROUTINE ltlw1
 
 ! **************************************************************
-	SUBROUTINE hbilin (z1,z2,z3,z4,x1,y1,x3,y3,xp,yp,zp)
+SUBROUTINE ltlw2(pus,pvs,tpus,tpvs,dray,cray)
+!
+REAL :: pus,pvs,tpus,tpvs,dray,cray
+!
+tpus = dray*pus-cray*pvs
+tpvs = cray*pus+dray*pvs
+!
+RETURN
+END SUBROUTINE ltlw2
+
+! **************************************************************
+SUBROUTINE hbilin (z1,z2,z3,z4,x1,y1,x3,y3,xp,yp,zp)
 ! **************************************************************
 ! effettua interpolazione bilineare dati i valori nei punti
 ! 1,2,3,4 e le coordinate dei punti 1 e 3 oltre a quelle
@@ -1751,18 +1750,18 @@ END FUNCTION uround
 ! 4 3
 ! 1 2
 !
-      REAL :: z1,z2,z3,z4,x1,y1,x3,y3,xp,yp,zp
-      REAL :: fc,z5,z6
+REAL :: z1,z2,z3,z4,x1,y1,x3,y3,xp,yp,zp
+REAL :: fc,z5,z6
 !
-      fc=((yp-y1)/(y3-y1))
+fc=((yp-y1)/(y3-y1))
 
-      z5=(z4-z1)*fc+z1
-      z6=(z3-z2)*fc+z2
+z5=(z4-z1)*fc+z1
+z6=(z3-z2)*fc+z2
 
-      zp=(z6-z5)*((xp-x1)/(x3-x1))+z5
+zp=(z6-z5)*((xp-x1)/(x3-x1))+z5
 
-      RETURN
-      END SUBROUTINE hbilin
+RETURN
+END SUBROUTINE hbilin
 
 END MODULE grid_handler
 
