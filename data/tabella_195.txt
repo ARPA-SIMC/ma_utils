@@ -4,7 +4,7 @@
 ! I parametri gas Chimere sono nella tabella 200, le variabili prognostiche
 ! aerosol nella tabella 196
 !
-!                                          Ultimo aggiornamento: 30/12/2011
+!                                          Ultimo aggiornamento: 22/11/2013
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890--12345
 !Cod  Sigla     Descrizione e unita'                      B-Tab 
@@ -38,7 +38,10 @@
   32  p10tsec   Total secondary part. in PM10 (ug/m3)     15223
   33  p10ant    Total anthrop. part. in PM10 (ug/m3)      15237
   34  p10bio    Total biogenic part. in PM10 (ug/m3)      15238
-  43  p10ant    Total anthrop. part. in PM2.5 (ug/m3)     15239
+  43  p25ant    Total anthrop. part. in PM2.5 (ug/m3)     15239
   44  p25bio    Total biogenic part. in PM2.5 (ug/m3)     15240
+
+!AOD
+ 200  aod       Aerosol Optical Depth (number)
 
 !123--12345678--1234567890123456789012345678901234567890

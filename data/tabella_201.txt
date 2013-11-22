@@ -3,7 +3,7 @@
 ! accessorie Lokal Modell)
 ! Altri parametri Lokal Model sono nelle tabelle 002 e 203
 !
-!                                          Ultimo aggiornamento: 03/02/2012
+!                                          Ultimo aggiornamento: 22/11/2013
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890--12345
 !Cod  Sigla     Descrizione e unita'                      B-Tab 
@@ -33,6 +33,8 @@
  112  prscon    prec. rate of convective snow [kg/m2*s]
  113  conrai    Convective liquid precipitation [kg/m2]   13202
  139  pp        deviation from reference pressure [pa]    10060
+ 145  cape      Conv. Avail. Potential Energy [J/kg]
+ 146  cin       Convective INibition [J/kg]
  152  tke       SQRT(2*TKE) [m/s]                         11198
  153  tkvm      turb. diff. coeff. for momentum [m2/s]
  154  tkvh      turb. diff. coeff. for heat [m2/s]

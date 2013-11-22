@@ -4,7 +4,7 @@
 ! I parametri aerosol di Chimere 2005 sono nella tab. 199
 ! I parametri Chimere gas sono nella tabella 200
 !
-!                                              mic    Versione 1.1,10/12/2012
+!                                          Ultimo aggiornamento: 22/11/2013
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890
 !Cod  Sigla     Descrizione e unita'
@@ -122,12 +122,17 @@
  152  p08NH3    p08NH3   (ppb; classe 5-10 um)  
  153  p08WATER  p08WATER (ppb; classe 5-10 um)  
  154  p08ISOPA1 p08ISOPA1(ppb; classe 5-10 um)
- 201  BCARAQ    BCARAQ   
- 203  OCARAQ    OCARAQ   
- 205  SALTAQ    SALTAQ   
- 206  AnA1DAQ   AnA1DAQ  
- 207  AnBmPAQ   AnBmPAQ  
- 208  BiA1DAQ   BiA1DAQ  
- 209  BiBmPAQ   BiBmPAQ  
-
+ 201  BCARAQ    BCARAQ  
+ 202  DUSTAQ    DUSTAQ  
+ 203  OCARAQ    OCARAQ    
+ 204  PPMAQ     PPMAQ     
+ 205  SALTAQ    SALTAQ    
+ 206  AnA1DAQ   AnA1DAQ   
+ 207  AnBmPAQ   AnBmPAQ   
+ 208  BiA1DAQ   BiA1DAQ   
+ 209  BiBmPAQ   BiBmPAQ   
+ 210  H2SO4AQ   H2SO4AQ   
+ 211  HNO3AQ    HNO3AQ    
+ 212  NH3AQ     NH3AQ     
+ 214  ISOPA1AQ  ISOPA1AQ
 !123--12345678--1234567890123456789012345678901234567890

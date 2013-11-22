@@ -16,7 +16,7 @@
 !          -4 (se cloud cover); -5 (se flussi di calore); 
 !          -6 (se specie chimiche); 0 (altri casi)
 !
-!                                               mic  Versione 2.1  10/12/2012
+!                                          Ultimo aggiornamento: 22/11/2013
 !--------------------------------------------------------------------------
 !123--12345678--123--1234567890--1234567890--123
 !Cod  Sigla     dec     val.min     val.max  cp2
@@ -133,11 +133,16 @@
  153  p08WATER  exp        0.00      100.00   -6
  154  p08ISOPA1 exp        0.00      100.00   -6
  201  BCARAQ    exp        0.00      100.00   -6
+ 202  DUSTAQ    exp        0.00      100.00   -6
  203  OCARAQ    exp        0.00      100.00   -6
+ 204  PPMAQ     exp        0.00      100.00   -6
  205  SALTAQ    exp        0.00      100.00   -6
  206  AnA1DAQ   exp        0.00      100.00   -6
  207  AnBmPAQ   exp        0.00      100.00   -6
  208  BiA1DAQ   exp        0.00      100.00   -6
  209  BiBmPAQ   exp        0.00      100.00   -6
-
+ 210  H2SO4AQ   exp        0.00      100.00   -6
+ 211  HNO3AQ    exp        0.00      100.00   -6
+ 212  NH3AQ     exp        0.00      100.00   -6
+ 214  ISOPA1AQ  exp        0.00      100.00   -6
 !123--12345678--123--1234567890--1234567890--123

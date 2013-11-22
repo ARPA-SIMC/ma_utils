@@ -3,7 +3,7 @@
 ! Calmet e modelli fotochimici)
 ! I parametri aerosol Chimere sono nelle tabelle 196 e 199.
 !
-!                                          Ultimo aggiornamento: 17/01/2012
+!                                          Ultimo aggiornamento: 22/11/2013
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890--12345
 !Cod  Sigla     Descrizione e unita'                      B-Tab 
@@ -16,6 +16,7 @@
   36  ff        Wind speed [m/s]                          11002
   40  w         Vertical Velocity (ter.foll.) [m/s]       11192
   41  wc        Vertical Velocity (cartesian) [m/s]       11006
+  52  relhum    relative humidity [%]                     13003
   89  ro        Air density [mle/cm3]                     12194
   90  xxx       Reserved for temporary use
   92  phat      Cloud Photolysis Attenuation [0-1]

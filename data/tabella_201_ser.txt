@@ -15,7 +15,7 @@
 !          -4 (se cloud cover); -5 (se flussi di calore); 
 !          -6 (se specie chimiche); 0 (altri casi)
 !
-!                                          Ultimo aggiornamento: 28/06/2011
+!                                          Ultimo aggiornamento: 22/11/2013
 !--------------------------------------------------------------------------
 !123--12345678--123--1234567890--1234567890--123
 !Cod  Sigla     dec     val.min     val.max  cp2
@@ -45,6 +45,8 @@
  112  prscon      4    -9999.99    99999.99    0   
  113  conrai      2        0.00     1000.00    0
  139  pp          4    -9999.99    99999.99    0   
+ 145  cape        1        0.00     5000.00    0   
+ 146  cin         1        0.00     5000.00    0   
  152  tke       exp        0.00       1.e10    0   
  153  tkvm        4    -9999.99    99999.99    0   
  154  tkvh        4    -9999.99    99999.99    0   

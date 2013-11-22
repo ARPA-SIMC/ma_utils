@@ -1,7 +1,7 @@
 PROGRAM grib23ddat
 !--------------------------------------------------------------------------
 ! Legge un blocco di dati in formato GRIB e li riscrive nel formato 3D.DAT,
-! versione 3.
+! versione 2.1 oppure 3.
 ! Uso: grib3ddat.exe file_static file_dat file_out
 !
 ! Input:
@@ -27,6 +27,13 @@ PROGRAM grib23ddat
 !   3) Q + Cloud water + cloud ice (in questo caso, scrivo la loro somma 
 !     come cloud water, e non scrivo cloud ice)
 !
+! - Secondo la documentazione (versione 2.1 degli output), i dati mancanti
+!   nei parametri superficiali (nell'header dei data record) dovrebbero 
+!   essere messi a 0, invece di -9999. (sub. write_dat)
+! - Con entrambi i formati in ouptut, le subr. di calmet che leggono i 
+!   dati sono rdhd5 e rdhd53
+!
+!
 ! SVILUPPI: 
 ! - file_static potrebbe essere ampliato, includendo:
 !   * land fraction: per discriminare punti di terra e di mare (parametro
@@ -41,7 +48,7 @@ PROGRAM grib23ddat
 !   che attualmente sono letti ma non utilizzati (sub. RDMM5, line 20175)
 !
 !
-!                                                   V1.2, Enrico 01/06/2011
+!                                                 V1.3.1, Enrico 07/11/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -64,17 +71,17 @@ CHARACTER (LEN=80), PARAMETER :: file_log = "grib23ddat.log"
 LOGICAL :: samegrid
 
 ! Altre varibaili del programma
-REAL, ALLOCATABLE :: orog(:),zlev3d(:,:),values3d(:,:,:),values2d(:,:)
+REAL, ALLOCATABLE :: orog(:),zlev3d(:,:),xgeo(:,:),ygeo(:,:)
+REAL, ALLOCATABLE :: values3d(:,:,:),values2d(:,:)
 INTEGER, ALLOCATABLE :: id_lev3d(:),rq_par3d(:,:),rq_lev3d(:,:)
 INTEGER, ALLOCATABLE :: rq_lev2d(:,:),rq_par2d(:,:)
 LOGICAL, ALLOCATABLE :: found3d(:,:),found2d(:)
 
 TYPE(date) :: data_ini,datac,datag,datav
-REAL :: x1,y1,dx,dy,xx,yy,xgeo,ygeo,xrot,yrot
-REAL :: rdum
+REAL :: x1,y1,dx,dy,xx,yy,xrot,yrot,rdum
 INTEGER :: nx,ny,nlev3d,nscad,npar3d,npar2d
 INTEGER :: hh_step,nht,hh_ini,hhc,hhg,hhv,hht,scad(3),lev(3),par(3)
-INTEGER :: tipo_scad,tipo_lev3d,id_model,inp_h2o,inp_sort,dlth,utmz
+INTEGER :: tipo_scad,tipo_lev3d,id_model,inp_h2o,inp_sort,out_fmt,dlth,utmz
 INTEGER :: if_static,if_dat,ig_orog,ig,idxl,idxp
 INTEGER :: iret,ier,idum(3),k,kpar,cnt_par,kl,kp,i,j,ilu,cnt_sea,ios,cnt_out
 CHARACTER (LEN=80) :: file_static,file_dat,file_out,error_message,ch80,chpar
@@ -91,7 +98,6 @@ LOGICAL :: lmodif
 
 next_arg = ""
 lmodif = .FALSE.
-utmz = 0
 cnt_par = 0
 
 DO kpar = 1,HUGE(0)
@@ -106,15 +112,6 @@ DO kpar = 1,HUGE(0)
     STOP
   ELSE IF (TRIM(chpar) == "-modif") THEN
     lmodif = .TRUE.
-  ELSE IF (TRIM(chpar) == "-utm") THEN
-    next_arg = "utm"
-  ELSE IF (next_arg == "utm") THEN
-    READ (chpar,*,IOSTAT=ios) utmz
-    IF (ios /= 0) THEN
-      CALL scrive_help
-      STOP
-    ENDIF  
-    next_arg = ""
   ELSE IF (cnt_par == 0) THEN
     cnt_par = 1
     file_static = chpar
@@ -141,8 +138,13 @@ id_lev3d(:) = imis
 READ (iunml,*, ERR=9996) id_lev3d(1:nlev3d)
 READ (iunml,*, ERR=9996) inp_h2o
 READ (iunml,*, ERR=9996) inp_sort
-IF (inp_sort == 0) READ (iunml,'(i4,3i2)', ERR=9996) &
-  data_ini%yy,data_ini%mm,data_ini%dd,hh_ini
+IF (inp_sort == 0) THEN
+  READ (iunml,'(i4,3i2)', ERR=9996) data_ini%yy,data_ini%mm,data_ini%dd,hh_ini
+ELSE
+  READ (iunml,*)
+ENDIF
+READ (iunml,*, ERR=9996) utmz
+READ (iunml,*, ERR=9996) out_fmt
 CLOSE (iunml)
 
 !--------------------------------------------------------------------------
@@ -153,7 +155,10 @@ IF ((id_model/=1 .AND. id_model/=2) .OR. &
     nscad < 1 .OR. &
     (tipo_lev3d/=1 .AND. tipo_lev3d/=2) .OR. &
     nlev3d < 1 .OR. &
-    ANY(id_lev3d(1:nlev3d)==imis) &
+    ANY(id_lev3d(1:nlev3d)==imis) .OR. &
+    (inp_h2o/=1 .AND. inp_h2o/=2 .AND.inp_h2o/=3) .OR. &
+    (inp_sort/=0 .AND. inp_sort/=1) .OR. &
+    (out_fmt/=2 .AND. out_fmt/=3) &
    ) THEN      
 
   WRITE (*,*) "Parametri illegali in ",TRIM(file_nml)
@@ -296,7 +301,7 @@ CALL grib_get(ig_orog,"latitudeOfSouthernPoleInDegrees",rdum)
 yrot = rdum + 90.
 
 ! Alloco arrays dipendenti dal numero di punti
-ALLOCATE (orog(nx*ny),zlev3d(nx*ny,nlev3d)) 
+ALLOCATE (xgeo(nx,ny),ygeo(nx,ny),orog(nx*ny),zlev3d(nx*ny,nlev3d)) 
 zlev3d(:,:) = rmis
 
 ! Salvo orografia
@@ -350,7 +355,7 @@ IF (inp_sort == 1) THEN
 
 ENDIF
 
-! Se richiesto, trasofrmo la data iniziale da GMT a LST
+! Se richiesto, trasformo la data iniziale da GMT a LST
 IF (utmz /= 0) THEN
   hht = hh_ini + utmz
   IF (hht < 0) THEN
@@ -364,21 +369,50 @@ IF (utmz /= 0) THEN
   ENDIF
 ENDIF
 
+! Calcolo le coordinate geografiche di tutti i punti
+DO j = 1,ny
+DO i = 1,nx
+  k = (j-1)*nx + i
+  xx = x1 + (i-1) * dx
+  yy = y1 + (j-1) * dy
+  CALL rtll (xx,yy,xrot,yrot,xgeo(i,j),ygeo(i,j))
+ENDDO
+ENDDO
+
 ! Header records fissi
 OPEN (UNIT=iuout, FILE=file_out, STATUS="REPLACE", ACTION="WRITE")
-WRITE (iuout,'(a17)') "3D.DAT          3"                     ! hr 1
-WRITE (iuout,'(a)') "1"                                       ! n.ro record commento
-WRITE (iuout,'(a)') "Anlisi operative COSMO-I7"               ! record(s) commento
-WRITE (iuout,'(a)') hr2                                       ! hr 2
-WRITE (iuout,'(a)') ""                                        ! hr 3
-WRITE (iuout,'(21i3)') (0,k=1,21)                             ! hr 4
-WRITE (iuout,'(i4.4,3i2.2,i4,i5,i5,3i4)') &                   ! hr 5
-  data_ini%yy,data_ini%mm,data_ini%dd,hh_ini, 0,nht,0, nx,ny,nlev3d
-WRITE (iuout,'(6i4,2f10.4,2f9.4)') &                          ! hr 6
-  1,1,0,0,1,nlev3d,0.,0.,0.,0.
-DO k = 1,nlev3d                                               ! sigma coeff.
-  WRITE (iuout,'(f6.3)') 0.
-ENDDO
+
+IF (out_fmt == 2) THEN
+  WRITE (iuout,'(a)') "3D.DAT          2.1"                     ! hr 1
+  WRITE (iuout,'(a)') "1"                                       ! n.ro record commento
+  WRITE (iuout,'(a)') "Analisi operative COSMO-I7"              ! record(s) commento
+  WRITE (iuout,'(a15,i3)') hr2,0                                ! hr 2
+  WRITE (iuout,'(a)') ""                                        ! hr 3
+  WRITE (iuout,'(21i3)') (0,k=1,21)                             ! hr 4
+  WRITE (iuout,'(i4.4,3i2.2,i5,3i4)') &                         ! hr 5
+    data_ini%yy,data_ini%mm,data_ini%dd,hh_ini,nht,nx,ny,nlev3d
+  WRITE (iuout,'(6i4,2f10.4,2f9.4)') &                          ! hr 6
+    1,1,nx,ny,1,nlev3d,MINVAL(xgeo),MAXVAL(xgeo),MINVAL(ygeo),MAXVAL(ygeo)
+  DO k = 1,nlev3d                                               ! sigma coeff.
+    WRITE (iuout,'(f6.3)') 0.
+  ENDDO
+
+ELSE IF (out_fmt == 3) THEN 
+  WRITE (iuout,'(a17)') "3D.DAT          3"                     ! hr 1
+  WRITE (iuout,'(a)') "1"                                       ! n.ro record commento
+  WRITE (iuout,'(a)') "Analisi operative COSMO-I7"              ! record(s) commento
+  WRITE (iuout,'(a)') hr2                                       ! hr 2
+  WRITE (iuout,'(a)') ""                                        ! hr 3
+  WRITE (iuout,'(21i3)') (0,k=1,21)                             ! hr 4
+  WRITE (iuout,'(i4.4,3i2.2,i4,i5,i5,3i4)') &                   ! hr 5
+    data_ini%yy,data_ini%mm,data_ini%dd,hh_ini, 0,nht,0, nx,ny,nlev3d
+  WRITE (iuout,'(6i4,2f10.4,2f9.4)') &                          ! hr 6
+    1,1,nx,ny,1,nlev3d,MINVAL(xgeo),MAXVAL(xgeo),MINVAL(ygeo),MAXVAL(ygeo)
+  DO k = 1,nlev3d                                               ! sigma coeff.
+    WRITE (iuout,'(f6.3)') 0.
+  ENDDO
+
+ENDIF
 
 ! Coordinate, quota e land-sea mask di ciascun punto. Il Land-Use (ilu) 
 ! serve solo per discriminare tra mare (16) e terra (/=16)
@@ -386,9 +420,6 @@ cnt_sea = 0
 DO j = 1,ny
 DO i = 1,nx
   k = (j-1)*nx + i
-  xx = x1 + (i-1) * dx
-  yy = y1 + (j-1) * dy
-  CALL rtll (xx,yy,xrot,yrot,xgeo,ygeo)
   IF (orog(k) < 0.015 .AND. orog(k) > 0.01) THEN
     ilu = 16
     cnt_sea = cnt_sea + 1
@@ -396,7 +427,13 @@ DO i = 1,nx
     ilu = 0
   ENDIF
 
-  WRITE (iuout,'(2i4,f9.4,f10.4,i5,i3)') i,j,ygeo,xgeo,NINT(orog(k)),ilu
+  IF (out_fmt == 2) THEN
+    WRITE (iuout,'(2i4,f9.4,f10.4,i5,i3,1x,f9.4,f10.4,i5)') &
+      i,j,ygeo(i,j),xgeo(i,j),NINT(orog(k)),ilu,ygeo(i,j),xgeo(i,j),NINT(orog(k))
+  ELSE IF (out_fmt == 3) THEN
+    WRITE (iuout,'(2i4,f9.4,f10.4,i5,i3)') i,j,ygeo(i,j),xgeo(i,j),NINT(orog(k)),ilu
+  ENDIF
+
 ENDDO
 ENDDO
 
@@ -527,7 +564,7 @@ DO k = 1,HUGE(0)
       ENDIF
 
       CALL write_dat(values3d,zlev3d,values2d,nx,ny,nlev3d, &
-        npar3d,npar2d,datac,hhc,iuout,inp_h2o,rmis,imis)
+        npar3d,npar2d,datac,hhc,iuout,inp_h2o,rmis,imis,out_fmt)
 !     CALL write_log(found3d,found2d)
       cnt_out = cnt_out + 1
 
@@ -613,7 +650,7 @@ IF (lmodif) THEN
 ENDIF
 
 CALL write_dat(values3d,zlev3d,values2d,nx,ny,nlev3d, &
-  npar3d,npar2d,datac,hhc,iuout,inp_h2o,rmis,imis)
+  npar3d,npar2d,datac,hhc,iuout,inp_h2o,rmis,imis,out_fmt)
 !CALL write_log(found3d,found2d)
 cnt_out = cnt_out + 1
 
@@ -758,8 +795,12 @@ WRITE (20,'(2a)')           "1        ! input H2O 3d (0:none, 1:Q, 2:", &
                             "Q+cloud water, 3:Q+cloud water+cloud ice"
 WRITE (20,'(2a)')           "1        ! ordine grib input (0: non ord", &
                             "inati, 1: ordinati per verification time"
-WRITE (20,'(2a)')           "2003040100  ! Data-ora iniziale (solo se", &
-                            " grib unsorted)"
+WRITE (20,'(2a)')           "2003040100  ! Data-ora iniziale (usata s", &
+                            "olo se i grib non sono ordinati)"
+WRITE (20,'(2a)')           "0        ! Time zone degli orari in outp", &
+                            "ut (0: ore GMT; /=0: LST; 1: LST Italia)"
+WRITE (20,'(2a)')           "3        ! formato in output (2: version", &
+                            "e 2.1; 3: versione 3)"
 CLOSE (20)
 
 ! Deafult per LAMAZ 35 layers
@@ -779,7 +820,7 @@ IMPLICIT NONE
 
 !                12345678901234567890123456789012345678901234567890123456789012345678901234567890
 WRITE (*,*)
-WRITE (*,'(a)') "Uso: grib3ddat.exe file_static file_dat file_out [-h] [-c] [-utm N] [-modif]"
+WRITE (*,'(a)') "Uso: grib3ddat.exe file_static file_dat file_out [-h] [-c] [-modif]"
 WRITE (*,'(a)') ""
 WRITE (*,'(a)') "file_static: in formato grib; contine orografia (1o campo) e quote model layers"
 WRITE (*,'(a)') "file_dat:    dati meteo in formato grib; obbligatori P,T,U,V,Prc,Tsup"
@@ -787,8 +828,6 @@ WRITE (*,'(a)') "             opzionali Q,Qcr,Qis "
 WRITE (*,'(a)') "file_out:    file di ouput, in formato 3D.DAT"
 WRITE (*,'(a)') "-h:          visualizza questo help"
 WRITE (*,'(a)') "-c:          costruisce un file grib23ddat.inp di esempio"
-WRITE (*,'(a)') "-utm N:      scrive date con orario LST, relativo alla zona N"
-WRITE (*,'(a)') "             (N segue la convenzione internazionale: Italia = +1)"
 WRITE (*,'(a)') "-modif:      scrive valori inventati per test/debug"
 WRITE (*,'(a)') ""
 
@@ -901,7 +940,7 @@ END SUBROUTINE scad2val
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 SUBROUTINE write_dat(values3d,zlev3d,values2d,nx,ny,nlev3d, &
-  npar3d,npar2d,datav,hhv,iuout,inp_h2o,rmis,imis)
+  npar3d,npar2d,datav,hhv,iuout,inp_h2o,rmis,imis,out_fmt)
 !
 ! Scrive su iuout una scadenza di dati superficiali e 3d
 !
@@ -911,7 +950,7 @@ IMPLICIT NONE
 
 ! Argomenti subroutine
 TYPE(date), INTENT(IN) :: datav
-INTEGER, INTENT(IN) :: nx,ny,nlev3d,npar3d,npar2d,hhv,iuout,inp_h2o,imis
+INTEGER, INTENT(IN) :: nx,ny,nlev3d,npar3d,npar2d,hhv,iuout,inp_h2o,imis,out_fmt
 REAL, INTENT(IN) :: values3d(nx*ny,nlev3d,npar3d),values2d(nx*ny,npar2d)
 REAL, INTENT(IN) :: zlev3d(nx*ny,nlev3d),rmis
 
@@ -920,6 +959,7 @@ REAL :: pmsl,rain,rads,radl,t2,qq2,wd10,ws10,sstp2
 REAL :: dd(nlev3d),ff(nlev3d),rh(nlev3d),mixr(nlev3d)
 INTEGER :: myrb,mmob,mdayb,mhrb,msecb, myr,mmo,mday,mhr,msec, ix,jx, isnow
 INTEGER :: i,j,k,iz
+CHARACTER (LEN=80) :: chfmt3d
 
 !--------------------------------------------------------------------------
 ! Data di validita'. 
@@ -948,20 +988,38 @@ qq2 = rmis
 wd10 = rmis
 ws10 = rmis
 
+! Formato per record dati 3D
+IF (inp_h2o == 0) THEN
+  chfmt3d = "(i4,i6,f6.1,i4,f5.1)"
+ELSE IF (inp_h2o == 1) THEN
+  chfmt3d = "(i4,i6,f6.1,i4,f5.1,i3,f5.2)"
+ELSE IF (inp_h2o == 2 .OR. inp_h2o == 3) THEN
+  IF (out_fmt == 2) THEN
+    chfmt3d = "(i4,i6,f6.1,i4,f5.1,i3,f5.2,2f6.3)"
+  ELSE IF (out_fmt == 3) THEN
+    chfmt3d = "(i4,i6,f6.1,i4,f5.1,i3,3f5.2)"
+  ENDIF
+ENDIF
+
 ! Ciclo sui punti griglia
 DO j = 1,ny
 DO i = 1,nx
   k = (j-1)*nx + i
 
 ! Elaboro e scrivo i parametri superficiali
-! NB: lettura Calmet: sub. rdmm5, line 20175)
+! NB: lettura Calmet V5.2: sub. rdmm5, line 20175)
 
   rain = MIN(values2d(k,2) / 10., 99.99)
   sstp2 = values2d(k,1)
 
-  WRITE (iuout,'(i4.4,3i2.2,i4,1x,i4.4,3i2.2,i4, i4,i3, f7.1,f5.2,i2,3f8.1,f8.2,3f8.1)') &
-    myrb,mmob,mdayb,mhrb,msecb, myr,mmo,mday,mhr,msec, i,j, &
-    pmsl,rain,isnow,rads,radl,t2,qq2,wd10,ws10,sstp2
+  IF (out_fmt == 2) THEN
+    WRITE (iuout,'(i4.4,3i2.2, 2i3, f7.1,f5.2,i2,3f8.1,f8.2,3f8.1)') &
+      myrb,mmob,mdayb,mhrb, i,j, pmsl,rain,isnow,rads,radl,t2,qq2,wd10,ws10,sstp2
+  ELSE IF (out_fmt == 3) THEN
+    WRITE (iuout,'(i4.4,3i2.2,i4,1x,i4.4,3i2.2,i4, i4,i3, f7.1,f5.2,i2,3f8.1,f8.2,3f8.1)') &
+      myrb,mmob,mdayb,mhrb,msecb, myr,mmo,mday,mhr,msec, i,j, &
+      pmsl,rain,isnow,rads,radl,t2,qq2,wd10,ws10,sstp2
+  ENDIF
 
 ! Elaboro e scrivo i parametri in quota 
 ! NB: lettura Calmet: sub. rdmm5, line 20333 e segg.
@@ -973,25 +1031,25 @@ DO i = 1,nx
   DO iz = 1, nlev3d
     SELECT  CASE (inp_h2o)
     CASE(0)                        ! P,T,U,V; ioutmm5 = 81
-       WRITE (iuout,'(i4,i6,f6.1,i4,f5.1)') &
+       WRITE (iuout,chfmt3d) &
         NINT(values3d(k,iz,1)/100.), NINT(zlev3d(k,iz)),values3d(k,iz,2), &
          NINT(dd(iz)),ff(iz)
 
     CASE(1)                        ! P,T,U,V,Q; ioutmm5 = 82
-      WRITE (iuout,'(i4,i6,f6.1,i4,f5.1,i3,f5.2)') &
+      WRITE (iuout,chfmt3d) &
         NINT(values3d(k,iz,1)/100.), NINT(zlev3d(k,iz)),values3d(k,iz,2), &
         NINT(dd(iz)),ff(iz),NINT(rh(iz)),1000.*mixr(iz)
 
     CASE(2)                        ! P,T,U,V,Q,Qcr; ioutmm5 = 83
-      WRITE (iuout,'(i4,i6,f6.1,i4,f5.1,i3,3f5.2)') &
+      WRITE (iuout,chfmt3d) &
         NINT(values3d(k,iz,1)/100.), NINT(zlev3d(k,iz)),values3d(k,iz,2), &
-         NINT(dd(iz)),ff(iz),NINT(rh(iz)),1000.*mixr(iz), &
+        NINT(dd(iz)),ff(iz),NINT(rh(iz)),1000.*mixr(iz), &
         1000.*values3d(k,iz,6),rmis
 
     CASE(3)                        ! P,T,U,V,Q,Qcr,Qis; ioutmm5 = 83
-      WRITE (iuout,'(i4,i6,f6.1,i4,f5.1,i3,3f5.2)') &
+      WRITE (iuout,chfmt3d) &
         NINT(values3d(k,iz,1)/100.), NINT(zlev3d(k,iz)),values3d(k,iz,2), &
-         NINT(dd(iz)),ff(iz),NINT(rh(iz)),1000.*mixr(iz), &
+        NINT(dd(iz)),ff(iz),NINT(rh(iz)),1000.*mixr(iz), &
         1000.*(values3d(k,iz,6)+values3d(k,iz,7)),rmis
 
     END SELECT
