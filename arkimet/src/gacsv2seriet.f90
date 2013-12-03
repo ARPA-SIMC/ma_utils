@@ -33,7 +33,7 @@ PROGRAM gacsv2seriet
 !   sarebbero comunque ordinati per reftime e trange, ie. non e' garantito
 !   che i verification times siano consecutivi)
 !
-!                                          Versione 1.6.6 Enrico 25/07/2013
+!                                          Versione 1.6.7 Enrico 29/11/2013
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -166,7 +166,11 @@ ELSE
   IF (ios /= 0 .OR. out_form < 1 .OR. out_form > 2 .OR. &
     qcont < 0 .OR. qcont > 3) GOTO 9984
 
-  IF (.NOT. libsim) convert = .FALSE.
+  IF (.NOT. libsim) THEN
+    WRITE (*,*) "I dati non sono stati prodotti da libsim (opzione libsim=.FALSE.):"
+    WRITE (*,*) "disabilito la ri-conversione delle unita' di misura"
+    convert = .FALSE.
+  ENDIF
 
   IF (out_form == 3) THEN        ! ADMS meteo
     dir_int     = .TRUE.
@@ -1690,9 +1694,8 @@ WRITE (*,*) ""
 WRITE (*,*) "-f fielfis: legge da filefis i parametri fisiogrfici relativi ai punti "
 WRITE (*,*) "  richiesti; filefis e' in formato gacsv e puo' contenere i campi "
 WRITE (*,*) "  albedo, z0, orog, zlay, zlev"
-WRITE (*,*) "-noconvert: non compensa le conversioni di unita' di misura fatte da Libsim"
-WRITE (*,*) "  (annulla in parte gli effetti del prametro libsim della namelist)"
-WRITE (*,*) "  Usare in concomitanza con l'opzione --noconvert di vg6d_getpoint"
+WRITE (*,*) "-noconv: non compensa le conversioni di unita' di misura fatte da Libsim;"
+WRITE (*,*) "  usare in concomitanza con l'opzione --noconvert di vg6d_getpoint"
 WRITE (*,*) ""
 WRITE (*,*) "Codice di uscita del programma (echo $?):"
 WRITE (*,*) "    0: letti tutti e soli i dati richiesti"

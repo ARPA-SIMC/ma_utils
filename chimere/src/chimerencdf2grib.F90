@@ -49,7 +49,7 @@ INTEGER :: kbuffer(maxdim),kword,kret,nbit
 REAL    :: psec2(512),psec3(2)
 
 ! Altre variabili del programma
-REAL, ALLOCATABLE :: conc_out(:,:,:),tot(:),conc_miss(:,:,:)
+REAL, ALLOCATABLE :: conc_out(:,:,:),tot(:),conc_miss(:,:,:),conc_out2d(:,:)
 REAL :: x1,y1,x2,y2,dx,dy,xrot,yrot,x2r,y2r
 INTEGER :: version
 INTEGER :: nvarout,nx,ny,np,nvar_fix,nl,slen,mm,nxi,nyi,ntrov,nscri
@@ -84,8 +84,7 @@ real,allocatable::buf2d1(:,:)
 real,allocatable::emisb(:,:,:),emisb1(:,:)
 real,allocatable::buf3d1(:,:,:)
 real,allocatable::buf4d1(:,:,:,:)
-real,allocatable::conc2(:,:),conc3(:,:,:),conc4(:,:,:,:)
-real,allocatable::conc1(:)
+real,allocatable::conc1(:),conc2(:,:),conc3(:,:,:),conc4(:,:,:,:)
 real,allocatable::conc(:,:,:)
 
 
@@ -550,12 +549,12 @@ ENDDO
 ALLOCATE (buf2d1(nzonal,nmerid))
 ALLOCATE (buf3d1(nzonal,nmerid,nlev))
 ALLOCATE (buf4d1(nzonal,nmerid,nlev,3))
+ALLOCATE (conc1(nzonal*nmerid))
 ALLOCATE (conc2(nzonal*nmerid,nlev))
 ALLOCATE (conc3(nzonal*nmerid,nlev,3))
-ALLOCATE (conc1(nzonal*nmerid))
 
 SELECT CASE (inp_fmt)
-CASE (1,2,8)
+CASE (1,2)
   ALLOCATE(conc_out(nzonal*nmerid,nlev,nvarout))
   ALLOCATE(varids1(nvarin))
 CASE (3)
@@ -577,6 +576,9 @@ CASE (7)
   ALLOCATE(varids1(nvarin))
   ALLOCATE (conc_out(nzonal*nmerid,nlev,nvarout))
   ALLOCATE (conc4(nzonal*nmerid,nlev,typeday,nvarout))
+CASE (8)
+  ALLOCATE (conc_out(nzonal*nmerid,nlev,nvarout))
+  ALLOCATE(varids1(nvarin))
 END SELECT
 
 ! Disabilito i controlli sui parametri GRIBEX
@@ -1099,29 +1101,27 @@ ELSE IF (inp_fmt == 8) THEN
              (ncid,ivarid,varids1(ivarid)%varname,vartype1,varids1(ivarid)%ndims)
            NCERR(__LINE__)
 
-           ncstat=nf90_get_var( ncid,ivarid, buf3d1, &
-                (/     1,      1,       1, kscad/),  & ! start vector
-                (/nzonal, nmerid, nlev,     1/))    ! count vector
+           ncstat=nf90_get_var( ncid,ivarid, buf2d1, &
+                (/     1,      1, kscad/),  & ! start vector
+                (/nzonal, nmerid,     1/))    ! count vector
            NCERR(__LINE__)
 
-           conc2 = RESHAPE(buf3d1,(/nzonal*nmerid,nlev/))
-           conc_out(:,:,ivar) = conc2(:,:)
+           conc1 = RESHAPE(buf2d1,(/nzonal*nmerid/))
+           conc_out(:,1,ivar) = conc1(:)
 
            IF (code_var(ivar) <= 0) CYCLE
            ksec1(1) = tab_var(ivar)
            ksec1(6) = code_var(ivar)
-           DO klev = 1,nlev
-             IF (lev_out(klev) == 0) CYCLE
-             ksec1(7) = 109
-             ksec1(8) = klev
-             ksec1(9) = 0
-             CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
-                  conc_out(1:np,klev,ivar),np,kbuffer,maxdim,kword,'C',kret)
 
-             CALL PBWRITE(iu,kbuffer,ksec0(1),kret)
-             IF (kret <= 0) WRITE(*,*) 'Errore pbwrite, kret ',kret
-             cnt_grb = cnt_grb + 1
-           ENDDO                 ! livelli
+           ksec1(7) = 1
+           ksec1(8) = 0
+           ksec1(9) = 0
+           CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
+                conc_out(1:np,1,ivar),np,kbuffer,maxdim,kword,'C',kret)
+
+           CALL PBWRITE(iu,kbuffer,ksec0(1),kret)
+           IF (kret <= 0) WRITE(*,*) 'Errore pbwrite, kret ',kret
+           cnt_grb = cnt_grb + 1
 
         ELSE
            IF (kscad ==1) WRITE(*,'(2a,2(1x,i3))') &

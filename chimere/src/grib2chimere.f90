@@ -19,7 +19,7 @@ PROGRAM grib2chimere
 ! - Mette a 0 le specie richieste in output e non presenti in input
 ! - Gestisce solo lo scanning flag 64 (010)
 !
-!                                         Versione 3.0.1, Enrico 02/05/2013
+!                                         Versione 3.0.2, Enrico 02/12/2013
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -268,7 +268,7 @@ DO
     np = ksec2(2) * ksec2(3)
     IF (ksec2(11) /= 64) GOTO 9994
   ELSE
-    IF (ANY(ksec2(:) /= ksec2_first(:)) .OR. ksec1(2) /= cem) GOTO 9993
+    IF (ANY(ksec2(1:11) /= ksec2_first(1:11)) .OR. ksec1(2) /= cem) GOTO 9993
   ENDIF
 
 ! Verifico se ho trovato un nuovo parametro 
@@ -340,7 +340,7 @@ IF (lroz) THEN
   IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
 !  CALL PBCLOSE(iu2)
 
-  IF (ANY(ksec2(:) /= ksec2_first(:))) GOTO 9992
+  IF (ANY(ksec2(1:11) /= ksec2_first(1:11))) GOTO 9992
   IF (ANY(orog(1:np) < 0.) .OR. (ANY(orog(1:np) >= 10000.))) &
     orog(1:np) = MAX(MIN(orog(1:np),10000.),0.)
   IF (ksec1(6) /= 8) WRITE (*,*) &
