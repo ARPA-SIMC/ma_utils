@@ -1,10 +1,10 @@
 program lm2ncdf
-! versione 2.2  29/11/2012 michele 
+! versione 2.3  08/01/2013 michele 
   ! This program reads a LM-output file interpolated horizontally, 
   ! extracts the variables required by CHIMERE, and generates a netCDF file,
   ! input to diagmet
   ! new scheme to evaluate cloud liquid water
-  ! for version chimere2008b
+  ! for version chimere2008b corregge alb mixr
   use netcdf
   use calendar
 #ifdef IFORT
@@ -99,7 +99,7 @@ program lm2ncdf
 !      real cliq(nxmax,nymax,nlevmax) ! Input cloud liquid water mixing ratio (Kg/Kg)
 !      real cice(nxmax,nymax,nlevmax) ! Input ice liquid water mixing ratio (Kg/Kg)
 !      real rain(nxmax,nymax,nlevmax) ! Input rain water mixing ratio (Kg/Kg)
-      real, allocatable,dimension(:,:)::clol,clom,cloh,pblh,u10m,v10m,usta,tem2,swrd,sshf,slhf,lspc,copc,soim
+      real, allocatable,dimension(:,:)::clol,clom,cloh,pblh,u10m,v10m,usta,tem2,swrd,alb,sshf,slhf,lspc,copc,soim
 !      real clol(nxmax,nymax)         ! Low cloud fraction (0-1)
 !      real clom(nxmax,nymax)         ! Medium cloud fraction (0-1)
 !      real cloh(nxmax,nymax)         ! High cloud fraction (0-1)
@@ -182,6 +182,7 @@ program lm2ncdf
       integer ifn_minf
       integer ifn_tem2
       integer ifn_swrd
+      integer ifn_alb
       integer ifn_u10m
       integer ifn_v10m
       integer ifn_usta
@@ -224,6 +225,7 @@ program lm2ncdf
       character*132 fniHIGC  ! 2D high   cloudiness
       character*132 fniTEM2  ! 2D 2m Temperature
       character*132 fniSWRD  ! 2D short wave radiation 
+      character*132 fniALB   ! 2D albedo 
       character*132 fniSSHF  ! 2D surface sensible heat fluxes
       character*132 fniSLHF  ! 2D Latent heat fluxes
       character*132 fniPBLH  ! 2D Boundary Layer Height file
@@ -276,6 +278,7 @@ program lm2ncdf
   integer,parameter :: ICOPC  = __LINE__ -IFIRST
   integer,parameter :: ISOIM  = __LINE__ -IFIRST
   integer,parameter :: ISWD   = __LINE__ -IFIRST
+  integer,parameter :: IALB   = __LINE__ -IFIRST
   integer,parameter :: ILAST  = __LINE__ -IFIRST
 
   integer,parameter :: nvars= ILAST -1
@@ -391,6 +394,7 @@ program lm2ncdf
       fniP    = 'PRES_3D'
       fniTEM2 = 'TEM2_2D'
       fniSWRD = 'SWRD_2D'
+      fniALB  = 'ALB_2D'
       fniSSHF = 'SSHF_2D'
       fniSLHF = 'SLHF_2D'
       fniU10M = 'U10M_2D'
@@ -495,6 +499,7 @@ program lm2ncdf
       call opfi(ifn_temp,fniT,'u','o')
       call opfi(ifn_tem2,fniTEM2,'u','o')
 !
+      call opfi(ifn_alb,fniALB,'u','o')
       call opfi(ifn_swrd,fniSWRD,'u','o')
 !
 !  Optional files
@@ -576,7 +581,7 @@ allocate(rain(nzonal,nmerid,nlev))
 
 allocate(clol(nzonal,nmerid),clom(nzonal,nmerid),cloh(nzonal,nmerid),pblh(nzonal,nmerid),u10m(nzonal,nmerid))
 allocate(v10m(nzonal,nmerid),usta(nzonal,nmerid),tem2(nzonal,nmerid),sshf(nzonal,nmerid),slhf(nzonal,nmerid))
-allocate (lspc(nzonal,nmerid),copc(nzonal,nmerid),soim(nzonal,nmerid),swrd(nzonal,nmerid))
+allocate (lspc(nzonal,nmerid),copc(nzonal,nmerid),soim(nzonal,nmerid),swrd(nzonal,nmerid),alb(nzonal,nmerid))
 
 
   
@@ -632,10 +637,13 @@ allocate (lspc(nzonal,nmerid),copc(nzonal,nmerid),soim(nzonal,nmerid),swrd(nzona
          read(ifn_zwin)id(3),(((zwin(izo,ime,nl),izo=1,nzonal),ime=1,nmerid),nl=1,nlevels)
          read(ifn_mwin)id(4),(((mwin(izo,ime,nl),izo=1,nzonal),ime=1,nmerid),nl=1,nlevels)
          read(ifn_mixr)id(5),(((mixr(izo,ime,nl),izo=1,nzonal),ime=1,nmerid),nl=1,nlevels)
+        where (mixr<=0) mixr=epsilon(mixr)
          read(ifn_temp)id(6),(((temp(izo,ime,nl),izo=1,nzonal),ime=1,nmerid),nl=1,nlevels)
          read(ifn_tem2)id(7),((tem2(izo,ime),izo=1,nzonal),ime=1,nmerid)
          read(ifn_swrd)id(23),((swrd(izo,ime),izo=1,nzonal),ime=1,nmerid)
         where (swrd<0) swrd=0
+         read(ifn_alb)id(24),((alb(izo,ime),izo=1,nzonal),ime=1,nmerid)
+         swrd=100*swrd/(100-alb)
 !  Reading optional data
          if(iread_cice.eq.1) read(ifn_cice)id(9),(((cice(izo,ime,nl),izo=1,nzonal),ime=1,nmerid),nl=1,nlevels)
          if(iread_rain.eq.1) read(ifn_rain)id(10),(((rain(izo,ime,nl),izo=1,nzonal),ime=1,nmerid),nl=1,nlevels)
@@ -677,8 +685,6 @@ allocate (lspc(nzonal,nmerid),copc(nzonal,nmerid),soim(nzonal,nmerid),swrd(nzona
               print *,'*** Date Problem with Meteo File: ',i1
               print *,'*** Expected date: ',idnow,' File date: ',id(i1)
             stop
-               else
-              print *,'*** Expected date: ',idnow,' File date: ',id(i1)
             endif
          enddo
          current_date=numeric2mm5date(idnow)
@@ -755,7 +761,6 @@ contains
       allocate(sat(nzonal,nmerid,nlevels),relhum(nzonal,nmerid,nlevels),crit(nzonal,nmerid,nlevels))
       allocate(HTOP(nzonal,nmerid,nlevels),hbase(nzonal,nmerid,nlevels))
 
-         write(6,*)'sono a clouds',nmerid,izo,ime
 ! determination of levels just below separation altitudes
         do ime=1,nmerid
         do izo=1,nzonal
@@ -1217,6 +1222,8 @@ contains
       NCERR(__LINE__)
       ncstat=nf90_put_var(ncid, meta(23)%varid, swrd, (/1,1,irec/),(/nzonal,nmerid,1/))
       NCERR(__LINE__)
+      ncstat=nf90_put_var(ncid, meta(24)%varid, alb, (/1,1,irec/),(/nzonal,nmerid,1/))
+      NCERR(__LINE__)
 
 
 ! optional variable
@@ -1418,6 +1425,7 @@ contains
     ! Add ShortWave Radiation for MEGAN (gc,06/02/2008)
     !'SW radiation down'                     )
     meta(ISWD)  =varmeta('SWRD_2D',2, 'swrd'    , 'W/m^2'     , 1. ,0, 'SW radiation down'                   ) 
+    meta(IALB)  =varmeta('ALB_2D',2, 'alb'    , 'fraction'     , 1. ,0, 'albedo'                   ) 
 
 
 
