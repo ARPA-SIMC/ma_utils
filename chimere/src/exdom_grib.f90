@@ -52,7 +52,7 @@ INTEGER :: data(3),ora(2),level(3),var(3)
 INTEGER :: np_in,np_out,nx,ny,nt,nz,dt
 INTEGER :: hh1,hh2,hhc,hhp,hh_tot,scanning,delta,nt_calc,idp,idata
 INTEGER :: k,kk,kl,kt,kz,kp,ier,ios,eof,eor,j,j2,iu,iu1,iu2
-CHARACTER (LEN=80) :: filein,fileout,filecoord,filelsm,chdum,arg(3)
+CHARACTER (LEN=200) :: filein,fileout,filecoord,filelsm,chdum,arg(3)
 CHARACTER (LEN=1) :: rule,next_arg
 LOGICAL :: log_int,hor_int,lsm_int,first,newlev,newist
 
@@ -165,15 +165,12 @@ DO kk=1,HUGE(0)
   ELSE
     IF (ksec1(5) == 0 .OR. ksec1(5) == 64) GOTO 9987
     IF (ksec1(1) /= ksec1_first(1) .OR. ksec1(6) /= ksec1_first(6) .OR. &
-        ANY(ksec2(1:11) /= ksec2_first(1:11)) .OR. &
-        ANY(ksec2(13:14) /= ksec2_first(13:14)) ) GOTO 9998
+        ANY(ksec2(1:11) /= ksec2_first(1:11)) ) GOTO 9998
     IF (ANY(ksec1(2:4) /= ksec1_first(2:4))) THEN
       WRITE (*,*) "WARNING: ci sono differenze nella sez.1, elementi 2-4"
       WRITE (*,'(a10,3(1x,i6))') "1o grib: ",ksec1_first(2:4)
       WRITE (*,'(a4,i4,a2,3(1x,i6))') "grib",kk,": ",ksec1(2:4)
     ENDIF
-    IF (ANY(ksec2(15:) /= ksec2_first(15:)) ) WRITE (*,*) &
-      "WARNING: Ci sono differenze in ksec2 (indici > 14): campo ",kk
 
   ENDIF
 
@@ -295,8 +292,7 @@ IF (lsm_int) THEN
   IF (ANY(ksec2(1:5) /= ksec2_first(1:5)) .OR. &
       ksec2(7) /= ksec2_first(7) .OR. &
       ksec2(8) /= ksec2_first(8) .OR. &
-      ksec2(11) /= ksec2_first(11) .OR. &
-      ANY(ksec2(13:20) /= ksec2_first(13:20)) ) GOTO 9989
+      ksec2(11) /= ksec2_first(11) ) GOTO 9989
   IF (ksec2(6) == 128 .AND. ksec2_first(6) == 128 .AND. &
       (ksec2(9) /= ksec2_first(9) .OR. ksec2(10) /= ksec2_first(10)) ) &
      GOTO 9989
@@ -447,8 +443,8 @@ STOP
 WRITE (*,'(a,i5)') "Errore, area o parametro diversi nel grib ",kk
 WRITE (*,'(a,2i6)') "Primo grib, ksec1(1,6): ",ksec1_first(1),ksec1_first(6)
 WRITE (*,'(a,2i6)') "Curr. grib, ksec1(1,6): ",ksec1(1),ksec1(6)
-WRITE (*,'(a,14(1x,i6))') "Primo grib, ksec2(1:14):",ksec2_first(1:14)
-WRITE (*,'(a,14(1x,i6))') "Curr. grib, ksec2(1:14):",ksec2(1:14)
+WRITE (*,'(a,14(1x,i6))') "Primo grib, ksec2(1:11):",ksec2_first(1:11)
+WRITE (*,'(a,14(1x,i6))') "Curr. grib, ksec2(1:11):",ksec2(1:11)
 STOP
 
 9997 CONTINUE

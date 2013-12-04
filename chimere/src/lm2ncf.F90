@@ -1,5 +1,5 @@
 program lm2ncdf
-! versione 2.2  29/11/2012 michele
+! versione 2.2  29/11/2012 michele 
   ! This program reads a LM-output file interpolated horizontally, 
   ! extracts the variables required by CHIMERE, and generates a netCDF file,
   ! input to diagmet
