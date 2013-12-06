@@ -20,7 +20,7 @@ PROGRAM stat_orari
 !   giornalieri. I nuovi files .sta sono la concatenazione di 5 estraqa-day
 !   (ave, max, min, nox, extra), separati da 2 record vuoti; il record dei
 !   livelli (se presente) e' il 2o di intestazione.
-! - Dalla versione 10 e' stat implementata la possibiliita' di aggiungere 
+! - Dalla versione 10 e' stata implementata la possibiliita' di aggiungere 
 !   ad alcuni files sta un 5o blocco con un'elaborazione extra, richiesta
 !   da riga comando (es: rank; mdoficare anche split_sta.ksh)
 ! - Il programma ignora le stazioni, e media tutti i dati presenti nel file
@@ -35,7 +35,7 @@ PROGRAM stat_orari
 !   in cui iniziano.
 ! - Usa il modulo per la gestione date date_hander.f90 (obsoleto)
 !
-!                                       V10.2.0, Enrico & Johnny 09/04/2013
+!                                       V10.2.1, Enrico & Johnny 04/12/2013
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -522,6 +522,7 @@ yrtyp(1:2,:,:) = 0.
 yrtyp(3,:,:) = -HUGE(0.)
 yrtyp(4,:,:) = HUGE(0.)
 yrtyp(5,:,:) = 0.
+daily(1:2,:,:) = 0.
 daily(3,:,:) = -HUGE(0.)
 daily(4,:,:) = HUGE(0.)
 daily(5,:,:) = rmis

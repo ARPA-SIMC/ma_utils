@@ -4,7 +4,7 @@
 ! I parametri aerosol di Chimere 2005 sono nella tab. 199
 ! I parametri Chimere gas sono nella tabella 200
 !
-!                                          Ultimo aggiornamento: 22/11/2013
+!                                          Ultimo aggiornamento: 06/12/2013
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890
 !Cod  Sigla     Descrizione e unita'
@@ -23,7 +23,14 @@
   11  p01HNO3   p01HNO3  (ppb; classe 39-78 nm)  
   12  p01NH3    p01NH3   (ppb; classe 39-78 nm)  
   13  p01WATER  p01WATER (ppb; classe 39-78 nm)
-  14  p01ISOPA1 p01ISOPA1(ppb; classe 39-78 nm)
+  14  p01ISOP1  p01ISOPA1(ppb; classe 39-78 nm)
+  15  p01AnA0D  p01AnA0D (ppb; classe 39-78 nm)
+  16  p01AnA2D  p01AnA2D (ppb; classe 39-78 nm)
+  17  p01AnBIP  p01AnBIP (ppb; classe 39-78 nm)
+  18  p01BiA0D  p01BiA0D (ppb; classe 39-78 nm)
+  19  p01BiA2D  p01BiA2D (ppb; classe 39-78 nm)
+  20  p01ISOP2  p01ISOP2 (ppb; classe 39-78 nm)
+
   21  p02BCAR   p02BCAR  (ppb; classe 78-156 nm)
   22  p02DUST   p02DUST  (ppb; classe 78-156 nm)
   23  p02OCAR   p02OCAR  (ppb; classe 78-156 nm)  
@@ -37,7 +44,14 @@
   31  p02HNO3   p02HNO3  (ppb; classe 78-156 nm)  
   32  p02NH3    p02NH3   (ppb; classe 78-156 nm)  
   33  p02WATER  p02WATER (ppb; classe 78-156 nm)  
-  34  p02ISOPA1 p02ISOPA1(ppb; classe 78-156 nm)
+  34  p02ISOP1  p02ISOPA1(ppb; classe 78-156 nm)
+  35  p02AnA0D  p02AnA0D (ppb; classe 78-156 nm)
+  36  p02AnA2D  p02AnA2D (ppb; classe 78-156 nm)
+  37  p02AnBIP  p02AnBIP (ppb; classe 78-156 nm)
+  38  p02BiA0D  p02BiA0D (ppb; classe 78-156 nm)
+  39  p02BiA2D  p02BiA2D (ppb; classe 78-156 nm)
+  40  p02ISOP2  p02ISOP2 (ppb; classe 78-156 nm)
+
   41  p03BCAR   p03BCAR  (ppb; classe 156-312 nm)
   42  p03DUST   p03DUST  (ppb; classe 156-312 nm)
   43  p03OCAR   p03OCAR  (ppb; classe 156-312 nm)  
@@ -51,7 +65,14 @@
   51  p03HNO3   p03HNO3  (ppb; classe 156-312 nm)  
   52  p03NH3    p03NH3   (ppb; classe 156-312 nm)  
   53  p03WATER  p03WATER (ppb; classe 156-312 nm)  
-  54  p03ISOPA1 p03ISOPA1(ppb; classe 156-312 nm)
+  54  p03ISOP1  p03ISOPA1(ppb; classe 156-312 nm)
+  55  p03AnA0D  p03AnA0D (ppb; classe 156-312 nm)
+  56  p03AnA2D  p03AnA2D (ppb; classe 156-312 nm)
+  57  p03AnBIP  p03AnBIP (ppb; classe 156-312 nm)
+  58  p03BiA0D  p03BiA0D (ppb; classe 156-312 nm)
+  59  p03BiA2D  p03BiA2D (ppb; classe 156-312 nm)
+  60  p03ISOP2  p03ISOP2 (ppb; classe 156-312 nm)
+
   61  p04BCAR   p04BCAR  (ppb; classe 312-625 nm)
   62  p04DUST   p04DUST  (ppb; classe 312-625 nm)
   63  p04OCAR   p04OCAR  (ppb; classe 312-625 nm)  
@@ -65,7 +86,14 @@
   71  p04HNO3   p04HNO3  (ppb; classe 312-625 nm)  
   72  p04NH3    p04NH3   (ppb; classe 312-625 nm)  
   73  p04WATER  p04WATER (ppb; classe 312-625 nm)  
-  74  p04ISOPA1 p04ISOPA1(ppb; classe 312-625 nm)
+  74  p04ISOP1  p04ISOPA1(ppb; classe 312-625 nm)
+  75  p04AnA0D  p04AnA0D (ppb; classe 312-625 nm)
+  76  p04AnA2D  p04AnA2D (ppb; classe 312-625 nm)
+  77  p04AnBIP  p04AnBIP (ppb; classe 312-625 nm)
+  78  p04BiA0D  p04BiA0D (ppb; classe 312-625 nm)
+  79  p04BiA2D  p04BiA2D (ppb; classe 312-625 nm)
+  80  p04ISOP2  p04ISOP2 (ppb; classe 312-625 nm)
+
   81  p05BCAR   p05BCAR  (ppb; classe 0.625-1.25 um)
   82  p05DUST   p05DUST  (ppb; classe 0.625-1.25 um)
   83  p05OCAR   p05OCAR  (ppb; classe 0.625-1.25 um)  
@@ -79,7 +107,14 @@
   91  p05HNO3   p05HNO3  (ppb; classe 0.625-1.25 um)  
   92  p05NH3    p05NH3   (ppb; classe 0.625-1.25 um)  
   93  p05WATER  p05WATER (ppb; classe 0.625-1.25 um)  
-  94  p05ISOPA1 p05ISOPA1(ppb; classe 0.625-1.25 um)
+  94  p05ISOP1  p05ISOPA1(ppb; classe 0.625-1.25 um)
+  95  p05AnA0D  p05AnA0D (ppb; classe 0.625-1.25 um)
+  96  p05AnA2D  p05AnA2D (ppb; classe 0.625-1.25 um)
+  97  p05AnBIP  p05AnBIP (ppb; classe 0.625-1.25 um)
+  98  p05BiA0D  p05BiA0D (ppb; classe 0.625-1.25 um)
+  99  p05BiA2D  p05BiA2D (ppb; classe 0.625-1.25 um)
+ 100  p05ISOP2  p05ISOP2 (ppb; classe 0.625-1.25 um)
+
  101  p06BCAR   p06BCAR  (ppb; classe 1.25-2.5 um)
  102  p06DUST   p06DUST  (ppb; classe 1.25-2.5 um)
  103  p06OCAR   p06OCAR  (ppb; classe 1.25-2.5 um)  
@@ -93,7 +128,14 @@
  111  p06HNO3   p06HNO3  (ppb; classe 1.25-2.5 um)  
  112  p06NH3    p06NH3   (ppb; classe 1.25-2.5 um)  
  113  p06WATER  p06WATER (ppb; classe 1.25-2.5 um)  
- 114  p06ISOPA1 p06ISOPA1(ppb; classe 1.25-2.5 um)
+ 114  p06ISOP1  p06ISOPA1(ppb; classe 1.25-2.5 um)
+ 115  p06AnA0D  p06AnA0D (ppb; classe 1.25-2.5 um)
+ 116  p06AnA2D  p06AnA2D (ppb; classe 1.25-2.5 um)
+ 117  p06AnBIP  p06AnBIP (ppb; classe 1.25-2.5 um)
+ 118  p06BiA0D  p06BiA0D (ppb; classe 1.25-2.5 um)
+ 119  p06BiA2D  p06BiA2D (ppb; classe 1.25-2.5 um)
+ 120  p06ISOP2  p06ISOP2 (ppb; classe 1.25-2.5 um)
+
  121  p07BCAR   p07BCAR  (ppb; classe 2.5-5 um)
  122  p07DUST   p07DUST  (ppb; classe 2.5-5 um)
  123  p07OCAR   p07OCAR  (ppb; classe 2.5-5 um)  
@@ -107,7 +149,14 @@
  131  p07HNO3   p07HNO3  (ppb; classe 2.5-5 um)  
  132  p07NH3    p07NH3   (ppb; classe 2.5-5 um)  
  133  p07WATER  p07WATER (ppb; classe 2.5-5 um)  
- 134  p07ISOPA1 p07ISOPA1(ppb; classe 2.5-5 um)
+ 134  p07ISOP1  p07ISOPA1(ppb; classe 2.5-5 um)
+ 135  p07AnA0D  p07AnA0D (ppb; classe 2.5-5 um)
+ 136  p07AnA2D  p07AnA2D (ppb; classe 2.5-5 um)
+ 137  p07AnBIP  p07AnBIP (ppb; classe 2.5-5 um)
+ 138  p07BiA0D  p07BiA0D (ppb; classe 2.5-5 um)
+ 139  p07BiA2D  p07BiA2D (ppb; classe 2.5-5 um)
+ 140  p07ISOP2  p07ISOP2 (ppb; classe 2.5-5 um)
+
  141  p08BCAR   p08BCAR  (ppb; classe 5-10 um)
  142  p08DUST   p08DUST  (ppb; classe 5-10 um)
  143  p08OCAR   p08OCAR  (ppb; classe 5-10 um)  
@@ -121,7 +170,14 @@
  151  p08HNO3   p08HNO3  (ppb; classe 5-10 um)  
  152  p08NH3    p08NH3   (ppb; classe 5-10 um)  
  153  p08WATER  p08WATER (ppb; classe 5-10 um)  
- 154  p08ISOPA1 p08ISOPA1(ppb; classe 5-10 um)
+ 154  p08ISOP1  p08ISOPA1(ppb; classe 5-10 um)
+ 155  p08AnA0D  p08AnA0D (ppb; classe 5-10 um)
+ 156  p08AnA2D  p08AnA2D (ppb; classe 5-10 um)
+ 157  p08AnBIP  p08AnBIP (ppb; classe 5-10 um)
+ 158  p08BiA0D  p08BiA0D (ppb; classe 5-10 um)
+ 159  p08BiA2D  p08BiA2D (ppb; classe 5-10 um)
+ 150  p08ISOP2  p08ISOP2 (ppb; classe 5-10 um)
+
  201  BCARAQ    BCARAQ  
  202  DUSTAQ    DUSTAQ  
  203  OCARAQ    OCARAQ    
@@ -135,4 +191,10 @@
  211  HNO3AQ    HNO3AQ    
  212  NH3AQ     NH3AQ     
  214  ISOPA1AQ  ISOPA1AQ
+ 215  AnA0DAQ   AnA0DAQ   
+ 216  AnA2DAQ   AnA2DAQ
+ 217  AnBIPAQ   AnBIPAQ
+ 218  BiA0DAQ   BiA0DAQ
+ 219  BiA2DAQ   BiA2DAQ
+ 220  ISOP2AQ   ISOP2AQ
 !123--12345678--1234567890123456789012345678901234567890

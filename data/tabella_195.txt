@@ -4,7 +4,9 @@
 ! I parametri gas Chimere sono nella tabella 200, le variabili prognostiche
 ! aerosol nella tabella 196
 !
-!                                          Ultimo aggiornamento: 29/11/2013
+! I suffissi "spl", "med" e "cpx" si riferiscono agli schemi aerosol
+! di Chimere
+!                                          Ultimo aggiornamento: 06/12/2013
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890--12345
 !Cod  Sigla     Descrizione e unita'                      B-Tab 
@@ -18,7 +20,7 @@
    7  pm015     Total aerosol < 0.15625 um (ug/m3)        15206
    8  pm008     Total aerosol < 0.078125 um (ug/m3)       15207
 
-!Speciazione PM10, V2008
+!Speciazione PM10, V2008 (specie: 9-29; aggregati: 30-38)
    9  p10ppm    Primary part. matter in PM10 (ug/m3)      15208
   10  p10h2so4  Sulfate in PM10 (ug/m3)                   15209
   11  p10hno3   Nitrate in PM10 (ug/m3)                   15210
@@ -32,14 +34,72 @@
   19  p10BiBmP  Biogenic BmP in PM10 (ug/m3)              15218
   20  p10WATER  Water in PM10 (ug/m3)                     15219
   21  p10salt   Sea salt in PM10 (ug/m3)                  15220
-  22  pISOPA1   ISOPA1 in PM10 (ug/m3)                    15235
+  22  p10ISOP1  ISOPA1 in PM10 (ug/m3)                    15235
+  23  p10AnA0D  Anthropogenic A0D in PM10 (ug/m3)
+  24  p10AnA2D  Anthropogenic A2D in PM10 (ug/m3)
+  25  p10AnBIP  Anthropogenic BIP in PM10 (ug/m3)
+  26  p10BiA0D  Biogenic A0D in PM10 (ug/m3)
+  27  p10BiA2D  Biogenic A2D in PM10 (ug/m3)
+  28  p10ISOP2  ISOPA2 in PM10 (ug/m3)
   30  p10tsoa   Total secondary organic in PM10 (ug/m3)   15221
   31  p10tpri   Total primary part. in PM10 (ug/m3)       15222
   32  p10tsec   Total secondary part. in PM10 (ug/m3)     15223
-  33  p10ant    Total anthrop. part. in PM10 (ug/m3)      15237
-  34  p10bio    Total biogenic part. in PM10 (ug/m3)      15238
-  43  p25ant    Total anthrop. part. in PM2.5 (ug/m3)     15239
-  44  p25bio    Total biogenic part. in PM2.5 (ug/m3)     15240
+  33  p10ant    Total antr. part. in PM10, med (ug/m3)    15237
+  34  p10bio    Total biog. part. in PM10, med (ug/m3)    15238
+
+!Speciazione PM25, V2008 (specie: 39-59; aggregati: 60-68)
+  39  p25ppm    Primary part. matter in PM25 (ug/m3)
+  40  p25h2so4  Sulfate in PM25 (ug/m3)
+  41  p25hno3   Nitrate in PM25 (ug/m3)
+  42  p25nh3    Ammonium in PM25 (ug/m3)
+  43  p25bcar   Black carbon in PM25 (ug/m3)
+  44  p25ocar   Organic carbon in PM25 (ug/m3)
+  45  p25dust   Dust in PM25 (ug/m3)
+  46  p25AnA1D  Anthropogenic A1D in PM25 (ug/m3)
+  47  p25AnBmP  Anthropogenic BmP in PM25 (ug/m3)
+  48  p25BiA1D  Biogenic A1D in PM25 (ug/m3)
+  49  p25BiBmP  Biogenic BmP in PM25 (ug/m3)
+  50  p25WATER  Water in PM25 (ug/m3)
+  51  p25salt   Sea salt in PM25 (ug/m3)
+  52  p25ISOP1  ISOPA1 in PM25 (ug/m3)
+  53  p25AnA0D  Anthropogenic A0D in PM25 (ug/m3)
+  54  p25AnA2D  Anthropogenic A2D in PM25 (ug/m3)
+  55  p25AnBIP  Anthropogenic BIP in PM25 (ug/m3)
+  56  p25BiA0D  Biogenic A0D in PM25 (ug/m3)
+  57  p25BiA2D  Biogenic A2D in PM25 (ug/m3)
+  58  p25ISOP2  ISOPA2 in PM25 (ug/m3)
+  60  p25tsoa   Total secondary organic in PM25 (ug/m3)
+  61  p25tpri   Total primary part. in PM25 (ug/m3)
+  62  p25tsec   Total secondary part. in PM25 (ug/m3)
+  63  p25ant    Total antr. part. in PM25, med (ug/m3)    15237
+  64  p25bio    Total biog. part. in PM25, med (ug/m3)    15238
+
+!Speciazione PM1, V2008 (specie: 69-89; aggregati: 90-98)
+  69  p1ppm     Primary part. matter in PM1 (ug/m3)
+  70  p1h2so4   Sulfate in PM1 (ug/m3)
+  71  p1hno3    Nitrate in PM1 (ug/m3)
+  72  p1nh3     Ammonium in PM1 (ug/m3)
+  73  p1bcar    Black carbon in PM1 (ug/m3)
+  74  p1ocar    Organic carbon in PM1 (ug/m3)
+  75  p1dust    Dust in PM1 (ug/m3)
+  76  p1AnA1D   Anthropogenic A1D in PM1 (ug/m3)
+  77  p1AnBmP   Anthropogenic BmP in PM1 (ug/m3)
+  78  p1BiA1D   Biogenic A1D in PM1 (ug/m3)
+  79  p1BiBmP   Biogenic BmP in PM1 (ug/m3)
+  80  p1WATER   Water in PM1 (ug/m3)
+  81  p1salt    Sea salt in PM1 (ug/m3)
+  82  p1ISOP1   ISOPA1 in PM1 (ug/m3)
+  83  p1AnA0D   Anthropogenic A0D in PM1 (ug/m3)
+  84  p1AnA2D   Anthropogenic A2D in PM1 (ug/m3)
+  85  p1AnBIP   Anthropogenic BIP in PM1 (ug/m3)
+  86  p1BiA0D   Biogenic A0D in PM1 (ug/m3)
+  87  p1BiA2D   Biogenic A2D in PM1 (ug/m3)
+  88  p1ISOP2   ISOPA2 in PM1 (ug/m3)
+  90  p1tsoa    Total secondary organic in PM1 (ug/m3)
+  91  p1tpri    Total primary part. in PM1 (ug/m3)
+  92  p1tsec    Total secondary part. in PM1 (ug/m3)
+  93  p1ant     Antr. part. in PM1, level 2 (ug/m3)
+  94  p1bio     Biog. part. in PM1, level 2 (ug/m3)
 
 !AOD
  200  aod550    Aerosol Optical Depth at 550nm (number)   15241
