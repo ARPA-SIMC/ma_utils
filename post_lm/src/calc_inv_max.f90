@@ -30,7 +30,7 @@ REAL, ALLOCATABLE :: temp(:,:),inv(:)
 INTEGER :: data_scad(9),data_scadc(9),lev(1:3),levp(1:3),par(3),np
 INTEGER :: iuin1,iuin2,iuout,k,kp,idp,cntl,cntt,cntg,cntsk
 CHARACTER (LEN=80) :: file_t2m,file_t3d,fileout,charg,next_arg
-LOGICAL :: levok1,levok2,lt2m
+LOGICAL :: levok1,levok2,lt2m,ksec2_diff
 
 !==========================================================================
 ! 1) Preliminari
@@ -125,7 +125,7 @@ grib: DO k = 1,HUGE(0)
     ENDIF
     cntl = 0
 
-  ELSE IF (ANY(ksec2(:) /= ksec2_sav(:))) THEN
+  ELSE IF (ksec2_diff(ksec2(1:14),ksec2_sav(1:14))) THEN
     GOTO 9997
 
   ENDIF
@@ -362,3 +362,32 @@ ENDDO
 
 RETURN
 END SUBROUTINE calc_inv
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+FUNCTION ksec2_diff(ksec2a,ksec2b) RESULT(is_diff)
+!
+! Controlla se due array ksec2 scritti da Gribex corrispondono alla stessa 
+! griglia
+!
+IMPLICIT NONE
+LOGICAL :: is_diff
+INTEGER, INTENT(IN) :: ksec2a(14),ksec2b(14)
+
+IF (ANY(ksec2a((/1,2,3,4,5,6,7,8,11/)) /= ksec2b((/1,2,3,4,5,6,7,8,11/)))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(6) == 128 .AND. &
+  (ksec2a(9) /= ksec2b(9) .OR. ksec2a(10) /= ksec2b(10))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(1) == 10 .AND. &
+  (ksec2a(13) /= ksec2b(13) .OR. ksec2a(14) /= ksec2b(14))) THEN
+  is_diff = .TRUE.
+
+ELSE 
+  is_diff = .FALSE.
+
+ENDIF
+
+END FUNCTION ksec2_diff

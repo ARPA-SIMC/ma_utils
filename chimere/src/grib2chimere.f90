@@ -19,7 +19,7 @@ PROGRAM grib2chimere
 ! - Mette a 0 le specie richieste in output e non presenti in input
 ! - Gestisce solo lo scanning flag 64 (010)
 !
-!                                         Versione 3.0.2, Enrico 02/12/2013
+!                                         Versione 3.0.3, Enrico 10/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -85,7 +85,7 @@ CHARACTER (LEN=120) :: filein,fileout,filespc,fileor,filevc,chdum,arg(4)
 CHARACTER (LEN=80) :: tab_path
 CHARACTER (LEN=8) :: req_spc(maxspc),dum_spc
 CHARACTER (LEN=2) :: next_arg,idscad
-LOGICAL :: spc_pres(maxspc),first,lroz,req_ro,req_zz
+LOGICAL :: spc_pres(maxspc),first,lroz,req_ro,req_zz,ksec2_diff
 
 !--------------------------------------------------------------------------
 ! 1) Elaborazioni preliminari
@@ -268,7 +268,7 @@ DO
     np = ksec2(2) * ksec2(3)
     IF (ksec2(11) /= 64) GOTO 9994
   ELSE
-    IF (ANY(ksec2(1:11) /= ksec2_first(1:11)) .OR. ksec1(2) /= cem) GOTO 9993
+    IF (ksec2_diff(ksec2(1:14),ksec2_first(1:14)) .OR. ksec1(2) /= cem) GOTO 9993
   ENDIF
 
 ! Verifico se ho trovato un nuovo parametro 
@@ -340,7 +340,8 @@ IF (lroz) THEN
   IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
 !  CALL PBCLOSE(iu2)
 
-  IF (ANY(ksec2(1:11) /= ksec2_first(1:11))) GOTO 9992
+  IF (ksec2_diff(ksec2(1:14),ksec2_first(1:14))) GOTO 9992
+
   IF (ANY(orog(1:np) < 0.) .OR. (ANY(orog(1:np) >= 10000.))) &
     orog(1:np) = MAX(MIN(orog(1:np),10000.),0.)
   IF (ksec1(6) /= 8) WRITE (*,*) &
@@ -872,6 +873,35 @@ WRITE (*,*) "    orog: file grib con orografia relativa al grigliato di filein"
 RETURN
 
 END SUBROUTINE write_help
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+FUNCTION ksec2_diff(ksec2a,ksec2b) RESULT(is_diff)
+!
+! Controlla se due array ksec2 scritti da Gribex corrispondono alla stessa 
+! griglia
+!
+IMPLICIT NONE
+LOGICAL :: is_diff
+INTEGER, INTENT(IN) :: ksec2a(14),ksec2b(14)
+
+IF (ANY(ksec2a((/1,2,3,4,5,6,7,8,11/)) /= ksec2b((/1,2,3,4,5,6,7,8,11/)))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(6) == 128 .AND. &
+  (ksec2a(9) /= ksec2b(9) .OR. ksec2a(10) /= ksec2b(10))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(1) == 10 .AND. &
+  (ksec2a(13) /= ksec2b(13) .OR. ksec2a(14) /= ksec2b(14))) THEN
+  is_diff = .TRUE.
+
+ELSE 
+  is_diff = .FALSE.
+
+ENDIF
+
+END FUNCTION ksec2_diff
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 

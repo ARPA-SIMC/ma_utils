@@ -16,7 +16,7 @@ PROGRAM grib2up_dat
 ! - Tracciato file di output (up.dat, esclusi headers): 
 !   pp(mb), zz(m), tt(K), dd(grd), ff(m/s)
 !
-!                                         Versione 2.0.0, Enrico 02/08/2012
+!                                         Versione 2.0.1, Enrico 10/01/2014
 !--------------------------------------------------------------------------
 USE file_utilities
 USE seriet_utilities
@@ -62,7 +62,7 @@ INTEGER :: k,kl,kp,kh,kv,krec,kpar,k1,k2,idl,ii,jj,nf
 CHARACTER(LEN=80) :: file_3d,file_z,file_sup,file_pts,file_srq,chpar
 CHARACTER(LEN=80) :: fileout,chdum,lab,chrec
 CHARACTER(LEN=3) :: next_arg
-LOGICAL :: ltest,l10m
+LOGICAL :: ltest,l10m,ksec2_diff
 
 !==========================================================================
 ! 1) Preliminari
@@ -300,8 +300,8 @@ istanti: DO kh = 1,nh
         CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                     field,maxdim,kbuffer,maxdim,klen,'D',kret)
         IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-        IF (ANY(ksec2(1:11)/=ksec2_sav(1:11)) .OR. &
-            ANY(ksec2(13:14)/=ksec2_sav(13:14))) GOTO 9987
+        IF (ksec2_diff(ksec2(1:14),ksec2_sav(1:14))) GOTO 9987
+
         var3d(kv,kl,1:np) = field(idx(1:np))
         IF (ier == -2) cnt_rew = cnt_rew + 1
       ELSE
@@ -330,8 +330,7 @@ istanti: DO kh = 1,nh
         CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                     field,maxdim,kbuffer,maxdim,klen,'D',kret)
         IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-        IF (ANY(ksec2(1:11)/=ksec2_sav(1:11)) .OR. &
-            ANY(ksec2(13:14)/=ksec2_sav(13:14))) GOTO 9986
+        IF (ksec2_diff(ksec2(1:14),ksec2_sav(1:14))) GOTO 9986
         var3d(kv,nl,1:np) = field(idx(1:np))
         IF (ier == -2) cnt_rew2 = cnt_rew2 + 1
       ELSE
@@ -694,6 +693,35 @@ WRITE (*,*) ""
 
 RETURN
 END SUBROUTINE scrive_help
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+FUNCTION ksec2_diff(ksec2a,ksec2b) RESULT(is_diff)
+!
+! Controlla se due array ksec2 scritti da Gribex corrispondono alla stessa 
+! griglia
+!
+IMPLICIT NONE
+LOGICAL :: is_diff
+INTEGER, INTENT(IN) :: ksec2a(14),ksec2b(14)
+
+IF (ANY(ksec2a((/1,2,3,4,5,6,7,8,11/)) /= ksec2b((/1,2,3,4,5,6,7,8,11/)))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(6) == 128 .AND. &
+  (ksec2a(9) /= ksec2b(9) .OR. ksec2a(10) /= ksec2b(10))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(1) == 10 .AND. &
+  (ksec2a(13) /= ksec2b(13) .OR. ksec2a(14) /= ksec2b(14))) THEN
+  is_diff = .TRUE.
+
+ELSE 
+  is_diff = .FALSE.
+
+ENDIF
+
+END FUNCTION ksec2_diff
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 

@@ -10,7 +10,7 @@ PROGRAM post_wind_lm
 !   scritta come griglia H (i.e. spostati di mezza cella verso NE)
 ! - Con l'opzione -antir antiruota le componenti
 !
-!                                         Versione 1.1.3, Enrico 16/05/2013
+!                                         Versione 1.1.4, Enrico 10/01/2014
 !--------------------------------------------------------------------------
 
 USE grid_handler
@@ -38,7 +38,7 @@ REAL :: fave,field1(maxdim),field2(maxdim)
 INTEGER :: kf,kp,ni,nj,k,ii,jj,kk,k0
 INTEGER :: ngrib,in_geo,iuin1,iuin2,iuout1,iuout2,nok,np_sav,np
 CHARACTER (LEN=80) :: filein1,filein2,fileout1,fileout2,chpar,file(4)
-LOGICAL :: dest,antir
+LOGICAL :: dest,antir,ksec2_diff
 
 !==========================================================================
 ! 1) Preliminari
@@ -162,7 +162,7 @@ grib: DO
 ! 2.3) Controlli sulle intestazioni dei grib
 
   IF (ANY(ksec1v(:5) /= ksec1u(:5)) .OR. ANY(ksec1v(7:21) /= ksec1u(7:21)) .OR. &
-      ANY(ksec2v(1:14) /= ksec2u(1:14)) ) THEN
+      ksec2_diff(ksec2u(1:14),ksec2v(1:14))) THEN
     WRITE (*,*) "Trovati grib con sezioni diverse, ngrib = ",ngrib+1
     DO kp = 1,5
       IF (ksec1v(kp) /= ksec1u(kp)) WRITE (*,*) &
@@ -305,7 +305,36 @@ CLOSE (96)
 
 END PROGRAM post_wind_lm
 
-!--------------------------------------------------------------------------
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+FUNCTION ksec2_diff(ksec2a,ksec2b) RESULT(is_diff)
+!
+! Controlla se due array ksec2 scritti da Gribex corrispondono alla stessa 
+! griglia
+!
+IMPLICIT NONE
+LOGICAL :: is_diff
+INTEGER, INTENT(IN) :: ksec2a(14),ksec2b(14)
+
+IF (ANY(ksec2a((/1,2,3,4,5,6,7,8,11/)) /= ksec2b((/1,2,3,4,5,6,7,8,11/)))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(6) == 128 .AND. &
+  (ksec2a(9) /= ksec2b(9) .OR. ksec2a(10) /= ksec2b(10))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(1) == 10 .AND. &
+  (ksec2a(13) /= ksec2b(13) .OR. ksec2a(14) /= ksec2b(14))) THEN
+  is_diff = .TRUE.
+
+ELSE 
+  is_diff = .FALSE.
+
+ENDIF
+
+END FUNCTION ksec2_diff
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 SUBROUTINE write_help
 

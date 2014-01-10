@@ -3,7 +3,7 @@ PROGRAM grib_ttd2rh
 ! Programma che legge da 2 file T e Td e scrive un file con RH.
 ! Usato dalla catena as2pm
 !
-!                                           Versione 1.1, Enrico 17/08/2011
+!                                         Versione 1.1.1, Enrico 10/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -25,6 +25,7 @@ REAL :: tt(maxdim),td(maxdim),rh(maxdim)
 REAL :: ttd2rh
 INTEGER :: ngrib,iuin1,iuin2,iuout,np,idp,k,kp
 CHARACTER (LEN=80) :: file_tt,file_td,file_rh,chdum
+LOGICAL :: ksec2_diff
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
@@ -105,7 +106,8 @@ grib: DO
   IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
 
 ! 2.3) Diagnostica sulla compatibilita' dei campi
-  IF (ANY(ksec2a(1:14) /= ksec2b(1:14)) .OR. (ksec4a(1) /= ksec4b(1))) THEN
+
+  IF (ksec2_diff(ksec2a(1:14),ksec2b(1:14)) .OR. (ksec4a(1) /= ksec4b(1))) THEN
     WRITE (*,*) "T e Td definiti su griglie diverse, skip (progr. ",ngrib + 1,")"
     DO k = 1,14 
       IF (ksec2a(k) /= ksec2b(k)) WRITE (*,'(a,i4,a,2i12)') &
@@ -217,3 +219,32 @@ rh = MIN(MAX(rh,0.),100.)
 
 RETURN
 END FUNCTION ttd2rh
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+FUNCTION ksec2_diff(ksec2a,ksec2b) RESULT(is_diff)
+!
+! Controlla se due array ksec2 scritti da Gribex corrispondono alla stessa 
+! griglia
+!
+IMPLICIT NONE
+LOGICAL :: is_diff
+INTEGER, INTENT(IN) :: ksec2a(14),ksec2b(14)
+
+IF (ANY(ksec2a((/1,2,3,4,5,6,7,8,11/)) /= ksec2b((/1,2,3,4,5,6,7,8,11/)))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(6) == 128 .AND. &
+  (ksec2a(9) /= ksec2b(9) .OR. ksec2a(10) /= ksec2b(10))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(1) == 10 .AND. &
+  (ksec2a(13) /= ksec2b(13) .OR. ksec2a(14) /= ksec2b(14))) THEN
+  is_diff = .TRUE.
+
+ELSE 
+  is_diff = .FALSE.
+
+ENDIF
+
+END FUNCTION ksec2_diff

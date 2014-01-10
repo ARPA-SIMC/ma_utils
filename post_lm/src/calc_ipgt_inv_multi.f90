@@ -13,7 +13,7 @@ PROGRAM calc_ipgt_inv_multi
 !   radiazione visibile e IR devono riferirsi alla media sull'ora 
 !   precedente (in analogia con la logica seguita da Calmet)
 !
-!                                         Versione 1.0.1, Enrico 07/09/2012
+!                                         Versione 1.0.2, Enrico 01/10/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -87,7 +87,7 @@ INTEGER :: np,nlevs,rql,iu_in(8),iu_out(4)
 INTEGER :: kfin,kp,k,kc,kl,kist,ios
 CHARACTER (LEN=80) :: chdum,next_arg
 CHARACTER (LEN=1) :: inp
-LOGICAL :: lreu,lbow,ltur,linv
+LOGICAL :: lreu,lbow,ltur,linv,ksec2_diff
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
@@ -222,7 +222,7 @@ ist: DO kist = 1,HUGE(kist)
       ENDIF
    
 ! 2.1.3 Controlli su data, scadenza, livello e area
-      IF (ANY(ksec2(:) /= ksec2_sav(:)) .OR. ksec4(1) /= np) GOTO 9997
+      IF (ksec2_diff(ksec2(1:14),ksec2_sav(1:14)) .OR. ksec4(1) /= np) GOTO 9997
    
       SELECT CASE (kfin)
       CASE (1)
@@ -597,3 +597,30 @@ RETURN
 END SUBROUTINE write_help
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+FUNCTION ksec2_diff(ksec2a,ksec2b) RESULT(is_diff)
+!
+! Controlla se due array ksec2 scritti da Gribex corrispondono alla stessa 
+! griglia
+!
+IMPLICIT NONE
+LOGICAL :: is_diff
+INTEGER, INTENT(IN) :: ksec2a(14),ksec2b(14)
+
+IF (ANY(ksec2a((/1,2,3,4,5,6,7,8,11/)) /= ksec2b((/1,2,3,4,5,6,7,8,11/)))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(6) == 128 .AND. &
+  (ksec2a(9) /= ksec2b(9) .OR. ksec2a(10) /= ksec2b(10))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(1) == 10 .AND. &
+  (ksec2a(13) /= ksec2b(13) .OR. ksec2a(14) /= ksec2b(14))) THEN
+  is_diff = .TRUE.
+
+ELSE 
+  is_diff = .FALSE.
+
+ENDIF
+
+END FUNCTION ksec2_diff

@@ -12,7 +12,7 @@ PROGRAM calc_ustar_mo
 !   del mixing ratio come sarebbe piu' corretto (le differenze sono del
 !   tutto trascurabili)
 !
-!                                           Versione 3.2, Enrico 28/03/2012
+!                                         Versione 3.2.1, Enrico 10/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -45,6 +45,7 @@ REAL :: fave1,fave2
 INTEGER :: iuin(6),iuout(2),np,kfin,kist,nok1,nok2,hh_dum,hhc,ier,k
 CHARACTER (LEN=80) :: filein(6),fileout(2)
 CHARACTER (LEN=2) :: hum
+LOGICAL :: ksec2_diff
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
@@ -57,7 +58,7 @@ ENDDO
 IF (ANY(filein(1:6) == "") .OR. TRIM(filein(1)) == "-h") THEN
   WRITE (*,*) "Uso: calc_ustar_mo.exe [-h] filein(6)" 
   WRITE (*,*) "Ordine dei files di input: T, Td/Q, Ps, umfl, vmfl, shf"
-  STOP
+  STOP 1
 ENDIF
 
 ! 1.2 Disabilito i controlli sui parametri GRIBEX
@@ -97,7 +98,7 @@ ist: DO kist = 1,HUGE(kist)
       GOTO 9998
     ELSE IF (kret < -1) THEN
       WRITE(*,*) "Error pbgrib: kret ",kret
-      STOP
+      STOP 2
     ENDIF
 
     psec3(2) = rmis                           ! forzo dati mancanti = rmis
@@ -119,7 +120,7 @@ ist: DO kist = 1,HUGE(kist)
     ENDIF
 
 !   Controlli su scadenza e area
-    IF (ANY(ksec2(:) /= ksec2_sav(:)) .OR. ksec4(1) /= np) GOTO 9997
+    IF (ksec2_diff(ksec2(1:14),ksec2_sav(1:14)) .OR. ksec4(1) /= np) GOTO 9997
 
     IF (kfin == 1) THEN
       ksec1_sav(:) = ksec1(:)
@@ -274,11 +275,11 @@ STOP
 
 9999 CONTINUE
 WRITE(*,*) "Errore aprendo ",TRIM(filein(kfin))," kret ",kret
-STOP
+STOP 2
 
 9998 CONTINUE
 WRITE(*,*) "Il file ",TRIM(filein(kfin))," contiene meno istanti"
-STOP
+STOP 3
 
 9997 CONTINUE
 WRITE(*,*) "Area diversa in ",TRIM(filein(kfin))," istante ",kist
@@ -289,24 +290,24 @@ DO k = 1,1024
     "ksec2(",k,") attesto ",ksec2_sav(k)," trovato ",ksec2(k)
 ENDDO
 
-STOP
+STOP 4
 
 9996 CONTINUE
 WRITE(*,'(2a,4i4)') "Scadenza non gestita in ",TRIM(filein(kfin)), &
   ksec1(15:18)
-STOP
+STOP 5
 
 9995 CONTINUE
 WRITE(*,*) "Data/scadenza disallineata in ",TRIM(filein(kfin)), &
   " istante ",kist
 WRITE(*,'(a,6i5,5x,4i4)') "Richiesta: ",ksec1_sav(21),ksec1_sav(10:18)
 WRITE(*,'(a,6i5,5x,4i4)') "Trovata:   ",ksec1(21),ksec1(10:18)
-STOP
+STOP 6
 
 9994 CONTINUE
 WRITE(*,'(3a,3i4)') "Parametro errato in ",TRIM(filein(kfin)), &
   " file,tab,var ",kfin,ksec1(1),ksec1(6)
-STOP
+STOP 7
 
 END PROGRAM calc_ustar_mo
 
@@ -507,5 +508,34 @@ ier = 2
 RETURN
 
 END SUBROUTINE ksec1_valid
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+FUNCTION ksec2_diff(ksec2a,ksec2b) RESULT(is_diff)
+!
+! Controlla se due array ksec2 scritti da Gribex corrispondono alla stessa 
+! griglia
+!
+IMPLICIT NONE
+LOGICAL :: is_diff
+INTEGER, INTENT(IN) :: ksec2a(14),ksec2b(14)
+
+IF (ANY(ksec2a((/1,2,3,4,5,6,7,8,11/)) /= ksec2b((/1,2,3,4,5,6,7,8,11/)))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(6) == 128 .AND. &
+  (ksec2a(9) /= ksec2b(9) .OR. ksec2a(10) /= ksec2b(10))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(1) == 10 .AND. &
+  (ksec2a(13) /= ksec2b(13) .OR. ksec2a(14) /= ksec2b(14))) THEN
+  is_diff = .TRUE.
+
+ELSE 
+  is_diff = .FALSE.
+
+ENDIF
+
+END FUNCTION ksec2_diff
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

@@ -35,7 +35,7 @@
 ! - manca formato mm4
 ! - manca interpolazione vento SMR
 !
-!                                                 V1.2.1, Enrico 10/09/2012
+!                                                 V1.2.2, Enrico 10/01/2014
 !--------------------------------------------------------------------------
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -124,6 +124,9 @@ INTEGER :: idum
 CHARACTER (LEN=80) :: fileorog,filegrib,filedate,filelam,fileout,out_head
 CHARACTER (LEN=10) :: str_tipo_scad
 CHARACTER (LEN=6) :: str_model
+
+LOGICAL :: ksec2_diff
+
 !--------------------------------------------------------------------------
 ! 1) Input: definisco quali sono i dati richiesti
 
@@ -410,7 +413,7 @@ scad_lam: DO kist = 1,nist_lam
     CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                  field,maxdim,kbuffer,maxdim,klen,'D',kret)
     IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-    IF (ANY( ksec2(:) /= ksec2_orog(:) )) &
+    IF (ksec2_diff(ksec2(1:14),ksec2_orog(1:14))) &
       CALL fatal_error(data,ora,scad,level,var,ier,2)
 
     pl_geop2(1:np,klevp) = field(1:np)
@@ -423,7 +426,7 @@ scad_lam: DO kist = 1,nist_lam
     CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                  field,maxdim,kbuffer,maxdim,klen,'D',kret)
     IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-    IF (ANY( ksec2(:) /= ksec2_orog(:) )) &
+    IF (ksec2_diff(ksec2(1:14),ksec2_orog(1:14))) &
       CALL fatal_error(data,ora,scad,level,var,ier,2)
 
     pl_uu2(1:np,klevp) = field(1:np)
@@ -436,7 +439,7 @@ scad_lam: DO kist = 1,nist_lam
     CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                  field,maxdim,kbuffer,maxdim,klen,'D',kret)
     IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-    IF (ANY( ksec2(:) /= ksec2_orog(:) )) &
+    IF (ksec2_diff(ksec2(1:14),ksec2_orog(1:14))) &
       CALL fatal_error(data,ora,scad,level,var,ier,2)
 
     pl_vv2(1:np,klevp) = field(1:np)
@@ -450,7 +453,7 @@ scad_lam: DO kist = 1,nist_lam
       CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                    field,maxdim,kbuffer,maxdim,klen,'D',kret)
       IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-      IF (ANY( ksec2(:) /= ksec2_orog(:) )) &
+      IF (ksec2_diff(ksec2(1:14),ksec2_orog(1:14))) &
         CALL fatal_error(data,ora,scad,level,var,ier,2)
 
       pl_tt2(1:np,klevp) = field(1:np)
@@ -465,8 +468,8 @@ scad_lam: DO kist = 1,nist_lam
       CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                    field,maxdim,kbuffer,maxdim,klen,'D',kret)
       IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-      IF (ANY( ksec2(:) /= ksec2_orog(:) )) &
-        CALL fatal_error(data,ora,scad,level,var,ier,2)
+      IF (ksec2_diff(ksec2(1:14),ksec2_orog(1:14))) &
+          CALL fatal_error(data,ora,scad,level,var,ier,2)
 
 !     Solo per Aladin, converto l'umidita' relativa in specifica
       IF (model == 3) THEN
@@ -497,7 +500,7 @@ scad_lam: DO kist = 1,nist_lam
     CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                  field,maxdim,kbuffer,maxdim,klen,'D',kret)
     IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-    IF (ANY( ksec2(:) /= ksec2_orog(:) )) &
+    IF (ksec2_diff(ksec2(1:14),ksec2_orog(1:14))) &
       CALL fatal_error(data,ora,scad,level,var,ier,2)
 
     IF (model == 3) THEN
@@ -514,7 +517,7 @@ scad_lam: DO kist = 1,nist_lam
     CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                  field,maxdim,kbuffer,maxdim,klen,'D',kret)
     IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-    IF (ANY( ksec2(:) /= ksec2_orog(:) )) &
+    IF (ksec2_diff(ksec2(1:14),ksec2_orog(1:14))) &
       CALL fatal_error(data,ora,scad,level,var,ier,2)
 
     ml_uu2(1:np,klevm) = field(1:np)
@@ -527,7 +530,7 @@ scad_lam: DO kist = 1,nist_lam
     CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                  field,maxdim,kbuffer,maxdim,klen,'D',kret)
     IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-    IF (ANY( ksec2(:) /= ksec2_orog(:) )) &
+    IF (ksec2_diff(ksec2(1:14),ksec2_orog(1:14))) &
       CALL fatal_error(data,ora,scad,level,var,ier,2)
 
     ml_vv2(1:np,klevm) = field(1:np)
@@ -541,7 +544,7 @@ scad_lam: DO kist = 1,nist_lam
       CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                    field,maxdim,kbuffer,maxdim,klen,'D',kret)
       IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-      IF (ANY( ksec2(:) /= ksec2_orog(:) )) &
+      IF (ksec2_diff(ksec2(1:14),ksec2_orog(1:14))) &
         CALL fatal_error(data,ora,scad,level,var,ier,2)
 
       ml_tt2(1:np,klevm) = field(1:np)
@@ -556,7 +559,7 @@ scad_lam: DO kist = 1,nist_lam
       CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                    field,maxdim,kbuffer,maxdim,klen,'D',kret)
       IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-      IF (ANY( ksec2(:) /= ksec2_orog(:) )) &
+      IF (ksec2_diff(ksec2(1:14),ksec2_orog(1:14))) &
         CALL fatal_error(data,ora,scad,level,var,ier,2)
 
 !     Solo per Aladin, converto l'umidita' relativa in specifica
@@ -1757,6 +1760,35 @@ ENDIF
 !
 RETURN
 END SUBROUTINE write_rec_pl
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+FUNCTION ksec2_diff(ksec2a,ksec2b) RESULT(is_diff)
+!
+! Controlla se due array ksec2 scritti da Gribex corrispondono alla stessa 
+! griglia
+!
+IMPLICIT NONE
+LOGICAL :: is_diff
+INTEGER, INTENT(IN) :: ksec2a(14),ksec2b(14)
+
+IF (ANY(ksec2a((/1,2,3,4,5,6,7,8,11/)) /= ksec2b((/1,2,3,4,5,6,7,8,11/)))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(6) == 128 .AND. &
+  (ksec2a(9) /= ksec2b(9) .OR. ksec2a(10) /= ksec2b(10))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(1) == 10 .AND. &
+  (ksec2a(13) /= ksec2b(13) .OR. ksec2a(14) /= ksec2b(14))) THEN
+  is_diff = .TRUE.
+
+ELSE 
+  is_diff = .FALSE.
+
+ENDIF
+
+END FUNCTION ksec2_diff
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 !                       SUBROUTINES DA TERMOLIB

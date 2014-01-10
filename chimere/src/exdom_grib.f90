@@ -19,7 +19,7 @@ PROGRAM exdom_grib
 !
 ! Richiede che i grib del file differiscano solo per data/scad e livello
 !
-!                                         Versione 3.2.1, Enrico 07/12/2012
+!                                         Versione 3.2.2, Enrico 10/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -54,7 +54,7 @@ INTEGER :: hh1,hh2,hhc,hhp,hh_tot,scanning,delta,nt_calc,idp,idata
 INTEGER :: k,kk,kl,kt,kz,kp,ier,ios,eof,eor,j,j2,iu,iu1,iu2
 CHARACTER (LEN=200) :: filein,fileout,filecoord,filelsm,chdum,arg(3)
 CHARACTER (LEN=1) :: rule,next_arg
-LOGICAL :: log_int,hor_int,lsm_int,first,newlev,newist
+LOGICAL :: log_int,hor_int,lsm_int,first,newlev,newist,ksec2_diff
 
 !==========================================================================
 ! 1) Elaborazioni preliminari
@@ -165,7 +165,7 @@ DO kk=1,HUGE(0)
   ELSE
     IF (ksec1(5) == 0 .OR. ksec1(5) == 64) GOTO 9987
     IF (ksec1(1) /= ksec1_first(1) .OR. ksec1(6) /= ksec1_first(6) .OR. &
-        ANY(ksec2(1:11) /= ksec2_first(1:11)) ) GOTO 9998
+        ksec2_diff(ksec2(1:14),ksec2_first(1:14)) ) GOTO 9998
     IF (ANY(ksec1(2:4) /= ksec1_first(2:4))) THEN
       WRITE (*,*) "WARNING: ci sono differenze nella sez.1, elementi 2-4"
       WRITE (*,'(a10,3(1x,i6))') "1o grib: ",ksec1_first(2:4)
@@ -285,17 +285,10 @@ IF (lsm_int) THEN
 
   IF (ksec1(1) /= 2 .OR. ksec1(6) /= 81) WRITE (*,*) & 
     "Warning, parametro inatteso nel file LSM: ",ksec1(1),ksec1(6)
+  IF (ksec2_diff(ksec2(1:14),ksec2_first(1:14))) GOTO 9989
   IF (MAXVAL(lsm(1:np_in)) > 1. .OR. MINVAL(lsm(1:np_in)) < 0.) &
     WRITE (*,*) "Warning, valori sospetti in LSM: min, max ", &
     MINVAL(lsm(1:np_in)),MAXVAL(lsm(1:np_in))
-  
-  IF (ANY(ksec2(1:5) /= ksec2_first(1:5)) .OR. &
-      ksec2(7) /= ksec2_first(7) .OR. &
-      ksec2(8) /= ksec2_first(8) .OR. &
-      ksec2(11) /= ksec2_first(11) ) GOTO 9989
-  IF (ksec2(6) == 128 .AND. ksec2_first(6) == 128 .AND. &
-      (ksec2(9) /= ksec2_first(9) .OR. ksec2(10) /= ksec2_first(10)) ) &
-     GOTO 9989
 
 ! Stabilisco il valore minimo della LSM perche' un dato sia utilizzato
   IF ((ksec1_first(1) == 2 .AND. ksec1_first(6) == 86) .OR. &
@@ -1142,3 +1135,30 @@ RETURN
 END SUBROUTINE get_eof_eor
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+FUNCTION ksec2_diff(ksec2a,ksec2b) RESULT(is_diff)
+!
+! Controlla se due array ksec2 scritti da Gribex corrispondono alla stessa 
+! griglia
+!
+IMPLICIT NONE
+LOGICAL :: is_diff
+INTEGER, INTENT(IN) :: ksec2a(14),ksec2b(14)
+
+IF (ANY(ksec2a((/1,2,3,4,5,6,7,8,11/)) /= ksec2b((/1,2,3,4,5,6,7,8,11/)))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(6) == 128 .AND. &
+  (ksec2a(9) /= ksec2b(9) .OR. ksec2a(10) /= ksec2b(10))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(1) == 10 .AND. &
+  (ksec2a(13) /= ksec2b(13) .OR. ksec2a(14) /= ksec2b(14))) THEN
+  is_diff = .TRUE.
+
+ELSE 
+  is_diff = .FALSE.
+
+ENDIF
+
+END FUNCTION ksec2_diff

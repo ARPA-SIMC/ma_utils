@@ -21,6 +21,7 @@ REAL    :: field(maxdim)
 REAL :: zlev(maxdim,maxlev),zlay(maxdim,maxlev)
 INTEGER :: iuin,iuout,kl,nlev,np,ksec2f(1024),idlev(maxlev)
 CHARACTER (LEN=80) :: filein,fileout
+LOGICAL :: ksec2_diff
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
@@ -61,8 +62,7 @@ DO kl = 1,maxlev
     ksec2f(:) = ksec2(:)
     np = ksec4(1)
   ELSE
-    IF (ANY(ksec2(1:11) /= ksec2f(1:11)) .OR. &
-        ANY(ksec2(13:) /= ksec2f(13:)) .OR. ksec4(1) /= np) THEN
+    IF (ksec2_diff(ksec2(1:14),ksec2f(1:14)) .OR. ksec4(1) /= np) THEN
       WRITE (*,*) "Errore, esistono grib con area diversa"
       STOP
     ELSE IF (ksec1(6) /= 8 .OR. ksec1(7) /= 109) THEN
@@ -117,3 +117,32 @@ WRITE (*,*) "Scritti layers: ",nlev-1
 STOP
 
 END PROGRAM rw_grib
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+FUNCTION ksec2_diff(ksec2a,ksec2b) RESULT(is_diff)
+!
+! Controlla se due array ksec2 scritti da Gribex corrispondono alla stessa 
+! griglia
+!
+IMPLICIT NONE
+LOGICAL :: is_diff
+INTEGER, INTENT(IN) :: ksec2a(14),ksec2b(14)
+
+IF (ANY(ksec2a((/1,2,3,4,5,6,7,8,11/)) /= ksec2b((/1,2,3,4,5,6,7,8,11/)))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(6) == 128 .AND. &
+  (ksec2a(9) /= ksec2b(9) .OR. ksec2a(10) /= ksec2b(10))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(1) == 10 .AND. &
+  (ksec2a(13) /= ksec2b(13) .OR. ksec2a(14) /= ksec2b(14))) THEN
+  is_diff = .TRUE.
+
+ELSE 
+  is_diff = .FALSE.
+
+ENDIF
+
+END FUNCTION ksec2_diff

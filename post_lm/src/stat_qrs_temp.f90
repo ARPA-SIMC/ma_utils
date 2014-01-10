@@ -3,7 +3,7 @@ PROGRAM stat_qrs_temp
 ! Programma che legge da files separati i grib di T, Qw, Qi, Qr, Qs e 
 ! calcola il rapporto tra acqua liquida e ghiaccio alle varie temperature.
 !
-!                                           Versione 1.0, Enrico 11/10/2007
+!                                         Versione 1.0.1, Enrico 10/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -31,6 +31,7 @@ CHARACTER (LEN=80), PARAMETER :: filein(5) = &
   (/"tt.grb","qw.grb","qi.grb","qr.grb","qs.grb"/)
 CHARACTER (LEN=80) :: charg
 LOGICAL, ALLOCATABLE :: ttmask(:)
+LOGICAL :: ksec2_diff
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
@@ -97,7 +98,7 @@ grib: DO kg = 1, HUGE(0)
       np = ksec4(1)
       ALLOCATE (dati(np,5),ttmask(np))
     ELSE 
-      IF (ANY(ksec2(:) /= ksec2_sav(:))) GOTO 9999
+      IF (ksec2_diff(ksec2(1:14),ksec2_sav(1:14))) GOTO 9999
     ENDIF
 
 !   Controlli su data, scadenza, livello
@@ -175,4 +176,33 @@ WRITE (*,*) "Trovata data/scad/liv diversa: file ",TRIM(filein(kf))," campo ",kg
 STOP
 
 END PROGRAM stat_qrs_temp
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+FUNCTION ksec2_diff(ksec2a,ksec2b) RESULT(is_diff)
+!
+! Controlla se due array ksec2 scritti da Gribex corrispondono alla stessa 
+! griglia
+!
+IMPLICIT NONE
+LOGICAL :: is_diff
+INTEGER, INTENT(IN) :: ksec2a(14),ksec2b(14)
+
+IF (ANY(ksec2a((/1,2,3,4,5,6,7,8,11/)) /= ksec2b((/1,2,3,4,5,6,7,8,11/)))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(6) == 128 .AND. &
+  (ksec2a(9) /= ksec2b(9) .OR. ksec2a(10) /= ksec2b(10))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(1) == 10 .AND. &
+  (ksec2a(13) /= ksec2b(13) .OR. ksec2a(14) /= ksec2b(14))) THEN
+  is_diff = .TRUE.
+
+ELSE 
+  is_diff = .FALSE.
+
+ENDIF
+
+END FUNCTION ksec2_diff
 

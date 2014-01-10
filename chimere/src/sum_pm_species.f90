@@ -8,7 +8,7 @@ PROGRAM sum_pm_species
 ! Derivato da somma_grib.f90; puo' essere usato anche per calcolare 
 ! combinazioni lineari di grib.
 !
-!                                           Versione 2.1, Enrico 10/11/2006
+!                                         Versione 2.1.1, Enrico 10/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -33,7 +33,7 @@ REAL :: fk1,fk2,tt_ro
 INTEGER :: iuin(maxfil),par_out(3),opt_ro,ngrib
 INTEGER :: nfin,np,ios,ios0,ios1,ios2,ios3,eof,eor,kf,kg,kp,idp,iuout,iuro
 CHARACTER (LEN=80) :: filein(maxfil),filelst,fileout,filero,chdum,next_arg
-LOGICAL :: ld_par,ld_lev,ld_date,ld_sca,ld_ksec1,lpar_out
+LOGICAL :: ld_par,ld_lev,ld_date,ld_sca,ld_ksec1,lpar_out,ksec2_diff
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
@@ -170,7 +170,7 @@ grib: DO kg = 1,HUGE(0)
       psec2a(:) = psec2(:)
       psec3a(:) = psec3(:)
     ELSE
-      IF (ANY(ksec2(:) /= ksec2a(:)) .OR. (ksec4(1) /= ksec4a(1))) THEN
+      IF (ksec2_diff(ksec2(1:14),ksec2a(1:14)) .OR. (ksec4(1) /= ksec4a(1))) THEN
         GOTO 9993
       ELSE IF (ANY(ksec1(1:2) /= ksec1a(1:2)) .OR. &
                ksec1(6) /= ksec1a(6)) THEN
@@ -214,7 +214,7 @@ grib: DO kg = 1,HUGE(0)
                  field,maxdim,kbuffer,maxdim,klen,'D',kret)
     IF (kret > 0) WRITE(*,*) "Warning gribex: kret ",kret
 
-    IF (ANY(ksec2(:) /= ksec2a(:)) .OR. (ksec4(1) /= ksec4a(1))) GOTO 9992
+    IF (ksec2_diff(ksec2(1:14),ksec2a(1:14)) .OR. (ksec4(1) /= ksec4a(1))) GOTO 9992
     IF (ksec1(6) /= 89 .OR. ksec1(1) /= 200) &
       WRITE (*,'(3a,3i4)') "Warning: ",TRIM(filero), &
       " contiene parametro sospetto: ",ksec1(2),ksec1(1),ksec1(6)
@@ -361,6 +361,35 @@ WRITE (*,*) "-rost tt:       converte in ug/m3, usando P=1013.25 e T=tt (0<=tt<=
 WRITE (*,*)
 
 END SUBROUTINE write_help
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+FUNCTION ksec2_diff(ksec2a,ksec2b) RESULT(is_diff)
+!
+! Controlla se due array ksec2 scritti da Gribex corrispondono alla stessa 
+! griglia
+!
+IMPLICIT NONE
+LOGICAL :: is_diff
+INTEGER, INTENT(IN) :: ksec2a(14),ksec2b(14)
+
+IF (ANY(ksec2a((/1,2,3,4,5,6,7,8,11/)) /= ksec2b((/1,2,3,4,5,6,7,8,11/)))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(6) == 128 .AND. &
+  (ksec2a(9) /= ksec2b(9) .OR. ksec2a(10) /= ksec2b(10))) THEN
+  is_diff = .TRUE.
+
+ELSE IF (ksec2a(1) == 10 .AND. &
+  (ksec2a(13) /= ksec2b(13) .OR. ksec2a(14) /= ksec2b(14))) THEN
+  is_diff = .TRUE.
+
+ELSE 
+  is_diff = .FALSE.
+
+ENDIF
+
+END FUNCTION ksec2_diff
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
