@@ -13,7 +13,7 @@ PROGRAM qsoil_ecmwf2lama
 ! generalizzato in modo da gestire interp. temporale di dati a intervalli 
 ! variabili.
 !
-!                                                Versione 1.0, Enrico 07/05/2007
+!                                              Versione 1.0.1, Enrico 13/01/2014
 !-------------------------------------------------------------------------------
 
 USE grid_handler
@@ -39,7 +39,7 @@ REAL    :: field_t1(maxdim),field_t2(maxdim),field_out(maxdim)
 TYPE(date) :: data1,data2,datac
 TYPE(grid) :: qs_in,qs_out,qs_lama
 INTEGER :: iuin,iuout,iulama,kg,hh1,hh2,hhc,hht,cntw,np_lama,hdt
-CHARACTER (LEN=80) :: filein,fileout,filelama
+CHARACTER (LEN=200) :: filein,fileout,filelama
 
 !-------------------------------------------------------------------------------
 ! 0) Preliminari

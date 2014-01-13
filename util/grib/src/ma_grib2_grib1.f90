@@ -11,7 +11,7 @@ PROGRAM ma_grib2_grib1
 ! 
 ! Uso: utm_grib2_grib1 [-h] [-gribex] filein fileout
 !
-!                                         Versione 2.3.2, Enrico 27/03/2013
+!                                         Versione 2.3.3, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -37,7 +37,7 @@ INTEGER :: ifin,ifout,igin=0,igout=0,igtemp=0,iu
 INTEGER :: par(3),lev(3),scad(4),datah_ref(4),min,sec,yoc,cortod
 INTEGER :: sc,igen,drt,nv,bp,bp_gbex,bmi,bpv,bpv_gbex,ni,nj,sogd,dig,idig, &
   jdig,rf,cf,uvrtg,sm,s1f,z,drtn,gnov,nocv,nom
-CHARACTER(LEN=250) ::  chpar,filein,fileout
+CHARACTER(LEN=200) ::  chpar,filein,fileout
 CHARACTER(LEN=80) :: grid_type
 CHARACTER(LEN=4) :: out_lib
 

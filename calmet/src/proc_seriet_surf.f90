@@ -12,7 +12,7 @@ PROGRAM proc_seriet_surf
 !   staz,net,anno,mese,giorno,ora, ff, dd, ceil,  tcc, tt, rh, prs,cod_prc 
 !                                 [m/s grd ft*100 10i  K   %   mb  Calmet ]
 !
-!                                         Versione 2.0.1, Enrico 01/03/2013
+!                                         Versione 2.0.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 IMPLICIT NONE
 
@@ -39,7 +39,7 @@ INTEGER :: idf_in(nf_in),kpar,kr,kp,k2,cnt_par,ios,eof,eor
 INTEGER :: gg,mm,yy,hh,net,staz,npar_tot,levid
 CHARACTER(LEN=10000) :: header_lev,header_par,rec_in
 CHARACTER(LEN=87) :: rec_out
-CHARACTER(LEN=80) :: filein,fileout,chpar
+CHARACTER(LEN=200) :: filein,fileout,chpar
 CHARACTER(LEN=fw) :: par_lab,lev_lab
 LOGICAL :: ltest,luv
 

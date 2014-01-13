@@ -5,7 +5,7 @@ PROGRAM grib_calc_median
 ! Note:
 !
 ! - Non gestisce dati mancanti
-!                                         Versione 1.0.3, Enrico 27/03/2013
+!                                         Versione 1.0.4, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -16,8 +16,8 @@ INTEGER, PARAMETER :: maxfiles=15,pt=1
 INTEGER :: ifin(maxfiles)=0,igin(maxfiles)=0,ifout=0,igout=0
 INTEGER :: ni,nj,dd,p1,iop,lev,ni_sav,nj_sav,dd_sav,p1_sav,iop_sav,lev_sav
 INTEGER :: nfiles,iret,kg,kf,ios,kk,k2,nom
-CHARACTER(LEN=80) :: filein(maxfiles)
-CHARACTER(LEN=80) :: fileout,chfmt
+CHARACTER(LEN=200) :: filein(maxfiles)
+CHARACTER(LEN=200) :: fileout,chfmt
 LOGICAL :: ldeb = .FALSE.
 
 REAL, ALLOCATABLE :: field_in(:,:),field_out(:),field_ave(:)

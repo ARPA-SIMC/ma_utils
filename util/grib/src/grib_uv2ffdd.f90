@@ -9,7 +9,7 @@ PROGRAM grib_uv2ffdd
 !   (sez 1)
 ! - Le altre sezioni sono prese dall'utlimo grib del file
 !
-!                                         Versione 1.3.1, Enrico 31/10/2012
+!                                         Versione 1.3.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -34,7 +34,7 @@ REAL :: field_ff(maxdim),field_dd(maxdim)
 ! Altre variabili del programma
 REAL :: fave
 INTEGER :: ngrib,iuin1,iuin2,iuout1,iuout2,nok,np_sav,np
-CHARACTER (LEN=80) :: filein1,filein2,fileout1,fileout2
+CHARACTER (LEN=200) :: filein1,filein2,fileout1,fileout2
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari

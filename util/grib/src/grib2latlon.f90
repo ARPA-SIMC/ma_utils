@@ -3,7 +3,7 @@ PROGRAM grib2latlon
 ! Legge il primo grib di un file, e scrive 2 grib con latitudini e 
 ! longitudini dei punti della griglia.
 !
-!                                           Versione 1.0, Enrico 04/11/2008
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -22,7 +22,7 @@ REAL    :: field(maxdim)
 REAL :: lat(maxdim),lon(maxdim)
 REAL :: x1,y1,dx,dy,xrot,yrot,xx,yy
 INTEGER :: iuin,iuout,nx,ny,i,j,k
-CHARACTER (LEN=80) :: filein,fileout
+CHARACTER (LEN=200) :: filein,fileout
 CHARACTER (LEN=1) :: proj
 
 !--------------------------------------------------------------------------

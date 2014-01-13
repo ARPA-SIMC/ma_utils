@@ -10,7 +10,7 @@ PROGRAM zoom_grib
 !  34  47 202 227 (LAMAZ  in LMSMR2)
 !  90  63 258 243 (LAMAZ  in LMSRM4)
 !
-!                                           Versione 2.0, Enrico 28/02/2008
+!                                         Versione 2.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -33,7 +33,7 @@ INTEGER :: iz1,jz1,iz2,jz2,sel
 INTEGER :: nx,ny,np,nxz,nyz,npz
 INTEGER :: iz,jz,kz,ic,jc,kc
 INTEGER :: iuin1,iuin2,iuout,idp,kp,cnt,ios(4)
-CHARACTER (LEN=80) :: filein,fileout,chdum,arg(2)
+CHARACTER (LEN=200) :: filein,fileout,chdum,arg(2)
 CHARACTER (LEN=1) :: next_arg
 
 !==========================================================================

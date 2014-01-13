@@ -18,7 +18,7 @@ PROGRAM merge_unf_chimere
 !
 ! Uso: merge_unf_chimere.exe filein1 filein2 fileout nptot data [-h]
 !
-!                                           Versione 1.0, Enrico 05/03/2007
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -27,7 +27,7 @@ REAL, ALLOCATABLE :: f(:),f1(:),f2(:)
 TYPE(date) :: data,datap1
 INTEGER :: nptot,kh,idata,idatap1,idata1,idata2,nr1,nr2,nr3,hh1,hh2
 INTEGER :: ios,ios1,ios2,eof,eor
-CHARACTER (LEN=80) :: filein1,filein2,fileout,chdum
+CHARACTER (LEN=200) :: filein1,filein2,fileout,chdum
 LOGICAL :: lf1,lf2
 
 !--------------------------------------------------------------------------

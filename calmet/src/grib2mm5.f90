@@ -35,7 +35,7 @@
 ! - manca formato mm4
 ! - manca interpolazione vento SMR
 !
-!                                                 V1.2.2, Enrico 10/01/2014
+!                                                 V1.2.3, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -121,7 +121,7 @@ INTEGER :: pmxv(1),pmnv(1),pmxd(1),pmnd(1)
 
 INTEGER :: idum
 
-CHARACTER (LEN=80) :: fileorog,filegrib,filedate,filelam,fileout,out_head
+CHARACTER (LEN=200) :: fileorog,filegrib,filedate,filelam,fileout,out_head
 CHARACTER (LEN=10) :: str_tipo_scad
 CHARACTER (LEN=6) :: str_model
 

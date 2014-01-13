@@ -8,7 +8,7 @@ PROGRAM sum_pm_species
 ! Derivato da somma_grib.f90; puo' essere usato anche per calcolare 
 ! combinazioni lineari di grib.
 !
-!                                         Versione 2.1.1, Enrico 10/01/2014
+!                                         Versione 2.1.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -32,7 +32,7 @@ REAL :: fout(maxdim),coeff(maxfil)
 REAL :: fk1,fk2,tt_ro
 INTEGER :: iuin(maxfil),par_out(3),opt_ro,ngrib
 INTEGER :: nfin,np,ios,ios0,ios1,ios2,ios3,eof,eor,kf,kg,kp,idp,iuout,iuro
-CHARACTER (LEN=80) :: filein(maxfil),filelst,fileout,filero,chdum,next_arg
+CHARACTER (LEN=200) :: filein(maxfil),filelst,fileout,filero,chdum,next_arg
 LOGICAL :: ld_par,ld_lev,ld_date,ld_sca,ld_ksec1,lpar_out,ksec2_diff
 
 !--------------------------------------------------------------------------

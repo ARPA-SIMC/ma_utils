@@ -30,7 +30,7 @@ PROGRAM grib_runmean
 !   Eventualmente si potrebbero tenere in memoria i campi corripondenti al 
 !   vettore igin (in modo da decodificare i grib una volta sola)
 !
-!                                                 V3.0.3, Enrico 17/04/2013
+!                                                 V3.0.4, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -52,7 +52,7 @@ INTEGER :: ifin,ifout,ig_read,ig_first,ig_write
 INTEGER :: nhr,nreq,hrout,nhincr,nx,ny,np,ibm,en,fstep,kdeb
 INTEGER :: ios(3),cnt_par,cnt_out,kpar,kg,ksk,iret,ier,idata,ihr,clret(0:5)
 INTEGER :: gnov,nom,nocv
-CHARACTER(LEN=80) :: filein,fileout,chpar
+CHARACTER(LEN=200) :: filein,fileout,chpar
 CHARACTER (LEN=12) :: ch12,ch12b
 CHARACTER (LEN=10) :: ch10
 CHARACTER (LEN=3) :: next_arg

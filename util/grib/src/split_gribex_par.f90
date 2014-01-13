@@ -4,7 +4,7 @@ PROGRAM split_grib_par
 ! stesso parametro (o allo stesso parametro/tipo livelo) in files diversi.
 ! Programma usato dalle catene NINFA e proc_lama_ope
 !
-!                                           Versione 3.3, Enrico 22/06/2009
+!                                         Versione 3.3.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -24,7 +24,7 @@ REAL    :: field(maxdim)
 ! Altre variabili del programma
 INTEGER :: iuin,iuout(maxpar,maxlev),cnt,kv,kl,kp,split_lev
 INTEGER :: par_id(3,maxpar),lev_id(3,maxlev),parc,levc,npar,nlev
-CHARACTER (LEN=80) :: filein,fileout,chpar
+CHARACTER (LEN=200) :: filein,fileout,chpar
 LOGICAL :: opened(maxpar,maxlev)
 
 !--------------------------------------------------------------------------

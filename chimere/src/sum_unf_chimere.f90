@@ -5,14 +5,14 @@ PROGRAM sum_unf_chimere
 !
 ! Uso: sum_unf_chimere.exe filein1 filein2 fileout nptot [-h]
 !
-!                                           Versione 1.0, Enrico 13/06/2005
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 IMPLICIT NONE
 
 REAL, ALLOCATABLE :: f(:),f1(:),f2(:)
 INTEGER :: nptot,k,idata1,idata2
 INTEGER :: ios,eof,eor
-CHARACTER (LEN=80) :: filein1,filein2,fileout,chdum
+CHARACTER (LEN=200) :: filein1,filein2,fileout,chdum
 
 !--------------------------------------------------------------------------
 ! 1)  Preliminari

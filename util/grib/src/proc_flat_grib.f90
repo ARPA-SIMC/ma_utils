@@ -9,7 +9,7 @@ PROGRAM proc_flat_grib
 ! - Se mi limito ad aggiungere al primo punto un valore molto piccolo, 
 !   quando il campo di ingresso e' costante e > 0 GRIBEX non funziona. 
 !
-!                                         Versione 1.0.0, Enrico 22/06/2012
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -23,7 +23,7 @@ REAL, ALLOCATABLE :: field(:)
 REAL :: avg
 INTEGER :: ifin,ifout,igin,igout,iret,kg
 INTEGER :: ni,nj,ic,bpv_in,cnt_const
-CHARACTER(LEN=80) :: filein,fileout
+CHARACTER(LEN=200) :: filein,fileout
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari

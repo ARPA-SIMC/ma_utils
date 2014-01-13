@@ -12,7 +12,7 @@ PROGRAM grib_dist_freq
 !   mancanti; e' ammesso che ci sia un diverso numero di dati mancanti nei
 !   diversi grib
 !
-!                                           Versione 2.0, Enrico 10/07/2007
+!                                         Versione 2.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -40,7 +40,7 @@ TYPE(date) :: data
 REAL :: fave
 INTEGER (KIND=8) :: count_okh(maxdim,0:23),tot_ok
 INTEGER :: nbin,ngribinh(0:23),iuin,iuout,nok,np_sav,kbin,p,hh,ier,karg,kg,kh
-CHARACTER (LEN=80) :: filein,fileout,file_root,charg
+CHARACTER (LEN=200) :: filein,fileout,file_root,charg
 CHARACTER (LEN=80) :: filepar="grib_dist_freq.inp"
 LOGICAL :: fraz_missing,rq_mday                 
 

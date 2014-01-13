@@ -24,7 +24,7 @@ PROGRAM test_inp_calmet
 ! Aggiungere codice tipo stazione (SYNOP, EMR, AGRO, LOCALE...)
 ! Leggere i nomi dei files dei temp da calmet.inp
 !
-!                                           Versione 4.0, Enrico 27/03/2008
+!                                         Versione 4.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -71,8 +71,7 @@ INTEGER :: k,k2,khr,krs,kvar,kst,p1,p2,st012
 INTEGER :: runl,nist_req,nftemp,hno
 INTEGER :: eof,eor,ios,ios1,ios2,ios3,errc,ier
 
-CHARACTER (LEN=200) :: chrec
-CHARACTER (LEN=100) :: chfmt1,chfmt2,str_dat,temp_file(mxftemp),fname
+CHARACTER (LEN=200) :: chrec,chfmt1,chfmt2,str_dat,temp_file(mxftemp),fname
 CHARACTER (LEN=80) :: str1,str2,str3,charg
 CHARACTER (LEN=5) :: idtemp(mxftemp)
 CHARACTER (LEN=3) :: hno_str
@@ -618,7 +617,7 @@ USE date_handler
 IMPLICIT NONE
 
 ! Parametri della subroutine
-CHARACTER (LEN=100),INTENT(IN) :: file   ! nome file up*.dat
+CHARACTER (LEN=200),INTENT(IN) :: file   ! nome file up*.dat
 TYPE (date), INTENT(IN) :: data1,data2   ! data iniziale/finale del run
 INTEGER, INTENT(IN) :: hh1,hh2           ! ora iniziale/finale del run
 INTEGER, INTENT(IN) :: stept_req         ! intervallo tra 2 temp richiesti

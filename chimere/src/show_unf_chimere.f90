@@ -3,7 +3,7 @@ PROGRAM show_unf_chimere
 ! Programma per vedere cosa c'e' in un file unformatted chimere
 ! Uso: show_unf_chimere.exe filein np nz [-h] [-a fileasc]
 !
-!                                           Versione 2.0, Enrico 06/12/2012
+!                                         Versione 2.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 IMPLICIT NONE
 
@@ -13,7 +13,7 @@ IMPLICIT NONE
 REAL, ALLOCATABLE :: f(:,:)
 INTEGER :: np,nz,nt,idpts
 INTEGER :: ios,ios1,ios2,idp,eof,eor,k,kp,kz,idata
-CHARACTER (LEN=80) :: filein,fileasc,chdum
+CHARACTER (LEN=200) :: filein,fileasc,chdum
 CHARACTER (LEN=1) :: next_arg
 LOGICAL :: out_asc,out_pts
 

@@ -12,7 +12,7 @@ PROGRAM calc_ustar_mo
 !   del mixing ratio come sarebbe piu' corretto (le differenze sono del
 !   tutto trascurabili)
 !
-!                                         Versione 3.2.1, Enrico 10/01/2014
+!                                         Versione 3.2.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -43,7 +43,7 @@ REAL, ALLOCATABLE :: par_in(:,:),q(:),ro(:),tetav(:),upwp(:),vpwp(:)
 REAL, ALLOCATABLE :: ustar(:),mo(:)
 REAL :: fave1,fave2
 INTEGER :: iuin(6),iuout(2),np,kfin,kist,nok1,nok2,hh_dum,hhc,ier,k
-CHARACTER (LEN=80) :: filein(6),fileout(2)
+CHARACTER (LEN=200) :: filein(6),fileout(2)
 CHARACTER (LEN=2) :: hum
 LOGICAL :: ksec2_diff
 

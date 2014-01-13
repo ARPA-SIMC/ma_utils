@@ -12,7 +12,7 @@ PROGRAM split_qrs
 !   ammesso che il file T contenga dei grib in piu' (che vengono saltati),
 !   purche' i campi da usare siano nello stesso ordine del file QRS.
 !
-!                                         Versione 2.0.1, Enrico 10/01/2014
+!                                         Versione 2.0.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -43,7 +43,7 @@ REAL :: fave1,fave2
 INTEGER, ALLOCATABLE :: idcl(:)
 INTEGER :: iuin(2),iuout(2),np,kfin,kg,nok1,nok2,hh_dum,hhc,ier,k,kp
 INTEGER :: nskipt,cnt_out
-CHARACTER (LEN=80) :: filein(2),fileout(2)
+CHARACTER (LEN=200) :: filein(2),fileout(2)
 CHARACTER (LEN=2) :: hum
 LOGICAL :: wait,ksec2_diff
 

@@ -40,7 +40,7 @@ PROGRAM proc_st1a
 ! - I files .st1a (input) devono contenere tutte le scadenze specificate in
 !   date_calmet.inp (intervallo di estrazione), in ordine cronologico.
 !
-!                         V2.0.1, Enrico 10/09/2012, da tappabuchi.f (Manu)
+!                                                 V2.0.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 
@@ -72,8 +72,7 @@ INTEGER :: ios,ios1,ios2,eof,eor,idum,idum2,khr_next_prc06,nok2,nint,nmis
 INTEGER :: kstaz,khr,k,kpar,p1,p2,cut1,cut2
 INTEGER :: nhh_run,nhh_est,ndays,nstaz
 INTEGER :: hh_int1,hh_int2,hh_int,cnt(0:5),cnt_hh_inv,cnt_par,dh,dhmin
-CHARACTER(LEN=200) :: chrec
-CHARACTER(LEN=80) :: filein,fileout,filedate,filesurf,chpar,chfmt
+CHARACTER (LEN=200) :: chrec,filein,fileout,filedate,filesurf,chpar,chfmt
 CHARACTER (LEN=6) :: str_rete
 LOGICAL :: force
 

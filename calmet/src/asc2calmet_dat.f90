@@ -12,7 +12,7 @@ PROGRAM asc2calmet_dat
 !   incompatibili con la lettura *: mettere T la variabile "form" e 
 !   modificare i formati di lettura (sez. 3.1)
 !
-!                                           Versione 2.1, Enrico 19/11/2007
+!                                         Versione 2.1.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE       
@@ -73,7 +73,7 @@ CHARACTER (LEN=8) :: clabpc
 ! 0.4) Altre variabili del programma
 REAL :: out_ver,rver
 INTEGER :: ios,idum(12),j,i,ih,k,k2,yy
-CHARACTER (LEN=80) :: filein,fileout,chver
+CHARACTER (LEN=200) :: filein,fileout,chver
 CHARACTER (LEN=9) :: ch9
 LOGICAL :: form
 

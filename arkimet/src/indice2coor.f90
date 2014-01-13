@@ -21,8 +21,8 @@ REAL :: xgrid,ygrid,xgeo,ygeo,xutm,yutm
 INTEGER :: nx,ny,utmz,scan(3)
 INTEGER :: k,i,j
 INTEGER :: ios,idum
-CHARACTER (LEN=120) :: nfile
-CHARACTER (LEN=80) :: tab_path
+CHARACTER (LEN=200) :: nfile
+CHARACTER (LEN=200) :: tab_path
 CHARACTER (LEN=78) :: ch78
 CHARACTER (LEN=61) :: ch61
 CHARACTER (LEN=12) :: aree_name

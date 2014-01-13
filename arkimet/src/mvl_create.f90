@@ -3,7 +3,7 @@ PROGRAM mvl_create
 ! Legge un file in formato short summary e lo riscrive in formato .mvl,
 ! accedendo alle tabelle seriet.
 !
-!                                             Versione 1.0.3, Enrico, 17/10/2013
+!                                             Versione 1.0.4, Enrico, 13/01/2014
 !-------------------------------------------------------------------------------
 
 USE seriet_utilities
@@ -15,7 +15,7 @@ INTEGER, PARAMETER :: iu_in = 20, iu_out = 30, iu_tab = 40
 REAL :: vmin,vmax
 INTEGER :: ios,eof,eor,ier,ios1,ios2,nok,nskip,ndef,kpar,kc
 INTEGER :: ps,p1,p2,p3,p4,pv1,pv2,var(3),liv(3),cnt_par,ndec,cp2
-CHARACTER (LEN=120) :: filein,fileout,chpar,chrec
+CHARACTER (LEN=200) :: filein,fileout,chpar,chrec
 CHARACTER (LEN=20) :: str_model,str_var
 CHARACTER (LEN=10) :: ch10(2)
 CHARACTER (LEN=3) :: ch3(2)

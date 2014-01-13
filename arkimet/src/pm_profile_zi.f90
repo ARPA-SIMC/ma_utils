@@ -9,7 +9,7 @@ PROGRAM pm_profile_zi
 ! Programma scritto per test prodotto QM1 Quitsat, specifico e poco 
 ! flessibile.
 !
-!                                         Versione 1.0.1, Enrico 10/09/2012
+!                                         Versione 1.0.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -29,7 +29,7 @@ INTEGER :: nok(nz)
 
 ! Altre variabili del programma
 TYPE (date) :: data1,data2
-CHARACTER (LEN=80) :: file1,file2,fileout,chfmt1,chfmt2,chfmt3
+CHARACTER (LEN=200) :: file1,file2,fileout,chfmt1,chfmt2,chfmt3
 REAL :: zi,val(nz*2)              ! val(1:nz): Z ; val(nz+1:2*nz): PM2.5
 INTEGER :: nf1,nf2,fmt1,fmt2
 INTEGER :: hh1,hh2,sca1,sca2
@@ -194,7 +194,7 @@ IMPLICIT NONE
 INTEGER, PARAMETER :: mxpar = 1000
 
 ! argomenti della subroutine
-CHARACTER (LEN=80), INTENT(IN) :: file
+CHARACTER (LEN=200), INTENT(IN) :: file
 INTEGER, INTENT(OUT) :: idfmt,nf
 
 ! Variabili locali

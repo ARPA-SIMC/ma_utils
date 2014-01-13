@@ -4,7 +4,7 @@ PROGRAM intercala_grib
 ! ciclicamente un grib da ciascun file. Non fa nessun controllo (non 
 ! decodifica i messaggi), e si ferma al primo EOF
 !
-!                                                   V1.0, Enrico 16/07/2009
+!                                                 V1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -19,7 +19,7 @@ INTEGER, PARAMETER :: mxfiles = 200
 ! Altre varibaili del programma
 INTEGER :: if(mxfiles),ig(mxfiles),ifo,nfiles,cntout
 INTEGER :: k,k2,ios,eof,eor,iret
-CHARACTER (LEN=120) :: filelst,fileout,filein(mxfiles),error_message
+CHARACTER (LEN=200) :: filelst,fileout,filein(mxfiles),error_message
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari

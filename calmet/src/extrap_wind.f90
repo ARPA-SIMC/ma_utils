@@ -11,7 +11,7 @@ PROGRAM extrap_wind
 !
 ! Uso: extrap_wind.exe filein fileout [-h] [-c]
 !
-!                                         Versione 1.1.1, Enrico 10/09/2012
+!                                         Versione 1.1.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -32,7 +32,7 @@ REAL :: dirx(maxlev),modx(maxlev),ux(maxlev),vx(maxlev)
 REAL :: mods,dirs,us,vs,cc,tt,pp,pexp2,fact,el,ustar,sinalp,sol_elev,rdum
 INTEGER :: idum,ios,eof,eor,k
 INTEGER :: yy,mm,dd,hh,njul,nlev,in_fmt
-CHARACTER (LEN=80) :: filein,fileout,rule,chfmt1,chfmt2,chfmt3,ch80
+CHARACTER (LEN=200) :: filein,fileout,rule,chfmt1,chfmt2,chfmt3,ch80
 CHARACTER (LEN=10) :: ch10
 CHARACTER (LEN=5) :: ch5
 LOGICAL :: sea

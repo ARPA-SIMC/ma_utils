@@ -4,7 +4,7 @@ PROGRAM grib_step_explicit
 ! passo griglia nei campi che non lo contengono.
 ! Utile per importare in GRADS campi lat-lon con step non indicato.
 !
-!                                           Versione 1.0, Enrico 23/09/2010
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -21,7 +21,7 @@ REAL    :: field(maxdim)
 
 ! Altre variabili del programma
 INTEGER :: iuin,iuout,cnt
-CHARACTER (LEN=80) :: filein,fileout
+CHARACTER (LEN=200) :: filein,fileout
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari

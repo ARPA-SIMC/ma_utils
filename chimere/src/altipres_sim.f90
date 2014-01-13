@@ -13,7 +13,7 @@ program altipres_sim
 ! Output:
 ! ALTI_3D: altezza dalla superficie dei livelli richiesti (m)
 !
-!                                         Versione 1.0.1, Enrico 26/09/2012
+!                                         Versione 1.0.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 IMPLICIT NONE
 
@@ -21,7 +21,7 @@ INTEGER :: np,nz,nt
 INTEGER :: iarg(2),ios(3),eof,eor,kp,kz,k,idata,idata2,idata3
 REAL, ALLOCATABLE :: t(:,:),ps(:),p(:,:),z(:,:)
 REAL :: pl0,pl1,alt,tm
-CHARACTER (LEN=80) :: filet,filep,fileps,filez,chdum
+CHARACTER (LEN=200) :: filet,filep,fileps,filez,chdum
 
 REAL, PARAMETER :: rsurg = 29.27
 

@@ -6,7 +6,7 @@ PROGRAM split_grib_par
 ! Note:
 ! Versioni <4.0 rinominate in split_gribex_par.f90
 !
-!                                           Versione 4.0, Enrico 01/03/2012
+!                                         Versione 4.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -22,7 +22,7 @@ INTEGER :: ifin,ifout(maxpar,maxlev),igrb
 INTEGER :: cnt,kv,kl,kp,split_lev,iret,ier
 INTEGER :: par_id(3,maxpar),lev_id(3,maxlev),par(3),lev(3)
 INTEGER :: parc,levc,npar,nlev
-CHARACTER (LEN=80) :: filein,fileout,chpar
+CHARACTER (LEN=200) :: filein,fileout,chpar
 LOGICAL :: opened(maxpar,maxlev)
 
 !--------------------------------------------------------------------------

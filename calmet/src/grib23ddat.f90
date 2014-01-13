@@ -48,7 +48,7 @@ PROGRAM grib23ddat
 !   che attualmente sono letti ma non utilizzati (sub. RDMM5, line 20175)
 !
 !
-!                                                 V1.3.1, Enrico 07/11/2013
+!                                                 V1.3.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -84,7 +84,7 @@ INTEGER :: hh_step,nht,hh_ini,hhc,hhg,hhv,hht,scad(3),lev(3),par(3)
 INTEGER :: tipo_scad,tipo_lev3d,id_model,inp_h2o,inp_sort,out_fmt,dlth,utmz
 INTEGER :: if_static,if_dat,ig_orog,ig,idxl,idxp
 INTEGER :: iret,ier,idum(3),k,kpar,cnt_par,kl,kp,i,j,ilu,cnt_sea,ios,cnt_out
-CHARACTER (LEN=80) :: file_static,file_dat,file_out,error_message,ch80,chpar
+CHARACTER (LEN=200) :: file_static,file_dat,file_out,error_message,ch80,chpar
 CHARACTER (LEN=20) :: str_model,str_tipo_scad
 CHARACTER (LEN=15) :: hr2
 CHARACTER (LEN=3) :: next_arg

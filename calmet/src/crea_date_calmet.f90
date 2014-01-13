@@ -5,7 +5,7 @@ PROGRAM crea_date_calmet
 !
 ! Uso: crea_date_calmet.exe [-h] data run_len hh_int fileout
 !
-!                                                    V2.0,Enrico 01/09/2007
+!                                                 V2.0.1, Enrico 14/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -13,7 +13,7 @@ IMPLICIT NONE
 TYPE(date) :: data_r1,data_r2,data_d1,data_d2
 INTEGER :: hh_r1,hh_r2,hh_d1,hh_d2
 INTEGER :: k,run_len,hh_int,days,ios(3)
-CHARACTER (LEN=80) :: chpar,fileout
+CHARACTER (LEN=200) :: chpar,fileout
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari e input

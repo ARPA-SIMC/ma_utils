@@ -5,14 +5,14 @@ PROGRAM test_1grib
 ! Usato da ak_getgrib.ksh per stabilire l'estensione del file in output e
 ! da ak_seriet.ksh per individuare i files Grib1-UTM
 !
-!                                             Versione 2, Enrico 12/04/2011
+!                                         Versione 2.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 USE grib_api
 IMPLICIT NONE
 
 REAL :: yi,yf
 INTEGER :: kpar,if,ig,iret,en
-CHARACTER (LEN=80) :: filein,chpar,gt
+CHARACTER (LEN=200) :: filein,chpar,gt
 CHARACTER (LEN=3) :: proj
 
 !--------------------------------------------------------------------------

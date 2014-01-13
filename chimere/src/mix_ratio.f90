@@ -10,7 +10,7 @@ PROGRAM mix_ratio
 ! Output:
 ! MIXR_3D: mixing ratio
 !
-!                                           Versione 1.0, Enrico 22/06/2004
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 IMPLICIT NONE
 
@@ -18,7 +18,7 @@ INTEGER :: np,nz,nt
 INTEGER :: iarg(2),ios(2),eof,eor,kp,kz,k,idata,idata2,idata3,ier,cnt
 REAL, ALLOCATABLE :: q(:,:),mr(:,:)
 REAL :: pl0,pl1,alt,tm
-CHARACTER (LEN=80) :: fileq,filemr,chdum
+CHARACTER (LEN=200) :: fileq,filemr,chdum
 
 !--------------------------------------------------------------------------
 ! 1) Elaborazioni preliminari

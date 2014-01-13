@@ -4,7 +4,7 @@ PROGRAM grib_ana2forc
 ! previsioni istantanee con reference time assegnato
 ! Per ora gestisce solo GRIB1
 !
-!                                          Versione 1.0.2 Enrico 07/12/2012
+!                                          Versione 1.0.3 Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -14,7 +14,7 @@ IMPLICIT NONE
 
 INTEGER :: ifin,ifout,igin,igout,iret,en,yoc,cortod,scad_out
 INTEGER :: yy,mm,dd,hh,kg,scad_min,scad_max,cntg
-CHARACTER(LEN=80) :: filein,fileout
+CHARACTER(LEN=200) :: filein,fileout
 CHARACTER(LEN=10) :: ch10
 TYPE(datetime) :: rtime_out,rtime_in,vtime_in
 TYPE(timedelta) :: dlt

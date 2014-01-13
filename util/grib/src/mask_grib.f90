@@ -3,7 +3,7 @@ PROGRAM maskout_grib
 ! Legge un file con molti grib e lo riscrive, sostituendo i valori nei 
 ! punti definiti da una maschera.
 !
-!                                           Versione 1.0, Enrico 04/05/2007
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -24,7 +24,7 @@ INTEGER :: np,npmask,nx,ny
 INTEGER :: iuin,iumask,iuout,cnt,ios,kp,kp2,ip,jp,ip2,jp2
 REAL :: field2(maxdim),fmask(maxdim),mask_val
 REAL :: dd,ddmin,dx,dy
-CHARACTER (LEN=80) :: filein,fileout,filemask,opt,chpar
+CHARACTER (LEN=200) :: filein,fileout,filemask,opt,chpar
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari

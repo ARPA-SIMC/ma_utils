@@ -5,7 +5,7 @@ PROGRAM grib_local_std
 ! Nei punti in cui non e' possibile il calcolo completo (vicino ai bordi o
 ! a dati mancanti), STD viene messa a dato mancante.
 !
-!                                           Versione 1.0, Enrico 17/07/2008
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -25,7 +25,7 @@ REAL (KIND=8) :: sum,sum2
 REAL :: radius,radius2,frq
 INTEGER :: iradius,ncircle,nrq,ni,nj,idp
 INTEGER :: iuin,iuout,ios1,ios2,i,j,k,i2,j2,k2,ii,jj,nok,cnt_ok,kp
-CHARACTER (LEN=80) :: filein,fileout,charg
+CHARACTER (LEN=200) :: filein,fileout,charg
 CHARACTER (LEN=3) :: oper
 CHARACTER (LEN=1) :: next_arg
 LOGICAL, ALLOCATABLE :: msk_circle(:,:)

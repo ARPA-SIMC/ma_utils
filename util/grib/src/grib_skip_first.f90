@@ -7,7 +7,7 @@ USE grib_api
 IMPLICIT NONE
 
 INTEGER :: ifin,ifout,igin,igout,iret,kg,ios
-CHARACTER(LEN=80) :: filein,fileout,chpar
+CHARACTER(LEN=200) :: filein,fileout,chpar
 
 REAL, ALLOCATABLE :: field(:)
 INTEGER :: ni,nj,bpv,nskip

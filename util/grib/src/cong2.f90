@@ -18,7 +18,7 @@ PROGRAM cong2
 !   alti), e il calcolo dei decimali significativi in base a nbit va in 
 !   crisi per campi come la pressione.
 !
-!                                           Versione 1.7, Enrico 10/04/2008
+!                                         Versione 1.7.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -43,7 +43,7 @@ INTEGER :: iuin,iuout,kp,idp,hh1,hh2,hhc,lev(3,maxll)
 INTEGER :: ios,ier,eof,eor,cnt_in,cnt_out,nll,kll,cnt_max,nbit,cnt_fnb
 INTEGER :: ni,nj,i,j,k
 INTEGER :: force_head,fh(3,maxfh),kfh
-CHARACTER (LEN=80) :: filein,fileout,filell,chdum,arg(2)
+CHARACTER (LEN=200) :: filein,fileout,filell,chdum,arg(2)
 CHARACTER (LEN=2) :: next_arg
 LOGICAL :: afa,data_range,lev_list,lrq,cnt_limit,force_nbit,novcp,uv2h,encode
 

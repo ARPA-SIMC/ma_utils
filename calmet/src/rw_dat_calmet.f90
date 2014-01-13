@@ -4,7 +4,7 @@ PROGRAM rw_dat_calmet
 ! cambiando le date. Gestisce le versioni di Calmet 5.0 e 5.2
 ! Versioni < 3.0 come read_dat_calmet.f90
 !
-!                                           Versione 3.1, Enrico 31/03/2009
+!                                         Versione 3.1.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -71,7 +71,7 @@ INTEGER, PARAMETER :: iuin=30, iuout=31
 INTEGER :: hh_in,hh_in1,hh_out,hh_out1,hh_req,hht,ndathr_out
 INTEGER :: ios,idum,iyy,ijj,ih,j,i,k
 REAL :: rver
-CHARACTER (LEN=80) :: filein,fileout,charg
+CHARACTER (LEN=200) :: filein,fileout,charg
 
 !=====================================================================
 ! 0) Preliminari

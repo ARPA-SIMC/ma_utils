@@ -20,7 +20,7 @@ REAL    :: field(maxdim)
 ! Altre variabili del programma
 REAL :: zlev(maxdim,maxlev),zlay(maxdim,maxlev)
 INTEGER :: iuin,iuout,kl,nlev,np,ksec2f(1024),idlev(maxlev)
-CHARACTER (LEN=80) :: filein,fileout
+CHARACTER (LEN=200) :: filein,fileout
 LOGICAL :: ksec2_diff
 
 !--------------------------------------------------------------------------

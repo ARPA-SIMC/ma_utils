@@ -6,7 +6,7 @@ PROGRAM chimeredep2grib
 !
 ! Uso: chimeredep2grib.exe filein fileout fileinfo filespcin igen 
 !
-!                                Versione 1.5, Enrico & Michele  02/12/2011
+!                               Versione 1.5.1, Enrico & Michele 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -63,7 +63,7 @@ INTEGER :: cem,igen,idata,idata_ini,yy,scad_ini
 INTEGER :: iu,k,kp,kvar,kscad,klev,ios,eof,eor,cnt_grb,idp
 INTEGER :: ns_org,ns_mod,idx(maxvar)
 INTEGER :: p1,ksm,kso,idum,hhc,hh_emi,bck_day
-CHARACTER (LEN=80) :: chdum,filein,fileout,fileinfo,filespcin,arg(5)
+CHARACTER (LEN=200) :: chdum,filein,fileout,fileinfo,filespcin,arg(5)
 CHARACTER (LEN=40) :: chrec,ids_org(maxvar)
 CHARACTER (LEN=10) :: chdata
 CHARACTER (LEN=3) :: proj

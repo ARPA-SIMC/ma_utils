@@ -2,7 +2,7 @@ PROGRAM diff_header_grib
 !--------------------------------------------------------------------------
 ! Legge da due files con molti grib e scrive le differenze tra gli header
 !
-!                                           Versione 2.1, Enrico 27/02/2012
+!                                         Versione 2.1.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -21,7 +21,7 @@ REAL :: field_a(maxdim),field_b(maxdim)
 ! Altre variabili del programma
 INTEGER :: ios(6),k,kg,ks1_max,ks2_max,ks3_max,ks4_max,ps2_max,ps3_max
 INTEGER :: iuin1,iuin2,np,idp,kp
-CHARACTER (LEN=80) :: filein1,filein2,chdum,opt
+CHARACTER (LEN=200) :: filein1,filein2,chdum,opt
 LOGICAL :: show_all,idx_all
 
 !--------------------------------------------------------------------------

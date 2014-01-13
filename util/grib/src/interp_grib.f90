@@ -32,7 +32,7 @@ Program interp_grib
 ! 1.0       19/03/2001   Versione iniziale
 ! 2.0       24/04/2002   Gestione UTM & comp. del vento non abbinate
 !
-!                                                Versione 2.5, Enrico 30/10/2009
+!                                              Versione 2.5.1, Enrico 13/01/2014
 !-------------------------------------------------------------------------------
 
 ! Declarations: 
@@ -69,7 +69,7 @@ TYPE(grid) :: grid_first
 INTEGER :: iuin, iuout, ngribin, ngribout, nval
 INTEGER :: i,ii,files,ipar,nok
 INTEGER :: nscal,nwind_sca,nwind_vec
-CHARACTER (LEN=120) :: chpar='',filein='',fileout=''
+CHARACTER (LEN=200) :: chpar='',filein='',fileout=''
 CHARACTER (LEN=20) :: filepar='interp_grib.inp'
 LOGICAL :: user_grid
 

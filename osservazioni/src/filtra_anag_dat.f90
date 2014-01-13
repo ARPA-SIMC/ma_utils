@@ -12,8 +12,7 @@ CHARACTER (LEN=40), PARAMETER :: anag_name = "db_anagrafica.dat"
 INTEGER :: req_net(maxstz),req_usr(maxstz)
 INTEGER :: anag_net,anag_usr,req_stz,idr,idu,nok
 INTEGER :: eof,eor,ios,k
-CHARACTER (LEN=200) :: chrec
-CHARACTER (LEN=80) :: anag_path,filein,fileout,home_bonafe
+CHARACTER (LEN=200) :: anag_path,filein,fileout,home_bonafe,chrec
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari

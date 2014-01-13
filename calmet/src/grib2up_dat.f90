@@ -59,8 +59,8 @@ INTEGER :: cnt_par,idum,iz,hht,data(3),ora(2),scad(4),level(3),var(3)
 INTEGER :: cnt_rew,cnt_rew2,cnt_mis(3)
 INTEGER :: ios,ios4(4),eof,eor,ier,ier6(6),iret
 INTEGER :: k,kl,kp,kh,kv,krec,kpar,k1,k2,idl,ii,jj,nf
-CHARACTER(LEN=80) :: file_3d,file_z,file_sup,file_pts,file_srq,chpar
-CHARACTER(LEN=80) :: fileout,chdum,lab,chrec
+CHARACTER(LEN=200) :: file_3d,file_z,file_sup,file_pts,file_srq,chpar
+CHARACTER(LEN=200) :: fileout,chdum,lab,chrec
 CHARACTER(LEN=3) :: next_arg
 LOGICAL :: ltest,l10m,ksec2_diff
 

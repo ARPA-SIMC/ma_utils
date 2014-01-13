@@ -6,7 +6,7 @@ PROGRAM calc_swdowm
 ! Note:
 ! Tutti i grib devono essere definiti sulla stessa area.
 !
-!                                         Versione 1.0.1, Enrico 10/12/2011
+!                                         Versione 1.0.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -34,7 +34,7 @@ REAL, ALLOCATABLE :: swb(:),alb(:),swdown(:)
 INTEGER :: kp,idp,ifswb,ifalb,ifout,iret
 INTEGER :: kg,tab,var,ni,nj,bpv
 INTEGER :: igswb,igalb,igout
-CHARACTER (LEN=80) :: fileswb,filealb,fileout,chdum
+CHARACTER (LEN=200) :: fileswb,filealb,fileout,chdum
 LOGICAL :: lalb1,lok(2)
 
 !--------------------------------------------------------------------------

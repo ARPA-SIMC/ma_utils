@@ -455,7 +455,7 @@ USE file_utilities
 IMPLICIT NONE
 
 ! Argomenti della subroutine
-CHARACTER(LEN=80), INTENT(IN) :: filefis
+CHARACTER(LEN=200), INTENT(IN) :: filefis
 INTEGER, INTENT(IN) :: npt
 DOUBLE PRECISION, INTENT(IN) :: req_lat(npt),req_lon(npt)
 LOGICAL, INTENT(IN) :: libsim 
@@ -750,7 +750,7 @@ CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
 REAL :: vmin_t,vmax_t
 INTEGER :: ndec_t,cp2_t,var_t
 INTEGER :: ios,ios2,iu,k
-CHARACTER (LEN=250) :: tab_file,tab_path
+CHARACTER (LEN=200) :: tab_file,tab_path
 CHARACTER (LEN=80) :: ch80
 CHARACTER (LEN=8) :: ch8
 CHARACTER (LEN=3) :: ch3

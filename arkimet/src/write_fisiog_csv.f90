@@ -3,7 +3,7 @@ PROGRAM write_fisiog_csv
 ! Legge un file .pts.csv e il relativo fisiog.gacsv; scrive coordinate e
 ! parametri fisiografici di ciascun punto in un .csv con una riga per punto
 !
-!                                        Versione 1.0.1, Enrico, 16/01/2012
+!                                        Versione 1.0.2, Enrico, 13/01/2014
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -18,7 +18,7 @@ REAL, ALLOCATABLE :: alb(:),z0(:),zlev(:,:),zlay(:,:),orog(:)
 INTEGER :: cnt_par,kpar,eof,eor,ios,ier,k,pi,pj,pk,npts
 
 CHARACTER (LEN=80) :: plabel,lab(maxpt),chdum
-CHARACTER (LEN=120) :: filepts,filefis,fileout,chpar,chrec
+CHARACTER (LEN=200) :: filepts,filefis,fileout,chpar,chrec
 CHARACTER (LEN=1) :: next_arg
 
 !--------------------------------------------------------------------------

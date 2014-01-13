@@ -4,7 +4,7 @@ PROGRAM sel_punti_grid
 ! nested; scrive gli indici dei punti (sel_punti_grid.pts.csv) e gli
 ! estremi della sottoarea (sel_punti_grid.zoom)
 !
-!                                         Versione 3.0.4, Enrico 24/09/2013
+!                                         Versione 3.0.5, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 USE file_utilities
 USE seriet_utilities
@@ -31,7 +31,7 @@ INTEGER :: nx(2),ny(2),scan(2,3),utmz(2)
 INTEGER :: maxp,idskip
 INTEGER :: iif,jjf,iil,jjl,npsel,npcal,nisel,njsel,nitry,njtry,ksk
 INTEGER :: eof,eor,ios,ios2,idum,kpar,cnt_par,kg,i,j,k,cnt_sel
-CHARACTER (LEN=120) :: nfile,chrec
+CHARACTER (LEN=200) :: nfile,chrec
 CHARACTER (LEN=80) :: charg,tab_path
 CHARACTER (LEN=78) :: ch78
 CHARACTER (LEN=61) :: ch61

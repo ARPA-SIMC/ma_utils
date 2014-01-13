@@ -17,7 +17,7 @@ PROGRAM scores_seriet
 !    delle previ.
 ! -  Deve esistere un record oss per ogni record previ
 !
-!                                         Versione 2.2.0, Enrico 06/10/2011
+!                                         Versione 2.2.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -40,7 +40,7 @@ INTEGER :: col_oss(mxpar),col_pre(mxpar),flag_dir(mxpar)
 INTEGER :: nf_oss,nf_pre,fmt_oss,fmt_pre
 INTEGER :: hho,hhp,hh1,hh2,hh_mxe(mxpar),hh_mne(mxpar),scao,scap
 INTEGER :: k,ios,npar,pp,idp,kp,nnml
-CHARACTER (LEN=80) :: fileoss,filepre,fileout,filtro,chfmt,chrec,chdum
+CHARACTER (LEN=200) :: fileoss,filepre,fileout,filtro,chfmt,chrec,chdum
 CHARACTER (LEN=40) :: label_oss(mxpar),label_pre(mxpar)
 CHARACTER (LEN=10) :: ch10head(3,mxpar)
 

@@ -4,7 +4,7 @@ PROGRAM orari_daily_stat
 ! orario o una statistica giornaliera soddisfano una condizione specificata.
 ! Scrive output a schermo
 ! 
-!                                                   V2.0, Enrico 17/01/2007
+!                                                 V2.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -22,7 +22,7 @@ TYPE(date) :: data_dum,datac
 REAL :: soglia,rval,rmis,cum_val,calc_val,val24(0:23)
 INTEGER :: campo,nhead,cnt_ok,cnt_ver,nv_cum,ndeb
 INTEGER :: karg,id_par,eof,eor,ios,k,hh_dum,kh
-CHARACTER (LEN=80) :: filein,ch80,label,chfmt
+CHARACTER (LEN=200) :: filein,ch80,label,chfmt
 CHARACTER (LEN=fw) :: chval,idpar
 CHARACTER (LEN=4) :: oper
 CHARACTER (LEN=3) :: inp_data

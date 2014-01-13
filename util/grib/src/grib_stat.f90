@@ -11,7 +11,7 @@ PROGRAM grib_stat
 !   diversi grib
 ! - Deriva da grib_ave.f90
 !
-!                                           Versione 1.0, Enrico 03/10/2007
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -33,7 +33,7 @@ REAL    :: field_max(maxdim),field_min(maxdim)
 ! Altre variabili del programma
 REAL :: fave,fave_sum
 INTEGER :: ngribin,iuin,iuout,nok,np_sav,data_sav(5)
-CHARACTER (LEN=80) :: filein, fileout
+CHARACTER (LEN=200) :: filein, fileout
 LOGICAL :: first
 
 !--------------------------------------------------------------------------

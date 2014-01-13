@@ -35,7 +35,7 @@ PROGRAM decumula_lm
 !  senza scrivere nulla.
 ! La de-cumulazione delle previsioni LM e' implementata ma non testata
 !
-!                                         Versione 3.8.0, Enrico 07/09/2012
+!                                         Versione 3.8.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -74,7 +74,7 @@ INTEGER :: kk,kp,kpt,karg,idp,ios,eof,eor
 INTEGER :: iuin,iuout,npts,ptdeb
 CHARACTER (LEN=len_lab+63) :: ch_record
 CHARACTER (LEN=len_lab) :: labelc,labeln
-CHARACTER (LEN=500) :: filein,fileout,chdum,nome_file,arg(2)
+CHARACTER (LEN=200) :: filein,fileout,chdum,nome_file,arg(2)
 CHARACTER (LEN=20) :: ch_value
 CHARACTER (LEN=10) :: str_oper(maxpar)
 LOGICAL :: deb,end_asc,first_asc,newp,lstag

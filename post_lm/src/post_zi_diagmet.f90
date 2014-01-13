@@ -3,7 +3,7 @@ PROGRAM post_zi_diagmet
 ! Legge un file con molti grib Zi scritti da chimere2grib.exe e li riscrive
 ! con le modifiche necessaria per l'importazione nei dataset LAMA*.
 !
-!                                           Versione 1.0, Enrico 01/09/2006
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -26,7 +26,7 @@ REAL    :: field(maxdim)
 ! Altre variabili del progra+mma
 TYPE(date) :: datac
 INTEGER :: iuin,iuout,cnt,np
-CHARACTER (LEN=80) :: filein,fileout
+CHARACTER (LEN=200) :: filein,fileout
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari

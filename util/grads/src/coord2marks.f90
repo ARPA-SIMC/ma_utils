@@ -5,7 +5,7 @@ PROGRAM coord2marks
 ! Gestisce coordinate geografiche (gradi e decimi o gradi.primi.secondi), 
 ! ruotate e UTM
 !
-!                                           Versione 1.0, Enrico 08/01/2008
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -14,7 +14,7 @@ REAL,PARAMETER :: xrot=10., yrot=57.5     ! centro rotazione coord. ruotate
 INTEGER, PARAMETER :: utmz = 32           ! zona per coordinate UTM 
 !
 REAL :: xgeo,ygeo,xout,yout,xread,yread
-CHARACTER (LEN=120) :: filein,fileout
+CHARACTER (LEN=200) :: filein,fileout
 CHARACTER (LEN=10) :: strx,stry,lab
 CHARACTER (LEN=3) :: inpc,outc
 INTEGER :: ier,iz,eof,eor,k,ios

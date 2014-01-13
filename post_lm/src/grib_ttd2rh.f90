@@ -3,7 +3,7 @@ PROGRAM grib_ttd2rh
 ! Programma che legge da 2 file T e Td e scrive un file con RH.
 ! Usato dalla catena as2pm
 !
-!                                         Versione 1.1.1, Enrico 10/01/2014
+!                                         Versione 1.1.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -24,7 +24,7 @@ REAL :: tt(maxdim),td(maxdim),rh(maxdim)
 ! Altre variabili del programma
 REAL :: ttd2rh
 INTEGER :: ngrib,iuin1,iuin2,iuout,np,idp,k,kp
-CHARACTER (LEN=80) :: file_tt,file_td,file_rh,chdum
+CHARACTER (LEN=200) :: file_tt,file_td,file_rh,chdum
 LOGICAL :: ksec2_diff
 
 !--------------------------------------------------------------------------

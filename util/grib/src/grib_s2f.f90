@@ -5,7 +5,7 @@ PROGRAM grib_s2f
 !
 ! Nota: pare che nbit si perda -> devo re-inventarlo (qui metto 16)
 !
-!                                         Versione 1.2.1, Enrico 06/09/2012
+!                                         Versione 1.2.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -22,7 +22,7 @@ REAL    :: field(maxdim)
 
 ! Altre variabili del programma
 INTEGER :: iuin,iuout,k,nbits,ios,cnt1,cnt2
-CHARACTER (LEN=80) :: filein,fileout,charg
+CHARACTER (LEN=200) :: filein,fileout,charg
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari

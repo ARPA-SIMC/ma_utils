@@ -7,7 +7,7 @@ PROGRAM grib_ave
 ! - I grib devono essere definiti sulla stessa area (sez. 2 coincidente)
 ! - Le altre sezioni sono prese dal primo grib del file
 !
-!                                           Versione 2.0, Enrico 08/06/2009
+!                                         Versione 2.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -27,7 +27,7 @@ REAL    :: field(maxdim),field_sum(maxdim),field_frok(maxdim)
 ! Altre variabili del programma
 REAL :: fave,fave_sum,fract_req
 INTEGER :: ngribin,iuin,iuout,iuout2,nok,np_sav,data_sav(5),idp,nreq,ios,kp,nskip
-CHARACTER (LEN=80) :: filein,fileout,fileout2,chdum
+CHARACTER (LEN=200) :: filein,fileout,fileout2,chdum
 CHARACTER (LEN=3) :: next_arg
 LOGICAL :: first
 

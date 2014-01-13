@@ -4,7 +4,7 @@ PROGRAM grib_uniq
 ! o piu' grib consecutivi che sono uguali in base ai criteri 
 ! specificati, scrive solo il primo.
 !
-!                                         Versione 2.0.0, Enrico 23/08/2013
+!                                         Versione 2.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -19,7 +19,8 @@ LOGICAL, PARAMETER :: lverbose = .FALSE.
 INTEGER, PARAMETER :: max_keys = 100
 INTEGER :: idp,kp,kk,ier,kg,cnt_out,clret(0:5),nkeys
 INTEGER :: ifin,ifout,iret,igin=0,iglast=0,igout=0
-CHARACTER (LEN=500) :: filein,fileout,chdum,strcl_meta,strcl_keys
+CHARACTER (LEN=500) :: chdum,strcl_meta,strcl_keys
+CHARACTER (LEN=200) :: filein,fileout
 CHARACTER(LEN=80) :: cl_keys(max_keys),chkey_in,chkey_last
 LOGICAL :: cl_grid,cl_time,cl_vtime,cl_lev,cl_var
 LOGICAL :: lcheck_meta,lcheck_keys,lout

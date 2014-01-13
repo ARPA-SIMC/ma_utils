@@ -23,7 +23,7 @@ PROGRAM scores_seriet_wind
 !           SUM(ABS(dd_pre - dd_oss))
 !   * cnt: Ntot; Nok; Ncalm: OS & PR; OS & noPR; noOS & PR; noOS & noPR
 !
-!                                           Versione 1.0, Enrico 18/01/2008
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -54,7 +54,7 @@ INTEGER :: fmt_oss,fmt_pre,nf_oss,nf_pre,nrho,cff,cdd,nsum
 INTEGER :: hho,hhp,scao,scap,hh1,hh2,clfo,cldo,clfp,cldp,quoz,resto
 INTEGER :: k,k2,ios,eof,eor,ff_bin
 CHARACTER (LEN=mxpar*11+30) :: chrec
-CHARACTER (LEN=80) :: fileoss,filepre,fileout,chfmt
+CHARACTER (LEN=200) :: fileoss,filepre,fileout,chfmt
 CHARACTER (LEN=10) :: ch10heado(3,mxpar),ch10headp(3,mxpar)
 LOGICAL :: warn
 

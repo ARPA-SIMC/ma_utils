@@ -21,7 +21,7 @@ PROGRAM calc_tpi
 !   potrewbbe essere risolto solo calcolando TPI direzionale, il che 
 !   implica una sostanziale riscrittura del programma)
 !
-!                                         Versione 1.3.1, Enrico 19/10/2012
+!                                         Versione 1.3.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -63,8 +63,7 @@ INTEGER :: ir_small,jr_small,ir_big,jr_big
 INTEGER :: np_req,cnt_par,cnt_print,cnt_small,cnt_big,nrq_big,nrq_small
 INTEGER :: ios,eof,eor,net_dum,usr_dum,quota_dum,iuin,iuout,iuext
 INTEGER :: kp,kr,i,j,k,ii_nasa,jj_nasa,ii_req,jj_req,i_req,j_req
-CHARACTER (LEN=120) :: chrec
-CHARACTER (LEN=80) :: charg,file_out,file_in,file_ext
+CHARACTER (LEN=200) :: charg,file_out,file_in,file_ext,chrec
 CHARACTER (LEN=20) :: nome_stz(max_pts),nome_dum,sim_txt(0:4)
 CHARACTER (LEN=3) :: inp
 CHARACTER (LEN=1) :: next_arg

@@ -19,7 +19,7 @@ PROGRAM tinterp_grib
 ! - il programma dovrebbe funzionare anche per sfoltire un file, ma in 
 !   questa modalita' potrebbe non essere ottimizzato.
 !
-!                                         Versione 1.0.1, Enrico 27/02/2013
+!                                         Versione 1.0.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -38,7 +38,7 @@ INTEGER :: step,delta_2r,delta_r1,delta_21,ni,nj,yy,mm,dd,hh
 INTEGER :: ft,en,gnov,nocv,nom
 INTEGER :: kp,cntg,k,cnt_eqt,cnt_int,cnt_unc
 INTEGER :: idp,ios,iret,clret(0:5)
-CHARACTER (LEN=80) :: chdum,filein,fileout
+CHARACTER (LEN=200) :: chdum,filein,fileout
 CHARACTER (LEN=13) :: ch13(3)
 CHARACTER (LEN=10) :: ch10
 LOGICAL :: verbose

@@ -13,7 +13,7 @@ PROGRAM calmet_dat2asc
 !   Con questi formati, calmet.asc.gz occupa circa 8M; scrivere in formato
 !   compatto anche ai campi 2d farebbe risparmiare meno del 10%
 !
-!                                           Versione 3.1, Enrico 19/11/2007
+!                                         Versione 3.1.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE       
@@ -74,7 +74,7 @@ CHARACTER (LEN=8) :: clabpc
 ! 0.4) Altre variabili del programma
 REAL :: rver
 INTEGER :: ios,idum(12),j,i,ih,k,k2
-CHARACTER (LEN=80) :: filein,fileout
+CHARACTER (LEN=200) :: filein,fileout
 CHARACTER (LEN=9) :: ch9
 LOGICAL :: form
 

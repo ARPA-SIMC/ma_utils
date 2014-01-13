@@ -4,7 +4,7 @@ PROGRAM llgrib
 ! intestazioni, una riga per ogni grib. Gestisce grib1 e (alcuni) grib2.
 ! Le versioni < 3 chiamano la Gribex e gestiscono solo grib1.
 !
-!                                         Versione 3.1.0, Enrico 06/11/2012
+!                                         Versione 3.1.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -16,9 +16,8 @@ REAL, ALLOCATABLE :: field(:)
 REAL :: pval
 INTEGER :: date,hh,en,nodp,nocv,df,drtn,bpv,sop,par(3),lev(3),scad(4)
 INTEGER :: ifin,igin,kpar,pshow,ios,iret,kg,ier,ni,nj
-CHARACTER (LEN=200) :: header,chrec,chrec1,chrec2
+CHARACTER (LEN=200) :: header,chrec,chrec1,chrec2,filein,chpar
 CHARACTER (LEN=80) :: chfmt0,chfmt1,chfmt2
-CHARACTER (LEN=80) :: filein,chpar
 CHARACTER (LEN=1) :: next_arg,pfmt
 LOGICAL :: ls4
 

@@ -15,7 +15,7 @@ INTEGER, PARAMETER :: maxdim = 10000000
 TYPE(date) :: datac
 INTEGER :: ios,eof,eor,kscad,hhc,idata,ntry,n1,n2,nd,cntr,idum
 REAL :: field(maxdim)
-CHARACTER (LEN=80) :: filein,fileout
+CHARACTER (LEN=200) :: filein,fileout
 
 !--------------------------------------------------------------------------
 ! 1) Elaborazioni preliminari

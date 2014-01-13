@@ -5,7 +5,7 @@ PROGRAM xout2grib
 ! Sostituisce met2grib.f 
 ! Uso: xout2grib.exe filedat filegrb igen
 !
-!                                         Versione 1.0.1, Enrico 05/11/2012
+!                                         Versione 1.0.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -57,7 +57,7 @@ TYPE (date) :: data_out(mxhr)
 REAL :: rver,x1,y1,x2,y2
 INTEGER :: ora_out(mxhr),iaa,ijj,hhgmt
 INTEGER :: igen,iuout,ios,idum,j,i,ih,k,kl,cntg
-CHARACTER (LEN=80) :: filedat,filegrb,str_gen
+CHARACTER (LEN=200) :: filedat,filegrb,str_gen
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari:

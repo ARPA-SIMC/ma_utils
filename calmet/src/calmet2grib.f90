@@ -5,7 +5,7 @@ PROGRAM calmet2grib
 !
 ! Uso: calmet2grib.exe filedat filegrb igen [-w] [-wcart] [-h] 
 !
-!                                         Versione 4.0.1, Enrico 05/11/2012
+!                                         Versione 4.0.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -77,7 +77,7 @@ REAL :: liv_uv(mxnz),x1,y1,x2,y2,dgridg,xorigrg,yorigrg
 INTEGER :: nxg,nyg,iutmzng,luse(mxnx,mxny)
 INTEGER :: ora_out(mxhr),iaa,ijj,hhgmt,cnt_par,kpar,iver
 INTEGER :: igen,iuout,iuorog,ios,ier,idum,j,i,ih,k,kl,kg,cntg
-CHARACTER (LEN=80) :: filedat,filegrb,str_gen,chpar,next_arg
+CHARACTER (LEN=200) :: filedat,filegrb,str_gen,chpar,next_arg
 LOGICAL :: outw_tf,outw_cart,orok
 
 !--------------------------------------------------------------------------

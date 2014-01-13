@@ -16,7 +16,7 @@ PROGRAM grib_utm_scale
 ! griglie UTM ad alta risoluzone (se si compiono operazioni tra files 
 ! diversi spesso dice che le griglie sono incompatibili)
 ! 
-!                                           Versione 2.0, Enrico 13/09/2011
+!                                         Versione 2.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -36,7 +36,7 @@ REAL    :: field(maxdim)
 REAL :: fnorm,offset
 INTEGER :: iuin,iuout,cnt_in,cnt_utm,ksec2_sav(1024)
 INTEGER :: new_dx,new_dy,ios1,ios2
-CHARACTER (LEN=80) :: filein,fileout,chpar1,chpar2
+CHARACTER (LEN=200) :: filein,fileout,chpar1,chpar2
 LOGICAL :: utm_uniq,wrn(3)
 
 !--------------------------------------------------------------------------

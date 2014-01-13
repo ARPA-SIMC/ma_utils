@@ -18,7 +18,7 @@ PROGRAM grb_chimere2netcdf
 ! Sviluppi:
 !   - nome e unita' di misura letta da tabelle (sez. 2.2)
 !
-!                                         Versione 1.3.1, Enrico 10/01/2014
+!                                         Versione 1.3.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE netcdf
@@ -52,7 +52,7 @@ REAL :: dx,dy,vmin,vmax
 INTEGER :: nx,ny,nz,nt,nscad_forc,nvar
 INTEGER :: var_grb(3,maxvar),hh1,hh2,hhc,ndec,cp2
 INTEGER :: iu,ncid,idp,k,kp,kv,kg,kl,ist,ier
-CHARACTER (LEN=80) :: filein,fileout,chdum
+CHARACTER (LEN=200) :: filein,fileout,chdum
 CHARACTER (LEN=40) :: var_name(maxvar),strcdf_dt,strcdf_t0
 CHARACTER (LEN=4) :: scad_type
 CHARACTER (LEN=3) :: proj,conventions

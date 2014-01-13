@@ -16,7 +16,7 @@ PROGRAM crea_wt_dat
 ! Note:
 ! Per il momento, i pesi dipendono solo dal livello
 ! 
-!                                                   V1.1, Enrico 10/10/2003
+!                                                 V1.1.1, Enrico 14/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -24,7 +24,7 @@ IMPLICIT NONE
 REAL, ALLOCATABLE :: quo(:),wt(:)
 INTEGER :: nx,ny,nz
 INTEGER :: ll,klev,i,j
-CHARACTER (LEN=80) :: chpar,chfmt,str,fileout
+CHARACTER (LEN=200) :: chpar,chfmt,str,fileout
 CHARACTER (LEN=40) :: progetto
 
 !--------------------------------------------------------------------------

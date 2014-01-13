@@ -13,7 +13,7 @@ PROGRAM pres_ecmwf
 ! Output:
 ! PRES_3D:  pressione sui livelli richiesti (Pa)
 !
-!                                         Versione 1.0.1, Enrico 17/10/2013
+!                                         Versione 1.0.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 IMPLICIT NONE
 
@@ -29,7 +29,7 @@ REAL, ALLOCATABLE :: ps(:),p(:,:)
 REAL :: ca(256),cb(256)
 INTEGER :: np,nz,nt,nzecm,idata
 INTEGER :: ios1,ios2,ios,eof,eor,idp,iu,kp,kz,k
-CHARACTER (LEN=80) :: filep,fileps,filegrib,chdum,arg(3)
+CHARACTER (LEN=200) :: filep,fileps,filegrib,chdum,arg(3)
 
 !--------------------------------------------------------------------------
 ! 1) Elaborazioni preliminari

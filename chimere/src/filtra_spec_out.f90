@@ -5,7 +5,7 @@ PROGRAM filtra_spec_out
 !
 ! Programma usato dalla catena Chimere (crea_input_bc.ksh)
 !
-!                                 Versione 1.1, Enrico & Michele 10/12/2010
+!                               Versione 1.1.1, Enrico & Michele 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -20,7 +20,7 @@ REAL :: dum_arr(maxdim)
 INTEGER :: np3d,ns_org,ns_mod,ns_file,ns_ok,idx(maxspec),ntry
 INTEGER :: ios,eof,eor,p1,ksm,kso,kscad,idum,n1,n2,idata
 CHARACTER (LEN=40) :: chrec,chdum,ids_org(maxspec),ids_mod(maxspec)
-CHARACTER (LEN=80) :: fout_org,fout_mod,fout_spec,flat_spec,chpar
+CHARACTER (LEN=200) :: fout_org,fout_mod,fout_spec,flat_spec,chpar
 
 !--------------------------------------------------------------------------
 ! 1) Elaborazioni preliminari

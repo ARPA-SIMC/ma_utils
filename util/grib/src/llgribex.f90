@@ -4,7 +4,7 @@ PROGRAM llgribex
 ! intestazioni, una riga per ogni grib
 ! Fa lo stesso lavoro di wgrib e lgrib, ma funziona anche con grib SOP
 !
-!                                           Versione 2.6, Enrico 02/03/2011
+!                                         Versione 2.6.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 !USE date_handler
@@ -22,9 +22,8 @@ REAL    :: field(maxdim)
 
 ! Altre variabili del programma
 INTEGER :: iuin,iuout,cnt,np,kpar,pshow,ios
-CHARACTER (LEN=200) :: header,chrec,chrec1,chrec2
+CHARACTER (LEN=200) :: header,chrec,chrec1,chrec2,filein,chpar
 CHARACTER (LEN=80) :: chfmt0,chfmt1,chfmt2
-CHARACTER (LEN=80) :: filein,chpar
 CHARACTER (LEN=1) :: next_arg,pfmt,hoper
 LOGICAL :: ls4
 

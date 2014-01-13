@@ -5,7 +5,7 @@ PROGRAM scale_unf_chimere
 !
 ! Uso: scale_unf_chimere.exe filein fileout nptot a b [-h]
 !
-!                                           Versione 1.0, Enrico 03/03/2004
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 IMPLICIT NONE
 
@@ -13,7 +13,7 @@ REAL, ALLOCATABLE :: f(:)
 REAL :: aa,bb
 INTEGER :: nptot,k,idata
 INTEGER :: ios,ios1,ios2,ios3,eof,eor
-CHARACTER (LEN=80) :: filein,fileout,chdum
+CHARACTER (LEN=200) :: filein,fileout,chdum
 
 !--------------------------------------------------------------------------
 ! 1)  Preliminari

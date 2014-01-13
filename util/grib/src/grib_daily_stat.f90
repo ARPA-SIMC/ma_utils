@@ -19,7 +19,7 @@ PROGRAM grib_daily_stat
 ! - Per rendere piu' leggibile il codice, il programma fa comunque tutti i
 !   calcoli, ma scrive solo gli output richiesti
 !
-!                                           Versione 5.0, Enrico 28/05/2012
+!                                         Versione 5.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -58,7 +58,7 @@ REAL :: fave
 INTEGER :: ngribin,ngribout
 INTEGER :: iuin,iuout_ave,iuout_max,iuout_dty,iuout_aot,iuout_rm1,iuout_rm2,iuout_exc
 INTEGER :: np,nok,hhv,hhv_sav,dlth,ier,kh,k,ios,kpar,cnt_par,kg,pdb
-CHARACTER (LEN=80) :: filein,fileout,chpar
+CHARACTER (LEN=200) :: filein,fileout,chpar
 CHARACTER (LEN=3) :: next_arg
 LOGICAL :: deb
 

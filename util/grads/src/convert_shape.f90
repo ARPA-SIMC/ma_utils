@@ -9,14 +9,14 @@ PROGRAM convert_shape
 ! in input si aspetta YY,XX
 ! Per leggere files XX,YY, usare il parametro -rev
 !
-!                                           Versione 1.0, Enrico 03/06/2003
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
 
 REAL :: xin,xout,yin,yout
 INTEGER :: ios,eof,eor,cnt1,cnt2,kp,idum,idp
-CHARACTER (LEN=80) :: filein,fileout,chrec,chdum
+CHARACTER (LEN=200) :: filein,fileout,chrec,chdum
 CHARACTER (LEN=7) :: ch7
 LOGICAL :: lrev
 

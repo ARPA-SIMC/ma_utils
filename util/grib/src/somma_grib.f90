@@ -13,7 +13,7 @@ PROGRAM somma_grib
 !
 ! PROGRAMMA RESO OBSOLETO DA math_grib.f90
 !
-!                                         Versione 3.2.1, Enrico 17/04/2013
+!                                         Versione 3.2.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -35,7 +35,7 @@ REAL :: field_a(maxdim),field_b(maxdim),field_c(maxdim)
 REAL :: fk1,fk2
 INTEGER :: ctv_out(3),ios(6),force_par_out
 INTEGER :: ngrib,iuin1,iuin2,iuout,np,kp,idp,k
-CHARACTER (LEN=80) :: filein1,filein2,fileout,chdum
+CHARACTER (LEN=200) :: filein1,filein2,fileout,chdum
 CHARACTER (LEN=3) :: next_arg
 LOGICAL :: ld_par,ld_lev,ld_date,ld_sca,ld_ksec1
 

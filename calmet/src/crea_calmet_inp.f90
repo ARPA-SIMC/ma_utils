@@ -32,7 +32,7 @@ PROGRAM crea_calmet_inp
 ! Con parametro -noobs: ignora filesurf, filetemp e stept_req, non scrive nessun
 !   dato relativo alle osservazioni
 !
-!                                                      V4.3.1, Enrico 02/05/2013
+!                                                      V4.3.2, Enrico 13/01/2014
 !-------------------------------------------------------------------------------
 
 USE date_handler
@@ -78,8 +78,7 @@ INTEGER :: vers_calmet
 INTEGER :: hh1,hh2,hht,stept_req,id_net,id_usr
 INTEGER :: dum_nx,dum_ny,dum_utmz,nusta_req
 CHARACTER (LEN=200) :: chrec,chfmt,rec_out,chxyz
-CHARACTER (LEN=120) :: filemodello,filedate,filesurf,filetemp,nfile
-CHARACTER (LEN=80) :: tab_path
+CHARACTER (LEN=200) :: filemodello,filedate,filesurf,filetemp,nfile,tab_path
 CHARACTER (LEN=20) :: ch20
 CHARACTER (LEN=10) :: dum_area,id_area
 LOGICAL :: req_obs

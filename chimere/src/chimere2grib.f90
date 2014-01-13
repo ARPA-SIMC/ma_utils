@@ -13,7 +13,7 @@ PROGRAM chimere2grib
 ! I grib in quota sono codificati come livelli ibridi, ma senza includere i
 !   vertical coordinate parameters. 
 !
-!                                           Versione 6.4, Enrico 22/05/2008
+!                                         Versione 6.4.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -57,7 +57,7 @@ INTEGER :: nvar,nlev,nx,ny,np,nvar_out,nvar3d,nvar2d,nl,slen,mm,ii,nxi,nyi
 INTEGER :: code_var(maxvar),tab_var(maxvar),lev_out(maxlev)
 INTEGER :: cem,igen,idata,idata_ini,yy,scad_ini
 INTEGER :: iu,k,kp,kvar,kscad,klev,kday,kh,ios,eof,eor,cnt_grb,idp,inp_fmt
-CHARACTER (LEN=80) :: filein,fileout,fileinfo,chrec,chdum,arg(4)
+CHARACTER (LEN=200) :: filein,fileout,fileinfo,chrec,chdum,arg(4)
 CHARACTER (LEN=10) :: chdata
 CHARACTER (LEN=3) :: proj
 LOGICAL :: verbose

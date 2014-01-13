@@ -10,14 +10,14 @@ PROGRAM crea_coord_chimere
 ! Gli estremi dell'area contenuti in crea_coord_chimere.inp devono essere
 ! anche loro relativi ai centri cella.
 !
-!                                           Versione 2.0, Enrico 08/06/2004
+!                                         Versione 2.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 IMPLICIT NONE
 
 REAL :: x1,x2,y1,y2,dx,dy,xrot,yrot,x,y,lat,lon
 REAL :: lat_mx,lat_mn,lon_mx,lon_mn
 INTEGER :: proj,ni,nj,utmz,i,j
-CHARACTER (LEN=80) :: chpar,fileout
+CHARACTER (LEN=200) :: chpar,fileout
 CHARACTER (LEN=6) :: area
 
 !--------------------------------------------------------------------------

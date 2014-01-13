@@ -3,7 +3,7 @@ PROGRAM grib_f2s
 ! Legge un file GRIB e lo ricodifica usando il second order packing con
 ! la codifica piu' semplice possibile (by ROW)
 !
-!                                           Versione 1.2, Enrico 05/01/2005
+!                                         Versione 1.2.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -20,7 +20,7 @@ REAL    :: field(maxdim)
 
 ! Altre variabili del programma
 INTEGER :: iuin,iuout,k,lpack,cnt1
-CHARACTER (LEN=80) :: filein,fileout,charg
+CHARACTER (LEN=200) :: filein,fileout,charg
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari

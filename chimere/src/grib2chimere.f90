@@ -19,7 +19,7 @@ PROGRAM grib2chimere
 ! - Mette a 0 le specie richieste in output e non presenti in input
 ! - Gestisce solo lo scanning flag 64 (010)
 !
-!                                         Versione 3.0.3, Enrico 10/01/2014
+!                                         Versione 3.0.4, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -80,8 +80,8 @@ INTEGER :: hhr,hhr_sav,sca,sca1,sca2
 INTEGER :: idata,hhc,hh_tot,cem,data(3),ora(2),scad(4),level(3),var(3)
 INTEGER :: np,nz,nt,nspc
 INTEGER :: k,kz,kt,ks,kp,ios,eof,eor,ier,cnt_rew,p1,p2,p3,l1,l2,t1,t2
-CHARACTER(LEN=120) :: file_tab(ntab)
-CHARACTER (LEN=120) :: filein,fileout,filespc,fileor,filevc,chdum,arg(4)
+CHARACTER (LEN=200) :: file_tab(ntab)
+CHARACTER (LEN=200) :: filein,fileout,filespc,fileor,filevc,chdum,arg(4)
 CHARACTER (LEN=80) :: tab_path
 CHARACTER (LEN=8) :: req_spc(maxspc),dum_spc
 CHARACTER (LEN=2) :: next_arg,idscad

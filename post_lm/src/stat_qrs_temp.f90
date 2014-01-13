@@ -3,7 +3,7 @@ PROGRAM stat_qrs_temp
 ! Programma che legge da files separati i grib di T, Qw, Qi, Qr, Qs e 
 ! calcola il rapporto tra acqua liquida e ghiaccio alle varie temperature.
 !
-!                                         Versione 1.0.1, Enrico 10/01/2014
+!                                         Versione 1.0.2, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -27,7 +27,7 @@ REAL :: sum1(ntt),sum2(ntt),sum3(ntt),thr(5)
 INTEGER :: np,kf,kg,kt,tc1,tc2
 INTEGER (KIND=8) :: nok1(ntt),nok2(ntt),nok3(ntt)
 INTEGER :: iuin(5)
-CHARACTER (LEN=80), PARAMETER :: filein(5) = &
+CHARACTER (LEN=200), PARAMETER :: filein(5) = &
   (/"tt.grb","qw.grb","qi.grb","qr.grb","qs.grb"/)
 CHARACTER (LEN=80) :: charg
 LOGICAL, ALLOCATABLE :: ttmask(:)

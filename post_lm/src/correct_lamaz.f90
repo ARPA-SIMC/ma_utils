@@ -4,7 +4,7 @@ PROGRAM correct_lamaz
 ! Scrive sui files gbex_fop.grb e gbex_sop.grb
 ! Uso: correct_lamaz.exe [-h] filein
 !
-!                                         Versione 2.1.0, Enrico 20/05/2013
+!                                         Versione 2.1.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -24,7 +24,7 @@ REAL    :: field(maxdim)
 TYPE(datetime) :: dt_lay40_first,dt_cineca_first,dt_bad_first,dt_bad_last,datahc
 TYPE (csv_record) :: out_rec
 INTEGER :: iuin,iuout1,iuout2,cnt,cnt_sop,cnt_u,cnt_v,cnt_bad,cnt_12h,yy,mm,dd,hh
-CHARACTER (LEN=80) :: filein,fileout1,fileout2
+CHARACTER (LEN=200) :: filein,fileout1,fileout2
 CHARACTER (LEN=10) :: ch10
 LOGICAL :: lsop
 

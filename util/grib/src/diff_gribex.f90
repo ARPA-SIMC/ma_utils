@@ -3,7 +3,7 @@ PROGRAM diff_grib
 ! Programma che legge due files con molti grib e visualizza le differenze
 ! Pensato principalmente per confrontare due files che dovrebbero essere 
 ! uguali, ma non sono identici al bit
-!                                           Versione 1.0, Enrico 05/01/2005
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -23,7 +23,7 @@ REAL    :: fielda(maxdim),fieldb(maxdim)
 ! Altre variabili del programma
 INTEGER :: iua,iub,ngrib,npa,npb,noka,nokb,nok,kp
 REAL :: avea,aveb,rms,mxdiff,rms_mx,mxdiff_absmx
-CHARACTER (LEN=80) :: filea,fileb
+CHARACTER (LEN=200) :: filea,fileb
 CHARACTER (LEN=14) :: str_nok
 CHARACTER (LEN=1) :: eq_ksec(4)
 LOGICAL :: leq(4),lnok

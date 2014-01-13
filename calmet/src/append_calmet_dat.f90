@@ -16,7 +16,7 @@ PROGRAM append_calmet_dat
 ! - Il programma controlla solo le date e che la griglia sia la stessa in
 !   tutti i files di input
 !
-!                                           Versione 1.0, Enrico 01/02/2008
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -82,7 +82,7 @@ REAL :: rgrid_desc(3),rver,rver_sav
 INTEGER :: cnt_skip,cnt_files,nheadrec
 INTEGER :: hhc,hhr,hh2,hht,igrid_desc(3),nhreq,yyyy,julday
 INTEGER :: ios,eof,eor
-CHARACTER (LEN=80) :: filein,fileout,filelst,chpar
+CHARACTER (LEN=200) :: filein,fileout,filelst,chpar
 CHARACTER (LEN=9) :: ch9
 
 !==========================================================================

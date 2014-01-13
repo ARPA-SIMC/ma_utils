@@ -11,7 +11,7 @@ IMPLICIT NONE
 
 INTEGER, PARAMETER :: np = 169*181
 INTEGER :: ifin=0,ifout=0,igin=0,igout=0,iret,kg,out_neg,data,time
-CHARACTER(LEN=80) :: filein,fileout
+CHARACTER(LEN=200) :: filein,fileout
 REAL :: field_in(np,12),field_out(np),out_ave
 
 !--------------------------------------------------------------------------

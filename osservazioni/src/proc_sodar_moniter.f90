@@ -31,7 +31,7 @@ INTEGER :: year,month,day,hh,min,delta_min,delta_step,irec,nt
 INTEGER :: out_ser,out_grads,out_ser_mis,out_grads_mis,expected_rec
 REAL :: dd(nlev),ff(nlev),ww(nlev),zi
 CHARACTER (LEN=400) :: chfmt
-CHARACTER (LEN=80) :: filein
+CHARACTER (LEN=200) :: filein
 CHARACTER (LEN=16) :: ch16,ch16a,ch16b
 CHARACTER (LEN=12) :: grads_date
 

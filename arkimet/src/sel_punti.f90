@@ -40,7 +40,7 @@ PROGRAM sel_punti
 !          parametri griglia da file grib. Di default non cerca stazioni
 !          vicine. Eliminata opzione per vecchio formato condivisione.
 !
-!                                                 V7.0.0, Enrico 13/06/2013
+!                                                 V7.0.1, Enrico 13/01/2014
 !                               (versioni <3.0: vedi crea_punti_seriet.f90)
 !--------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ INTEGER :: i,j,k,kc,eof,eor,ios,ios1,ios2,ier,iz,ll,kpar
 INTEGER :: iret,ifil,ig,en,yf,yl
 INTEGER :: pts_inp,pts_coor,n_list_stz,grid_coor,npunti
 INTEGER :: niexp,njexp,nskipexp
-CHARACTER (LEN=120) :: file_out,chrec,file_grb,chpar,str_xread,str_yread
+CHARACTER (LEN=200) :: file_out,chrec,file_grb,chpar,str_xread,str_yread
 CHARACTER (LEN=40) :: progetto,pts_file,grid_area,gt
 CHARACTER (LEN=40) :: pts_coor_unit,pts_coor_str,str,str_lon,str_lat
 CHARACTER (LEN=30) :: label_out

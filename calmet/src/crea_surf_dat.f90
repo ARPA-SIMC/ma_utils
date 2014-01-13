@@ -60,8 +60,7 @@ INTEGER :: ibyr,ibjul,ibhr,ieyr,iejul,iehr,hr1,hr2,hr_req,hr_fil
 INTEGER :: kstaz,khr,kpar,ios,ios2,eof,eor,idum,idum2,cnt_par
 INTEGER :: hr_out,jul_out,yea_out,hr_out2,jul_out2,dh1,dh2
 INTEGER :: id_rete,id_user,ndays,ndays2,nhr,nstaz
-CHARACTER (LEN=200) :: chrec
-CHARACTER(LEN=80) :: filein,chpar,filedate,filesurf
+CHARACTER(LEN=200) :: chrec,filein,chpar,filedate,filesurf
 CHARACTER(LEN=4) :: next_arg
 CHARACTER(LEN=3) :: out_ver
 

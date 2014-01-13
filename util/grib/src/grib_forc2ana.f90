@@ -10,7 +10,7 @@ PROGRAM grib_forc2ana
 ! - confrontare i campi di prima scelta per Calmet con Calmet stesso
 !
 ! Derivato da rw_grib.f90
-!                                           Versione 1.0, Enrico 04/06/2003
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -31,7 +31,7 @@ REAL    :: field(maxdim)
 TYPE(date) :: datar, dataw
 INTEGER :: sca,hhr,hhw,hh_tot
 INTEGER :: iuin,iuout,cnt_tot,cnt_cng,cnt_err
-CHARACTER (LEN=80) :: filein,fileout
+CHARACTER (LEN=200) :: filein,fileout
 LOGICAL :: modif
 
 !--------------------------------------------------------------------------

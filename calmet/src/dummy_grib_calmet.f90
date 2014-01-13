@@ -8,7 +8,7 @@ PROGRAM dummy_grib_calmet
 !
 ! Uso: dummy_grib_calmet fileinp igen fileout
 !
-!                                         Versione 3.2.1, Enrico 17/10/2013
+!                                         Versione 3.2.3, Enrico 14/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -37,9 +37,8 @@ CHARACTER (LEN=100) :: exinp,exdat
 
 ! Altre variabili del programma
 INTEGER :: iuout,igen,cc,yy,kh,kl,ios
-CHARACTER (LEN=200) :: chrec
+CHARACTER (LEN=200) :: chrec,fileout,fileinp
 CHARACTER (LEN=100) :: chdat
-CHARACTER (LEN=80) :: fileout,fileinp
 CHARACTER (LEN=8) :: str_gen
 
 !--------------------------------------------------------------------------

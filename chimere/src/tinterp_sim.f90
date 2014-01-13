@@ -5,7 +5,7 @@ PROGRAM tinterp_sim
 !
 ! Uso: tinterp_sim.exe filein fileout np nz [-cum] [-h]
 !
-!                                           Versione 1.0, Enrico 01/07/2004
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -15,7 +15,7 @@ INTEGER :: np,nz,lcum,idata,hh1,hh2,hhc,hht,dt
 INTEGER :: idp,kp,kz,kh,ios,ios1,ios2,eof,eor
 REAL, ALLOCATABLE :: x1(:,:),x2(:,:),x(:,:)
 REAL :: w1,w2,rdum
-CHARACTER (LEN=80) :: filein,fileout,arg(4),chdum
+CHARACTER (LEN=200) :: filein,fileout,arg(4),chdum
 CHARACTER (LEN=10) :: ch10
 
 !--------------------------------------------------------------------------

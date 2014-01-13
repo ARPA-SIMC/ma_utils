@@ -10,7 +10,7 @@ PROGRAM post_wind_lm
 !   scritta come griglia H (i.e. spostati di mezza cella verso NE)
 ! - Con l'opzione -antir antiruota le componenti
 !
-!                                         Versione 1.1.4, Enrico 10/01/2014
+!                                         Versione 1.1.5, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grid_handler
@@ -37,7 +37,7 @@ TYPE(grid) :: grin_uu,grin_vv,grout_uu,grout_vv
 REAL :: fave,field1(maxdim),field2(maxdim)
 INTEGER :: kf,kp,ni,nj,k,ii,jj,kk,k0
 INTEGER :: ngrib,in_geo,iuin1,iuin2,iuout1,iuout2,nok,np_sav,np
-CHARACTER (LEN=80) :: filein1,filein2,fileout1,fileout2,chpar,file(4)
+CHARACTER (LEN=200) :: filein1,filein2,fileout1,fileout2,chpar,file(4)
 LOGICAL :: dest,antir,ksec2_diff
 
 !==========================================================================

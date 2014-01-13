@@ -8,7 +8,7 @@ PROGRAM calc_inv_max
 ! raggruppati  per data/scad, ed essere ordinati per livello (dal basso)
 ! E'ammessa la presenza di livelli diversi in istanti diversi.
 !
-!                                           Versione 2.0, Enrico 03/12/2008
+!                                         Versione 2.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -29,7 +29,7 @@ REAL    :: field(maxdim)
 REAL, ALLOCATABLE :: temp(:,:),inv(:)
 INTEGER :: data_scad(9),data_scadc(9),lev(1:3),levp(1:3),par(3),np
 INTEGER :: iuin1,iuin2,iuout,k,kp,idp,cntl,cntt,cntg,cntsk
-CHARACTER (LEN=80) :: file_t2m,file_t3d,fileout,charg,next_arg
+CHARACTER (LEN=200) :: file_t2m,file_t3d,fileout,charg,next_arg
 LOGICAL :: levok1,levok2,lt2m,ksec2_diff
 
 !==========================================================================

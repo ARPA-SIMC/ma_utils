@@ -2,7 +2,7 @@ PROGRAM replace_dat_grib
 !--------------------------------------------------------------------------
 ! Pende il primo grib e lo riscrive, mettendo solo i valori del secondo.
 !
-!                                           Versione 1.0, Enrico 10/09/2009
+!                                         Versione 1.0.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -24,7 +24,7 @@ REAL :: field_a(maxdim),field_b(maxdim),field_c(maxdim)
 REAL :: fk1,fk2
 INTEGER :: ctv_out(3),ios(6),force_par_out,k
 INTEGER :: iuin1,iuin2,iuout,np,kp,idp
-CHARACTER (LEN=80) :: filein1,filein2,fileout,chdum
+CHARACTER (LEN=200) :: filein1,filein2,fileout,chdum
 CHARACTER (LEN=3) :: next_arg
 
 !--------------------------------------------------------------------------

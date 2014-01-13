@@ -27,7 +27,7 @@ PROGRAM proc_seriet_prf
 ! Todo: gestire la presenza di un livello formato da V10m,T2m,Psup (utile 
 !   per run con dati ECMWF o LAMA ante 2006)
 !
-!                                         Versione 2.1.0, Enrico 05/04/2013
+!                                         Versione 2.1.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -50,7 +50,7 @@ INTEGER :: npar_tot,nlev_out,hh1,hh2,hhc,l1out,npar_req
 INTEGER :: cnt_par,k,k1,k2,krec,kpar,kp,kl,kl2
 INTEGER :: eof,eor,ios
 CHARACTER(LEN=10000) :: header_lev,header_par,chrec
-CHARACTER(LEN=120) :: filein,fileout,chpar,chfmt
+CHARACTER(LEN=200) :: filein,fileout,chpar,chfmt
 CHARACTER(LEN=5) :: stzid
 CHARACTER(LEN=4) :: next_arg
 CHARACTER(LEN=3) :: out_ver

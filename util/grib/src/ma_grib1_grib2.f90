@@ -10,7 +10,7 @@ PROGRAM ma_grib1_grib2
 ! - opzione -ana (per scrivere i dati previsti come analisi con lo stesso 
 !   verification time)
 !
-!                                         Versione 2.3.3, Enrico 18/03/2013
+!                                         Versione 2.3.4, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -29,7 +29,7 @@ INTEGER :: scad(4),lev(3),ni,nj
 INTEGER :: cem,sc,par,tab,sortx,togp,igen,gd,topd,dig,uvrtg,sm,pdtn,dd, &
   dt,ft,toffs,sfoffs,svoffs,tosfs,sfosfs,svosfs,toti,lotr,bp,bpv,bmi,bmp, &
   nv,tosp,ct,drtn,en,gnov,nocv,nom
-CHARACTER(LEN=250) :: chpar,filein,fileout
+CHARACTER(LEN=200) :: chpar,filein,fileout
 CHARACTER(LEN=80) :: grid_type
 LOGICAL :: lforc,lmacc
 TYPE(datetime) :: datet_in,datet_ref,datet_end
