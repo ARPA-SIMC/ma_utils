@@ -1,14 +1,14 @@
 Summary: Utilities area Meteorologia Ambientale SIMC
 Name: ma_utils
-Version: 0.4
-Release: 55%{dist}
+Version: 0.6
+Release: 100%{dist}
 License: GPL
 Group: Applications/Meteo
 URL: http://www.arpa.emr.it/sim
 Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
-BuildRequires: netcdf-devel, grib_api-devel >= 1.10
+BuildRequires: netcdf-devel, grib_api-devel >= 1.10, libdballe-devel, libsim
 Requires: libsim >= 5.0, libsim < 6.0
 
 Vendor:	       Enrico Minguzzi <eminguzzi@arpa.emr.it>
@@ -41,6 +41,7 @@ rm -rf %{buildroot}
 %doc
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/*.exe
+%{_libexecdir}/%{name}/*sh
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/*
 

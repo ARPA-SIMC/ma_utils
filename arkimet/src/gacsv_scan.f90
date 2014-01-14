@@ -502,7 +502,7 @@ WRITE (*,*)
 WRITE (*,*) "-m model: stringa identificativa del modello (per header files seriet)"
 WRITE (*,*) "-h: visualizza questo help" 
 WRITE (*,*) "-verbose: visualizza informazioni aggiuntive per debug"
-WRITE (*,*) "Cerca le tabelle seriet in $MA_UTILS_DAT (default: "//PKGDATAROOTDIR//")"
+WRITE (*,*) "Cerca le tabelle seriet in $MA_UTILS_DAT (default: PKGDATAROOTDIR)"
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 
 RETURN
