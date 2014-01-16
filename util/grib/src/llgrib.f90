@@ -18,7 +18,7 @@ INTEGER :: date,hh,en,nodp,nocv,df,drtn,bpv,sop,par(3),lev(3),scad(4)
 INTEGER :: ifin,igin,kpar,pshow,ios,iret,kg,ier,ni,nj
 CHARACTER (LEN=200) :: header,chrec,chrec1,chrec2,filein,chpar
 CHARACTER (LEN=80) :: chfmt0,chfmt1,chfmt2
-CHARACTER (LEN=1) :: next_arg,pfmt
+CHARACTER (LEN=1) :: next_arg,pfmt=""
 LOGICAL :: ls4
 
 INTEGER, PARAMETER :: imiss_out = 999

@@ -1,163 +1,165 @@
 PROGRAM grib_forc2ana
 !--------------------------------------------------------------------------
-! Legge un file con molti grib e lo riscrive, trasformado tutte le 
-! previsioni in analisi relative alla data-ora di emissione. 
+! Legge un file con molti grib e riscrive tutti i campi come analisi
+! istantanee, relative alla data-ora di validita' o di emissione.
+! Gestisce GRIB1 e GRIB2.
 ! I parametri relativi a un intervallo (es .precipitazione) vengono 
 ! attribuiti all'istante finale dell'intervallo.
 !
-! Serve per:
-! - importare in grads
-! - confrontare i campi di prima scelta per Calmet con Calmet stesso
-!
-! Derivato da rw_grib.f90
-!                                         Versione 1.0.1, Enrico 13/01/2014
+!                                         Versione 1.0.0, Enrico 16/01/2014
 !--------------------------------------------------------------------------
 
-USE date_handler
-
+USE grib2_utilities
+USE datetime_class
+USE grib_api
 IMPLICIT NONE
 
-! Parametri costanti
-REAL, PARAMETER :: rmis = -9999.           ! valore per dati mancanti
-INTEGER, PARAMETER :: maxdim = 200000      ! dimensione massima dei GRIB
-
-! Dichiarazioni per GRIBEX.
-INTEGER :: ksec0(2),ksec1(1024),ksec2(1024),ksec3(2),ksec4(512)
-INTEGER :: kbuffer(maxdim), klen, kret
-REAL    :: psec2(512),psec3(2)
-REAL    :: field(maxdim)
-
-! Altre variabili del programma
-TYPE(date) :: datar, dataw
-INTEGER :: sca,hhr,hhw,hh_tot
-INTEGER :: iuin,iuout,cnt_tot,cnt_cng,cnt_err
-CHARACTER (LEN=200) :: filein,fileout
-LOGICAL :: modif
+TYPE (datetime) :: rtime_in,vtime_in,rtime_out
+INTEGER :: ifin=0,ifout=0,igin=0,igout=0
+INTEGER :: kg,idp,kp,iret,yy,mon,dd,hh,min,en,yoc,cortod
+CHARACTER(LEN=200) :: filein,fileout,chdum
+CHARACTER(LEN=1) :: out_times
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
 
 ! 1.1 Parametri da riga comando
-CALL getarg(1,filein)
-CALL getarg(2,fileout)
+out_times = "V"
+idp = 0
+DO kp = 1,HUGE(0)
+  CALL getarg(kp,chdum)
+  IF (TRIM(chdum) == "") THEN
+    EXIT
+  ELSE IF (TRIM(chdum) == "-h") THEN
+    CALL write_help
+    STOP 1
+  ELSE IF (TRIM(chdum) == "-rtime") THEN
+    out_times = "R"
 
-IF (filein == "" .OR. fileout == "" .OR. TRIM(filein) == "-h") THEN
-  WRITE (*,*) "Uso: grib_forc2ana.exe [-h] filein fileout" 
-  STOP
-ENDIF
+  ELSE 
+    idp = idp + 1
+    SELECT CASE (idp)
+    CASE (1)
+      filein = chdum
+    CASE (2)
+      fileout = chdum
+    CASE DEFAULT
+      CALL write_help
+      STOP 1
+    END SELECT
+  ENDIF
+ENDDO
 
-! 1.2 Disabilito i controlli sui parametri GRIBEX
-CALL grsvck(0)
-
-! 1.3 Apro i files
-CALL PBOPEN (iuin,filein,'R',kret)
-CALL PBOPEN (iuout,fileout,'W',kret)
+! Apro i files
+CALL grib_open_file(ifin,filein,"r",iret)
+IF (iret /= GRIB_SUCCESS) GOTO 9999
+CALL grib_open_file(ifout,fileout,"w")
 
 !--------------------------------------------------------------------------
-! 2) Leggo / Scrivo (ciclo sui grib)
+! 2) Esecuzione (ciclo sui grib)
 
-cnt_tot = 0 
-cnt_cng = 0 
-cnt_err = 0 
+DO kg = 1,HUGE(0)
 
-DO 
+! 2.1 Leggo il prossimo campo
+  igin = -1
+  CALL grib_new_from_file(ifin,igin,iret)
+  IF (iret == GRIB_END_OF_FILE) EXIT
+  IF (iret /= GRIB_SUCCESS) GOTO 9998
 
-! 2.1 Leggo il grib 
-  CALL PBGRIB(iuin,kbuffer,maxdim*4,klen,kret)
-  IF (kret == -1) THEN
-    EXIT
-  ELSE IF (kret < -1) THEN
-    WRITE(*,*) "Error pbgrib: kret ",kret
-    STOP
+! 2.2 Calcolo il nuovo reference time
+  CALL grib_get(igin,"editionNumber",en)
+  CALL get_grib_time(igin, RTIME=rtime_in, VTIME=vtime_in, IRET=iret)
+  IF (iret /= 0) GOTO 9997
+
+  IF (out_times == "V") THEN
+    rtime_out = vtime_in
+  ELSE IF (out_times == "R") THEN
+    rtime_out = rtime_in
+  ENDIF
+  CALL getval(rtime_out, YEAR=yy, MONTH=mon, DAY=dd, HOUR=hh, MINUTE=min)
+
+! 2.3 Costruisco il grib modificato
+  CALL grib_clone(igin,igout)
+
+  IF (en == 1) THEN
+    yoc = MOD((yy-1),100) + 1
+    cortod = (yy-1)/100 + 1
+    CALL grib_set(igout,"yearOfCentury",yoc)
+    CALL grib_set(igout,"month",mon)
+    CALL grib_set(igout,"day",dd)
+    CALL grib_set(igout,"hour",hh)
+    CALL grib_set(igout,"minute",min)
+    CALL grib_set(igout,"centuryOfReferenceTimeOfData",cortod)
+    CALL grib_set(igout,"unitOfTimeRange",1)
+    CALL grib_set(igout,"P1",0)
+    CALL grib_set(igout,"P2",0)
+    CALL grib_set(igout,"timeRangeIndicator",0)
+
+  ELSE IF (en == 2) THEN
+    CALL grib_set(igout,"year",yy)
+    CALL grib_set(igout,"month",mon)
+    CALL grib_set(igout,"day",dd)
+    CALL grib_set(igout,"hour",hh)
+    CALL grib_set(igout,"minute",min)
+    CALL grib_set(igout,"significanceOfReferenceTime",0)
+    CALL grib_set(igout,"typeOfProcessedData",0)
+    CALL grib_set(igout,"productDefinitionTemplateNumber",0)
+    CALL grib_set(igout,"typeOfGeneratingProcess",0)
+    CALL grib_set(igout,"forecastTime",0)
+
   ENDIF
 
-  CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
-               field,maxdim,kbuffer,maxdim,klen,'D',kret)
-  IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-
-! 2.2 Trasformo data-scad da previsione ad analisi
-  datar = date(ksec1(12),ksec1(11),ksec1(10))
-  hhr = ksec1(13)
-
-
-! Gestione time range & time unit
-  SELECT CASE(ksec1(18))
-  CASE(0)
-    IF (ksec1(16) == 0) THEN      ! unintialised analysis
-      modif = .FALSE.
-    ELSE                          ! forecast
-      IF (ksec1(15) == 1) THEN
-        modif = .TRUE.
-        sca = ksec1(16)
-      ELSE
-        modif = .FALSE.
-        WRITE (*,'(a,i3,a)') "Time unit indicator ",ksec1(15), &
-          " non gestito, non modifico il grib"
-        cnt_err = cnt_err + 1
-      ENDIF
-    ENDIF
-
-  CASE(1)                         ! initialised analysis
-    modif = .TRUE.
-    sca = 0
-
-  CASE(2:5)                       ! prodotto riferito a un intervallo
-    IF (ksec1(15) == 1) THEN
-      modif = .TRUE.
-      sca = ksec1(17)
-    ELSE
-      modif = .FALSE.
-      WRITE (*,'(a,i3,a)') "Time unit indicator ",ksec1(15), &
-       " non gestito, non modifico il grib"
-      cnt_err = cnt_err + 1
-    ENDIF
-
-  CASE DEFAULT                    ! time range non gestio
-    modif = .FALSE.
-    WRITE (*,'(a,i3,a)') "Time range indicator ",ksec1(18), &
-      " non gestito, non modifico il grib"
-    cnt_err = cnt_err + 1
-  END SELECT
-
-! Se necessario, modifico data e scadenza
-  IF (modif) THEN
-    hh_tot = hhr + sca
-    dataw = datar + (hh_tot/24)
-    hhw = MOD(hh_tot,24)
-
-    ksec1(10) = dataw%yy
-    ksec1(11) = dataw%mm
-    ksec1(12) = dataw%dd
-    ksec1(13) = hhw
-
-    ksec1(15) = 1
-    ksec1(16) = 0
-    ksec1(17) = 0
-    ksec1(18) = 0
-
-    cnt_cng = cnt_cng + 1
-  ENDIF
-
-! 2.3 Lo riscrivo
-  CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
-               field,maxdim,kbuffer,maxdim,klen,'C',kret)
-  IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-  
-  CALL PBWRITE (iuout,kbuffer,ksec0(1),kret)
-  IF (kret <= 0) WRITE(*,*) "Error pbwrite, kret ",kret
-  cnt_tot = cnt_tot + 1
+! 2.4 Lo scrivo su fileout
+  CALL grib_write (igout,ifout)
+  CALL grib_release(igin)
+  CALL grib_release(igout)
 
 ENDDO
+
 !--------------------------------------------------------------------------
-! 3) Chiudo i files e termino
+! 3) Conclusione
 
-CALL PBCLOSE (iuin,kret)
-CALL PBCLOSE (iuout,kret)
+WRITE (*,*) "Elaborazioni completate, letti e riscritti ",kg-1," campi"
 
-WRITE (*,*) "Grib scritti        ",cnt_tot
-WRITE (*,*) "Grib modificati:    ",cnt_cng
-WRITE (*,*) "Grib non gestibili: ",cnt_err
-
+CALL grib_close_file(ifin)
+CALL grib_close_file(ifout)
 STOP
 
+!--------------------------------------------------------------------------
+! 4) Gestione errori
+
+9999 CONTINUE
+WRITE (*,*) "Errore aprendo ",TRIM(filein)
+STOP 2
+
+9998 CONTINUE
+WRITE (*,*) "Errore leggendo ",TRIM(filein)," grib n.ro " ,kg
+STOP 2
+
+9997 CONTINUE
+WRITE (*,*) "Data o scadenza non gestite in input: ",TRIM(filein)," grib n.ro " ,kg
+STOP 2
+
 END PROGRAM grib_forc2ana
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+SUBROUTINE write_help
+! Scrive a schermo l'help del programma
+
+!            123456789012345678901234567890123456789012345678901234567890123456789012345
+WRITE (*,*) "Uso: grib_forc2ana.exe [-h] filein fileout [-rtime]"
+WRITE (*,*) "Legge un file con molti grib e riscrive tutti i campi come analisi"
+WRITE (*,*) "istantanee, relative alla data-ora di validita' o di emissione."
+WRITE (*,*)
+WRITE (*,*) "-h    : visualizza questo help"
+WRITE (*,*) "filein, fileout: in formato GRIB1 o GRIB2"
+WRITE (*,*) "-rtime: scrive analisi con data uguale al reference time (default: "
+WRITE (*,*) "        usa il verification time)"
+WRITE (*,*) ""
+!            123456789012345678901234567890123456789012345678901234567890123456789012345
+
+RETURN
+END SUBROUTINE write_help
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

@@ -1,7 +1,7 @@
 AM_FCFLAGS = -I/usr/include -I/usr/lib64/gfortran/modules -I/usr/lib/gfortran/modules -I$(top_builddir)/modules -I$(top_builddir)/chimere/src/ver2011 -I$(top_builddir)/chimere/src/ver2007 -DPKGDATAROOTDIR='"$(datarootdir)/$(PACKAGE)"' -cpp
 LDADD = $(top_builddir)/modules/libmautils.la
 
-pkglibexec_PROGRAMS = altipres_sim.exe chimere2grib.exe chimeredep2grib.exe chimerencdf2grib.exe chmbc2cdf.exe crea_coord_chimere.exe exdom_grib.exe filtra_spec_out.exe grb_chimere2netcdf.exe grib2chimere.exe lm2ncf.exe merge_unf_chimere.exe mix_ratio.exe pres_ecmwf.exe scale_unf_chimere.exe sum_unf_chimere.exe show_unf_chimere.exe riscrivi_meteonc.exe split_output.exe sum_pm_species.exe tinterp_sim.exe diagmet_LMSMR4.exe diagmet_LAMAZ.exe diagmet_LAMA3.exe
+pkglibexec_PROGRAMS = altipres_sim.exe chimere2grib.exe chimeredep2grib.exe chimerencdf2grib.exe chmbc2cdf.exe column_content.exe crea_coord_chimere.exe exdom_grib.exe filtra_spec_out.exe grb_chimere2netcdf.exe grib2chimere.exe lm2ncf.exe merge_unf_chimere.exe mix_ratio.exe pres_ecmwf.exe scale_unf_chimere.exe sum_unf_chimere.exe show_unf_chimere.exe riscrivi_meteonc.exe split_output.exe sum_pm_species.exe tinterp_sim.exe diagmet_LMSMR4.exe diagmet_LAMAZ.exe diagmet_LAMA3.exe
 
 altipres_sim_exe_SOURCES = altipres_sim.f90      
 chimere2grib_exe_SOURCES = chimere2grib.f90      
@@ -13,6 +13,7 @@ chimerencdf2grib_exe_LDADD = $(LDADD) $(top_builddir)/chimere/src/ver2011/libchi
 chmbc2cdf_exe_SOURCES = chmbc2cdf.F90
 chmbc2cdf_exe_LDADD = $(LDADD) $(top_builddir)/chimere/src/ver2011/libchimere2011.la
 
+column_content_exe_SOURCES = column_content.f90
 crea_coord_chimere_exe_SOURCES = crea_coord_chimere.f90
 exdom_grib_exe_SOURCES = exdom_grib.f90	      
 filtra_spec_out_exe_SOURCES = filtra_spec_out.f90   

@@ -11,7 +11,7 @@ PROGRAM extrap_wind
 !
 ! Uso: extrap_wind.exe filein fileout [-h] [-c]
 !
-!                                         Versione 1.1.2, Enrico 13/01/2014
+!                                         Versione 1.1.3, Enrico 15/01/2014
 !--------------------------------------------------------------------------
 USE date_handler
 IMPLICIT NONE
@@ -233,8 +233,8 @@ DO
       sol_elev = ASIN(sinalp)*180./3.1415926
     ENDIF
 
-    WRITE (32,"(i2.2,1x,i2.2,1x,i4.4,1x,i2.2,1x,i3.3,1x,f10.0,1x,f10.1, &
-      1x,f10.3)") dd,mm,yy,hh,0,sol_elev,el,ustar
+    WRITE (32,"(i2.2,1x,i2.2,1x,i4.4,1x,i2.2,1x,i3.3,1x,f10.0,1x,f10.1,1x,f10.3)") &
+      dd,mm,yy,hh,0,sol_elev,el,ustar
   ENDIF
  
 ENDDO

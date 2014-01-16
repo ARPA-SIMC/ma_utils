@@ -15,31 +15,34 @@ CONTAINS
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-SUBROUTINE get_grib1_header(gaid,par,lev,scad,iret)
+SUBROUTINE get_grib1_header(gaid,reftime,par,lev,scad,iret)
 !--------------------------------------------------------------------------
 ! Dato il puntatore a un grib1 o grib2, ritorna alcune informazioni 
 ! contenute dell'header, nello stile "GRIB1"
-! par: centre, table, parameter
-! lev: level_type, level1, level2
-! scad: unit, p1, p2, timerange
+! 1) reftime: refernce time
+! 2) par: centre, table, parameter
+! 3) lev: level_type, level1, level2
+! 4) scad: unit, p1, p2, timerange
 !
 ! Note:
 ! - Per ora gestisce solo grib2 con pdtn = 0,8 o 40
 !--------------------------------------------------------------------------
 
+USE datetime_class
 USE grib_api
 IMPLICIT NONE
 
 ! Argomenti della subroutine
 INTEGER, INTENT(IN) :: gaid
+TYPE(datetime) ,INTENT(OUT), OPTIONAL :: reftime
 INTEGER, INTENT(OUT), OPTIONAL :: par(3),lev(3),scad(4),iret
 !TYPE(grib1_grid), INTENT(OUT), OPTIONAL :: grid
 
 ! Variabili locali
 REAL :: voffs,vosfs
-INTEGER :: en,ier
+INTEGER :: en,ier,yy,mon,dd,hh,min
 INTEGER :: toffs,svoffs,sfoffs,tosfs,sfosfs,svosfs,pc,pn,ct
-INTEGER :: sort,topd,pdtn,togp,ft,iouotr,toti,tosp,iouftr,lotr
+INTEGER :: sortt,topd,pdtn,togp,ft,iouotr,toti,tosp,iouftr,lotr
 
 !--------------------------------------------------------------------------
 
@@ -47,7 +50,20 @@ ier = 0
 CALL grib_get(gaid,"editionNumber",en)
 
 !--------------------------------------------------------------------------
-! Parametro
+! 1) Reference time
+
+IF (PRESENT(reftime)) THEN
+  CALL grib_get(gaid,"year",yy)
+  CALL grib_get(gaid,"month",mon)
+  CALL grib_get(gaid,"day",dd)
+  CALL grib_get(gaid,"hour",hh)
+  CALL grib_get(gaid,"minute",min)
+
+  reftime = datetime_new(YEAR=yy, MONTH=mon, DAY=dd, HOUR=hh, MINUTE=min)
+ENDIF
+
+!--------------------------------------------------------------------------
+! 2) Parametro
 
 IF (PRESENT(par)) THEN
   par(:) = imiss
@@ -104,7 +120,7 @@ IF (PRESENT(par)) THEN
 ENDIF
 
 !--------------------------------------------------------------------------
-! Livello
+! 3) Livello
 
 IF (PRESENT(lev)) THEN
   lev(:) = imiss
@@ -175,7 +191,7 @@ IF (PRESENT(lev)) THEN
 ENDIF
 
 !--------------------------------------------------------------------------
-! Scadenza
+! 4) Scadenza
 
 IF (PRESENT(scad)) THEN
   scad(:) = imiss
@@ -186,7 +202,7 @@ IF (PRESENT(scad)) THEN
     CALL grib_get(gaid,"timeRangeIndicator",scad(4))
  
   ELSE IF (en == 2) THEN 
-    CALL grib_get(gaid,"significanceOfReferenceTime",sort)
+    CALL grib_get(gaid,"significanceOfReferenceTime",sortt)
     CALL grib_get(gaid,"typeOfProcessedData",topd)
     CALL grib_get(gaid,"productDefinitionTemplateNumber",pdtn)
     CALL grib_get(gaid,"typeOfGeneratingProcess",togp)
@@ -207,44 +223,44 @@ IF (PRESENT(scad)) THEN
       WRITE (*,*) "Unit of timerange is not hour"
       ier = 3
     ENDIF
-    IF (sort==0 .AND. topd==0 .AND. pdtn==0 .AND. togp==0 .AND. &
+    IF (sortt==0 .AND. topd==0 .AND. pdtn==0 .AND. togp==0 .AND. &
         ft==0) THEN                  ! Analisi istantanea
       scad(1) = iouotr
       scad(2) = 0  
       scad(3) = 0
       scad(4) = 0
-    ELSE IF (sort==1 .AND. topd==1 .AND. pdtn==0 .AND. togp==2 .AND. &
+    ELSE IF (sortt==1 .AND. topd==1 .AND. pdtn==0 .AND. togp==2 .AND. &
         ft/=0) THEN                  ! Previsione istantanea
       scad(1) = iouotr
       scad(2) = ft  
       scad(3) = 0
       scad(4) = 0
-    ELSE IF (sort==0 .AND. topd==0 .AND. pdtn==8 .AND. togp==0 .AND. &
+    ELSE IF (sortt==0 .AND. topd==0 .AND. pdtn==8 .AND. togp==0 .AND. &
         ft==0 .AND. tosp==0 .AND. toti==1) THEN ! Analisi mediata (Pesco)
       scad(1) = iouotr
       scad(2) = 0
       scad(3) = lotr
       scad(4) = 14
-    ELSE IF (sort==0 .AND. topd==0 .AND. pdtn==8 .AND. togp==0 .AND. &
+    ELSE IF (sortt==0 .AND. topd==0 .AND. pdtn==8 .AND. togp==0 .AND. &
         ft==0 .AND. tosp==1 .OR. toti==1) THEN  ! Analisi cum (dep.Chimere)
       scad(1) = iouotr
       scad(2) = 0
       scad(3) = lotr
       scad(4) = 15
-    ELSE IF (sort==1 .AND. topd==1 .AND. pdtn==8 .AND. togp==2 .AND. &
+    ELSE IF (sortt==1 .AND. topd==1 .AND. pdtn==8 .AND. togp==2 .AND. &
         toti==2) THEN                ! Previsione mediata
       scad(1) = iouotr
       scad(2) = ft 
       scad(3) = ft + lotr
       scad(4) = 3
-    ELSE IF (sort==1 .AND. topd==2 .AND. pdtn==40 .AND. togp==2) THEN
+    ELSE IF (sortt==1 .AND. topd==2 .AND. pdtn==40 .AND. togp==2) THEN
       scad(1) = iouotr               ! Analisi o previ ist. MACC
       scad(2) = ft 
       scad(3) = 0
       scad(4) = 0
     ELSE
       WRITE (*,'(2a,6i8)') "[get_grib1_header] Timerange non gestito; ", &
-        "sort,topd,pdtn,togp,ft,toti ",sort,topd,pdtn,togp,ft,toti
+        "sort,topd,pdtn,togp,ft,toti ",sortt,topd,pdtn,togp,ft,toti
       ier = 4
     ENDIF
 
@@ -260,7 +276,7 @@ END SUBROUTINE get_grib1_header
 
 SUBROUTINE get_grib_time(gaid,rtime,vtime,iret)
 !--------------------------------------------------------------------------
-! Dato il puntatore a un grib1 o grib2, ne ritorna refernce time e 
+! Dato il puntatore a un grib1 o grib2, ne ritorna reference time e 
 ! verification time.
 !
 ! Note:

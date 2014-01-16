@@ -5,10 +5,10 @@ PROGRAM sum_pm_species
 ! ug/m3)
 !
 ! Note:
-! Derivato da somma_grib.f90; puo' essere usato anche per calcolare 
-! combinazioni lineari di grib.
+! - Derivato da somma_grib.f90; puo' essere usato anche per calcolare 
+!   combinazioni lineari di grib.
 !
-!                                         Versione 2.1.2, Enrico 13/01/2014
+!                                         Versione 2.1.3, Enrico 15/01/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -347,11 +347,14 @@ WRITE (*,*) "Operazione compiuta: output = SUM(pmol_N * input_N) [ * Ro * e3/Avg
 WRITE (*,*)
 WRITE (*,*) "Serve a:"
 WRITE (*,*) "- leggere molte specie di PM (in ppb) e scriverne la somma (ev. in ug/m3)"
+WRITE (*,*) "  Il calcolo di una family di aerosol a partire dalle componenti (es: da"
+WRITE (*,*) "  p0*ppm a p10ppm) e' preciso solo usando la densita' dell'aria di Chimere"
+WRITE (*,*) "  (opzione -ro)"
 WRITE (*,*) "- convertire una specie da ppb a ug/m3"
 WRITE (*,*) "- compiere un'operazione lineare su files grib (non attivare -ro e -rost)"
 WRITE (*,*)
 WRITE (*,*) "filelst:        elenco dei nomi files con le specie PM e dei relativi pesi"
-WRITE (*,*) "                molecolari (un file per record, formato libero)"
+WRITE (*,*) "                molecolari (un file per record, formato per READ * fortran)"
 WRITE (*,*) "fileout:        nome file ouptut"
 WRITE (*,*) "-h              visualizza questo help"
 WRITE (*,*) "-p cem,tab,var: modifica codici descrittori parametro in output (altrimenti "

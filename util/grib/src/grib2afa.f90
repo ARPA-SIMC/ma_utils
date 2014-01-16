@@ -68,7 +68,7 @@ DO kg = 1,HUGE(0)
   CALL grib_get(igin,"day",dd)
   CALL grib_get(igin,"hour",hh)
   CALL grib_get(igin,"minute",min)
-  CALL get_grib1_header(igin,par,lev,scad,iret)
+  CALL get_grib1_header(igin, PAR=par, LEV=lev, SCAD=scad, IRET=iret)
   IF (iret /= 0) THEN
     WRITE (*,*) "Errore get_grib1_header, skip"
     CYCLE

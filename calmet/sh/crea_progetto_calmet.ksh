@@ -1,6 +1,6 @@
 #!/bin/ksh
 ###########################################################################
-# crea_progetto_run.ksh
+# crea_progetto_calmet.ksh
 #
 # Procedura interattiva per costurire un nuovo progetto per run Calmet
 # Puo' essere lanciata per creare da zero un nuovo progetto o per 
@@ -29,7 +29,7 @@ if [ -z $MA_UTILS_SVN ] ; then
   llgrib=/usr/libexec/ma_utils/llgrib.exe
   zoom_grib=/usr/libexec/ma_utils/zoom_grib.exe
 else
-  echo "(crea_progetto_run.ksh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
+  echo "(crea_progetto_calmet.ksh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
   sel_punti_grid=${MA_UTILS_SVN}/arkimet/src/sel_punti_grid.exe
   proc_fisiog=${MA_UTILS_SVN}/fisiog/src/proc_fisiog.exe
   llgrib=${MA_UTILS_SVN}/util/grib/src/llgrib.exe
@@ -42,7 +42,7 @@ editor=emacs
 if [ -z $MA_UTILS_DAT ] ; then
   export MA_UTILS_DAT=/usr/share/ma_utils
 else
-  echo "(crea_progetto_run.ksh) Path tabelle ma_utils: "$MA_UTILS_DAT
+  echo "(crea_progetto_calmet.ksh) Path tabelle ma_utils: "$MA_UTILS_DAT
 fi
 aree_utm=${MA_UTILS_DAT}/aree_utm.dat
 
@@ -58,13 +58,13 @@ area="null"
 
 # 1.2) Gestione parametri (nome progetto)
 if [ $# -eq 0 ] ; then
-  echo "Uso: crea_progetto_run.ksh PROGETTO"
+  echo "Uso: crea_progetto_calmet.ksh PROGETTO"
   echo "Progetti gia fatti:"
   ls -1rt $root_dir
   exit
 fi
 if [ $1 = "-h" ] ; then
-  echo "Uso: crea_progetto_run.ksh PROGETTO"
+  echo "Uso: crea_progetto_calmet.ksh PROGETTO"
   echo "Progetti gia fatti:"
   ls $root_dir
   exit
