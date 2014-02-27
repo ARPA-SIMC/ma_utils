@@ -33,7 +33,7 @@ PROGRAM gacsv2seriet
 !   sarebbero comunque ordinati per reftime e trange, ie. non e' garantito
 !   che i verification times siano consecutivi)
 !
-!                                          Versione 1.6.7 Enrico 29/11/2013
+!                                          Versione 1.6.9 Enrico 21/02/2014
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -875,7 +875,7 @@ ELSE
   pct_ok = 0.
 ENDIF
 WRITE (*,'(2x,i10,a,f6.2,5a)') cnt_ok," validi in output (",pct_ok,"%; ", &
-  TRIM(ADJUSTL(ch10(1)))," mancanti totali, ", &
+  TRIM(ADJUSTL(ch10(1)))," mancanti in output, ", &
   TRIM(ADJUSTL(ch10(2)))," mancanti in input)"
 WRITE (ch10(1),'(i10)') cnt_qc(1)
 WRITE (ch10(2),'(i10)') cnt_qc(2)
@@ -925,7 +925,7 @@ STOP 2
 WRITE (*,*)  "Header inatteso in ",TRIM(filepts)
 STOP 3
 9996 CONTINUE
-WRITE (*,'(3a,i2)')  "Errore leggendo ",TRIM(filepts),"Record ",npt+1
+WRITE (*,'(3a,i3)')  "Errore leggendo ",TRIM(filepts)," Record ",npt+1
 WRITE (*,'(a)') ,TRIM(chrec)
 STOP 4
 
@@ -936,7 +936,7 @@ STOP 5
 WRITE (*,*)  "Header inatteso in ",TRIM(filecol)
 STOP 6
 9993 CONTINUE
-WRITE (*,'(3a,i2)')  "Errore leggendo ",TRIM(filecol),"Record ",nvl+1
+WRITE (*,'(3a,i3)')  "Errore leggendo ",TRIM(filecol)," Record ",nvl+1
 WRITE (*,'(a)') ,TRIM(chrec)
 STOP 7
 
@@ -947,7 +947,7 @@ STOP 8
 WRITE (*,*)  "Header inatteso in ",TRIM(filerow)
 STOP 9
 9990 CONTINUE
-WRITE (*,'(3a,i2)')  "Errore leggendo ",TRIM(filerow),"Record ",nrrow+1
+WRITE (*,'(3a,i3)')  "Errore leggendo ",TRIM(filerow)," Record ",nrrow+1
 WRITE (*,'(a)') ,TRIM(chrec)
 STOP 10
 
@@ -1221,6 +1221,10 @@ IF (out_form == 1 .OR. out_form == 2) THEN
     IF (varliv(4,k) == 1) THEN
       tipo_lev = "sup"                     ! Surface
       zid = 0.
+
+    ELSE IF (varliv(4,k) == 256) THEN
+      tipo_lev = "cld"                     ! Cloud groups
+      zid = varliv(6,k)
 
     ELSE IF (varliv(4,k) == 103) THEN
       tipo_lev = "sup"                     ! Specified height above ground

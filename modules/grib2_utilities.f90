@@ -2,7 +2,7 @@ MODULE grib2_utilities
 !--------------------------------------------------------------------------
 ! Utilita' per la getione dei GRIB2 in logica GRIB1
 !
-!                                         Versione 1.1.7, Enrico 17/10/2013
+!                                         Versione 1.2.0, Enrico 25/02/2014
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -19,7 +19,7 @@ SUBROUTINE get_grib1_header(gaid,reftime,par,lev,scad,iret)
 !--------------------------------------------------------------------------
 ! Dato il puntatore a un grib1 o grib2, ritorna alcune informazioni 
 ! contenute dell'header, nello stile "GRIB1"
-! 1) reftime: refernce time
+! 1) reftime: reference time
 ! 2) par: centre, table, parameter
 ! 3) lev: level_type, level1, level2
 ! 4) scad: unit, p1, p2, timerange
@@ -247,6 +247,12 @@ IF (PRESENT(scad)) THEN
       scad(2) = 0
       scad(3) = lotr
       scad(4) = 15
+    ELSE IF (sortt==0 .AND. topd==0 .AND. pdtn==8 .AND. togp==0 .AND. &
+        ft==0 .AND. tosp==2 .OR. toti==1) THEN  ! Analisi max (NinfaUB, O3/NO2)
+      scad(1) = iouotr
+      scad(2) = 0
+      scad(3) = lotr
+      scad(4) = 16
     ELSE IF (sortt==1 .AND. topd==1 .AND. pdtn==8 .AND. togp==2 .AND. &
         toti==2) THEN                ! Previsione mediata
       scad(1) = iouotr

@@ -18,7 +18,7 @@
 # LIBSIM_SVN:   esegubili (ad esempio: /home/eminguzzi/svn/libsim; se non 
 #               specificato, usa gli eseguibili in path)
 #
-#                                                 V7.8.3, Enrico 19/11/2013
+#                                                 V7.9.0, Enrico 21/02/2014
 #==========================================================================
 
 #==========================================================================
@@ -31,10 +31,11 @@ function write_help
 {
 #       123456789012345678901234567890123456789012345678901234567890123456789012345
   echo "Uso: crea_progetto_ak.ksh PROGETTO [-seropt=\"OPT1 OPT2 ...\"] "
-  echo "  [-batch] [-list] [-h]"
+  echo "  [-debug] [-batch] [-list] [-h]"
   echo
   echo "PROGETTO: nome del progetto di estrazione"
   echo "-seropt:  eventuali opzioni della chiamata ad ak_seriet"
+  echo "-debug:   come -seropt=-debug"
   echo "-batch:   estrae e archivia, senza input interattivo"
   echo "-list:    elenca i progetti salvati e termina"
   echo "-h        visualizza questo help e termina"
@@ -101,6 +102,7 @@ fi
 
 # 1.1) Path
 work_root=/autofs/scratch2/eminguzzi/arkimet/tmp_point # root dir lavoro
+#work_root=/scratch/eminguzzi/tmp_point     # root dir lavoro
 template_dir=${HOME_MINGUZZI}/arkimet/templates    # templates .akq
 fisiog_dir=${HOME_MINGUZZI}/util/grib/lm_ope       # dati fisiografici
 arc_root=${HOME_MINGUZZI}/arkimet/progetti_point   # root arc. estrazioni
@@ -162,6 +164,9 @@ while [ $# -ge 1 ] ; do
   elif [ `echo $1 | awk '{print $1}'` = '-batch' ] ; then
     batch="Y"
     shift
+  elif [ `echo $1 | awk '{print $1}'` = '-debug' ] ; then
+    seropt=$seropt" -debug"
+    shift
   elif [ `echo $1 | awk '{print substr($1,1,7)}'` = '-seropt' ] ; then
     seropt=$seropt" "`echo $1 | cut -d = -f 2-`
     shift
@@ -221,10 +226,6 @@ if [ $batch = "Y" ] ; then
   fi
   if [ ! -s $work_dir/$proj.akq ] ; then
     echo "File non trovato "$work_dir/$proj.akq
-    exit
-  fi
-  if [ ! -s $work_dir/$proj.ptn ] ; then
-    echo "File non trovato "$work_dir/$proj.ptn
     exit
   fi
   if [ ! -s $work_dir/$proj.pts.csv ] ; then
@@ -340,6 +341,7 @@ if [ $batch = "N" -a $modif != "S" ] ; then
     echo "Punti selezionati:"
     echo ""
     cat "$proj".pts.csv
+    echo ""
     echo "Totale: "$nprq" punti"
     echo "Li modifico? (Y/N)" 
     read yn
@@ -399,7 +401,7 @@ if [ $batch = "N" -a $modif != "S" ] ; then
     $editor sel_punti.inp 2>/dev/null
     $sel_punti
     echo "punti selezionati:"
-    cat "$proj".ptn
+    cat "$proj".pts.csv
   fi
 fi
 
@@ -430,6 +432,28 @@ if [ $destag = "Y" -a  $? -ne 0 ] ; then
     fi
   else
     seropt=$seropt" "-destag
+  fi
+fi
+
+#--------------------------------------------------------------------------
+# 2.7) Se necessario, gestisco i dati con codifica al secondo ordine
+
+echo $seropt | grep fop >/dev/null
+fop_opt=$?
+grep -E "qcr|qis|tke" ${proj}.akq > /dev/null
+fop_req=$?
+
+if [ $destag = "Y" -a  $fop_opt -ne 0 -a $fop_req -eq 0 ] ; then
+  if [ $batch = "N" -a $modif != "S" ] ; then
+    echo "La query contiene dati con codifica al 2o ordine (qcr,qis,tke)? (Y/N)"
+    read yn
+    if [ -z $yn ] ; then
+      echo ""
+    elif [ $yn = "y" -o $yn = "Y" ] ; then
+      seropt=$seropt" "-fop
+    fi
+  else
+    seropt=$seropt" "-fop
   fi
 fi
 
@@ -541,13 +565,14 @@ out_form=`grep ^out_form gacsv2seriet.nml | head -n 1 | sed 's/ //g' | \
 
 # 3.2.2 Elaboro solo il punto centrale
 if [ $plt -eq 1 ] ; then
-  line=`head -n 5 sel_punti.inp | tail -n 1`
-  nx=`echo $line | awk '{print $1}'`
-  ny=`echo $line | awk '{print $2}'`
-  nprq=`expr \( \( $ny - 1 \) / 2 \) \* $nx + \( $nx + 1 \) / 2`
-  idprq=`head -n $nprq ${proj}.ptn | tail -n 1`
-  idxprq=`echo $idprq | awk '{print $1}'`
-  echo "Elaboro punto "$nprq" "$idprq
+  nlines=`wc -l ${proj}.pts.csv | awk '{print $1}'`
+  nlinerq=`expr $nlines / 2 + 1`    # n.ro riga corrispondente al punto centrale
+  nprq=`expr $nlinerq - 1`          # n.ro progressivo del punto centrale
+  strrq=`head -n $nlinerq ${proj}.pts.csv | tail -n 1`
+  labprq=`echo $strrq | cut -d , -f 3`  
+  idxprq=`echo $strrq | cut -d , -f 6`
+
+  echo "Elaboro il punto "$nprq": "$labprq
   intfill $nprq 3
 
   if [ $out_form = "1" ] ; then
@@ -574,10 +599,14 @@ if [ $plt -eq 1 ] ; then
 
 # 3.2.3 Elaboro tutti i punti
 elif [ $plt -eq 2 ] ; then
+  tmp_file=`mktemp XXX.pts.csv`
+  tail -n +2 ${proj}.pts.csv > $tmp_file
   nprq=0
   while read line ; do
     nprq=`expr $nprq + 1`
-    idxprq=`echo $line | awk '{print $1}'`
+    labprq=`echo $line | cut -d , -f 3`  
+    idxprq=`echo $line | cut -d , -f 6`
+    echo "Elaboro il punto "$nprq": "$labprq
     intfill $nprq 3
     idp3=$str_out
 
@@ -616,7 +645,7 @@ elif [ $plt -eq 2 ] ; then
     echo $idp6 >> tmp.1.dat
     head -n 6 ${proj}_punti_${idp3}_stats.sta | tail -n 1 | cut -c 7- >> tmp.2.dat
 
-  done < ${proj}.ptn
+  done < $tmp_file
 
   paste tmp.1.dat tmp.2.dat > ${proj}_allave.dat
 fi

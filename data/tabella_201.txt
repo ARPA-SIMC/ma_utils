@@ -33,7 +33,7 @@
  112  prscon    prec. rate of convective snow [kg/m2*s]
  113  conrai    Convective liquid precipitation [kg/m2]   13202
  139  pp        deviation from reference pressure [pa]    10060
- 145  cape      Conv. Avail. Potential Energy [J/kg]
+ 145  cape      Conv. Avail. Potential Energy [J/kg]      13230
  146  cin       Convective INibition [J/kg]
  152  tke       SQRT(2*TKE) [m/s]                         11198
  153  tkvm      turb. diff. coeff. for momentum [m2/s]

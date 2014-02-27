@@ -10,7 +10,7 @@ PROGRAM ma_grib1_grib2
 ! - opzione -ana (per scrivere i dati previsti come analisi con lo stesso 
 !   verification time)
 !
-!                                         Versione 2.3.4, Enrico 13/01/2014
+!                                         Versione 2.4.0, Enrico 25/02/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -199,7 +199,7 @@ DO kg = 1,HUGE(0)
       gd /= 255 .OR. &                      ! section 2 not included
       sm /= 64 .OR. &                       ! scanning mode anomalo
       (scad(4)/=0 .AND. scad(4)/=3 .AND. scad(4) /= 4 .AND. &
-       scad(4)/=10 .AND. scad(4)/=14 .AND. scad(4)/=15).OR. &
+       scad(4)/=10 .AND. scad(4)/=14 .AND. scad(4)/=15 .AND. scad(4)/=16).OR. &
        (scad(4)/=0 .AND. scad(4)/=10 .AND. scad(2)>scad(3)) .OR. &
       (lev(1)/=1 .AND. lev(1)/=105 .AND. lev(1)/=109 .AND. lev(1)/=110) &
       ) GOTO 9996
@@ -241,6 +241,22 @@ DO kg = 1,HUGE(0)
     pdtn = 8
     ft = 0 
     tosp = 1               ! typeOfStatisticalProcessing (t4.10)
+    toti = 1               ! typeOtTimeIncrement (t4.11)
+    lotr = scad(3)-scad(2) ! lenghtOfTimeRange (INT >= 0)
+    IF (.NOT. lforc) THEN
+      topd = 0
+      sortx = 0
+      togp = 0
+    ELSE
+      topd = 1
+      sortx = 1
+      togp = 2
+    ENDIF
+
+  ELSE IF (scad(4) == 16) THEN  ! analisi massima (NinfaUB O3/NO2)
+    pdtn = 8
+    ft = 0 
+    tosp = 2               ! typeOfStatisticalProcessing (t4.10)
     toti = 1               ! typeOtTimeIncrement (t4.11)
     lotr = scad(3)-scad(2) ! lenghtOfTimeRange (INT >= 0)
     IF (.NOT. lforc) THEN

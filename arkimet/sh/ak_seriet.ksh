@@ -42,7 +42,7 @@
 #   verification time, si potranno togliere i comandi sort (adesso le analisi
 #   escono dopo le previsioni)
 # - Quando le Grib-API gestiranno correttamente i campi Grib1 SOP, eliminare 
-#   l'opzione -sop e tutto quanto ad essa collegato
+#   l'opzione -fop e tutto quanto ad essa collegato
 # - Calcolo automatico degli estremi dello zoom (se mai si rivelasse utile...)
 #   * se non richiesta destag, posso farlo a partire dal .ptn, passando a
 #     vg6d_subarea le coordinate estreme.

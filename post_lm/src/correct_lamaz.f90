@@ -4,6 +4,15 @@ PROGRAM correct_lamaz
 ! Scrive sui files gbex_fop.grb e gbex_sop.grb
 ! Uso: correct_lamaz.exe [-h] filein
 !
+! TODO:
+! - aggiungere controllo dei timerange: p.es., vmax in alcuni istanti (es.
+!   2013052400) ha timerage (1,0,0,13) invece di (1,0,1,13)
+! - modificare il processo generatore: indipendente da quello COSMO, cambia
+!   solo quando cambiano griglia o quota orografia, distingue tra dati
+!   prodotti da corsa SIMC e CINECA (per 2.2.5)
+! - modificare il filtro nel config del dataset arkimet (togliere lonfirst
+!   e latfirst, mettere Nj, modificare igen). Nome del nuovo archivio: lama7
+!
 !                                         Versione 2.1.1, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
