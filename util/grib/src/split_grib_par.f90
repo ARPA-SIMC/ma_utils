@@ -6,7 +6,7 @@ PROGRAM split_grib_par
 ! Note:
 ! Versioni <4.0 rinominate in split_gribex_par.f90
 !
-!                                         Versione 4.0.1, Enrico 13/01/2014
+!                                         Versione 4.1.0, Enrico 31/03/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -19,10 +19,11 @@ INTEGER, PARAMETER :: maxlev = 75       ! n.ro max di livelli diversi
 
 ! Altre variabili del programma
 INTEGER :: ifin,ifout(maxpar,maxlev),igrb
-INTEGER :: cnt,kv,kl,kp,split_lev,iret,ier
+INTEGER :: cnt,kv,kl,kp,split_lev,iret,ier,pp
 INTEGER :: par_id(3,maxpar),lev_id(3,maxlev),par(3),lev(3)
 INTEGER :: parc,levc,npar,nlev
 CHARACTER (LEN=200) :: filein,fileout,chpar
+CHARACTER (LEN=20) :: ext
 LOGICAL :: opened(maxpar,maxlev)
 
 !--------------------------------------------------------------------------
@@ -56,6 +57,13 @@ ENDIF
 ! 1.2 Apro input file
 CALL grib_open_file(ifin,filein,"r",iret)
 IF (iret /= GRIB_SUCCESS) GOTO 9999
+
+pp = INDEX(filein, ".", BACK=.TRUE.)
+IF (pp == 0) THEN
+  ext = "grb"
+ELSE
+  ext = filein(pp+1:LEN(TRIM(filein)))
+ENDIF
 
 !--------------------------------------------------------------------------
 ! 2) Leggo / Scrivo (ciclo sui grib)
@@ -134,19 +142,19 @@ DO cnt = 1,HUGE(cnt)
 ! 2.4 Se necessario, apro un nuovo file
   IF (.NOT. opened(parc,levc)) THEN
     IF (split_lev == 0) THEN
-      WRITE (fileout,'(a,3(i3.3,a))') "sg_",par_id(1,parc),"_", &
-        par_id(2,parc),"_",par_id(3,parc),".grb"
+      WRITE (fileout,'(a,3(i3.3,a),a)') "sg_",par_id(1,parc),"_", &
+        par_id(2,parc),"_",par_id(3,parc),".",TRIM(ext)
     ELSE IF (split_lev == 1) THEN
-      WRITE (fileout,'(a,4(i3.3,a))') "sg_",par_id(1,parc),"_", &
-        par_id(2,parc),"_",par_id(3,parc),"_",lev_id(1,levc),".grb"
+      WRITE (fileout,'(a,4(i3.3,a),a)') "sg_",par_id(1,parc),"_", &
+        par_id(2,parc),"_",par_id(3,parc),"_",lev_id(1,levc),".",TRIM(ext)
     ELSE IF (split_lev == 2) THEN
-      WRITE (fileout,'(a,6(i3.3,a))') "sg_", &
+      WRITE (fileout,'(a,6(i3.3,a),a)') "sg_", &
         par_id(1,parc),"_",par_id(2,parc),"_",par_id(3,parc),"_", &
-        lev_id(1,levc),"_",lev_id(2,levc),"_",lev_id(3,levc),".grb"
+        lev_id(1,levc),"_",lev_id(2,levc),"_",lev_id(3,levc),".",TRIM(ext)
     ELSE IF (split_lev == 3) THEN
-      WRITE (fileout,'(a,4(i3.3,a),2(i4.4,a))') "sg_", &
+      WRITE (fileout,'(a,4(i3.3,a),2(i4.4,a),a)') "sg_", &
         par_id(1,parc),"_",par_id(2,parc),"_",par_id(3,parc),"_", &
-        lev_id(1,levc),"_",lev_id(2,levc),"_",lev_id(3,levc),".grb"
+        lev_id(1,levc),"_",lev_id(2,levc),"_",lev_id(3,levc),".",TRIM(ext)
     ENDIF
 
     CALL grib_open_file(ifout(parc,levc),fileout,"w")

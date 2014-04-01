@@ -4,7 +4,7 @@ PROGRAM grib_ana2forc
 ! previsioni istantanee con reference time assegnato
 ! Per ora gestisce solo GRIB1
 !
-!                                          Versione 1.0.3 Enrico 13/01/2014
+!                                          Versione 1.0.4 Enrico 31/03/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -84,6 +84,10 @@ DO kg = 1,HUGE(0)
 ! Lo riscrivo
   CALL grib_write (igout,ifout)
   cntg = cntg + 1
+
+! Libero memoria
+  CALL grib_release(igin)
+  CALL grib_release(igout)
 
 ENDDO
 

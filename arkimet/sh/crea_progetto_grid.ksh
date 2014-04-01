@@ -43,7 +43,7 @@ function write_help
   echo "Se possible, costruisce anche orografia, quote e coordiate relativi"
   echo "alla sottoarea richiesta."
   echo ""
-  echo "-unsort:  non ordina i grib in output (def: ordian per reftime, trange, level)"
+  echo "-unsort:  non ordina i grib in output (def: ordina per reftime, trange, level)"
   echo "-3dd:     converte in formato 3D.DAT i dati prodotti (per Calmet)"
   echo "-afa:     converte in formato afa i dati prodotti (obsolescente)"
   echo ""
@@ -71,6 +71,7 @@ template_dir=${HOME_MINGUZZI}/arkimet/templates       # templates .akq
 fisiog_dir=${HOME_MINGUZZI}/util/grib/lm_ope          # dati fisiografici
 arc_root=${HOME_MINGUZZI}/arkimet/progetti_grid       # root arc. progetti
 work_root=/autofs/scratch2/eminguzzi/arkimet/tmp_grid # root dir lavoro
+#work_root=/scratch/eminguzzi/tmp_grid
 akurl="http://arkimet.metarpa:8090"                   # URL archivio Arkimet
 
 # 1.2) Utility e files di appoggio non in PATH

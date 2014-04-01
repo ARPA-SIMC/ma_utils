@@ -4,7 +4,7 @@ PROGRAM grib_uniq
 ! o piu' grib consecutivi che sono uguali in base ai criteri 
 ! specificati, scrive solo il primo.
 !
-!                                         Versione 2.0.1, Enrico 13/01/2014
+!                                         Versione 2.0.2, Enrico 31/03/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -18,7 +18,7 @@ TYPE (csv_record) :: csvline
 LOGICAL, PARAMETER :: lverbose = .FALSE.
 INTEGER, PARAMETER :: max_keys = 100
 INTEGER :: idp,kp,kk,ier,kg,cnt_out,clret(0:5),nkeys
-INTEGER :: ifin,ifout,iret,igin=0,iglast=0,igout=0
+INTEGER :: ifin,ifout,iret,igin=0,iglast=0
 CHARACTER (LEN=500) :: chdum,strcl_meta,strcl_keys
 CHARACTER (LEN=200) :: filein,fileout
 CHARACTER(LEN=80) :: cl_keys(max_keys),chkey_in,chkey_last
@@ -28,7 +28,7 @@ LOGICAL :: lcheck_meta,lcheck_keys,lout
 !--------------------------------------------------------------------------
 ! 1) Preliminari
 
-! 1.1 Default
+! 1.1 Inizializzo flag di controllo
 lcheck_meta = .FALSE.
 lcheck_keys = .FALSE.
 cl_grid  = .FALSE.
@@ -80,9 +80,6 @@ IF (idp /= 2) THEN
   CALL write_help
   STOP 1
 ENDIF
-
-
-
 
 IF (lcheck_meta .AND. LEN(TRIM(strcl_meta)) > 0) THEN 
   CALL parse_check_list (strcl_meta,cl_grid,cl_time,cl_vtime,cl_lev,cl_var,ier)
@@ -150,9 +147,14 @@ DO kg = 1,HUGE(0)
 
 ! Se il GRIB appena letto e' "diverso" dall'ultimo scritto, lo scrivo
   IF (lout) THEN
-    CALL grib_write (igin,ifout)
+    CALL grib_write(igin,ifout)
     cnt_out = cnt_out + 1
+    CALL grib_release(iglast)
     iglast = igin
+
+  ELSE
+    CALL grib_release(igin)
+
   ENDIF
 
 ENDDO
@@ -160,7 +162,7 @@ ENDDO
 !--------------------------------------------------------------------------
 ! 3) Conclusione; log a schermo
 
-WRITE (*,*) "Ealborazioni termintate: campi letti ",kg-1," scritti ",cnt_out
+WRITE (*,*) "Elaborazioni termintate: campi letti ",kg-1," scritti ",cnt_out
 STOP
 
 !--------------------------------------------------------------------------

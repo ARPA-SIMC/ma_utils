@@ -5,7 +5,7 @@ PROGRAM test_1grib
 ! Usato da ak_getgrib.ksh per stabilire l'estensione del file in output e
 ! da ak_seriet.ksh per individuare i files Grib1-UTM
 !
-!                                         Versione 2.0.1, Enrico 13/01/2014
+!                                         Versione 2.0.2, Enrico 31/03/2014
 !--------------------------------------------------------------------------
 USE grib_api
 IMPLICIT NONE
@@ -70,4 +70,6 @@ ELSE
 ENDIF
 
 WRITE (*,'(i1,a1,a3)') en,",",proj
+
+CALL grib_release(ig)
 END PROGRAM test_1grib

@@ -2,7 +2,7 @@ MODULE grib2_utilities
 !--------------------------------------------------------------------------
 ! Utilita' per la getione dei GRIB2 in logica GRIB1
 !
-!                                         Versione 1.2.0, Enrico 25/02/2014
+!                                         Versione 1.2.1, Enrico 06/03/2014
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -342,6 +342,9 @@ IF (PRESENT(vtime)) THEN
     SELECT CASE (scad(4))
     CASE(0)
       vtime_work = rtime_work + timedelta_new(hour=scad(2))
+
+    CASE(1)
+      vtime_work = rtime_work
 
     CASE(2,3,4,5,14,15)
       vtime_work = rtime_work + timedelta_new(hour=scad(3))

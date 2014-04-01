@@ -4,7 +4,7 @@ PROGRAM math_grib
 ! in due files grib. 
 ! Sostituisce ed integra somma_grib.f90 e moltiplica_grib.f90
 !
-!                                         Versione 1.0.4, Enrico 29/08/2013
+!                                         Versione 1.0.5, Enrico 31/03/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -226,9 +226,15 @@ DO kga = 1,HUGE(0)
   CALL grib_set(igout,"values",valuesout(:))
 
   CALL grib_write (igout,ifout)
+
+! 2.5) Libero memoria
+  CALL grib_release(iga)
+  IF (.NOT. lbconst) CALL grib_release(igb)
+  CALL grib_release(igout)
+  
 ENDDO
 
-! 2.5) conclusione; log a schermo
+! 2.6) conclusione; log a schermo
 WRITE (*,*) "Elaborati ",kga-1," campi"
 IF (lforce .AND. nmiss > 0) THEN
   WRITE (*,*) "Campi inconsistenti messi mancanti: ",nmiss

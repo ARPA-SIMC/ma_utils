@@ -1,10 +1,18 @@
 !--------------------------------------------------------------------------
-!Sigla GRADS e descrizione dei parametri della tabella 128 (usata da ECMWF)
+!Sigla GRADS e descrizione dei parametri della tabella 128 (ECMWF)
 !
-!                                                  Versione 1.1, 25/02/2009
+!                                          Ultimo aggiornamento: 28/03/2014
 !--------------------------------------------------------------------------
-!123--12345678--1234567890123456789012345678901234567890
-!Cod  Sigla     Descrizione e unita'
- 165  u10       10 m zonal wind [m/s]
- 166  v10       10 m meridional wind [m/s]
- 167  t2m       2 m temperature [K]
+!123--12345678--1234567890123456789012345678901234567890--12345
+!Cod  Sigla     Descrizione e unita'                      B-Tab 
+ 129  z         geopotential [m2/s2]                      10008
+ 130  t         temperature [k]                           12101
+ 131  u         zonal wind [m/s]                          11003
+ 132  v         meridional wind [m/s]                     11004
+ 133  q         specific water vapor content [kg/kg]      13001
+ 135  omega     vertical velocity [Pa/s]                  11005
+ 138  vo        relative vorticity
+ 157  relhum    relative humidity [%]                     13003
+ 165  u10       10 m zonal wind [m/s]]                    11003
+ 166  v10       10 m meridional wind [m/s]]               11003
+ 167  t2m       2 m temperature [K]                       12101

@@ -141,7 +141,7 @@ DO kg = 1,HUGE(0)
     ni*nj,sm_out,0,rmiss,imiss,0
   WRITE (30,*) field(1:ni*nj)
 
-! 2.4 Dealloco il puntatore al grib e l'array dei valori
+! 2.4 Libero memeoria
   CALL grib_release(igin)
   DEALLOCATE (field)
 

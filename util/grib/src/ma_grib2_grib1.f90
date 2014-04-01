@@ -11,7 +11,7 @@ PROGRAM ma_grib2_grib1
 ! 
 ! Uso: utm_grib2_grib1 [-h] [-gribex] filein fileout
 !
-!                                         Versione 2.3.3, Enrico 13/01/2014
+!                                         Versione 2.3.4, Enrico 03/03/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -402,7 +402,12 @@ DO kg = 1,HUGE(0)
 
   ENDIF
 
+!--------------------------------------------------------------------------
+! 6) Libero memoria
+
   DEALLOCATE (values)
+  CALL grib_release(igin)
+  IF (out_lib == "gapi") CALL grib_release(igout)
 
 ENDDO
 

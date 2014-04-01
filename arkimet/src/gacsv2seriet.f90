@@ -33,7 +33,7 @@ PROGRAM gacsv2seriet
 !   sarebbero comunque ordinati per reftime e trange, ie. non e' garantito
 !   che i verification times siano consecutivi)
 !
-!                                          Versione 1.6.9 Enrico 21/02/2014
+!                                         Versione 1.6.10 Enrico 25/03/2014
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -95,7 +95,7 @@ INTEGER :: gtdh,gp1_min,gp1_max,gp1_step,p1_req,special_gtd,mm1,mm2,yy1,yy2
 CHARACTER (LEN=50+maxvl*9) :: chfmt_seriet
 CHARACTER (LEN=500) :: filein(maxqry)
 CHARACTER (LEN=500) :: chrec,filepts,filerow,filecol,filefis,chdum
-CHARACTER (LEN=20) :: req_label(maxpt)
+CHARACTER (LEN=80) :: req_label(maxpt)
 CHARACTER (LEN=10) :: model(maxvl),varname(maxvl),ch10(3)
 CHARACTER (LEN=1) :: next_arg,cheor
 LOGICAL :: tvar_alb,tvar_z0,convert

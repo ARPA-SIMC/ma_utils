@@ -30,7 +30,7 @@ PROGRAM grib_runmean
 !   Eventualmente si potrebbero tenere in memoria i campi corripondenti al 
 !   vettore igin (in modo da decodificare i grib una volta sola)
 !
-!                                                 V3.0.4, Enrico 13/01/2014
+!                                                 V3.0.5, Enrico 13/01/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -48,7 +48,7 @@ INTEGER, PARAMETER :: igmiss = 0              ! Handler di un grib mancante
 ! Variabili locali
 REAL, ALLOCATABLE :: values(:,:),mean(:),val_deb(:)
 INTEGER, ALLOCATABLE :: igin(:),nok(:)
-INTEGER :: ifin,ifout,ig_read,ig_first,ig_write
+INTEGER :: ifin,ifout,ig_read=0,ig_first=0,ig_write=0
 INTEGER :: nhr,nreq,hrout,nhincr,nx,ny,np,ibm,en,fstep,kdeb
 INTEGER :: ios(3),cnt_par,cnt_out,kpar,kg,ksk,iret,ier,idata,ihr,clret(0:5)
 INTEGER :: gnov,nom,nocv
@@ -311,10 +311,11 @@ DO kg = 1,HUGE(0)
     ENDIF
 
     CALL grib_write(ig_write,ifout)
+    CALL grib_release(ig_write)
     cnt_out = cnt_out + 1
-
   ENDDO
 
+  CALL grib_release(ig_read)
 ENDDO
 
 ! 2.3 Chiudo il file

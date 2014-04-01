@@ -17,7 +17,7 @@ PROGRAM diff_grib
 ! - Gestione dei campi con dati mancanti implementata ma non testata
 ! - Versione 1.* rinominata come diff_gribex.f90
 !
-!                                         Versione 2.0.1, Enrico 27/02/2013
+!                                         Versione 2.0.2, Enrico 31/03/2013
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -209,7 +209,7 @@ DO kg = 1,HUGE(0)
         rms = rms + ad*ad
         rms_sig = rms_sig + ads*ads
 
-if (kg==756) write (92,*) kp,fielda(kp),fieldb(kp),step,ad,ads,abs_diff_sig
+! if (kg==756) write (92,*) kp,fielda(kp),fieldb(kp),step,ad,ads,abs_diff_sig
 
       ENDIF
     ENDDO
@@ -275,6 +275,8 @@ if (kg==756) write (92,*) kp,fielda(kp),fieldb(kp),step,ad,ads,abs_diff_sig
 
 ! Libero memoria
   DEALLOCATE (fielda,fieldb)
+  CALL grib_release(iga)
+  CALL grib_release(igb)
 
 ENDDO
 

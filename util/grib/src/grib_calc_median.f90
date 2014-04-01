@@ -160,6 +160,12 @@ fields: DO kg = 1,HUGE(0)
     WRITE (95,*) field_out(pt)
   ENDIF
 
+! 2.7 Libero memeoria
+  DO kf = 1,nfiles
+    CALL grib_release(igin(kf))
+  ENDDO
+  CALL grib_release(igout)
+
 ENDDO fields
 
 WRITE (*,*) "Elaborazioni completate, elaborati ",kg-1," campi"

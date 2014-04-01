@@ -10,7 +10,7 @@ PROGRAM ma_grib1_grib2
 ! - opzione -ana (per scrivere i dati previsti come analisi con lo stesso 
 !   verification time)
 !
-!                                         Versione 2.4.0, Enrico 25/02/2014
+!                                         Versione 2.4.1, Enrico 03/03/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -536,6 +536,10 @@ DO kg = 1,HUGE(0)
 ! 5) Scrivo il grib modificato
 
   CALL grib_write (igout,ifout)
+
+! Libero memoria
+  CALL grib_release(igin)
+  CALL grib_release(igout)
   DEALLOCATE (values)
 ENDDO
 

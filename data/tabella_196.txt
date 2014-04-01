@@ -176,7 +176,7 @@
  157  p08AnBIP  p08AnBIP (ppb; classe 5-10 um)
  158  p08BiA0D  p08BiA0D (ppb; classe 5-10 um)
  159  p08BiA2D  p08BiA2D (ppb; classe 5-10 um)
- 150  p08ISOP2  p08ISOP2 (ppb; classe 5-10 um)
+ 160  p08ISOP2  p08ISOP2 (ppb; classe 5-10 um)
 
  201  BCARAQ    BCARAQ  
  202  DUSTAQ    DUSTAQ  

@@ -102,11 +102,10 @@ fi
 
 # 1.1) Path
 work_root=/autofs/scratch2/eminguzzi/arkimet/tmp_point # root dir lavoro
-#work_root=/scratch/eminguzzi/tmp_point     # root dir lavoro
+# work_root=/scratch/eminguzzi/tmp_point
 template_dir=${HOME_MINGUZZI}/arkimet/templates    # templates .akq
 fisiog_dir=${HOME_MINGUZZI}/util/grib/lm_ope       # dati fisiografici
 arc_root=${HOME_MINGUZZI}/arkimet/progetti_point   # root arc. estrazioni
-
 
 # 1.2) Utility e files di appoggio non in PATH
 doc_file=${arc_root}/_doc/progetti_estra.doc       

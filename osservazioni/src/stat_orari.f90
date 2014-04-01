@@ -35,7 +35,7 @@ PROGRAM stat_orari
 !   in cui iniziano.
 ! - Usa il modulo per la gestione date date_hander.f90 (obsoleto)
 !
-!                                       V10.2.1, Enrico & Johnny 04/12/2013
+!                                       V10.2.3, Enrico & Johnny 31/03/2014
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -140,7 +140,7 @@ CHARACTER (LEN=mxpar*(fw+1)+20) :: chdum,chdum2,head_par,head_liv
 CHARACTER (LEN=500) :: chfmt0,chfmt1,chfmt2,chfmt3,chfmt4,chfmt5,chfmth
 CHARACTER (LEN=100) :: chpar,file_in,file_root,file_out,file_out2
 CHARACTER (LEN=fw) :: str_par(mxpar),str_par2(mxpar),str_liv(mxpar)
-CHARACTER (LEN=fw) :: chval(mxpar),str_par_dum
+CHARACTER (LEN=fw) :: chval(mxpar),str_par_dum,str_par_dum2
 CHARACTER (LEN=17) :: str_data_ser
 CHARACTER (LEN=13) :: str_data_csv
 CHARACTER (LEN=12) :: title(5)
@@ -911,13 +911,19 @@ ENDIF
 !--------------------------------------------------------------------------
 ! 5.0 Operazioni preliminari
 
-! 5.0.1 Tolgo gli spazi e caratteri speciali dalle stringhe identificative 
-!       dei parametri (per importazione excel ed evitare problemi con GRADS)
+! 5.0.1 Costruisco le stringhe identificative dei caratteri per excel e 
+!       GRADS (senza spazi e caratteri speciali, il 1o carattere non numerico)
 
 str_par2(:) = ""
 
-DO kpar = 1,mxpar
-  str_par_dum = ADJUSTL(str_par(kpar))
+DO kpar = 1,npar
+  str_par_dum2 = ADJUSTL(str_par(kpar))
+  IF (INDEX("0123456789",str_par_dum2(1:1)) == 0) THEN
+    str_par_dum = str_par_dum2(1:fw-1)
+  ELSE
+    str_par_dum = "v" // str_par_dum2(1:fw-2)
+  ENDIF
+
   k2 = 0
   DO k = 1,LEN(TRIM(str_par_dum))
     IF (str_par_dum(k:k) == " " .OR. str_par_dum(k:k) == "_" .OR. &
@@ -926,6 +932,7 @@ DO kpar = 1,mxpar
     str_par2(kpar)(k2:k2) = str_par_dum(k:k)
   ENDDO
   str_par2(kpar) = ADJUSTR(str_par2(kpar))
+
 ENDDO
 
 ! 5.0.2 Scelgo il formato per i files .sta
@@ -952,7 +959,7 @@ WRITE (chfmt5,'(a,i3,a,i2,a)') "(a13,",npar,"(1x,i",fw,"))"
 
 OPEN (UNIT=31, FILE=file_out, STATUS="REPLACE", FORM="FORMATTED")
 IF (out_fmt == "txt") THEN
-  WRITE (31,chfmth) (str_par2(kpar), kpar=1,npar)
+  WRITE (31,chfmth) (str_par(kpar), kpar=1,npar)
   IF (out_liv) WRITE (31,chfmth) (str_liv(kpar), kpar=1,npar)
   IF (out_liv) WRITE (31,*)
   WRITE (31,chfmt5) "Tot. report: ",(nrep,k=1,npar)
@@ -969,7 +976,7 @@ ELSE IF (out_fmt == "csv") THEN
   CALL init(csvline)
   CALL csv_record_addfield(csvline,"Parametro")
   DO kpar = 1,npar
-    CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
+    CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par(kpar))))
   ENDDO
   WRITE (31,'(a)') csv_record_getrecord(csvline)
   CALL delete(csvline)
@@ -1065,7 +1072,7 @@ OPEN (UNIT=31, FILE=file_out, STATUS="REPLACE", FORM="FORMATTED")
 IF (out_fmt == "txt") THEN
   WRITE (31,'(a)') "Dati validi"
   WRITE (31,*)
-  WRITE (31,chfmth) (str_par2(kpar), kpar=1,npar)
+  WRITE (31,chfmth) (str_par(kpar), kpar=1,npar)
   IF (out_liv) WRITE (31,chfmth) (str_liv(kpar), kpar=1,npar)
   IF (out_liv) WRITE (31,*)
   
@@ -1082,7 +1089,7 @@ IF (out_fmt == "txt") THEN
   WRITE (31,*)
   WRITE (31,'(a)') "Estremo superiore (inclusivo) di ciascun intervallo:"
   WRITE (31,*)
-  WRITE (31,chfmth) (str_par2(kpar),kpar=1,npar)
+  WRITE (31,chfmth) (str_par(kpar),kpar=1,npar)
   IF (out_liv) WRITE (31,chfmth) (str_liv(kpar), kpar=1,npar)
   IF (out_liv) WRITE (31,*)
   DO kbin = 1,mxbin
@@ -1096,7 +1103,7 @@ ELSE IF (out_fmt == "csv") THEN
   CALL init(csvline)
   CALL csv_record_addfield(csvline,"Valori")
   DO kpar = 1,npar
-    CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
+    CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par(kpar))))
   ENDDO
   WRITE (31,'(a)') csv_record_getrecord(csvline)
   CALL delete(csvline)
@@ -1128,7 +1135,7 @@ ELSE IF (out_fmt == "csv") THEN
   CALL init(csvline)
   CALL csv_record_addfield(csvline,"Estremo_sup_inclusivo_intervalli")
   DO kpar = 1,npar
-    CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
+    CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par(kpar))))
   ENDDO
   WRITE (31,'(a)') csv_record_getrecord(csvline)
   CALL delete(csvline)
@@ -1183,7 +1190,7 @@ DO kk = 1,4
     ELSE
       WRITE (31,*)
     ENDIF
-    WRITE (31,chfmth) "hh        ",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
+    WRITE (31,chfmth) "hh        ",(str_par(kpar), kpar=1,npar) ! head 3 (par)
     DO khr = 0,23                                       ! dati
       IF (kk == 4) THEN
         WRITE (31,chfmt5) khr,NINT(ggtyp(idx_stat(kk),1:npar,khr))
@@ -1216,7 +1223,7 @@ DO kk = 1,4
     CALL init(csvline)
     CALL csv_record_addfield(csvline,24)
     DO kpar = 1,npar
-      CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
+      CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par(kpar))))
     ENDDO
     WRITE (31,'(a)') csv_record_getrecord(csvline)
     CALL delete(csvline)
@@ -1285,7 +1292,7 @@ DO kpar = 1,npar
 ENDDO
 DO kpar = 1,npar
   WRITE (33,'(2a,1x,2i4,1x,2a)') "nr_",ADJUSTL(str_par2(kpar)), &
-    0,99,"n.ro dati valdi: ",ADJUSTL(str_par2(kpar))
+    0,99,"n.ro dati valdi: ",ADJUSTL(str_par(kpar))
 ENDDO
 WRITE (33,'(a)')                 "ENDVARS"
 
@@ -1318,7 +1325,7 @@ DO kk = 1,out_grp
     ELSE
       WRITE (31,*)
     ENDIF
-    WRITE (31,chfmth) "mm        ",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
+    WRITE (31,chfmth) "mm        ",(str_par(kpar), kpar=1,npar) ! head 3 (par)
     DO kmm = 1,12                                       ! dati
       IF (kk == 4) THEN
         WRITE (31,chfmt5) kmm,NINT(yrtyp(idx_stat(kk),1:npar,kmm))
@@ -1351,7 +1358,7 @@ DO kk = 1,out_grp
     CALL init(csvline)
     CALL csv_record_addfield(csvline,24)
     DO kpar = 1,npar
-      CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
+      CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par(kpar))))
     ENDDO
     WRITE (31,'(a)') csv_record_getrecord(csvline)
     CALL delete(csvline)
@@ -1430,12 +1437,12 @@ DO kpar = 1,npar
 ENDDO
 DO kpar = 1,npar
   WRITE (33,'(2a,1x,2i4,1x,2a)') "nr_",ADJUSTL(str_par2(kpar)), &
-    0,99,"n.ro dati valdi: ",ADJUSTL(str_par2(kpar))
+    0,99,"n.ro dati valdi: ",ADJUSTL(str_par(kpar))
 ENDDO
 IF (lstd) THEN
   DO kpar = 1,npar
     WRITE (33,'(2a,1x,2i4,1x,2a)') "std_",ADJUSTL(str_par2(kpar)), &
-      0,99,"n.ro dati valdi: ",ADJUSTL(str_par2(kpar))
+      0,99,"n.ro dati valdi: ",ADJUSTL(str_par(kpar))
   ENDDO
 ENDIF
 WRITE (33,'(a)')                 "ENDVARS"
@@ -1469,7 +1476,7 @@ DO kk = 1, 4
     ELSE
       WRITE (31,*)
     ENDIF
-    WRITE (31,chfmth) "aaaa mm gg",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
+    WRITE (31,chfmth) "aaaa mm gg",(str_par(kpar), kpar=1,npar) ! head 3 (par)
     DO kday = 1,ndays                                   ! dati
       data_dum = data1 + kday - 1
       IF (kk == 4) THEN
@@ -1505,7 +1512,7 @@ DO kk = 1, 4
     CALL init(csvline)
     CALL csv_record_addfield(csvline,ndays)
     DO kpar = 1,npar
-      CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
+      CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par(kpar))))
     ENDDO
     WRITE (31,'(a)') csv_record_getrecord(csvline)
     CALL delete(csvline)
@@ -1630,7 +1637,7 @@ DO kk = 1,4
     ELSE
       WRITE (31,*)
     ENDIF
-    WRITE (31,chfmth) "aaaa mm gg",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
+    WRITE (31,chfmth) "aaaa mm gg",(str_par(kpar), kpar=1,npar) ! head 3 (par)
     DO kmonth = 1,nmonths
       month_tot = data1%mm + kmonth -1
       data_dum%yy = data1%yy + (month_tot - 1) / 12
@@ -1669,7 +1676,7 @@ DO kk = 1,4
     CALL init(csvline)
     CALL csv_record_addfield(csvline,nmonths)
     DO kpar = 1,npar
-      CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
+      CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par(kpar))))
     ENDDO
     WRITE (31,'(a)') csv_record_getrecord(csvline)
     CALL delete(csvline)
@@ -1814,7 +1821,7 @@ DO nsea = 1,9
       ELSE
         WRITE (31,*)
       ENDIF
-      WRITE (31,chfmth) "aaaa mm gg",(str_par2(kpar), kpar=1,npar) ! head 3 (par)
+      WRITE (31,chfmth) "aaaa mm gg",(str_par(kpar), kpar=1,npar) ! head 3 (par)
       DO kyear = 1,nyears
         data_dum%yy = kyear + year1 - 1
         IF (kk == 4) THEN
@@ -1850,7 +1857,7 @@ DO nsea = 1,9
       CALL init(csvline)
       CALL csv_record_addfield(csvline,nyears)
       DO kpar = 1,npar
-        CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par2(kpar))))
+        CALL csv_record_addfield(csvline,TRIM(ADJUSTL(str_par(kpar))))
       ENDDO
       WRITE (31,'(a)') csv_record_getrecord(csvline)
       CALL delete(csvline)
