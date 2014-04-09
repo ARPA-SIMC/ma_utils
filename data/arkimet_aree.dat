@@ -19,8 +19,10 @@ lmsmr4x38,lmsmr4,rot,y,n,1,n
 lmsmr4x42,lmsmr4,rot,y,n,1,n
 lmsmr4x46,lmsmr4,rot,y,n,1,n
 lmsmr4x52,lmsmr4,rot,y,n,1,n
+lmsmr4x56,lmsmr4,rot,y,n,1,n
 lmsmr6x48,lmsmr5,rot,y,n,1,n
 lmsmr6x54,lmsmr5,rot,y,n,1,n
+lmsmr6x58,lmsmr5,rot,y,n,1,n
 pescoemrope,pesemr,utm,n,n,2,n
 ninfabpa10,ctnbp1,utm,n,n,2,n
 ninfabpa5,ctnbp2,utm,n,n,2,n

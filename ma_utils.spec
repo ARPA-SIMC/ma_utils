@@ -1,7 +1,7 @@
 Summary: Utilities area Meteorologia Ambientale SIMC
 Name: ma_utils
 Version: 0.6
-Release: 100%{dist}
+Release: 117%{dist}
 License: GPL
 Group: Applications/Meteo
 URL: http://www.arpa.emr.it/sim
@@ -60,6 +60,9 @@ GRIB to seriet postprocessor for arkimet
 %{_libdir}/arkimet/seriet
 
 %changelog
+* Wed Apr 9 2014 Daniele Branchini <dbranchini@arpa.emr.it> - 0.2-46
+- Nuovi processi generatori cosmo I7 e cosmo I2 cineca
+
 * Fri May 10 2013 Daniele Branchini <dbranchini@arpa.emr.it> - 0.2-46
 - Rebuild on dballe 6 and to reflect upstream changes
 
