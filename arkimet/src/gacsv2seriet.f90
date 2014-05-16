@@ -1191,7 +1191,7 @@ INTEGER, INTENT(IN) :: npt,nvl,kpt,varliv(6,nvl),iu,out_form,lab3d,lab3ddec
 CHARACTER (LEN=10), INTENT(IN) :: model(nvl),varname(nvl)
 DOUBLE PRECISION, INTENT(IN) :: req_lon(npt),req_lat(npt)
 REAL, INTENT(IN) :: zlev(npt,maxaklev),zlay(npt,maxaklay),orog(npt)
-CHARACTER (LEN=20), INTENT(IN) :: req_label(npt)
+CHARACTER (LEN=80), INTENT(IN) :: req_label(npt)
 CHARACTER (LEN=1), INTENT(IN) :: cheor
 
 ! Variabili locali

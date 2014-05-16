@@ -12,14 +12,18 @@ PROGRAM grib_daily_stat
 ! - Il programma ragiona solo sull'istante di validita': le statistiche
 !   reltive ai campi previsti saranno scritte come analisi relative alla 
 !   data di validita'
-! - Per una data giornata, se non trova nessun dato non scrive nulla; se 
-!   nessuno dei punti ha un numero di dati insufficienti, scrive un campo
-!   interamente mancante (questo puo' innescare un bug grib-api, volendo si
-!   potrebbe decidere di non scrivere i campi interamente mancanti...)
+! - Se per una data giornata non ci sono dati in input o se nessuno dei 
+!   punti ha un numero di dati sufficienti, non scrive nulla.
+!   Con nval=0, scrive un campo interamente mancate nelle giornate con dati
+!   in input, ma in cui nessun punto ha un numero di dati sufficienti.
+!   I campi "giorno medio" vengono scritti sempre (ev. tutti mancanti)
+!   Si potrebbe mettere un'opzione per scrivere sempre un campo per 
+!   ciascuna giornata di calendario, ma l'implementazione e' complessa.
+!   I campi interamente mancanti danno comunque problemi con grib_api!!
 ! - Per rendere piu' leggibile il codice, il programma fa comunque tutti i
 !   calcoli, ma scrive solo gli output richiesti
 !
-!                                         Versione 5.0.1, Enrico 13/01/2014
+!                                         Versione 5.1.0, Enrico 08/04/2014
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -176,7 +180,7 @@ ENDDO
 ! 1.1.3 Controlli sui parametri
 IF ((ldty.AND.ldtylc) .OR. &
     ((lmxrm1.OR.lmxrm2) .AND. nrm<1) .OR. &
-    (nval<1 .OR. nval>24) .OR. & 
+    (nval<0 .OR. nval>24) .OR. & 
     (laot.AND.thr_aot==rmis) .OR. (lmxrm1.AND.thr_mxrm1==rmis) .OR. &
     (lexc.AND.thr_exc==rmis) .OR. (lmxrm2.AND.thr_mxrm2==rmis) .OR. &
     (nbit<1 .OR. nbit>24) .OR. pdb<0) THEN
@@ -481,161 +485,160 @@ grib: DO kg = 1,HUGE(0)
     ksec1_sav(13) = 12
 
 !   Scrivo il campo medio del giorno precedente
-    IF (lave) THEN
     nok = COUNT(field_ave(1:np) /= rmis)
-    fave = rmis
-    IF (nok>0) fave = SUM(field_ave(1:np), MASK = field_ave(1:np)/=rmis) / REAL(nok)
-    WRITE (96,*) "Scrivo media: dati ok, media ",nok,fave
-    IF (deb) WRITE (97,*) "ave  : ",field_ave(pdb)
-
-    fout(1:np) = field_ave(1:np)
-    ksec1_out(:) = ksec1_sav(:)
-    ksec4_out(:) = ksec4_sav(:)
-    IF (ANY(fout(1:np) == rmis)) THEN
-      IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
-        ksec1_out(5) = ksec1_out(5) + 64
-      psec3(2) = rmis 
-    ENDIF
-    IF (l_mod_scad) ksec1_out(16:17) = 0
-    ksec4_out(2) = nbit    
-
-    CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
-                 ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
-    IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-    CALL PBWRITE (iuout_ave,kbuffer,ksec0(1),kret)
-    ngribout = ngribout + 1
+    IF (lave .AND. nok>0) THEN
+      fave = SUM(field_ave(1:np), MASK = field_ave(1:np)/=rmis) / REAL(nok)
+      WRITE (96,*) "Scrivo media: dati ok, media ",nok,fave
+      IF (deb) WRITE (97,*) "ave  : ",field_ave(pdb)
+  
+      fout(1:np) = field_ave(1:np)
+      ksec1_out(:) = ksec1_sav(:)
+      ksec4_out(:) = ksec4_sav(:)
+      IF (ANY(fout(1:np) == rmis)) THEN
+        IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
+          ksec1_out(5) = ksec1_out(5) + 64
+        psec3(2) = rmis 
+      ENDIF
+      IF (l_mod_scad) ksec1_out(16:17) = 0
+      ksec4_out(2) = nbit    
+  
+      CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
+                   ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
+      IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+      CALL PBWRITE (iuout_ave,kbuffer,ksec0(1),kret)
+      ngribout = ngribout + 1
     ENDIF
 
 !   Scrivo il campo massimo del giorno precedente
-    IF (lmax) THEN
     nok = COUNT(field_max(1:np) /= rmis)
-    fave = rmis
-    IF (nok>0) fave = SUM(field_max(1:np), MASK = field_max(1:np)/=rmis) / REAL(nok)
-    WRITE (96,*) "Scrivo max  : dati ok, media ",nok,fave
-    IF (deb) WRITE (97,*) "max  : ",field_max(pdb)
-
-    fout(1:np) = field_max(1:np)
-    ksec1_out(:) = ksec1_sav(:)
-    ksec4_out(:) = ksec4_sav(:)
-    IF (ANY(fout(1:np) == rmis)) THEN
-      IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
-        ksec1_out(5) = ksec1_out(5) + 64
-      psec3(2) = rmis 
-    ENDIF
-    IF (l_mod_scad) ksec1_out(16:17) = 0
-    ksec4_out(2) = nbit    
-
-    CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
-                 ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
-    IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-    CALL PBWRITE (iuout_max,kbuffer,ksec0(1),kret)
-    ngribout = ngribout + 1
+    IF (lmax .AND. nok>0) THEN
+      fave = rmis
+      IF (nok>0) fave = SUM(field_max(1:np), MASK = field_max(1:np)/=rmis) / REAL(nok)
+      WRITE (96,*) "Scrivo max  : dati ok, media ",nok,fave
+      IF (deb) WRITE (97,*) "max  : ",field_max(pdb)
+  
+      fout(1:np) = field_max(1:np)
+      ksec1_out(:) = ksec1_sav(:)
+      ksec4_out(:) = ksec4_sav(:)
+      IF (ANY(fout(1:np) == rmis)) THEN
+        IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
+          ksec1_out(5) = ksec1_out(5) + 64
+        psec3(2) = rmis 
+      ENDIF
+      IF (l_mod_scad) ksec1_out(16:17) = 0
+      ksec4_out(2) = nbit    
+  
+      CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
+                   ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
+      IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+      CALL PBWRITE (iuout_max,kbuffer,ksec0(1),kret)
+      ngribout = ngribout + 1
     ENDIF
 
 !   Scrivo il campo AOT del giorno precedente
-    IF (laot) THEN
     nok = COUNT(field_aot(1:np) /= rmis)
-    fave = rmis
-    IF (nok>0) fave = SUM(field_aot(1:np), MASK = field_aot(1:np)/=rmis) / REAL(nok)
-    WRITE (96,*) "Scrivo AOT: dati ok, media ",nok,fave
-    IF (deb) WRITE (97,*) "AOT  : ",field_aot(pdb)
-
-    fout(1:np) = field_aot(1:np)
-    ksec1_out(:) = ksec1_sav(:)
-    ksec4_out(:) = ksec4_sav(:)
-    IF (ANY(fout(1:np) == rmis)) THEN
-      IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
-        ksec1_out(5) = ksec1_out(5) + 64
-      psec3(2) = rmis 
-    ENDIF
-    IF (l_mod_scad) ksec1_out(16:17) = 0
-    ksec4_out(2) = nbit    
-
-    CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
-                 ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
-    IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-    CALL PBWRITE (iuout_aot,kbuffer,ksec0(1),kret)
-    ngribout = ngribout + 1
+    IF (laot .AND. nok>0) THEN
+      fave = rmis
+      IF (nok>0) fave = SUM(field_aot(1:np), MASK = field_aot(1:np)/=rmis) / REAL(nok)
+      WRITE (96,*) "Scrivo AOT: dati ok, media ",nok,fave
+      IF (deb) WRITE (97,*) "AOT  : ",field_aot(pdb)
+  
+      fout(1:np) = field_aot(1:np)
+      ksec1_out(:) = ksec1_sav(:)
+      ksec4_out(:) = ksec4_sav(:)
+      IF (ANY(fout(1:np) == rmis)) THEN
+        IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
+          ksec1_out(5) = ksec1_out(5) + 64
+        psec3(2) = rmis 
+      ENDIF
+      IF (l_mod_scad) ksec1_out(16:17) = 0
+      ksec4_out(2) = nbit    
+  
+      CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
+                   ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
+      IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+      CALL PBWRITE (iuout_aot,kbuffer,ksec0(1),kret)
+      ngribout = ngribout + 1
     ENDIF
 
 !   Scrivo il campo "eccedenza del max media mobile" del giorno precedente
     IF (deb .AND. (lmxrm1 .OR. lmxrm2)) WRITE (97,*) "MxRM : ",field_mxrm(pdb)
 
-    IF (lmxrm1) THEN
     nok = COUNT(field_mxrm1(1:np) /= rmis)
-    fave = rmis
-    IF (nok>0) fave = SUM(field_mxrm1(1:np), MASK = field_mxrm1(1:np)/=rmis) / REAL(nok)
-    WRITE (96,*) "Scrivo MxRMH1: dati ok, media ",nok,fave
-    IF (deb) WRITE (97,*) "MxRM1: ",field_mxrm1(pdb)
-
-    fout(1:np) = field_mxrm1(1:np)
-    ksec1_out(:) = ksec1_sav(:)
-    ksec4_out(:) = ksec4_sav(:)
-    IF (ANY(fout(1:np) == rmis)) THEN
-      IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
-        ksec1_out(5) = ksec1_out(5) + 64
-      psec3(2) = rmis 
-    ENDIF
-    IF (l_mod_scad) ksec1_out(16:17) = 0
-    ksec4_out(2) = nbit    
-
-    CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
-                 ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
-    IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-    CALL PBWRITE (iuout_rm1,kbuffer,ksec0(1),kret)
-    ngribout = ngribout + 1
+    IF (lmxrm1 .AND. nok>0) THEN
+      fave = rmis
+      IF (nok>0) fave = SUM(field_mxrm1(1:np), MASK = field_mxrm1(1:np)/=rmis) / REAL(nok)
+      WRITE (96,*) "Scrivo MxRMH1: dati ok, media ",nok,fave
+      IF (deb) WRITE (97,*) "MxRM1: ",field_mxrm1(pdb)
+  
+      fout(1:np) = field_mxrm1(1:np)
+      ksec1_out(:) = ksec1_sav(:)
+      ksec4_out(:) = ksec4_sav(:)
+      IF (ANY(fout(1:np) == rmis)) THEN
+        IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
+          ksec1_out(5) = ksec1_out(5) + 64
+        psec3(2) = rmis 
+      ENDIF
+      IF (l_mod_scad) ksec1_out(16:17) = 0
+      ksec4_out(2) = nbit    
+  
+      CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
+                   ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
+      IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+      CALL PBWRITE (iuout_rm1,kbuffer,ksec0(1),kret)
+      ngribout = ngribout + 1
     ENDIF
 
 !   Scrivo il campo "superamenti del max media mobile" del giorno precedente
-    IF (lmxrm2) THEN
     nok = COUNT(field_mxrm2(1:np) /= rmis)
-    fave = rmis
-    IF (nok>0) fave = SUM(field_mxrm2(1:np), MASK = field_mxrm2(1:np)/=rmis) / REAL(nok)
-    WRITE (96,*) "Scrivo MxRMH2: dati ok, media ",nok,fave
-    IF (deb) WRITE (97,*) "MxRM2: ",field_mxrm2(pdb)
-
-    fout(1:np) = field_mxrm2(1:np)
-    ksec1_out(:) = ksec1_sav(:)
-    ksec4_out(:) = ksec4_sav(:)
-    IF (ANY(fout(1:np) == rmis)) THEN
-      IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
-        ksec1_out(5) = ksec1_out(5) + 64
-      psec3(2) = rmis 
-    ENDIF
-    IF (l_mod_scad) ksec1_out(16:17) = 0
-    ksec4_out(2) = nbit    
-
-    CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
-                 ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
-    IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-    CALL PBWRITE (iuout_rm2,kbuffer,ksec0(1),kret)
-    ngribout = ngribout + 1
+    IF (lmxrm2 .AND. nok>0) THEN
+      fave = rmis
+      IF (nok>0) fave = SUM(field_mxrm2(1:np), MASK = field_mxrm2(1:np)/=rmis) / REAL(nok)
+      WRITE (96,*) "Scrivo MxRMH2: dati ok, media ",nok,fave
+      IF (deb) WRITE (97,*) "MxRM2: ",field_mxrm2(pdb)
+  
+      fout(1:np) = field_mxrm2(1:np)
+      ksec1_out(:) = ksec1_sav(:)
+      ksec4_out(:) = ksec4_sav(:)
+      IF (ANY(fout(1:np) == rmis)) THEN
+        IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
+          ksec1_out(5) = ksec1_out(5) + 64
+        psec3(2) = rmis 
+      ENDIF
+      IF (l_mod_scad) ksec1_out(16:17) = 0
+      ksec4_out(2) = nbit    
+  
+      CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
+                   ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
+      IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+      CALL PBWRITE (iuout_rm2,kbuffer,ksec0(1),kret)
+      ngribout = ngribout + 1
     ENDIF
 
 !   Scrivo il campo superamenti del giorno precedente
-    IF (lexc) THEN
     nok = COUNT(field_exc(1:np) /= rmis)
-    fave = rmis
-    IF (nok>0) fave = SUM(field_exc(1:np), MASK = field_exc(1:np)/=rmis) / REAL(nok)
-    WRITE (96,*) "Scrivo EXC  : dati ok, media ",nok,fave
-    IF (deb) WRITE (97,*) "EXC  : ",field_exc(pdb)
-
-    fout(1:np) = field_exc(1:np)
-    ksec1_out(:) = ksec1_sav(:)
-    ksec4_out(:) = ksec4_sav(:)
-    IF (ANY(fout(1:np) == rmis)) THEN
-      IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
-        ksec1_out(5) = ksec1_out(5) + 64
-      psec3(2) = rmis 
-    ENDIF
-    IF (l_mod_scad) ksec1_out(16:17) = 0
-    ksec4_out(2) = nbit    
-
-    CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
-                 ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
-    IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-    CALL PBWRITE (iuout_exc,kbuffer,ksec0(1),kret)
-    ngribout = ngribout + 1
+    IF (lexc .AND. nok>0) THEN
+      fave = rmis
+      IF (nok>0) fave = SUM(field_exc(1:np), MASK = field_exc(1:np)/=rmis) / REAL(nok)
+      WRITE (96,*) "Scrivo EXC  : dati ok, media ",nok,fave
+      IF (deb) WRITE (97,*) "EXC  : ",field_exc(pdb)
+  
+      fout(1:np) = field_exc(1:np)
+      ksec1_out(:) = ksec1_sav(:)
+      ksec4_out(:) = ksec4_sav(:)
+      IF (ANY(fout(1:np) == rmis)) THEN
+        IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
+          ksec1_out(5) = ksec1_out(5) + 64
+        psec3(2) = rmis 
+      ENDIF
+      IF (l_mod_scad) ksec1_out(16:17) = 0
+      ksec4_out(2) = nbit    
+  
+      CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
+                   ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
+      IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+      CALL PBWRITE (iuout_exc,kbuffer,ksec0(1),kret)
+      ngribout = ngribout + 1
     ENDIF
   
     WRITE (*,'(a,i4.4,2(1x,i2.2))') "Elaborata data ", &
@@ -788,166 +791,166 @@ IF (ngribin > 0) THEN
   ksec1_sav(13) = 12
 
 ! Scrivo il campo medio dell'ultima giornata
-  IF (lave) THEN
   nok = COUNT(field_ave(1:np) /= rmis)
-  fave = rmis
-  IF (nok>0) fave = SUM(field_ave(1:np), MASK = field_ave(1:np)/=rmis) / REAL(nok)
-  WRITE (96,*) "Scrivo media: dati ok, media ",nok,fave
-  IF (deb) WRITE (97,*) "ave  : ",field_ave(pdb)
-
-  fout(1:np) = field_ave(1:np)
-  ksec1_out(:) = ksec1_sav(:)
-  ksec4_out(:) = ksec4_sav(:)
-  IF (ANY(fout(1:np) == rmis)) THEN
-    IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
-      ksec1_out(5) = ksec1_out(5) + 64
-    psec3(2) = rmis 
-  ENDIF
-  IF (l_mod_scad) ksec1_out(16:17) = 0
-  ksec4_out(2) = nbit    
-
-  CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
-               ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
-  IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-  CALL PBWRITE (iuout_ave,kbuffer,ksec0(1),kret)
-  ngribout = ngribout + 1
+  IF (lave .AND. nok>0) THEN
+    fave = rmis
+    IF (nok>0) fave = SUM(field_ave(1:np), MASK = field_ave(1:np)/=rmis) / REAL(nok)
+    WRITE (96,*) "Scrivo media: dati ok, media ",nok,fave
+    IF (deb) WRITE (97,*) "ave  : ",field_ave(pdb)
+  
+    fout(1:np) = field_ave(1:np)
+    ksec1_out(:) = ksec1_sav(:)
+    ksec4_out(:) = ksec4_sav(:)
+    IF (ANY(fout(1:np) == rmis)) THEN
+      IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
+        ksec1_out(5) = ksec1_out(5) + 64
+      psec3(2) = rmis 
+    ENDIF
+    IF (l_mod_scad) ksec1_out(16:17) = 0
+    ksec4_out(2) = nbit    
+  
+    CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
+                 ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
+    IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+    CALL PBWRITE (iuout_ave,kbuffer,ksec0(1),kret)
+    ngribout = ngribout + 1
   ENDIF
 
 ! Scrivo il campo massimo dell'ultima giornata
-  IF (lmax) THEN
   nok = COUNT(field_max(1:np) /= rmis)
-  fave = rmis
-  IF (nok>0) fave = SUM(field_max(1:np), MASK = field_max(1:np)/=rmis) / REAL(nok)
-  WRITE (96,*) "Scrivo max  : dati ok, media ",nok,fave
-  IF (deb) WRITE (97,*) "max  : ",field_max(pdb)
-
-  fout(1:np) = field_max(1:np)
-  ksec1_out(:) = ksec1_sav(:)
-  ksec4_out(:) = ksec4_sav(:)
-  IF (ANY(fout(1:np) == rmis)) THEN
-    IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
-      ksec1_out(5) = ksec1_out(5) + 64
-    psec3(2) = rmis 
-  ENDIF
-  IF (l_mod_scad) ksec1_out(16:17) = 0
-  ksec4_out(2) = nbit    
-
-  CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
-               ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
-  IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-  CALL PBWRITE (iuout_max,kbuffer,ksec0(1),kret)
-  ngribout = ngribout + 1
+  IF (lmax .AND. nok>0) THEN
+    fave = rmis
+    IF (nok>0) fave = SUM(field_max(1:np), MASK = field_max(1:np)/=rmis) / REAL(nok)
+    WRITE (96,*) "Scrivo max  : dati ok, media ",nok,fave
+    IF (deb) WRITE (97,*) "max  : ",field_max(pdb)
+  
+    fout(1:np) = field_max(1:np)
+    ksec1_out(:) = ksec1_sav(:)
+    ksec4_out(:) = ksec4_sav(:)
+    IF (ANY(fout(1:np) == rmis)) THEN
+      IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
+        ksec1_out(5) = ksec1_out(5) + 64
+      psec3(2) = rmis 
+    ENDIF
+    IF (l_mod_scad) ksec1_out(16:17) = 0
+    ksec4_out(2) = nbit    
+  
+    CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
+                 ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
+    IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+    CALL PBWRITE (iuout_max,kbuffer,ksec0(1),kret)
+    ngribout = ngribout + 1
   ENDIF
 
 ! Scrivo il campo AOT dell'ultima giornata
-  IF (laot) THEN
   nok = COUNT(field_aot(1:np) /= rmis)
-  fave = rmis
-  IF (nok>0) fave = SUM(field_aot(1:np), MASK = field_aot(1:np)/=rmis) / REAL(nok)
-  WRITE (96,*) "Scrivo AOT  : dati ok, media ",nok,fave
-  IF (deb) WRITE (97,*) "AOT  : ",field_aot(pdb)
-
-  fout(1:np) = field_aot(1:np)
-  ksec1_out(:) = ksec1_sav(:)
-  ksec4_out(:) = ksec4_sav(:)
-  IF (ANY(fout(1:np) == rmis)) THEN
-    IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
-      ksec1_out(5) = ksec1_out(5) + 64
-    psec3(2) = rmis 
-  ENDIF
-  IF (l_mod_scad) ksec1_out(16:17) = 0
-  ksec4_out(2) = nbit    
-
-  CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
-               ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
-  IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-  CALL PBWRITE (iuout_aot,kbuffer,ksec0(1),kret)
-  ngribout = ngribout + 1
+  IF (laot .AND. nok>0) THEN
+    fave = rmis
+    IF (nok>0) fave = SUM(field_aot(1:np), MASK = field_aot(1:np)/=rmis) / REAL(nok)
+    WRITE (96,*) "Scrivo AOT  : dati ok, media ",nok,fave
+    IF (deb) WRITE (97,*) "AOT  : ",field_aot(pdb)
+  
+    fout(1:np) = field_aot(1:np)
+    ksec1_out(:) = ksec1_sav(:)
+    ksec4_out(:) = ksec4_sav(:)
+    IF (ANY(fout(1:np) == rmis)) THEN
+      IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
+        ksec1_out(5) = ksec1_out(5) + 64
+      psec3(2) = rmis 
+    ENDIF
+    IF (l_mod_scad) ksec1_out(16:17) = 0
+    ksec4_out(2) = nbit    
+  
+    CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
+                 ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
+    IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+    CALL PBWRITE (iuout_aot,kbuffer,ksec0(1),kret)
+    ngribout = ngribout + 1
   ENDIF
 
 ! Scrivo il campo "eccedenza del max media mobile" dell'ultima giornata
   IF (deb .AND. (lmxrm1 .OR. lmxrm2)) WRITE (97,*) "MxRM : ",field_mxrm(pdb)
 
-  IF (lmxrm1) THEN
   nok = COUNT(field_mxrm1(1:np) /= rmis)
-  fave = rmis
-  IF (nok>0) fave = SUM(field_mxrm1(1:np), MASK = field_mxrm1(1:np)/=rmis) / REAL(nok)
-  WRITE (96,*) "Scrivo MxRM1: dati ok, media ",nok,fave
-  IF (deb) WRITE (97,*) "MxRM1: ",field_mxrm1(pdb)
-
-  fout(1:np) = field_mxrm1(1:np)
-  ksec1_out(:) = ksec1_sav(:)
-  ksec4_out(:) = ksec4_sav(:)
-  IF (ANY(fout(1:np) == rmis)) THEN
-    IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
-      ksec1_out(5) = ksec1_out(5) + 64
-    psec3(2) = rmis 
+  IF (lmxrm1 .AND. nok>0) THEN
+    fave = rmis
+    IF (nok>0) fave = SUM(field_mxrm1(1:np), MASK = field_mxrm1(1:np)/=rmis) / REAL(nok)
+    WRITE (96,*) "Scrivo MxRM1: dati ok, media ",nok,fave
+    IF (deb) WRITE (97,*) "MxRM1: ",field_mxrm1(pdb)
+  
+    fout(1:np) = field_mxrm1(1:np)
+    ksec1_out(:) = ksec1_sav(:)
+    ksec4_out(:) = ksec4_sav(:)
+    IF (ANY(fout(1:np) == rmis)) THEN
+      IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
+        ksec1_out(5) = ksec1_out(5) + 64
+      psec3(2) = rmis 
+    ENDIF
+    IF (l_mod_scad) ksec1_out(16:17) = 0
+    ksec4_out(2) = nbit    
+  
+    CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
+                 ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
+    IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+    CALL PBWRITE (iuout_rm1,kbuffer,ksec0(1),kret)
+    ngribout = ngribout + 1
   ENDIF
-  IF (l_mod_scad) ksec1_out(16:17) = 0
-  ksec4_out(2) = nbit    
 
-  CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
-               ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
-  IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-  CALL PBWRITE (iuout_rm1,kbuffer,ksec0(1),kret)
-  ngribout = ngribout + 1
-  ENDIF
-
-! Scrivo il campo "sueperamenti del max media mobile" dell'ultima giornata
-  IF (lmxrm2) THEN
+! Scrivo il campo "superamenti del max media mobile" dell'ultima giornata
   nok = COUNT(field_mxrm2(1:np) /= rmis)
-  fave = rmis
-  IF (nok>0) fave = SUM(field_mxrm2(1:np), MASK = field_mxrm2(1:np)/=rmis) / REAL(nok)
-  WRITE (96,*) "Scrivo MxRM2: dati ok, media ",nok,fave
-  IF (deb) WRITE (97,*) "MxRM2: ",field_mxrm2(pdb)
-
-  fout(1:np) = field_mxrm2(1:np)
-  ksec1_out(:) = ksec1_sav(:)
-  ksec4_out(:) = ksec4_sav(:)
-  IF (ANY(fout(1:np) == rmis)) THEN
-    IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
-      ksec1_out(5) = ksec1_out(5) + 64
-    psec3(2) = rmis 
-  ENDIF
-  IF (l_mod_scad) ksec1_out(16:17) = 0
-  ksec4_out(2) = nbit    
-
-  CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
-               ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
-  IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-  CALL PBWRITE (iuout_rm2,kbuffer,ksec0(1),kret)
-  ngribout = ngribout + 1
+  IF (lmxrm2 .AND. nok>0) THEN
+    fave = rmis
+    IF (nok>0) fave = SUM(field_mxrm2(1:np), MASK = field_mxrm2(1:np)/=rmis) / REAL(nok)
+    WRITE (96,*) "Scrivo MxRM2: dati ok, media ",nok,fave
+    IF (deb) WRITE (97,*) "MxRM2: ",field_mxrm2(pdb)
+  
+    fout(1:np) = field_mxrm2(1:np)
+    ksec1_out(:) = ksec1_sav(:)
+    ksec4_out(:) = ksec4_sav(:)
+    IF (ANY(fout(1:np) == rmis)) THEN
+      IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
+        ksec1_out(5) = ksec1_out(5) + 64
+      psec3(2) = rmis 
+    ENDIF
+    IF (l_mod_scad) ksec1_out(16:17) = 0
+    ksec4_out(2) = nbit    
+  
+    CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
+                 ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
+    IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+    CALL PBWRITE (iuout_rm2,kbuffer,ksec0(1),kret)
+    ngribout = ngribout + 1
   ENDIF
 
 ! Scrivo il campo superamenti dell'ultima giornata
-  IF (lexc) THEN
   nok = COUNT(field_exc(1:np) /= rmis)
-  fave = rmis
-  IF (nok>0) fave = SUM(field_exc(1:np), MASK = field_exc(1:np)/=rmis) / REAL(nok)
-  WRITE (96,*) "Scrivo EXC  : dati ok, media ",nok,fave
-  IF (deb) WRITE (97,*) "EXC  : ",field_exc(pdb)
-
-  fout(1:np) = field_exc(1:np)
-  ksec1_out(:) = ksec1_sav(:)
-  ksec4_out(:) = ksec4_sav(:)
-  IF (ANY(fout(1:np) == rmis)) THEN
-    IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
-      ksec1_out(5) = ksec1_out(5) + 64
-    psec3(2) = rmis 
+  IF (lexc .AND. nok>0) THEN
+    fave = rmis
+    IF (nok>0) fave = SUM(field_exc(1:np), MASK = field_exc(1:np)/=rmis) / REAL(nok)
+    WRITE (96,*) "Scrivo EXC  : dati ok, media ",nok,fave
+    IF (deb) WRITE (97,*) "EXC  : ",field_exc(pdb)
+  
+    fout(1:np) = field_exc(1:np)
+    ksec1_out(:) = ksec1_sav(:)
+    ksec4_out(:) = ksec4_sav(:)
+    IF (ANY(fout(1:np) == rmis)) THEN
+      IF (ksec1_out(5) == 0 .OR. ksec1_out(5) == 128) &
+        ksec1_out(5) = ksec1_out(5) + 64
+      psec3(2) = rmis 
+    ENDIF
+    IF (l_mod_scad) ksec1_out(16:17) = 0
+    ksec4_out(2) = nbit    
+  
+    CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
+                 ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
+    IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+    CALL PBWRITE (iuout_exc,kbuffer,ksec0(1),kret)
+    ngribout = ngribout + 1
   ENDIF
-  IF (l_mod_scad) ksec1_out(16:17) = 0
-  ksec4_out(2) = nbit    
-
-  CALL GRIBEX (ksec0,ksec1_out,ksec2_sav,psec2_sav,ksec3_sav,psec3, &
-               ksec4_out,fout,maxdim,kbuffer,maxdim,klen,'C',kret)
-  IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-  CALL PBWRITE (iuout_exc,kbuffer,ksec0(1),kret)
-  ngribout = ngribout + 1
 
   WRITE (*,'(a,i4.4,2(1x,i2.2))') "Elaborata data ", &
     datav_sav%yy,datav_sav%mm,datav_sav%dd
   WRITE (96,*)
-  ENDIF
 
 ! Scrivo i campi del giorno tipo. 
 
@@ -1191,7 +1194,7 @@ IMPLICIT NONE
 !            123456789012345678901234567890123456789012345678901234567890123456789012345678
 WRITE (*,*)
 WRITE (*,*) "Uso: grib_daily_stat.exe filein [-h] [-pts N] [-nbit N] "
-WRITE (*,*) " [-nval NVAL] [-nrm NRM] [-nvalrm NVALRM]"
+WRITE (*,*) " [-nval NVAL] [-nrm NRM] [-nvalrm NVALRM] [-wmiss]"
 WRITE (*,*) " [-ave] [-max] [-dty/dtylc] [-aot X] [-mxrm1 X] [-mxrm2 X] [-exc X]"
 WRITE (*,*)
 WRITE (*,*) "filein   file in input, in formato GRIB1"

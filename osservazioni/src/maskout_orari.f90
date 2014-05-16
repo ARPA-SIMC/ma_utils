@@ -15,7 +15,7 @@ PROGRAM maskout_orari
 ! maskout_orari.exe [-h] filein filemask fileout
 !   [-inpf FMT] [-mskf FMT] [-mskn N] [-outm N]
 !
-!                                                 V1.1.0, Enrico 07/09/2012
+!                                                 V1.2.0, Enrico 18/04/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -38,8 +38,9 @@ REAL, ALLOCATABLE :: val_inp(:),val_msk(:),val_out(:)
 REAL :: rmis_inp,rmis_msk,thr_low,thr_high
 INTEGER :: head_offset_inp,nhead_inp,head_offset_msk,nhead_msk,mand_par
 INTEGER :: msk_col,mis_col,head_len,npar_inp,npar_msk
-INTEGER :: cnt_mis_val,cnt_mis_rec
-INTEGER :: yy,mm,dd,hh,sca,k,kp,kr,ios(4),ier,eof,eor
+INTEGER :: cnt_mis_val,cnt_mis_rec,cnt_skip
+INTEGER :: yy,mm,dd,hh,sca,yy_msk,mm_msk,dd_msk,hh_msk,sca_msk
+INTEGER :: k,kp,kr,ios(4),ier,eof,eor,kskip
 CHARACTER (LEN=mxpar*(fw+1)+20) :: chrec_inp,chrec_msk,head_par
 CHARACTER (LEN=fw), ALLOCATABLE :: chval_inp(:),chval_msk(:)
 CHARACTER (LEN=250) :: chdum,fileinp,fileout,filemsk,chfmt1,chfmt2,chfmt3
@@ -210,7 +211,7 @@ OPEN (UNIT=20, FILE=fileinp, STATUS="OLD", FORM="FORMATTED", ERR=9999)
 OPEN (UNIT=30, FILE=filemsk, STATUS="OLD", FORM="FORMATTED", ERR=9998)
 OPEN (UNIT=40, FILE=fileout, STATUS="REPLACE", FORM="FORMATTED")
 
-! Leggo e riscrico gli header di fileinp
+! Leggo e riscrivo gli header di fileinp
 DO k = 1, nhead_inp - 1
   READ (20,'(a)',IOSTAT=ier) chrec_inp
   IF (ier /= 0) GOTO 9997
@@ -314,8 +315,9 @@ WRITE (*,'(a,2(i4,a))') "Numero di parametri: ", &
 
 cnt_mis_val = 0
 cnt_mis_rec = 0
+cnt_skip = 0
 
-DO kr = 1,HUGE(0)
+main: DO kr = 1,HUGE(0)
 
 !--------------------------------------------------------------------------
 ! 2.1 Leggo il prossimo record dal file di input
@@ -359,41 +361,59 @@ DO kr = 1,HUGE(0)
 !--------------------------------------------------------------------------
 ! 2.2 Leggo il prossimo record dal file di maschera
 
-  val_msk(:) = rmis_msk
-  READ (30,'(a)',IOSTAT=ier) chrec_msk
-  IF (ier == eof) EXIT
-  IF (ier /= 0) GOTO 9992
-
-  IF (msk_fmt == "hhr") THEN
-    READ (chrec_msk,chfmt3,IOSTAT=ier) yy,mm,dd,hh,chval_msk(1:npar_msk)
+  skip: DO kskip = 1,HUGE(0)
+    val_msk(:) = rmis_msk
+    READ (30,'(a)',IOSTAT=ier) chrec_msk
+    IF (ier == eof) EXIT main
     IF (ier /= 0) GOTO 9992
-    DO kp = 1,npar_msk
-      READ (chval_msk(kp),*,ERR=9992) val_msk(kp)
-    ENDDO
+  
+    IF (msk_fmt == "hhr") THEN
+      READ (chrec_msk,chfmt3,IOSTAT=ier) yy_msk,mm_msk,dd_msk,hh_msk, &
+        chval_msk(1:npar_msk)
+      IF (ier /= 0) GOTO 9992
+      DO kp = 1,npar_msk
+        READ (chval_msk(kp),*,ERR=9992) val_msk(kp)
+      ENDDO
+  
+    ELSE IF (msk_fmt == "qad") THEN
+      READ (chrec_msk,chfmt3,IOSTAT=ier) yy_msk,mm_msk,dd_msk,chval_msk(1:npar_msk)
+      hh = 0
+      IF (ier /= 0) GOTO 9992
+      DO kp = 1,npar_msk
+        READ (chval_msk(kp),*,ERR=9992) val_msk(kp)
+      ENDDO
+  
+    ELSE IF (msk_fmt == "ser" .OR. msk_fmt == "sex") THEN
+      READ (chrec_msk,chfmt3,IOSTAT=ier) dd_msk,mm_msk,yy_msk,hh_msk,sca_msk, &
+        chval_msk(1:npar_msk)
+      IF (ier /= 0) GOTO 9992
+      DO kp = 1,npar_msk
+        READ (chval_msk(kp),*,ERR=9992) val_msk(kp)
+      ENDDO
+  
+    ELSE IF (msk_fmt == "tem") THEN
+      READ (chrec_msk,chfmt3,IOSTAT=ier) yy_msk,mm_msk,dd_msk,hh_msk, &
+        chval_msk(1:npar_msk)
+      IF (ier /= 0) GOTO 9992
+      DO kp = 1,npar_msk
+        READ (chval_msk(kp),*,ERR=9992) val_msk(kp)
+      ENDDO
+  
+    ENDIF
+  
+    IF ((msk_fmt == "qad" .AND. &
+         yy==yy_msk .AND. mm==mm_msk .AND. dd==dd_msk) .OR. &
+        ((msk_fmt == "hhr" .OR. msk_fmt == "tem").AND. &
+         yy==yy_msk .AND. mm==mm_msk .AND. dd==dd_msk .AND. hh==hh_msk) .OR. &
+        (msk_fmt == "ser" .AND. &
+         yy==yy_msk .AND. mm==mm_msk .AND. dd==dd_msk .AND. hh==hh_msk .AND.&
+         sca==sca_msk)) THEN
+      EXIT skip
+    ELSE
+      cnt_skip = cnt_skip + 1
+    ENDIF
 
-  ELSE IF (msk_fmt == "qad") THEN
-    READ (chrec_msk,chfmt3,IOSTAT=ier) yy,mm,dd,chval_msk(1:npar_msk)
-    hh = 0
-    IF (ier /= 0) GOTO 9992
-    DO kp = 1,npar_msk
-      READ (chval_msk(kp),*,ERR=9992) val_msk(kp)
-    ENDDO
-
-  ELSE IF (msk_fmt == "ser" .OR. msk_fmt == "sex") THEN
-    READ (chrec_msk,chfmt3,IOSTAT=ier) dd,mm,yy,hh,sca,chval_msk(1:npar_msk)
-    IF (ier /= 0) GOTO 9992
-    DO kp = 1,npar_msk
-      READ (chval_msk(kp),*,ERR=9992) val_msk(kp)
-    ENDDO
-
-  ELSE IF (msk_fmt == "tem") THEN
-    READ (chrec_msk,chfmt3,IOSTAT=ier) yy,mm,dd,hh,chval_msk(1:npar_msk)
-    IF (ier /= 0) GOTO 9992
-    DO kp = 1,npar_msk
-      READ (chval_msk(kp),*,ERR=9992) val_msk(kp)
-    ENDDO
-
-  ENDIF
+  ENDDO skip
 
 !--------------------------------------------------------------------------
 ! 2.3 Metto mancanti i dati necessari
@@ -431,7 +451,7 @@ DO kr = 1,HUGE(0)
   ENDIF
   IF (ier /= 0) GOTO 9991
 
-ENDDO
+ENDDO main
 
 !==========================================================================
 ! 3) Conclusione
@@ -440,6 +460,7 @@ WRITE (*,'(a,i4,a,i6,a)') "Elaborati ",npar_inp," parametri ",kr-1," istanti"
 WRITE (*,'(a,2(i8,a),f6.2,a)') "Messi mancanti ", &
   cnt_mis_val," dati in ",cnt_mis_rec," istanti (", &
   100.*REAL(cnt_mis_rec)/REAL(kr-1),"%)"
+IF (cnt_skip > 0) WRITE (*,*) "Record saltati in filemask: ",cnt_skip
 
 STOP
 
@@ -496,6 +517,12 @@ STOP 4
 
 9991 CONTINUE
 WRITE (*,*) "Errore scrittura output, riga ",kr+nhead_inp
+
+9990 CONTINUE
+WRITE (*,*) "Data o scadenza disallineate tra ",TRIM(fileinp)," e ",TRIM(filemsk)
+WRITE (*,*) "Record ",kr
+WRITE (*,*) "Input: yy,mm,dd,hh,sca ",yy,mm,dd,hh,sca 
+WRITE (*,*) "Mask:  yy,mm,dd,hh,sca ",yy_msk,mm_msk,dd_msk,hh_msk,sca_msk 
 
 END PROGRAM maskout_orari
 
@@ -569,11 +596,12 @@ IMPLICIT NONE
 INTEGER :: mxstaz
 
 !            12345678901234567890123456789012345678901234567890123456789012345678901234567890
-WRITE (*,*) "maskout_orari.exe [-h] filein filemask fileout -miss -high X -low X"
+WRITE (*,*) "maskout_orari.exe [-h] filein filemask fileout [-miss] [-high X] [-low X]"
 WRITE (*,*) "  [-inpf FMT] [-mskf FMT] [-mskn N] [-outm N]"
 WRITE (*,*) "Legge 2 files relativi a serie temporali su punto; riscrive il primo (input)"
 WRITE (*,*) "mettendo mancanti i dati relativi ad alcuni istanti, scelti in base al valore di "
 WRITE (*,*) "  un campo del secondo file (mask)"
+WRITE (*,*) "Filemask puo' avere piu' dati di filein"
 WRITE (*,*) ""
 WRITE (*,*) "filein    : file da leggere e riscrivere"
 WRITE (*,*) "filemask  : file da cui leggere la lista dei dati mancanti"

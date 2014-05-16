@@ -107,9 +107,9 @@ if [ ! -z $DBA_TABLES ] ; then
 fi
 
 # 1.4 Altri preliminari
-#if [ ! -z $http_proxy ] ; then
-#  unset http_proxy
-#fi
+if [ ! -z $http_proxy ] ; then
+  unset http_proxy
+fi
 
 is_local=`echo $akurl | grep "http" | wc -l`
 if [ $is_local -eq 0 ] ; then
