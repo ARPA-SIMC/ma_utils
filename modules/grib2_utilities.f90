@@ -2,7 +2,7 @@ MODULE grib2_utilities
 !--------------------------------------------------------------------------
 ! Utilita' per la getione dei GRIB2 in logica GRIB1
 !
-!                                         Versione 1.2.1, Enrico 06/03/2014
+!                                         Versione 1.3.0, Enrico 16/05/2014
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -91,26 +91,51 @@ IF (PRESENT(par)) THEN
 
       par(2) = 200
       SELECT CASE (ct)
-      CASE(1)    ! O3
+      CASE(0)    ! O3
         par(3) = 151
-      CASE(5)    ! CO
+      CASE(4)    ! CO
         par(3) = 154
-      CASE(6)    ! NO2
+      CASE(5)    ! NO2
         par(3) = 153
-      CASE(8)    ! NO
-        par(3) = 152
-      CASE(10)   ! SO2
+      CASE(8)    ! SO2
         par(3) = 155
-      CASE(17)   ! Radon (non codificato!)
-        par(3) = 1
+      CASE(9)    ! NH3
+        par(3) = 205
+      CASE(11)   ! NO
+        par(3) = 152
       CASE(40008) ! PM10
         par(3) = 220
       CASE(40009) ! PM25
         par(3) = 221
+      CASE(60013) ! NMVOC
+        par(3) = 213
+      CASE(60018) ! PANs
+        par(3) = 159
       CASE DEFAULT
         WRITE(*,*) "GRIB2 AQ ECMWF con parametro non gestito: ",ct
         ier = 6
       END SELECT
+
+!***   Vecchie definizioni
+!      CASE(1)    ! O3
+!        par(3) = 151
+!      CASE(5)    ! CO
+!        par(3) = 154
+!      CASE(6)    ! NO2
+!        par(3) = 153
+!      CASE(8)    ! NO
+!        par(3) = 152
+!      CASE(10)   ! SO2
+!        par(3) = 155
+!      CASE(17)   ! Radon (non codificato!)
+!        par(3) = 1
+!      CASE(40008) ! PM10
+!        par(3) = 220
+!      CASE(40009) ! PM25
+!        par(3) = 221
+!      CASE DEFAULT
+!        WRITE(*,*) "GRIB2 AQ ECMWF con parametro non gestito: ",ct
+!        ier = 6
 
     ELSE
       WRITE (*,'(a,i4,a)') "Grib2 con pdtn = ",pdtn," non gestito"
@@ -223,14 +248,14 @@ IF (PRESENT(scad)) THEN
       WRITE (*,*) "Unit of timerange is not hour"
       ier = 3
     ENDIF
-    IF (sortt==0 .AND. topd==0 .AND. pdtn==0 .AND. togp==0 .AND. &
-        ft==0) THEN                  ! Analisi istantanea
+    IF (sortt==0 .AND. topd==0 .AND. (pdtn==0 .OR. pdtn==40) .AND. &
+        togp==0 .AND. ft==0) THEN               ! Analisi istantanea
       scad(1) = iouotr
       scad(2) = 0  
       scad(3) = 0
       scad(4) = 0
-    ELSE IF (sortt==1 .AND. topd==1 .AND. pdtn==0 .AND. togp==2 .AND. &
-        ft/=0) THEN                  ! Previsione istantanea
+    ELSE IF (sortt==1 .AND. topd==1 .AND. (pdtn==0 .OR. pdtn==40) .AND. &
+        togp==2 .AND. ft/=0) THEN               ! Previsione istantanea
       scad(1) = iouotr
       scad(2) = ft  
       scad(3) = 0

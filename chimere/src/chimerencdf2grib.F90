@@ -1,7 +1,7 @@
 PROGRAM chimerencdf2grib
 !--------------------------------------------------------------------------
 ! Legge un file di netcdf di Chimere e lo scrive in formato GRIB
-! Uso: chimerencdf22grib.e filein fileout fileinfo igen
+! Uso: chimerencdf2grib.exe filein fileout fileinfo igen
 !                       [-out/-met/-bio/-ini/-bc/-emibio/-eminv/-aodem]
 !
 ! NOTE:
@@ -12,12 +12,17 @@ PROGRAM chimerencdf2grib
 ! I grib in quota sono codificati come livelli ibridi, ma senza includere i
 !   vertical coordinate parameters. 
 !
-!                               Versione 3.0.0, Michele & Enrico 22/11/2013
+! Uso per leggere dati MACC:
+! - occorrono le opzioni: -grd MACCEU -rmis -999. -vt YYYYMMDDHH
+! - i dati Chimere sembrano avere solo 4 livelli (dagli header risultano 8)
+! - i dati ENS hanno campi mancanti qua e la' (file *additional*, livello 2)
+! NB I dati sono il ug/m3, ma la codifica grib dei gas richiederebbe ppb!!
+!
+!                               Versione 3.1.0, Michele & Enrico 20/05/2014
 !--------------------------------------------------------------------------
 use calendar 
 use netcdf
 IMPLICIT NONE
-#define NCERR(lnum) if(ncstat/=NF90_NOERR) call nc_err(ncstat,lnum,'chimerencdf2grib.F90')
 
 INTERFACE
   FUNCTION lowercase(chin) RESULT (chout)
@@ -34,10 +39,9 @@ INTERFACE
 END INTERFACE
 
 ! Parametri costanti
-INTEGER, PARAMETER :: maxdim = 100000  ! dimensione massima dei GRIB
+INTEGER, PARAMETER :: maxdim = 1000000 ! dimensione massima dei GRIB
 INTEGER, PARAMETER :: maxvar = 200     ! n.ro max var. in output Chimere
 INTEGER, PARAMETER :: maxlev = 16      ! n.ro max livelli in output Chimere
-REAL, PARAMETER :: rmis = -1.e9        ! codifica valore mancante
 REAL, PARAMETER :: eps = 0.0001        ! tolleranza per uguaglianza estemi griglia
 
 CHARACTER (LEN=120) :: tab_path_def = PKGDATAROOTDIR
@@ -49,19 +53,20 @@ INTEGER :: kbuffer(maxdim),kword,kret,nbit
 REAL    :: psec2(512),psec3(2)
 
 ! Altre variabili del programma
-REAL, ALLOCATABLE :: conc_out(:,:,:),tot(:),conc_miss(:,:,:),conc_out2d(:,:)
-REAL :: x1,y1,x2,y2,dx,dy,xrot,yrot,x2r,y2r
+REAL, ALLOCATABLE :: conc_out(:,:,:),tot(:),conc_miss(:,:,:)
+REAL :: x1,y1,x2,y2,dx,dy,xrot,yrot,x2r,y2r,rmis
 INTEGER :: version
-INTEGER :: nvarout,nx,ny,np,nvar_fix,nl,slen,mm,nxi,nyi,ntrov,nscri
+INTEGER :: nvarout,nx,ny,np,nl,slen,mm,nxi,nyi,ntrov,nscri
 INTEGER :: code_var(maxvar),tab_var(maxvar),lev_out(maxlev)
 INTEGER :: cem,igen,idata,idata_ini,scad_ini
 INTEGER :: iu,k,kp,kvar,kscad,klev,kday,kh,ios,eof,eor,cnt_grb,idp
 INTEGER :: inp_fmt,info_fmt,p1,p2,nhead,iproj
 CHARACTER (LEN=120) :: filein,fileout,fileinfo,chrec,chdum,arg(4),tab_file,tab_path
 CHARACTER (LEN=3) :: proj
+CHARACTER (LEN=1) :: next_arg
 LOGICAL :: verbose
 
-CHARACTER(LEN=10):: namevar(maxvar)
+CHARACTER(LEN=20):: namevar(maxvar)
 !
 ! Length of a date buffer in CHIMERE
 integer,parameter :: dlen=19
@@ -87,20 +92,15 @@ real,allocatable::buf4d1(:,:,:,:)
 real,allocatable::conc1(:),conc2(:,:),conc3(:,:,:),conc4(:,:,:,:)
 real,allocatable::conc(:,:,:)
 
-
 ! return status of all netCDF functions calls
-integer :: ncstat
+integer :: ncstat,ncstat1,ncstat2,ncstat3,dimid,dimid1,dimid2
 ! file identifier
 integer :: ncid
 ! dimension identifiers
-integer :: times1_dimid,times2_dimid
 integer :: dstrdimid
-integer :: we1_dimid
-integer :: sn1_dimid
-integer :: bt1_dimid,h_dimid
+integer :: h_dimid
 integer :: biospe_dimid
 integer :: latspe_dimid
-
 
 ! dimension lengths
 integer :: times1
@@ -115,10 +115,8 @@ integer :: ivar,ivarid
 integer:: vartype1,times1_varid,typeday,biospecies,biospe_varid,latspe_varid,species
 
 character(len=dlen)   :: datebuf
-character(len=40)::buffatt1
 
-
-logical::is3d1
+logical::is3d1,rtm
 
 
 integer::mm5date2numeric
@@ -127,7 +125,7 @@ character(len=6)::domain,rdomain
 !==========================================================================
 ! 1) Elaborazioni preliminari
 
-! nvar_fix: varibaili non chimiche presenti nei files NetCDF
+! Nei files NetCDF relativi ad output Chimere sono presenti 10 varibili fisse:
 ! out_fmt=1: lon,lat,a_vcoord,b_vcoord,cut_off_diameters,Times,hlay,airm,relh,temp (10)
 ! 
 !--------------------------------------------------------------------------
@@ -135,40 +133,55 @@ character(len=6)::domain,rdomain
 
 idp = 0
 inp_fmt = 1
-version=2007
+version = 2007
+rmis = -HUGE(0.)
+domain = ""
+next_arg = ""
+rtm = .FALSE.
 
 DO kp = 1,HUGE(kp)
    CALL getarg(kp,chdum)
    IF (TRIM(chdum) == "-h") THEN
-      CALL write_help
-      STOP
+     CALL write_help
+     STOP
    ELSE IF (TRIM(chdum) == "") THEN  
-      EXIT
+     EXIT
+   ELSE IF (TRIM(chdum) == "-grd") THEN
+     next_arg = "G"
+   ELSE IF (TRIM(chdum) == "-vt") THEN
+     rtm = .TRUE.
+     next_arg = "T"
+   ELSE IF (TRIM(chdum) == "-rmis") THEN
+     next_arg = "M"
+   ELSE IF (next_arg == "G") THEN
+     domain = TRIM(chdum)
+     next_arg = ""
+   ELSE IF (next_arg == "T") THEN
+     READ (chdum,'(i10)') idata
+     next_arg = ""
+   ELSE IF (next_arg == "M") THEN
+     READ (chdum,*) rmis
+     next_arg = ""
    ELSE IF (TRIM(chdum) == "-out") THEN
-      inp_fmt = 1  
-      nvar_fix = 10
+     inp_fmt = 1  
    ELSE IF (TRIM(chdum) == "-met") THEN
-      inp_fmt = 2  
-      nvar_fix = 0
+     inp_fmt = 2  
    ELSE IF (TRIM(chdum) == "-bio") THEN
-      inp_fmt = 3  
-      nvar_fix = 0
+     inp_fmt = 3  
    ELSE IF (TRIM(chdum) == "-ini") THEN
-      inp_fmt = 4  
-      nvar_fix = 0
+     inp_fmt = 4  
    ELSE IF (TRIM(chdum) == "-bc") THEN
-      inp_fmt = 5  
-      nvar_fix = 0
+     inp_fmt = 5  
    ELSE IF (TRIM(chdum) == "-emibio") THEN
-      inp_fmt = 6  
-      nvar_fix = 0
+     inp_fmt = 6  
    ELSE IF (TRIM(chdum) == "-eminv") THEN
-      inp_fmt = 7  
-      nvar_fix = 0
+     inp_fmt = 7  
    ELSE IF (TRIM(chdum) == "-aodem") THEN
-      inp_fmt = 8  
-      nvar_fix = 0
-   ELSE
+     inp_fmt = 8  
+   ELSE IF (idp >= 4) THEN
+     CALL write_help
+     STOP
+   ELSE   
       idp = idp + 1
       arg(idp) = chdum
    ENDIF
@@ -190,74 +203,77 @@ ENDIF
 
 ! Apro il file
 ncstat=nf90_open(filein,NF90_NOWRITE,ncid)
-NCERR(__LINE__)
 
-! Titolo
-ncstat=nf90_get_att(ncid,NF90_GLOBAL,'Title',buffatt1)
-NCERR(__LINE__)
-ncstat=nf90_get_att(ncid,NF90_GLOBAL,'Domain',domain)
-NCERR(__LINE__)
+! Area
+IF (domain == "") THEN
+  ncstat=nf90_get_att(ncid,NF90_GLOBAL,'Domain',domain)
+  IF (ncstat/=NF90_NOERR) CALL attr_err(filein,"Domain")
+ENDIF
 
-! Tempo
-ncstat=nf90_inq_varid(ncid,'Times',times1_varid)
-NCERR(__LINE__)
+! Numero istanti
+ncstat1 = nf90_inq_dimid(ncid,'Time',dimid1)
+ncstat2 = nf90_inq_dimid(ncid,'time',dimid2)
+IF (ncstat1 == NF90_NOERR) THEN
+  ncstat=nf90_inquire_dimension(ncid,dimid1,len=times1)
+ELSE IF (ncstat2 == NF90_NOERR) THEN
+  ncstat=nf90_inquire_dimension(ncid,dimid2,len=times1)
+ELSE
+  WRITE (*,*) "N.ro istanti temporali non presente nel file NetCDF"
+ENDIF
 
-ncstat=nf90_inq_dimid(ncid,'DateStrLen',dstrdimid)
-NCERR(__LINE__)
-ncstat=nf90_inquire_dimension(ncid,dstrdimid,len=dstrlen)
+! Valore istanti
+ncstat1=nf90_inq_varid(ncid,'Times',times1_varid)
+ncstat2=nf90_inq_dimid(ncid,'DateStrLen',dstrdimid)
+ncstat3=nf90_inquire_dimension(ncid,dstrdimid,len=dstrlen)
+IF (.NOT.rtm .AND. (ncstat1/=NF90_NOERR .OR. ncstat2/=NF90_NOERR .OR. &
+  ncstat3/=NF90_NOERR)) GOTO 9989
 
-ncstat=nf90_inq_dimid(ncid,'Time',times1_dimid)
-NCERR(__LINE__)
-ncstat=nf90_inquire_dimension(ncid,times1_dimid,len=times1)
-NCERR(__LINE__)
-WRITE (*,*)'N step temporali: ',times1
-
-ncstat=nf90_inq_dimid(ncid,'type_day',times2_dimid)
-is3d1=(ncstat==NF90_NOERR)
-IF (is3d1) THEN
-  NCERR(__LINE__)
-  ncstat=nf90_inquire_dimension(ncid,times2_dimid,len=typeday)
-  NCERR(__LINE__)
+! Tipo di giorni (per emi)
+ncstat=nf90_inq_dimid(ncid,'type_day',dimid)
+IF (inp_fmt == 7 .AND. ncstat == NF90_NOERR) THEN
+  ncstat=nf90_inquire_dimension(ncid,dimid,len=typeday)
 ELSE
   typeday=1
 ENDIF
 
 ! Nx
-ncstat=nf90_inq_dimid(ncid,'west_east',we1_dimid)
-is3d1=(ncstat==NF90_NOERR)
-IF (is3d1) THEN
-  NCERR(__LINE__)                                  
-  ncstat=nf90_inquire_dimension(ncid,we1_dimid,len=nzonal)
-  NCERR(__LINE__)
+ncstat1 = nf90_inq_dimid(ncid,'west_east',dimid1)
+ncstat2 = nf90_inq_dimid(ncid,'longitude',dimid2)
+IF (ncstat1 == NF90_NOERR) THEN
+  ncstat=nf90_inquire_dimension(ncid,dimid1,len=nzonal)
+ELSE IF (ncstat2 == NF90_NOERR) THEN
+  ncstat=nf90_inquire_dimension(ncid,dimid2,len=nzonal)
 ELSE
-  WRITE (*,*) "N.ro celle in direzione X (west_est) non presente nel file NetCDF"
+  WRITE (*,*) "N.ro celle in direzione X non presente nel file NetCDF"
 ENDIF
 
 ! Ny
-ncstat=nf90_inq_dimid(ncid,'south_north',sn1_dimid)
-is3d1=(ncstat==NF90_NOERR)
-IF (is3d1) THEN
-  NCERR(__LINE__)
-  ncstat=nf90_inquire_dimension(ncid,sn1_dimid,len=nmerid)
-  NCERR(__LINE__)
-ELSE 
-  WRITE (*,*) "N.ro celle in direzione Y (south-norht) non presente nel file NetCDF"
+ncstat1 = nf90_inq_dimid(ncid,'south_north',dimid1)
+ncstat2 = nf90_inq_dimid(ncid,'latitude',dimid2)
+IF (ncstat1 == NF90_NOERR) THEN
+  ncstat=nf90_inquire_dimension(ncid,dimid1,len=nmerid)
+ELSE IF (ncstat2 == NF90_NOERR) THEN
+  ncstat=nf90_inquire_dimension(ncid,dimid2,len=nmerid)
+ELSE
+  WRITE (*,*) "N.ro celle in direzione Y non presente nel file NetCDF"
 ENDIF
 
 ! Nz
 IF (inp_fmt == 8) THEN
   nlev = 1
+
 ELSE
-  ncstat=nf90_inq_dimid(ncid,'bottom_top',bt1_dimid) 
-  is3d1=(ncstat==NF90_NOERR)
-  IF (is3d1) THEN
-    NCERR(__LINE__)                                  
-    ncstat=nf90_inquire_dimension(ncid,bt1_dimid,len=nlev)
-    NCERR(__LINE__)
+  ncstat1 = nf90_inq_dimid(ncid,'bottom_top',dimid1)
+  ncstat2 = nf90_inq_dimid(ncid,'level',dimid2)
+  IF (ncstat1 == NF90_NOERR) THEN
+    ncstat=nf90_inquire_dimension(ncid,dimid1,len=nlev)
+  ELSE IF (ncstat2 == NF90_NOERR) THEN
+    ncstat=nf90_inquire_dimension(ncid,dimid2,len=nlev)
   ELSE
-    WRITE (*,*) "N.ro livelli (bottom_top) non presente nel file NetCDF"
-    nlev=1
+    WRITE (*,*) "N.ro livelli non presente nel file NetCDF, assumo un solo livello"
+    nlev = 1
   ENDIF
+
 ENDIF
 
 ! Nhori (Solo per BC; numero celle di bordo? crev)
@@ -265,9 +281,7 @@ IF (inp_fmt == 5) THEN
   ncstat=nf90_inq_dimid(ncid,'h_boundary',h_dimid) 
   is3d1=(ncstat==NF90_NOERR)
   IF (is3d1) THEN
-    NCERR(__LINE__)                                  
     ncstat=nf90_inquire_dimension(ncid,h_dimid,len=nhori)
-    NCERR(__LINE__)
   ELSE
     WRITE (*,*) "Quota livelli (h_boundary) non presente nel file NetCDF"
   ENDIF
@@ -278,11 +292,8 @@ IF (inp_fmt==5) THEN !crev
   ncstat=nf90_inq_dimid(ncid,'Species',latspe_dimid)
   is3d1=(ncstat==NF90_NOERR)
   IF (is3d1) THEN
-    NCERR(__LINE__)
     ncstat=nf90_inquire_dimension(ncid,latspe_dimid,len=species)
-    NCERR(__LINE__)
     ncstat=nf90_inq_varid(ncid,'conc',latspe_varid)
-    NCERR(__LINE__)
     WRITE (*,*) 'latspe_varid',latspe_varid
     nvarin = species
   ELSE
@@ -293,11 +304,8 @@ ELSE IF (inp_fmt==6) THEN !crev
   ncstat=nf90_inq_dimid(ncid,'biospecies',biospe_dimid) !crev
   is3d1=(ncstat==NF90_NOERR)
   IF (is3d1) THEN
-    NCERR(__LINE__)
     ncstat=nf90_inquire_dimension(ncid,biospe_dimid,len=biospecies)
-    NCERR(__LINE__)
     ncstat=nf90_inq_varid(ncid,'emisb',biospe_varid)
-    NCERR(__LINE__)
     WRITE (*,*)'biospoe_varid',biospe_varid
     nvarin = biospecies
   ELSE
@@ -306,7 +314,6 @@ ELSE IF (inp_fmt==6) THEN !crev
 
 ELSE
   ncstat=nf90_inquire(ncid, nVariables=nvarin)
-  NCERR(__LINE__)
 
 ENDIF
 
@@ -409,7 +416,6 @@ DO
          read(chrec(p1+1:),'(a)') namevar(k-nhead)
        ENDIF
        namevar(k-nhead) = ADJUSTL(TRIM(namevar(k-nhead)))
-           write(6,*)code_var(k-nhead),namevar(k-nhead),k-nhead,k
     ELSE
        WRITE (*,*) "Troppe specie, elaboro le prime ",maxvar,&
             " (aumentare param. maxvar)"
@@ -459,14 +465,14 @@ IF (cem <= 0 .OR. nlev < 0 .OR. &
 !--------------------------------------------------------------------------
 ! 1.5 Log a schermo dei dati richiesti
 
+WRITE (*,*) "N step temporali: ",times1
 WRITE (*,*) "Parametri griglia: (",TRIM(domain),")"
-WRITE (*,*) "proj,nx,ny,nz: ",proj,nx,ny,nlev
-WRITE (*,*) "x1,y1,x2,y2: ",x1,y1,x2,y2
-WRITE (*,*) "dx,dy: ",dx,dy
+WRITE (*,*) "  proj,nx,ny,nz: ",proj,nx,ny,nlev
+WRITE (*,*) "  x1,y1,x2,y2:   ",x1,y1,x2,y2
+WRITE (*,*) "  dx,dy:         ",dx,dy
 WRITE (*,*) ""
 WRITE (*,*) "Numero di parametri:"
 WRITE (*,*) "variabili totali in input:  ",nvarin
-WRITE (*,*) "   di cui specie chimiche:  ",nvarin - nvar_fix
 WRITE (*,*) "variabili richieste in out: ",nvarout
 WRITE (*,*) "livelli in outuput:         ",COUNT(lev_out(1:nlev) /= 0)
 WRITE (*,*) ""
@@ -483,7 +489,7 @@ ksec1(3) = igen
 ksec1(4) = 255
 IF (inp_fmt == 7) THEN
    ksec1(5) = 192
-ELSE
+ELSE IF (inp_fmt /= 1) THEN
    ksec1(5) = 128
 ENDIF
 
@@ -602,19 +608,17 @@ IF (inp_fmt == 1) THEN
   cnt_grb = 0
   ntrov=0
   DO kscad = 1, times1
-     ncstat=nf90_get_var(ncid,times1_varid,datebuf,(/1,kscad/),(/dstrlen, 1/))
-     NCERR(__LINE__)
-     idata=mm5date2numeric(datebuf)
-
+     IF (.NOT. rtm) THEN
+       ncstat=nf90_get_var(ncid,times1_varid,datebuf,(/1,kscad/),(/dstrlen, 1/))
+       idata=mm5date2numeric(datebuf)
+     ENDIF
      IF (kscad == 1) idata_ini = idata
      CALL chdata2ksec(idata,idata_ini,scad_ini,verbose, &
-          ksec1(10),ksec1(11),ksec1(12),ksec1(13),ksec1(16),ksec1(21))
+        ksec1(10),ksec1(11),ksec1(12),ksec1(13),ksec1(16),ksec1(21))
 
      DO ivar=1,nvarout
         ncstat=nf90_inq_varid(ncid,namevar(ivar),ivarid)
-        is3d1=(ncstat==NF90_NOERR)
-
-        IF (is3d1) THEN
+        IF (ncstat==NF90_NOERR) THEN
            IF (kscad ==1) THEN
              WRITE(*,'(2a,2(1x,i3))') "Trovata la variabile: ", &
                namevar(ivar),ivar,ivarid
@@ -623,12 +627,9 @@ IF (inp_fmt == 1) THEN
 
            ncstat=nf90_inquire_variable &
              (ncid,ivarid,varids1(ivarid)%varname,vartype1,varids1(ivarid)%ndims)
-           NCERR(__LINE__)
-
            ncstat=nf90_get_var( ncid,ivarid, buf3d1, &
                 (/     1,      1,       1, kscad/),  & ! start vector
                 (/nzonal, nmerid, nlev,     1/))    ! count vector
-           NCERR(__LINE__)
 
            conc2 = RESHAPE(buf3d1,(/nzonal*nmerid,nlev/))
            conc_out(:,:,ivar) = conc2(:,:)
@@ -641,6 +642,12 @@ IF (inp_fmt == 1) THEN
              ksec1(7) = 109
              ksec1(8) = klev
              ksec1(9) = 0
+             IF (ANY(conc_out(1:np,klev,ivar) == rmis)) THEN
+               ksec1(5) = 192
+             ELSE
+               ksec1(5) = 128
+             ENDIF
+
              CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
                   conc_out(1:np,klev,ivar),np,kbuffer,maxdim,kword,'C',kret)
 
@@ -651,14 +658,13 @@ IF (inp_fmt == 1) THEN
 
         ELSE
            IF (kscad ==1) WRITE(*,'(2a,2(1x,i3))') &
-             "Variabile non trovata: ",namevar(ivar),ivar,ivarid
+             "Variabile non trovata: ",namevar(ivar),ivar
 
         ENDIF
      ENDDO                       ! specie 
   ENDDO                          ! istanti
 
   ncstat=nf90_close(ncid)
-  NCERR(__LINE__)
   WRITE (*,'(3(a,i6))') "Scadenze elaborate ",kscad-1, &
     ", variabili scritte ",ntrov,", grib scritti ",cnt_grb
 
@@ -674,7 +680,6 @@ ELSE IF (inp_fmt == 2) THEN
      ntrov=0
      nscri=0  
      ncstat=nf90_get_var(ncid,times1_varid,datebuf,(/1,kscad/),(/dstrlen, 1/))
-     NCERR(__LINE__)
      idata=mm5date2numeric(datebuf)
      write(6,*)trim(datebuf),idata
 
@@ -688,14 +693,12 @@ ELSE IF (inp_fmt == 2) THEN
            write(6,*)'ho trovato la variabile  ',namevar(ivar),ivar,ivarid,code_var(ivar)
            ntrov=ntrov+1
            ncstat=nf90_inquire_variable(ncid,ivarid,varids1(ivarid)%varname,vartype1,varids1(ivarid)%ndims)
-           NCERR(__LINE__)
            if(varids1(ivarid)%ndims==3)  then
               ! 2d fil
 
               ncstat=nf90_get_var( ncid,ivarid, buf2d1, &
                    (/     1,      1,        kscad/),  & ! start vector
                    (/nzonal, nmerid,    1/))    ! count vector
-              NCERR(__LINE__)
               write(6,*)'2D ',varids1(ivarid)%varname
               nl=1
               conc1=reshape(buf2d1,(/nzonal*nmerid/))
@@ -707,7 +710,6 @@ ELSE IF (inp_fmt == 2) THEN
               ncstat=nf90_get_var( ncid,ivarid, buf3d1, &
                    (/     1,      1,       1, kscad/),  & ! start vector
                    (/nzonal, nmerid, nlev,     1/))    ! count vector
-              NCERR(__LINE__)
 
               write(6,*)'3D ',varids1(ivarid)%varname
               conc2=reshape(buf3d1,(/nzonal*nmerid,nlev/))
@@ -746,7 +748,6 @@ ELSE IF (inp_fmt == 2) THEN
      end do                       !specie 
   ENDDO                     ! scadenze
   ncstat=nf90_close(ncid)
-  NCERR(__LINE__)
   WRITE (*,'(a,i3,a,i6,a,i3,a,i3,a)') "Elaborate ",kscad-1," scadenze, scritti ", &
           cnt_grb," grib, Trovate ",ntrov, " N variabili  ,Scritte ",nscri ," N variabili"
 
@@ -816,7 +817,6 @@ ELSE IF (inp_fmt == 4) THEN
      ntrov=0
      nscri=0
      ncstat=nf90_get_var(ncid,times1_varid,datebuf,(/1,kscad/),(/dstrlen, 1/))
-     NCERR(__LINE__)
      idata=mm5date2numeric(datebuf)
 
      IF (kscad == 1) idata_ini = idata
@@ -830,13 +830,11 @@ ELSE IF (inp_fmt == 4) THEN
            ntrov=ntrov+1
            write(6,*)'trovo la variabile  ',namevar(ivar),ivar,ivarid
            ncstat=nf90_inquire_variable(ncid,ivarid,varids1(ivarid)%varname,vartype1,varids1(ivarid)%ndims)
-           NCERR(__LINE__)
 
 
            ncstat=nf90_get_var( ncid,ivarid, buf3d1, &
                 (/     1,      1,       1, kscad/),  & ! start vector
                 (/nzonal, nmerid, nlev,     1/))    ! count vector
-           NCERR(__LINE__)
 
            conc2=reshape(buf3d1,(/nzonal*nmerid,nlev/))
            conc_out(:,:,ivar)=conc2(:,:)
@@ -865,7 +863,6 @@ ELSE IF (inp_fmt == 4) THEN
   ENDDO                     ! scadenze
 
   ncstat=nf90_close(ncid)
-  NCERR(__LINE__)
   WRITE (*,'(a,i3,a,i6,a,i3,a,i3,a)') "Elaborate ",kscad-1," scadenze, scritti ", &
           cnt_grb," grib, Trovate ",ntrov, " N variabili  ,Scritte ",nscri ," N variabili"
 
@@ -875,7 +872,6 @@ ELSE IF (inp_fmt == 4) THEN
 ELSE IF (inp_fmt == 5) THEN
   DO kscad = 1, times1
     ncstat=nf90_get_var(ncid,times1_varid,datebuf,(/1,kscad/),(/dstrlen, 1/))
-    NCERR(__LINE__)
     idata=mm5date2numeric(datebuf)
     write(6,*)trim(datebuf),idata
 
@@ -885,7 +881,6 @@ ELSE IF (inp_fmt == 5) THEN
     ncstat=nf90_get_var( ncid,latspe_varid, conc, &
       (/     1,        1,  1, kscad/),  & ! start vector
       (/species,nhori,nlev,    1/))    ! count vector
-    NCERR(__LINE__)
     write(6,*)'qu3',nyi,nxi
 
     write(6,*)nhori,nlev,species
@@ -932,7 +927,6 @@ ELSE IF (inp_fmt == 5) THEN
     ENDDO                  ! specie
   ENDDO                    ! scadenze
   ncstat=nf90_close(ncid)
-  NCERR(__LINE__)
 
   WRITE (*,'(a,i3,a,i6,a)') "Elaborate ",kscad-1," scadenze, scritti ", &
                  cnt_grb," grib"
@@ -947,7 +941,6 @@ ELSE IF (inp_fmt == 6) THEN
     ntrov=0
     nscri=0
     ncstat=nf90_get_var(ncid,times1_varid,datebuf,(/1,kscad/),(/dstrlen, 1/))
-    NCERR(__LINE__)
     idata=mm5date2numeric(datebuf)
 
     CALL chdata2ksec(idata,idata_ini,scad_ini,verbose, &
@@ -956,7 +949,6 @@ ELSE IF (inp_fmt == 6) THEN
     ncstat=nf90_get_var( ncid,biospe_varid, emisb, &
       (/     1,        1,  1, kscad/),  & ! start vector
       (/biospecies,nzonal, nmerid,    1/))    ! count vector
-    NCERR(__LINE__)
 
     emisb1=reshape(emisb,(/biospecies,nzonal*nmerid/))
     do k=1,np
@@ -986,7 +978,6 @@ ELSE IF (inp_fmt == 6) THEN
   ENDDO                    ! scadenze
 
   ncstat=nf90_close(ncid)
-  NCERR(__LINE__)
   WRITE (*,'(a,i3,a,i6,a,i3,a,i3,a)') "Elaborate ",kscad-1," scadenze, scritti ", &
     cnt_grb," grib, Trovate ",ntrov, " N variabili  ,Scritte ",nscri ," N variabili"
 
@@ -1004,7 +995,6 @@ ELSE IF (inp_fmt == 7) THEN
     ntrov=0
     nscri=0
     ncstat=nf90_get_var(ncid,times1_varid,datebuf,(/1,kscad/),(/dstrlen, 1/))
-    NCERR(__LINE__)
     idata=mm5date2numeric(datebuf)
     write(6,*)trim(datebuf),idata
     DO ivar=1,nvarout
@@ -1016,14 +1006,12 @@ ELSE IF (inp_fmt == 7) THEN
           namevar(ivar),ivar,ivarid,code_var(ivar)
         ncstat=nf90_inquire_variable &
           (ncid,ivarid,varids1(ivarid)%varname,vartype1,varids1(ivarid)%ndims)
-        NCERR(__LINE__)
         ntrov=ntrov+1 
         write(6,*)ivarid,varids1(ivarid)%varname,namevar(ivar)
         ncstat=nf90_get_var( ncid,ivarid, buf4d1, &
              (/  1,   1,      1,       1, kscad/),  & ! start vector
              (/ nzonal, nmerid, nlev,typeday,1/)   & ! count vector
              )
-        NCERR(__LINE__)
         conc3=reshape(buf4d1,(/nzonal*nmerid,nlev,typeday/))
         conc4(:,:,:,ivar)=conc3(:,:,:)     
         IF (code_var(ivar)<=0) CYCLE
@@ -1066,7 +1054,6 @@ ELSE IF (inp_fmt == 7) THEN
   ENDDO                          ! scadenze
 
   ncstat=nf90_close(ncid)
-  NCERR(__LINE__)
   WRITE (*,'(a,i3,a,i10,a,i3,a,i3,a)') "Elaborate ",kscad-1," scadenze, scritti ", &
           cnt_grb," grib, Trovate ",ntrov, " N variabili  ,Scritte ",nscri ," N variabili"
 
@@ -1079,7 +1066,6 @@ ELSE IF (inp_fmt == 8) THEN
   ntrov=0
   DO kscad = 1, times1
      ncstat=nf90_get_var(ncid,times1_varid,datebuf,(/1,kscad/),(/dstrlen, 1/))
-     NCERR(__LINE__)
      idata=mm5date2numeric(datebuf)
 
      IF (kscad == 1) idata_ini = idata
@@ -1099,12 +1085,10 @@ ELSE IF (inp_fmt == 8) THEN
 
            ncstat=nf90_inquire_variable &
              (ncid,ivarid,varids1(ivarid)%varname,vartype1,varids1(ivarid)%ndims)
-           NCERR(__LINE__)
 
            ncstat=nf90_get_var( ncid,ivarid, buf2d1, &
                 (/     1,      1, kscad/),  & ! start vector
                 (/nzonal, nmerid,     1/))    ! count vector
-           NCERR(__LINE__)
 
            conc1 = RESHAPE(buf2d1,(/nzonal*nmerid/))
            conc_out(:,1,ivar) = conc1(:)
@@ -1125,14 +1109,13 @@ ELSE IF (inp_fmt == 8) THEN
 
         ELSE
            IF (kscad ==1) WRITE(*,'(2a,2(1x,i3))') &
-             "Variabile non trovata: ",namevar(ivar),ivar,ivarid
+             "Variabile non trovata: ",namevar(ivar),ivar
 
         ENDIF
      ENDDO                       ! specie 
   ENDDO                          ! istanti
 
   ncstat=nf90_close(ncid)
-  NCERR(__LINE__)
   WRITE (*,'(3(a,i6))') "Scadenze elaborate ",kscad-1, &
     ", variabili scritte ",ntrov,", grib scritti ",cnt_grb
 
@@ -1176,12 +1159,20 @@ STOP
            STOP
 
 9991       CONTINUE
-           WRITE (*,*) "Dati inconsistenti in ",TRIM(tab_file)," e ", &
-             TRIM(filein)
-           STOP
+WRITE (*,*) "Dati inconsistenti in ",TRIM(tab_file)," e ",TRIM(filein)
+IF (nx /= nzonal) WRITE (*,*) "Nx: ",nx,nzonal
+IF (ny /= nmerid) WRITE (*,*) "Nx: ",ny,nmerid
+IF (ABS(x2r-x2) > eps) WRITE (*,*) "x2 ",x2r,x2
+IF (ABS(y2r-y2) > eps) WRITE (*,*) "y2 ",y2r,y2
+STOP
 
 9990       CONTINUE
            WRITE (*,*) "Area ",TRIM(domain),"non trovata in ",TRIM(tab_file)
+
+
+9989 CONTINUE
+WRITE (*,*) "Reference time non trovato in ",TRIM(filein)," usare parametro -rtm"
+STOP
 
 END PROGRAM chimerencdf2grib
 
@@ -1274,28 +1265,45 @@ SUBROUTINE write_help
 ! Scrive a scehmo l'help del programma
 !
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
-WRITE (*,*) "Uso: chimere2grib.exe filein fileout fileinfo igen"
+WRITE (*,*) "Uso: chimere2grib.exe filein fileout fileinfo igen "
 WRITE (*,*) "     [-out/-met/-bio/-ini/-bc/-emibio/-eminv/-aodem]"
+WRITE (*,*) "     [-grd DOM] [-vt YYYYMMDDHH] [-rmis VAL]"
 WRITE (*,*)
 WRITE (*,*) "Legge un file di netcdf di Chimere e lo scrive in formato GRIB"
 WRITE (*,*) "filein:   file di input (NetCDF)"
 WRITE (*,*) "fileout:  file di output (GRIB)"
 WRITE (*,*) "fileinfo: namelsit (formato CHIMERE_INFO.DAT o CHIMERE_NCINFO.DAT)"
+WRITE (*,*) "igen:     processo generatore dei grib in output"
 WRITE (*,*)
-WRITE (*,*) "  -out: analizza l'output di Chimere (concentrazioni) [DEFAULT]"
-WRITE (*,*) "  -met: analizza un file METEO"
-WRITE (*,*) "  -bio: analizza un file BIOFACS (??? calcola potenziale totale)"
-WRITE (*,*) "  -ini: analizza un file ini.sim o end.sim"
-WRITE (*,*) "  -bc:  analizza un file LAT_CONCS o TOP_CONCS"
-WRITE (*,*) "  -emibio: analizza un file BEMISSIONS ???" 
-WRITE (*,*) "  -eminv:  analizza un file EMISSIONS-area.mm (profili giorn. di emiss.)"
-WRITE (*,*) "  -aodem:  analizza l'output di AODEM (solo AOD, 2-dim)"
+WRITE (*,*) "  -out:   analizza l'output di Chimere (concentrazioni) [DEFAULT]"
+WRITE (*,*) "  -met:   analizza un file METEO"
+WRITE (*,*) "  -bio:   analizza un file BIOFACS (??? calcola potenziale totale)"
+WRITE (*,*) "  -ini:   analizza un file ini.sim o end.sim"
+WRITE (*,*) "  -bc:    analizza un file LAT_CONCS o TOP_CONCS"
+WRITE (*,*) "  -emibio:analizza un file BEMISSIONS ???" 
+WRITE (*,*) "  -eminv: analizza un file EMISSIONS-area.mm (profili giorn. di emiss.)"
+WRITE (*,*) "  -aodem: analizza l'output di AODEM (solo AOD, 2-dim)"
 WRITE (*,*) ""
+WRITE (*,*) "Opzioni per convertire i dati MACC:"
+WRITE (*,*) "-grd DOM: usa i parametri griglia relativi all'aera DOM (default: legge DOM"
+WRITE (*,*) "          da filein). DOM deve essere incluso in domainlist.nml" 
+WRITE (*,*) "-vt YYYYMMDDHH: specifica il verification time del primo istante in output"
+WRITE (*,*) "          (def: lo legge da filein)"
+WRITE (*,*) "-rmis VAL: considera mancanti i valori pari a VAL (in MACC -999.)"
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 
 RETURN
 
 END SUBROUTINE write_help
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+SUBROUTINE attr_err(file,attr)
+CHARACTER (LEN=*), INTENT(IN)  :: file,attr
+
+WRITE (*,*) "Attributo non trovato in ",TRIM(file),": ",TRIM(attr)
+STOP
+END SUBROUTINE attr_err
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
