@@ -14,7 +14,7 @@ PROGRAM grib_daily_stat
 !   data di validita'
 ! - Se per una data giornata non ci sono dati in input o se nessuno dei 
 !   punti ha un numero di dati sufficienti, non scrive nulla.
-!   Con nval=0, scrive un campo interamente mancate nelle giornate con dati
+!   Con nval=0, scrive un campo interamente mancante nelle giornate con dati
 !   in input, ma in cui nessun punto ha un numero di dati sufficienti.
 !   I campi "giorno medio" vengono scritti sempre (ev. tutti mancanti)
 !   Si potrebbe mettere un'opzione per scrivere sempre un campo per 
@@ -1194,7 +1194,7 @@ IMPLICIT NONE
 !            123456789012345678901234567890123456789012345678901234567890123456789012345678
 WRITE (*,*)
 WRITE (*,*) "Uso: grib_daily_stat.exe filein [-h] [-pts N] [-nbit N] "
-WRITE (*,*) " [-nval NVAL] [-nrm NRM] [-nvalrm NVALRM] [-wmiss]"
+WRITE (*,*) " [-nval NVAL] [-nrm NRM] [-nvalrm NVALRM]"
 WRITE (*,*) " [-ave] [-max] [-dty/dtylc] [-aot X] [-mxrm1 X] [-mxrm2 X] [-exc X]"
 WRITE (*,*)
 WRITE (*,*) "filein   file in input, in formato GRIB1"

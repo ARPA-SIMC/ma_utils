@@ -1,234 +1,315 @@
 PROGRAM grib_stat
 !--------------------------------------------------------------------------
-! Programma che legge un file con molti grib e scrive in 4 files separati
-! i campi: massimo, minimo, media, varianza
+! Legge un file son molti grib; scrive il file stat.grib, con intestazione
+! uguale al primo file in input e valori relativi alla statistica richiesta.
 !
-! Note:
-! - I grib devono essere definiti sulla stessa area (sez. 2 coincidente)
-! - Le altre sezioni sono prese dal primo grib del file
-! - I punti che risultano mancanti in un qualsiasi GRIB sono messi
-!   mancanti; e' ammesso che ci sia un diverso numero di dati mancanti nei
-!   diversi grib
-! - Deriva da grib_ave.f90
-!
-!                                         Versione 1.0.1, Enrico 13/01/2014
+!                                         Versione 2.0.0, Enrico 28/05/2014
 !--------------------------------------------------------------------------
 
+USE grib_api
+USE missing_values
+USE grib2_utilities
 IMPLICIT NONE
 
-! Parametri costanti
-REAL, PARAMETER :: rmis = -1.E30           ! valore per dati mancanti
-!REAL, PARAMETER :: rmis = -HUGE(0.)       ! valore per dati mancanti
-INTEGER, PARAMETER :: maxdim = 100000      ! dimensione massima dei GRIB
-
-! Dichiarazioni per GRIBEX.
-INTEGER :: ksec0(2),ksec1(1024),ksec2(1024),ksec3(2),ksec4(512)
-INTEGER :: ksec1_sav(1024),ksec2_sav(1024),ksec3_sav(2),ksec4_sav(512)
-INTEGER :: kbuffer(maxdim), klen, kret
-INTEGER :: field_nok(maxdim)
-REAL    :: psec2(512),psec3(2),psec2_sav(512),psec3_sav(2)
-REAL    :: field(maxdim),field_sum(maxdim),field_sum2(maxdim)
-REAL    :: field_max(maxdim),field_min(maxdim)
-
-! Altre variabili del programma
-REAL :: fave,fave_sum
-INTEGER :: ngribin,iuin,iuout,nok,np_sav,data_sav(5)
-CHARACTER (LEN=200) :: filein, fileout
-LOGICAL :: first
+INTEGER, ALLOCATABLE :: val_nok(:)
+INTEGER :: ifin=0,ifout=0,igin=0,igout=0
+INTEGER :: iret,ier,ios,ios2,clret(0:5),kg,kp,ks,kpar
+INTEGER :: nv_stat,idp,idp_req
+INTEGER :: ni,nj,nocv,out_nok,kptest
+REAL :: out_max,out_min,out_ave
+REAL, ALLOCATABLE :: field_in(:),field_out(:)
+REAL, ALLOCATABLE :: val_max(:),val_min(:),val_sum(:),val_sum2(:)
+REAL, ALLOCATABLE :: val_nth(:,:),old_val(:)
+CHARACTER(LEN=200) :: filein,fileout,chdum
+CHARACTER(LEN=3) :: stat
+CHARACTER(LEN=1) :: next_arg
+LOGICAL :: ldeb
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
 
 ! 1.1 Parametri da riga comando
-CALL getarg(1,filein)
+ldeb = .FALSE.
+next_arg = ""
+idp = 0
+ios = 0
+ios2 = 0
+DO kpar = 1,HUGE(0)
+  CALL getarg(kpar,chdum)
+  IF (TRIM(chdum) == "") THEN
+    EXIT
+  ELSE IF (TRIM(chdum) == "-h") THEN
+    CALL write_help
+    STOP 1
+  ELSE IF (TRIM(chdum) == "-deb") THEN
+    ldeb = .TRUE.
+    next_arg = "D"
+  ELSE IF (next_arg == "D") THEN
+    READ (chdum,*,IOSTAT=ios2) kptest
+    next_arg = ""
+  ELSE 
+    idp = idp + 1
+    SELECT CASE (idp)
+    CASE (1)
+      filein = chdum
+    CASE (2)
+      stat = TRIM(ADJUSTL(chdum))
+    CASE (3)
+      READ (chdum,*,IOSTAT=ios) nv_stat
+    CASE DEFAULT
+      CALL write_help
+      STOP 1
+    END SELECT
+  ENDIF
+ENDDO
 
-IF (filein == "" .OR. TRIM(filein) == "-h") THEN
-  WRITE (*,*) "Uso: grib_stat.exe [-h] filein"
-  WRITE (*,*) "Scrive i files: ave.grb, max.grb, min.grb, var.grb"
-  STOP
+! Controlli sui parametri
+IF (stat/="max" .AND. stat/="min" .AND. stat/="ave" .AND. &
+    stat/="std" .AND. stat/="nth" .AND. stat/="ntl") THEN
+  CALL write_help
+  STOP 1
+ENDIF  
+
+IF (stat=="nth" .OR. stat=="ntl") THEN
+  idp_req = 3
+ELSE
+  idp_req = 2
 ENDIF
+IF (idp /= idp_req .OR. ios /= 0 .OR. ios2 /= 0) THEN
+  CALL write_help
+  STOP 1
+ENDIF  
 
-! 1.2 Disabilito i controlli sui parametri GRIBEX
-CALL grsvck(0)
-
-! 1.3 Apro i files
-CALL PBOPEN (iuin,filein,'R',kret)
-IF (kret /= 0) THEN 
-  WRITE(*,*) "Errore aprendo ",filein," kret ",kret
-  STOP
-ENDIF
-
-OPEN (UNIT=96, FILE="grib_ave.log", STATUS="REPLACE", ACTION="WRITE")
+! Apro i files input
+CALL grib_open_file(ifin,filein,"r",iret)
+IF (iret /= GRIB_SUCCESS) GOTO 9999
+WRITE (fileout,'(2a)') stat,".grib"
+CALL grib_open_file(ifout,fileout,"w")
+IF (ldeb) OPEN (UNIT=95, file="grib_stat.log", STATUS="REPLACE")
 
 !--------------------------------------------------------------------------
-! 2) Lettura (ciclo sui grib)
+! 2) Lettura
 
-field_max(:) = -HUGE(0.)
-field_min(:) = HUGE(0.)
-field_sum(:) = 0.
-field_sum2(:) = 0.
-field_nok(:) = 0
-fave_sum = 0.
-first = .TRUE.
-ngribin = 0
+DO kg = 1,HUGE(0)
 
-grib: DO
+!--------------------------------------------------------------------------
+! 2.1 Leggo il prossimo campo
+  igin = -1
+  CALL grib_new_from_file(ifin,igin,iret)
+  IF (iret == GRIB_END_OF_FILE) EXIT
+  IF (iret /= GRIB_SUCCESS) GOTO 9998
 
-! Leggo il grib
-  CALL PBGRIB(iuin,kbuffer,maxdim*4,klen,kret)
-  IF (kret.eq.-1) THEN 
-    EXIT grib
-  ELSE IF (kret < -1) THEN
-    WRITE(*,*) "Error pbgrib: kret ",kret
-    STOP
-  ENDIF
+  IF (kg == 1) THEN
+!   Primo campo: alloco e inizializzo i contatori statistici
+    CALL grib_get(igin,"numberOfPointsAlongAParallel",ni)
+    CALL grib_get(igin,"numberOfPointsAlongAMeridian",nj)
+    ALLOCATE (field_in(ni*nj),field_out(ni*nj),val_nok(ni*nj))
 
-! Lo decodifico
-  psec3(2) = rmis                !impongo di mettere i dati mancanti = rmis
-  CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
-               field,maxdim,kbuffer,maxdim,klen,'D',kret)
-  IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
+    val_nok = 0
+    IF (stat =="max") THEN
+      ALLOCATE (val_max(ni*nj))
+      val_max(:) = rmiss
+    ELSE IF (stat =="min") THEN
+      ALLOCATE (val_min(ni*nj))
+      val_min(:) = rmiss
+    ELSE IF (stat == "ave") THEN
+      ALLOCATE (val_sum(ni*nj))
+      val_sum(:) = 0.
+    ELSE IF (stat == "std") THEN
+      ALLOCATE (val_sum(ni*nj),val_sum2(ni*nj))
+      val_sum(:) = 0.
+      val_sum2(:) = 0.
+    ELSE IF (stat == "nth" .OR. stat == "ntl") THEN
+      ALLOCATE(val_nth(ni*nj,nv_stat),old_val(nv_stat))
+      val_nth(:,:) = rmiss
+    ENDIF
 
-! Controllo che area e n.ro di punti siano giusti, e che i dati non siano 
-! tutti mancanti
-  IF (first) THEN
-    first = .FALSE.
-    ksec1_sav(:) = ksec1(:)
-    ksec2_sav(:) = ksec2(:)
-    ksec3_sav(:) = ksec3(:)
-    ksec4_sav(:) = ksec4(:)
-    psec2_sav(:) = psec2(:)
-    psec3_sav(:) = psec3(:)
-    np_sav = ksec4(1) 
-  ELSE IF (ANY( ksec2(:) /= ksec2_sav(:) ) .OR. ksec4(1) /= np_sav) THEN
-    WRITE (*,*) "Il grib ",ngribin," e' definito su un'area diversa, skippo"
-    CYCLE grib
-  ENDIF  
+    CALL grib_clone(igin,igout)
 
-  nok = COUNT(field(1:np_sav) /= rmis)
-  IF (nok > 0) THEN
-    ngribin = ngribin +1
   ELSE
-    WRITE (*,*) "Campo interamente mancante, skippo"
-    CYCLE grib
+!   Altri campi: controllo che la griglia non sia cambiata
+    CALL check_consistency(igin,igout,.TRUE.,.FALSE.,.FALSE.,.FALSE., &
+      .FALSE.,.FALSE.,clret,ier)
+    IF (ier /= 0) GOTO 9997
+
   ENDIF
 
-! Calcolo e memorizzo la media del campo
-  fave = SUM(field(1:np_sav), MASK = field(1:np_sav)/=rmis) / REAL(nok)
-  fave_sum = fave_sum + fave
-  WRITE (96,'(a,i6,a,i4,i7,3(1x,e12.5))') &
-    "Grib ",ngribin," Par,nok,ave,max,min ",ksec1(6),nok,fave, &
-    MAXVAL(field(1:np_sav), MASK = field(1:np_sav)/=rmis), &
-    MINVAL(field(1:np_sav), MASK = field(1:np_sav)/=rmis)
+! Leggo i valori
+  CALL grib_get(igin,"numberOfCodedValues",nocv)  ! n.ro dati validi
+  IF (nocv == 0) THEN
+    field_in(:) = rmiss
+  ELSE
+    CALL grib_set(igin,"missingValue",rmiss)
+    CALL grib_get(igin,"values",field_in)
+  ENDIF
 
-! Aggiorno i campi relativi alle statistiche
-  WHERE (field(:) /= rmis .AND. field_max(:) /= rmis)
-    WHERE (field(:) > field_max(:))
-      field_max(:) = field(:)
-    ENDWHERE
-    WHERE (field(:) < field_min(:))
-      field_min(:) = field(:)
-    ENDWHERE
-    field_sum(:) = field_sum(:) + field(:)
-    field_sum2(:) = field_sum2(:) + field(:)*field(:)
-    field_nok(:) = field_nok(:) + 1
+!--------------------------------------------------------------------------
+! 2.2 Aggiorno i contatori statistici
 
-  ELSEWHERE
-    field_max(:) = rmis
-    field_min(:) = rmis
-    field_sum(:) = rmis
-    field_sum2(:) = rmis
+  WHERE (field_in(:) /= rmiss)
+    val_nok(:) = val_nok(:) + 1
   ENDWHERE
 
-ENDDO grib
+  IF (stat =="max") THEN
+    WHERE (field_in(:) /= rmiss .AND. &
+           (field_in(:) > val_max(:) .OR. val_max(:) == rmiss))
+      val_max(:) = field_in(:) 
+    ENDWHERE
 
-CALL PBCLOSE (iuin,kret)
+  ELSE IF (stat == "min") THEN
+    WHERE (field_in(:) /= rmiss .AND. &
+           (field_in(:) < val_min(:) .OR. val_min(:) == rmiss))
+      val_min(:) = field_in(:) 
+    ENDWHERE
+
+  ELSE IF (stat == "ave") THEN
+    WHERE (field_in(:) /= rmiss)
+      val_sum(:) = val_sum(:) + field_in(:)
+    ENDWHERE
+
+  ELSE IF (stat == "std") THEN
+    WHERE (field_in(:) /= rmiss)
+      val_sum(:) = val_sum(:) + field_in(:)
+      val_sum2(:) = val_sum2(:) + field_in(:)**2
+    ENDWHERE
+
+  ELSE IF (stat == "nth") THEN
+    DO kp = 1,ni*nj
+      nth: DO ks = 1,nv_stat
+        IF (field_in(kp) /= rmiss .AND. &
+            (field_in(kp) > val_nth(kp,ks) .OR. val_nth(kp,ks) == rmiss)) THEN
+          old_val(ks:nv_stat-1) = val_nth(kp,ks:nv_stat-1)
+          val_nth(kp,ks+1:nv_stat) =  old_val(ks:nv_stat-1)
+          val_nth(kp,ks) = field_in(kp)  
+
+          IF (ldeb .AND. kp == kptest) WRITE (95,*) kg,field_in(kp),"###", &
+              val_nth(kp,1:nv_stat)
+          EXIT nth
+        ENDIF  
+      ENDDO nth
+    ENDDO
+
+  ELSE IF (stat == "ntl") THEN
+    DO kp = 1,ni*nj
+      ntl: DO ks = 1,nv_stat
+        IF (field_in(kp) /= rmiss .AND. &
+            (field_in(kp) < val_nth(kp,ks) .OR. val_nth(kp,ks) == rmiss)) THEN
+          old_val(ks:nv_stat-1) = val_nth(kp,ks:nv_stat-1)
+          val_nth(kp,ks+1:nv_stat) =  old_val(ks:nv_stat-1)
+          val_nth(kp,ks) = field_in(kp)  
+
+          IF (ldeb .AND. kp == kptest) WRITE (95,*) kg,field_in(kp),"###", &
+              val_nth(kp,1:nv_stat)
+          EXIT ntl
+        ENDIF  
+      ENDDO ntl
+    ENDDO
+
+  ENDIF
+
+  CALL grib_release(igin)
+  IF (ldeb .AND. MOD(kg,1000)==0) WRITE (*,*) "Ealborato grib ",kg
+ENDDO
 
 !--------------------------------------------------------------------------
-! 3) Calcolo le statistiche e le scrivo
+! 3) Calcolo le statistiche e scrivo in output
 
-WHERE (field_sum(:) /= rmis)
-  field_sum(:) = field_sum(:)/REAL(field_nok(:))
-  field_sum2(:) = field_sum2(:)/REAL(field_nok(:)) - field_sum(:)*field_sum(:)
-ENDWHERE
-fave_sum = fave_sum / REAL(ngribin)
+! Calcolo le statistiche
+IF (stat =="max") THEN
+  field_out(:) = val_max(:)
 
-! Confronto la media del campo medio con la media delle medie dei campi
-nok = COUNT(field_sum(1:np_sav) /= rmis)
-IF (nok > 0) THEN
-  fave = SUM(field_sum(1:np_sav), MASK = field_sum(1:np_sav)/=rmis) / &
-    REAL(nok)
-ELSE
-  fave = rmis
+ELSE IF (stat =="min") THEN
+  field_out(:) = val_min(:)
+
+ELSE IF (stat == "ave") THEN
+  WHERE (val_nok(:) > 0)
+    field_out(:) = val_sum(:) / REAL(val_nok(:))
+  ELSEWHERE
+    field_out(:) = rmiss
+  ENDWHERE
+
+ELSE IF (stat == "std") THEN
+  WHERE (val_nok(:) > 0)
+    field_out(:) = SQRT(MAX( val_sum2(:)/REAL(val_nok(:)) - &
+      (val_sum(:)/REAL(val_nok(:)))**2 ,0.))
+  ELSEWHERE
+    field_out(:) = rmiss
+  ENDWHERE
+
+ELSE IF (stat == "nth" .OR. stat == "ntl") THEN
+  WHERE (val_nok(:) > 0)
+    field_out(:) = val_nth(:,nv_stat)
+  ELSEWHERE
+    field_out(:) = rmiss
+  ENDWHERE
+
 ENDIF
 
-WRITE (*,*)
-WRITE (*,*) "Grib con dati buoni: ",ngribin
-WRITE (*,*) "Punti in un grib:    ",np_sav
-WRITE (*,*) "Media delle medie dei campi: ",fave_sum
-WRITE (*,*) "Media del campo medio:       ",fave
-WRITE (*,*) "Max,Min,Nok del campo medio: ", &
-  MAXVAL(field_sum(1:np_sav), MASK = field_sum(1:np_sav)/=rmis), &
-  MINVAL(field_sum(1:np_sav), MASK = field_sum(1:np_sav)/=rmis), &
-  COUNT(field_sum(1:np_sav)/=rmis)
-
-! Definisco gli headers del grib con i valori del primo campo
-ksec1(:) = ksec1_sav(:)
-ksec2(:) = ksec2_sav(:)
-ksec3(:) = ksec3_sav(:)
-ksec4(:) = ksec4_sav(:)
-psec2(:) = psec2_sav(:)
-psec3(:) = psec3_sav(:)
-
-! Se ci sono dati mancanti forzo la scrittura della bitmap
-IF (nok /= np_sav) THEN
-  IF (ksec1(5) == 0 .OR. ksec1(5) == 64) THEN
-    ksec1(5) = 64
-  ELSE 
-    ksec1(5) = 192
-  ENDIF
+! Assegno i valori al campo di output
+IF (COUNT(field_out(:) == rmiss) > 0) THEN
+  CALL grib_set(igout,"missingValue",rmiss)
+  CALL grib_set(igout,"bitmapPresent",1)
 ENDIF
+CALL grib_set(igout,"values",field_out)
 
-! Scrivo il grib massimo
-CALL GRIBEX (ksec0,ksec1,ksec2_sav,psec2,ksec3,psec3,ksec4, &
-             field_max,maxdim,kbuffer,maxdim,klen,'C',kret)
-IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+! Scrivo output
+CALL grib_write (igout,ifout)
 
-CALL PBOPEN (iuout,"max.grb",'W',kret)
-CALL PBWRITE (iuout,kbuffer,ksec0(1),kret)
-IF (kret <= 0) WRITE(*,*) "Error pbwrite, kret ",kret
-CALL PBCLOSE (iuout,kret)
+! Conclusione
+CALL grib_get(igout,"maximum",out_max)
+CALL grib_get(igout,"minimum",out_min)
+CALL grib_get(igout,"average",out_ave)
+CALL grib_get(igout,"numberOfCodedValues",out_nok)
 
-! Scrivo il grib minimo
-CALL GRIBEX (ksec0,ksec1,ksec2_sav,psec2,ksec3,psec3,ksec4, &
-             field_min,maxdim,kbuffer,maxdim,klen,'C',kret)
-IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+WRITE (*,*) "Elaborazioni completate, elaborati ",kg-1," campi"
+WRITE (*,*) "In output: dati validi: ",out_nok,"/",ni*nj
+WRITE (*,*) "           ave,max,min: ",out_ave,out_max,out_min
 
-CALL PBOPEN (iuout,"min.grb",'W',kret)
-CALL PBWRITE (iuout,kbuffer,ksec0(1),kret)
-IF (kret <= 0) WRITE(*,*) "Error pbwrite, kret ",kret
-CALL PBCLOSE (iuout,kret)
+CALL grib_release(igout)
+CALL grib_close_file(ifin)
+CALL grib_close_file(ifout)
+STOP
 
-! Scrivo il grib medio
-CALL GRIBEX (ksec0,ksec1,ksec2_sav,psec2,ksec3,psec3,ksec4, &
-             field_sum,maxdim,kbuffer,maxdim,klen,'C',kret)
-IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+!--------------------------------------------------------------------------
+! 4) Gestione errori
 
-CALL PBOPEN (iuout,"ave.grb",'W',kret)
-CALL PBWRITE (iuout,kbuffer,ksec0(1),kret)
-IF (kret <= 0) WRITE(*,*) "Error pbwrite, kret ",kret
-CALL PBCLOSE (iuout,kret)
+9999 CONTINUE
+WRITE (*,*) "Errore aprendo ",TRIM(filein)
+STOP 2
 
-! Scrivo il grib varianza
-CALL GRIBEX (ksec0,ksec1,ksec2_sav,psec2,ksec3,psec3,ksec4, &
-             field_sum2,maxdim,kbuffer,maxdim,klen,'C',kret)
-IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+9998 CONTINUE
+WRITE (*,*) "Errore leggendo ",TRIM(filein)," grib n.ro " ,kg
+STOP 2
 
-CALL PBOPEN (iuout,"var.grb",'W',kret)
-CALL PBWRITE (iuout,kbuffer,ksec0(1),kret)
-IF (kret <= 0) WRITE(*,*) "Error pbwrite, kret ",kret
-CALL PBCLOSE (iuout,kret)
-
-CLOSE (96)
+9997 CONTINUE
+WRITE (*,*) "Trovato comap con griglia diversa dal primo: ",kg
+STOP 3
 
 END PROGRAM grib_stat
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+SUBROUTINE write_help
+! Scrive a schermo l'help del programma
+
+!            123456789012345678901234567890123456789012345678901234567890123456789012345
+WRITE (*,*) "Uso: grib_stat.exe [-h] [-deb] filein STAT [N]"
+WRITE (*,*)
+WRITE (*,*) "Legge un file son molti grib; scrive il file stat.grib, con intestazione"
+WRITE (*,*) "uguale al primo file in input e valori relativi alla statistica richiesta."
+WRITE (*,*) "Statistiche gestite:"
+WRITE (*,*) "  max  : massimo"
+WRITE (*,*) "  min  : minimo"
+WRITE (*,*) "  ave  : media"
+WRITE (*,*) "  std  : deviazione standard"
+WRITE (*,*) "  nth N: N-mo valore piu' alto"
+WRITE (*,*) "  ntl N: N-mo valore piu' basso"
+WRITE (*,*) ""
+WRITE (*,*) "-h:    visualizza questo help"
+WRITE (*,*) "-deb N scrive su grib_stat.log il debug relativo al punto N"
+!            123456789012345678901234567890123456789012345678901234567890123456789012345
+
+RETURN
+END SUBROUTINE write_help
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
