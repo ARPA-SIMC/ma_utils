@@ -1,9 +1,9 @@
 PROGRAM grib_stat
 !--------------------------------------------------------------------------
-! Legge un file son molti grib; scrive il file stat.grib, con intestazione
+! Legge un file son molti grib; scrive il file STAT.grib, con intestazione
 ! uguale al primo file in input e valori relativi alla statistica richiesta.
 !
-!                                         Versione 2.0.0, Enrico 28/05/2014
+!                                         Versione 2.1.0, Enrico 09/06/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -11,12 +11,12 @@ USE missing_values
 USE grib2_utilities
 IMPLICIT NONE
 
-INTEGER, ALLOCATABLE :: val_nok(:)
+INTEGER, ALLOCATABLE :: val_nok(:),val_nex(:)
 INTEGER :: ifin=0,ifout=0,igin=0,igout=0
 INTEGER :: iret,ier,ios,ios2,clret(0:5),kg,kp,ks,kpar
-INTEGER :: nv_stat,idp,idp_req
+INTEGER :: iv_stat,idp,idp_req
 INTEGER :: ni,nj,nocv,out_nok,kptest
-REAL :: out_max,out_min,out_ave
+REAL :: out_max,out_min,out_ave,rv_stat
 REAL, ALLOCATABLE :: field_in(:),field_out(:)
 REAL, ALLOCATABLE :: val_max(:),val_min(:),val_sum(:),val_sum2(:)
 REAL, ALLOCATABLE :: val_nth(:,:),old_val(:)
@@ -34,6 +34,8 @@ next_arg = ""
 idp = 0
 ios = 0
 ios2 = 0
+iv_stat=imiss
+rv_stat=rmiss
 DO kpar = 1,HUGE(0)
   CALL getarg(kpar,chdum)
   IF (TRIM(chdum) == "") THEN
@@ -55,7 +57,11 @@ DO kpar = 1,HUGE(0)
     CASE (2)
       stat = TRIM(ADJUSTL(chdum))
     CASE (3)
-      READ (chdum,*,IOSTAT=ios) nv_stat
+      IF (stat == "nth" .OR. stat == "ntl") THEN
+        READ (chdum,*,IOSTAT=ios) iv_stat
+      ELSE IF (stat == "nex") THEN
+        READ (chdum,*,IOSTAT=ios) rv_stat
+      ENDIF
     CASE DEFAULT
       CALL write_help
       STOP 1
@@ -64,13 +70,13 @@ DO kpar = 1,HUGE(0)
 ENDDO
 
 ! Controlli sui parametri
-IF (stat/="max" .AND. stat/="min" .AND. stat/="ave" .AND. &
-    stat/="std" .AND. stat/="nth" .AND. stat/="ntl") THEN
+IF (stat/="max" .AND. stat/="min" .AND. stat/="ave" .AND. stat/="std" .AND. &
+    stat/="nth" .AND. stat/="ntl" .AND.  stat/="nex") THEN
   CALL write_help
   STOP 1
 ENDIF  
 
-IF (stat=="nth" .OR. stat=="ntl") THEN
+IF (stat=="nth" .OR. stat=="ntl" .OR. stat=="nex") THEN
   idp_req = 3
 ELSE
   idp_req = 2
@@ -101,8 +107,8 @@ DO kg = 1,HUGE(0)
 
   IF (kg == 1) THEN
 !   Primo campo: alloco e inizializzo i contatori statistici
-    CALL grib_get(igin,"numberOfPointsAlongAParallel",ni)
-    CALL grib_get(igin,"numberOfPointsAlongAMeridian",nj)
+    CALL grib_get(igin,"Ni",ni)
+    CALL grib_get(igin,"Nj",nj)
     ALLOCATE (field_in(ni*nj),field_out(ni*nj),val_nok(ni*nj))
 
     val_nok = 0
@@ -120,8 +126,11 @@ DO kg = 1,HUGE(0)
       val_sum(:) = 0.
       val_sum2(:) = 0.
     ELSE IF (stat == "nth" .OR. stat == "ntl") THEN
-      ALLOCATE(val_nth(ni*nj,nv_stat),old_val(nv_stat))
+      ALLOCATE(val_nth(ni*nj,iv_stat),old_val(iv_stat))
       val_nth(:,:) = rmiss
+    ELSE IF (stat == "nex") THEN
+      ALLOCATE(val_nex(ni*nj))
+      val_nex(:) = 0
     ENDIF
 
     CALL grib_clone(igin,igout)
@@ -175,15 +184,15 @@ DO kg = 1,HUGE(0)
 
   ELSE IF (stat == "nth") THEN
     DO kp = 1,ni*nj
-      nth: DO ks = 1,nv_stat
+      nth: DO ks = 1,iv_stat
         IF (field_in(kp) /= rmiss .AND. &
             (field_in(kp) > val_nth(kp,ks) .OR. val_nth(kp,ks) == rmiss)) THEN
-          old_val(ks:nv_stat-1) = val_nth(kp,ks:nv_stat-1)
-          val_nth(kp,ks+1:nv_stat) =  old_val(ks:nv_stat-1)
+          old_val(ks:iv_stat-1) = val_nth(kp,ks:iv_stat-1)
+          val_nth(kp,ks+1:iv_stat) =  old_val(ks:iv_stat-1)
           val_nth(kp,ks) = field_in(kp)  
 
           IF (ldeb .AND. kp == kptest) WRITE (95,*) kg,field_in(kp),"###", &
-              val_nth(kp,1:nv_stat)
+              val_nth(kp,1:iv_stat)
           EXIT nth
         ENDIF  
       ENDDO nth
@@ -191,19 +200,24 @@ DO kg = 1,HUGE(0)
 
   ELSE IF (stat == "ntl") THEN
     DO kp = 1,ni*nj
-      ntl: DO ks = 1,nv_stat
+      ntl: DO ks = 1,iv_stat
         IF (field_in(kp) /= rmiss .AND. &
             (field_in(kp) < val_nth(kp,ks) .OR. val_nth(kp,ks) == rmiss)) THEN
-          old_val(ks:nv_stat-1) = val_nth(kp,ks:nv_stat-1)
-          val_nth(kp,ks+1:nv_stat) =  old_val(ks:nv_stat-1)
+          old_val(ks:iv_stat-1) = val_nth(kp,ks:iv_stat-1)
+          val_nth(kp,ks+1:iv_stat) =  old_val(ks:iv_stat-1)
           val_nth(kp,ks) = field_in(kp)  
 
           IF (ldeb .AND. kp == kptest) WRITE (95,*) kg,field_in(kp),"###", &
-              val_nth(kp,1:nv_stat)
+              val_nth(kp,1:iv_stat)
           EXIT ntl
         ENDIF  
       ENDDO ntl
     ENDDO
+
+  ELSE IF (stat == "nex") THEN
+    WHERE (field_in(:) /= rmiss .AND. field_in(:) > rv_stat)
+      val_nex(:) = val_nex(:) + 1
+    ENDWHERE
 
   ENDIF
 
@@ -238,10 +252,13 @@ ELSE IF (stat == "std") THEN
 
 ELSE IF (stat == "nth" .OR. stat == "ntl") THEN
   WHERE (val_nok(:) > 0)
-    field_out(:) = val_nth(:,nv_stat)
+    field_out(:) = val_nth(:,iv_stat)
   ELSEWHERE
     field_out(:) = rmiss
   ENDWHERE
+
+ELSE IF (stat =="nex") THEN
+  field_out(:) = REAL(val_nex(:))
 
 ENDIF
 
@@ -304,6 +321,7 @@ WRITE (*,*) "  ave  : media"
 WRITE (*,*) "  std  : deviazione standard"
 WRITE (*,*) "  nth N: N-mo valore piu' alto"
 WRITE (*,*) "  ntl N: N-mo valore piu' basso"
+WRITE (*,*) "  nex X: Numero di valori maggiori di X"
 WRITE (*,*) ""
 WRITE (*,*) "-h:    visualizza questo help"
 WRITE (*,*) "-deb N scrive su grib_stat.log il debug relativo al punto N"

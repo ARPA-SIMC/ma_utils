@@ -12,7 +12,7 @@ PROGRAM grib23ddat
 ! NOTE: 
 ! - I grib in file_dat:
 !   * devono essere definiti sulla stessa griglia di file_static
-!   * possono contenere anlisi COSMO, previsioni COSMO (una sola data di 
+!   * possono contenere analisi COSMO, previsioni COSMO (una sola data di 
 !     emissione), analisi ECMWF
 !   * se si usa l'opzione "grib ordinati" (piu' veloce), devono essere 
 !     ordinati per data di validita' crescente
@@ -83,8 +83,8 @@ INTEGER :: nx,ny,nlev3d,nscad,npar3d,npar2d
 INTEGER :: hh_step,nht,hh_ini,hhc,hhg,hhv,hht,scad(3),lev(3),par(3)
 INTEGER :: tipo_scad,tipo_lev3d,id_model,inp_h2o,inp_sort,out_fmt,dlth,utmz
 INTEGER :: if_static,if_dat,ig_orog,ig,idxl,idxp
-INTEGER :: iret,ier,idum(3),k,kpar,cnt_par,kl,kp,i,j,ilu,cnt_sea,ios,cnt_out
-CHARACTER (LEN=200) :: file_static,file_dat,file_out,error_message,ch80,chpar
+INTEGER :: iret,ier,idum(3),k,kpar,cnt_par,kl,kp,i,j,ilu,cnt_sea,cnt_out
+CHARACTER (LEN=200) :: file_static,file_dat,file_out,error_message,chpar
 CHARACTER (LEN=20) :: str_model,str_tipo_scad
 CHARACTER (LEN=15) :: hr2
 CHARACTER (LEN=3) :: next_arg
@@ -564,7 +564,7 @@ DO k = 1,HUGE(0)
       ENDIF
 
       CALL write_dat(values3d,zlev3d,values2d,nx,ny,nlev3d, &
-        npar3d,npar2d,datac,hhc,iuout,inp_h2o,rmis,imis,out_fmt)
+        npar3d,npar2d,datac,hhc,iuout,inp_h2o,rmis,out_fmt)
 !     CALL write_log(found3d,found2d)
       cnt_out = cnt_out + 1
 
@@ -650,7 +650,7 @@ IF (lmodif) THEN
 ENDIF
 
 CALL write_dat(values3d,zlev3d,values2d,nx,ny,nlev3d, &
-  npar3d,npar2d,datac,hhc,iuout,inp_h2o,rmis,imis,out_fmt)
+  npar3d,npar2d,datac,hhc,iuout,inp_h2o,rmis,out_fmt)
 !CALL write_log(found3d,found2d)
 cnt_out = cnt_out + 1
 
@@ -940,7 +940,7 @@ END SUBROUTINE scad2val
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 SUBROUTINE write_dat(values3d,zlev3d,values2d,nx,ny,nlev3d, &
-  npar3d,npar2d,datav,hhv,iuout,inp_h2o,rmis,imis,out_fmt)
+  npar3d,npar2d,datav,hhv,iuout,inp_h2o,rmis,out_fmt)
 !
 ! Scrive su iuout una scadenza di dati superficiali e 3d
 !
@@ -950,14 +950,14 @@ IMPLICIT NONE
 
 ! Argomenti subroutine
 TYPE(date), INTENT(IN) :: datav
-INTEGER, INTENT(IN) :: nx,ny,nlev3d,npar3d,npar2d,hhv,iuout,inp_h2o,imis,out_fmt
+INTEGER, INTENT(IN) :: nx,ny,nlev3d,npar3d,npar2d,hhv,iuout,inp_h2o,out_fmt
 REAL, INTENT(IN) :: values3d(nx*ny,nlev3d,npar3d),values2d(nx*ny,npar2d)
 REAL, INTENT(IN) :: zlev3d(nx*ny,nlev3d),rmis
 
 ! Variabili locali
 REAL :: pmsl,rain,rads,radl,t2,qq2,wd10,ws10,sstp2
 REAL :: dd(nlev3d),ff(nlev3d),rh(nlev3d),mixr(nlev3d)
-INTEGER :: myrb,mmob,mdayb,mhrb,msecb, myr,mmo,mday,mhr,msec, ix,jx, isnow
+INTEGER :: myrb,mmob,mdayb,mhrb,msecb,myr,mmo,mday,mhr,msec,isnow
 INTEGER :: i,j,k,iz
 CHARACTER (LEN=80) :: chfmt3d
 
@@ -1067,6 +1067,10 @@ IMPLICIT NONE
 LOGICAL, INTENT(IN) :: found3d(nlev3d,npar3d),found2d(npar2d)
 INTEGER, INTENT(IN) :: nlev3d,npar3d,npar2d,iulog
 !
+OPEN (UNIT=iulog, FILE="grib23ddat.log", STATUS="REPLACE")
+WRITE (iulog,*) found3d
+WRITE (iulog,*) found2d
+CLOSE(iulog)
 
 !
 RETURN

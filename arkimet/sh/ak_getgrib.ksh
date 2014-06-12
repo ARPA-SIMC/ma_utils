@@ -14,7 +14,7 @@
 # LIBSIM_SVN:   eseguibili (ad esempio: /home/eminguzzi/svn/libsim; se non 
 #               specificato, usa gli eseguibili in path)
 #
-#                                         Versione 1.4.0, Enrico 28/11/2013
+#                                         Versione 2.0.0, Enrico 10/06/2014
 #--------------------------------------------------------------------------
 #set -x
 
@@ -35,6 +35,9 @@ function write_help
   echo "          archivio centrale SIMC: http://arkimet.metarpa:8090 (default)"
   echo "          archivio backup maialinux: http://maialinux.metarpa:8090"
   echo "          archivio locale MA: /autofs/scratch2/eminguzzi/tmp/local_arkimet"
+  echo "-zoom=LON_MIN,LAT_MIN,LON_MAX,LAT_MAX: ritaglia (lato client) una sottoarea "
+  echo "-mon=FILE scrive su FILE le date estratte, man man che vengono elaborate"
+  echo "          (se usato senza opzione -zoom potrebbe rallentare l'estrazione)"
   echo "-h:       visualizza questo help"
   echo ""
   echo "Per usare versioni di lavoro di programmi e tabelle, esportare le variabili:"
@@ -54,8 +57,13 @@ if [ $# -eq 0 ] ; then
   exit 1
 fi
 
+split="N"
+zoom="N"
+mon="N"
+filemon=""
 akurl="http://arkimet.metarpa:8090"
 local_aliases=/autofs/nethomes/eminguzzi/arkimet/dat/match-alias.conf.local
+split_opt="--time-interval=day"
 
 mand_par=0
 while [ $# -ge 1 ] ; do
@@ -64,6 +72,19 @@ while [ $# -ge 1 ] ; do
     exit 1
   elif [ `echo $1 | awk '{print substr($1,1,4)}'` = '-arc' ] ; then
     akurl=`echo $1 | cut -d = -f 2`
+    shift
+  elif [ `echo $1 | awk '{print substr($1,1,4)}'` = '-mon' ] ; then
+    mon="Y"
+    filemon=`echo $1 | cut -d = -f 2`
+    rm -f $filemon
+    shift
+  elif [ `echo $1 | awk '{print substr($1,1,5)}'` = '-zoom' ] ; then
+    zoom="Y"
+    str_zoom=`echo $1 | cut -d = -f 2`
+    lon_min=`echo $str_zoom | cut -d , -f 1`
+    lat_min=`echo $str_zoom | cut -d , -f 2`
+    lon_max=`echo $str_zoom | cut -d , -f 3`
+    lat_max=`echo $str_zoom | cut -d , -f 4`
     shift
   elif [ $mand_par -eq 0 ] ; then
     prog=$1
@@ -79,9 +100,13 @@ while [ $# -ge 1 ] ; do
   fi
 done
 
+# Controlli sui parametri
 if [ $mand_par -ne 2 ] ; then
   write_help
   exit 1
+fi
+if [ $zoom = "Y" -o $mon = "Y" ] ; then
+  split="Y"
 fi
 
 # 1.2 Path e utility
@@ -161,15 +186,37 @@ done < ${prog}.akq.proc
 
 echo "Pronto per estrarre, lancero' "$cntq" query"
 
-# 2.3 Estraggo
+# 2.3 Se richiesto, costruisco lo script per arki-xargs
+if [ $split = "Y" ] ; then
+  rm -f xargs.ksh
+  echo "rm -f tmp.grb" >> xargs.ksh
+  if [ $zoom = "Y" ] ; then
+    echo "vg6d_subarea --trans-type=zoom --sub-type=coordbb --ilon=$lon_min --ilat=$lat_min --flon=$lon_max --flat=$lat_max \$2 tmp.grb" >> xargs.ksh
+  else
+    echo mv $2 tmp.grb
+  fi
+  if [ $mon = "Y" ] ; then
+    echo "curr_date=\`grib_get -P dataDate tmp.grb | head -n 1\`" >> xargs.ksh
+    echo "echo \$curr_date >> $filemon" >> xargs.ksh
+  fi
+  echo "cat tmp.grb >> \$1" >> xargs.ksh
+  chmod +x xargs.ksh
+fi
+
+# 2.4 Estraggo
 cnt=1
 while [ $cnt -le $cntq ] ; do
   echo "Elaboro query "$cnt"      "`date "+%Y%m%d %H:%M:%S"`
-  arki-query --data --file=${prog}.query.${cnt} -C ${ds}.conf >> ${prog}.grb 
+  if [ $split = "Y" ] ; then
+    arki-query --config=${ds}.conf --file=${prog}.query.${cnt} --inline | \
+      arki-xargs ${split_opt} ./xargs.ksh ${prog}.grb 
+  elif [ $split = "N" ] ; then
+    arki-query --config=${ds}.conf --file=${prog}.query.${cnt} --data >> ${prog}.grb 
+  fi
   cnt=`expr $cnt + 1`
 done
 
-# 2.4 controllo edition
+# 2.5 controllo edition
 if [ -s ${prog}.grb ] ; then
   en=`$test_1grib ${prog}.grb | cut -d , -f 1`
   if [ $en -eq 2 ] ; then
