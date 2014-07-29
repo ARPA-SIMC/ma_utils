@@ -18,7 +18,7 @@
 # LIBSIM_SVN:   esegubili (ad esempio: /home/eminguzzi/svn/libsim; se non 
 #               specificato, usa gli eseguibili in path)
 #
-#                                                 V7.9.0, Enrico 21/02/2014
+#                                                 V7.9.1, Enrico 13/06/2014
 #==========================================================================
 
 #==========================================================================
@@ -266,6 +266,10 @@ if [ $batch = "N" ] ; then
     fi
     cd $work_root
     mkdir $proj
+    if [ $? -ne 0 ] ; then
+      echo "Errore creando la dir "${work_root}/${proj}
+      exit
+    fi
     chgrp ambiente $proj
     chmod g+s $proj
   fi

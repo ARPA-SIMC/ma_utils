@@ -27,12 +27,23 @@ PROGRAM grib23ddat
 !   3) Q + Cloud water + cloud ice (in questo caso, scrivo la loro somma 
 !     come cloud water, e non scrivo cloud ice)
 !
+! - Lettura del 3D.DAT nelle varie versioni Calmet. Sono coinvolte le sub.:
+!     - rdhd5 (versione del formato 3D.DAT)
+!     - rdhd52/rdhd53 (lettura headers)
+!     - rdmm5 (lettura dati)
+!   Calmet desume la versione del file 3D.DAT dal contenuto dei primi 2 
+!   record e la salva nella variabile imm53d (sub. rdhd5), che vale:
+!     0: MM5.DAT   - Calmet V?.?, sub. rdhd51 (attualmente non gestita)
+!     1: 3D.DAT V1 - Calmet V5.2, sub. rdhd52 (attualmente non gestita)
+!     2: 3D.DAT V2 - Calmet V5.5/5.8 sub rdhd53
+!     3: 3D.DAT V3 - Calmet V6.*
+!   Tutte le versioni di Calmet continuano a gestire le versioni precedenti
+!   del file 3D.DAT. La varibile ioutmm5 (sub. rdhd5*) codifica la lista
+!   dei parametri disponibli in input.
+!
 ! - Secondo la documentazione (versione 2.1 degli output), i dati mancanti
 !   nei parametri superficiali (nell'header dei data record) dovrebbero 
 !   essere messi a 0, invece di -9999. (sub. write_dat)
-! - Con entrambi i formati in ouptut, le subr. di calmet che leggono i 
-!   dati sono rdhd5 e rdhd53
-!
 !
 ! SVILUPPI: 
 ! - file_static potrebbe essere ampliato, includendo:
@@ -48,7 +59,7 @@ PROGRAM grib23ddat
 !   che attualmente sono letti ma non utilizzati (sub. RDMM5, line 20175)
 !
 !
-!                                                 V1.3.2, Enrico 13/01/2014
+!                                                 V1.3.3, Enrico 17/06/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -328,6 +339,8 @@ IF (id_model == 1) THEN
         EXIT
       ENDIF
     ENDDO
+
+    CALL grib_release(ig)
   ENDDO
 
   IF (ANY(zlev3d(:,:) == rmis)) GOTO 9993
@@ -346,13 +359,14 @@ IF (inp_sort == 1) THEN
   IF (iret /= GRIB_SUCCESS) GOTO 9990
   CALL grib_get(ig,"dataDate",idum(1))
   CALL grib_get(ig,"dataTime",idum(2))
-  CALL grib_close_file(if_dat)
   
   data_ini%yy = idum(1)/10000
   data_ini%mm = MOD(idum(1)/100,100)
   data_ini%dd = MOD(idum(1),100)
   hh_ini = idum(2) / 100
 
+  CALL grib_release(ig)
+  CALL grib_close_file(if_dat)
 ENDIF
 
 ! Se richiesto, trasformo la data iniziale da GMT a LST
@@ -383,10 +397,10 @@ ENDDO
 OPEN (UNIT=iuout, FILE=file_out, STATUS="REPLACE", ACTION="WRITE")
 
 IF (out_fmt == 2) THEN
-  WRITE (iuout,'(a)') "3D.DAT          2.1"                     ! hr 1
-  WRITE (iuout,'(a)') "1"                                       ! n.ro record commento
-  WRITE (iuout,'(a)') "Analisi operative COSMO-I7"              ! record(s) commento
-  WRITE (iuout,'(a15,i3)') hr2,0                                ! hr 2
+!                      12345678901234561234567890123456
+  WRITE (iuout,'(a)') "3D.DAT          2.1             Analisi operative COSMO-I7" ! hr 1
+  WRITE (iuout,'(a)') "0"                                       ! n.ro record commento
+  WRITE (iuout,'(a15)') hr2                                     ! hr 2
   WRITE (iuout,'(a)') ""                                        ! hr 3
   WRITE (iuout,'(21i3)') (0,k=1,21)                             ! hr 4
   WRITE (iuout,'(i4.4,3i2.2,i5,3i4)') &                         ! hr 5
@@ -398,9 +412,8 @@ IF (out_fmt == 2) THEN
   ENDDO
 
 ELSE IF (out_fmt == 3) THEN 
-  WRITE (iuout,'(a17)') "3D.DAT          3"                     ! hr 1
-  WRITE (iuout,'(a)') "1"                                       ! n.ro record commento
-  WRITE (iuout,'(a)') "Analisi operative COSMO-I7"              ! record(s) commento
+  WRITE (iuout,'(a)') "3D.DAT            3             Analisi operative COSMO-I7" ! hr 1
+  WRITE (iuout,'(a)') "0"                                       ! n.ro record commento
   WRITE (iuout,'(a)') hr2                                       ! hr 2
   WRITE (iuout,'(a)') ""                                        ! hr 3
   WRITE (iuout,'(21i3)') (0,k=1,21)                             ! hr 4
@@ -482,6 +495,7 @@ DO k = 1,HUGE(0)
   CALL grib_new_from_file(if_dat,ig,iret)
   IF (iret == GRIB_END_OF_FILE) EXIT
   IF (iret /= GRIB_SUCCESS) GOTO 9990
+  IF (.NOT. samegrid(ig_orog,ig)) GOTO 9986
 
 ! data
   CALL grib_get(ig,"dataDate",idum(1))
@@ -631,6 +645,7 @@ DO k = 1,HUGE(0)
   ENDIF
 
 ! Chiudo ciclo lettura grib
+  CALL grib_release(ig)
 ENDDO
 
 ! 4.5 Scrivo l'ultimo istante e chiudo il file
@@ -766,6 +781,11 @@ WRITE (*,'(2(a,i3),2(a,i2))') "Trovati: 3D ", &
 WRITE (*,'(2a)') "Verificare la consitenza tra grib23ddat.inp e ",TRIM(file_dat)
 STOP
 
+9986 CONTINUE
+WRITE (*,*) "Campo in input definito su griglia diversa da orografia"
+WRITE (*,*) "Campo ",k," file ",TRIM(file_dat)
+STOP
+
 END PROGRAM grib23ddat
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -793,8 +813,8 @@ WRITE (20,'(2a)')           "24       ! Numero e lista dei livelli ve", &
 WRITE (20,'(a)')            "40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17"
 WRITE (20,'(2a)')           "1        ! input H2O 3d (0:none, 1:Q, 2:", &
                             "Q+cloud water, 3:Q+cloud water+cloud ice"
-WRITE (20,'(2a)')           "1        ! ordine grib input (0: non ord", &
-                            "inati, 1: ordinati per verification time"
+WRITE (20,'(2a)')           "1        ! ordine grib input (1: ordinat", &
+                            "i per verification time, 0: NON GESTITA)"
 WRITE (20,'(2a)')           "2003040100  ! Data-ora iniziale (usata s", &
                             "olo se i grib non sono ordinati)"
 WRITE (20,'(2a)')           "0        ! Time zone degli orari in outp", &

@@ -502,6 +502,7 @@ DO kt = t1,t2
       " su ",nz*nspc," rewind ",cnt_rew
   ENDIF
 
+  cnt_rew = 0
 ENDDO
 
 IF (ALL(nfs(1:nspc) == nt*nz) ) THEN
