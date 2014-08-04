@@ -2,7 +2,7 @@ MODULE grib2_utilities
 !--------------------------------------------------------------------------
 ! Utilita' per la getione dei GRIB2 in logica GRIB1
 !
-!                                         Versione 1.3.0, Enrico 16/05/2014
+!                                         Versione 1.3.1, Enrico 04/08/2014
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -357,10 +357,10 @@ ENDIF
 ! 2) Trovo verification time
 IF (PRESENT(vtime)) THEN
   ier = 0
-  CALL get_grib1_header(gaid,scad=scad,iret=ier)
+  CALL get_grib1_header(gaid, SCAD=scad, IRET=ier)
 
   IF (ier /= 0) THEN
-    iret = 1
+    IF (PRESENT(iret)) iret = 1
     vtime_work = datetime_miss
 
   ELSE
@@ -378,7 +378,7 @@ IF (PRESENT(vtime)) THEN
       vtime_work = rtime_work
 
     CASE DEFAULT
-      iret = 2
+      IF (PRESENT(iret)) iret = 2
       vtime_work = datetime_miss
 
     END SELECT
@@ -388,7 +388,7 @@ ENDIF
 ! 3) Ritorno i parametri richiesti
 IF (PRESENT(vtime)) vtime = vtime_work
 IF (PRESENT(rtime)) rtime = rtime_work
-iret = 0
+IF (PRESENT(iret)) iret = 0
 
 RETURN
 END SUBROUTINE get_grib_time
