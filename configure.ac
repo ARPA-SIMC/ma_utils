@@ -3,9 +3,14 @@
 
 AC_PREREQ(2.61)
 AC_INIT(ma_utils, 0.7, dbranchini@arpa.emr.it)
+
+m4_pattern_allow([AM_PROG_AR])
+AM_PROG_AR
+
 LT_INIT
 AM_INIT_AUTOMAKE([-Wall foreign])
 AC_CONFIG_MACRO_DIR([m4])
+
 
 # Checks for programs.
 AC_PROG_FC
