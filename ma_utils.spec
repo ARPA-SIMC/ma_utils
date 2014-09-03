@@ -9,7 +9,7 @@ Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: netcdf-devel, grib_api-devel >= 1.10, libdballe-devel, libsim, libsmr
-Requires: libsim >= 5.0, libsim < 6.0, libsmr
+Requires: libsim >= 6.0, libsim < 7.0, libsmr
 
 Vendor:	       Enrico Minguzzi <eminguzzi@arpa.emr.it>
 Packager:      Daniele Branchini <dbranchini@arpa.emr.it>
