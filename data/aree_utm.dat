@@ -49,6 +49,9 @@ cesi02       41   41  450.000 4950.000  490.000 4990.000   32 !
 cesi03       41   41  485.000 4340.000  525.000 4380.000   32 ! 
 cityde       60   60  386.500 4892.500  681.500 5187.500   32 ! CityDelta Milano (5 x 5 km) [in gribarch: CITY_D]
 city10km     30   30  389.000 4895.000  679.000 5185.000   32 ! CityDelta Milano (10 x 10 km)
+ispbpa      138   92  262.500 4732.500  947.500 5187.500   32 ! Run ISPRA, dominio nord
+ispita      105  124  285.000 4025.000 1325.000 5255.000   32 ! Run ISPRA, dominio Italia
+ispsud      111  131  782.500 4042.500 1332.500 4692.500   32 ! Run ISPRA, dominio sud
 lamareno     75   75  669.405 4907.377  684.205 4922.177   32 ! Calmet per Lama di Reno (0.2 x 0.2 km)
 lazio1       40   40  692.500 4542.500  887.500 4737.500   32 ! Run Calmet per ARPA Lazio (5 x 5 km)
 pesemr500   594  322  510.250 4843.250  806.750 5003.750   32 ! Area PESCO per analisi clima vento (0.5 x 0.5 km)

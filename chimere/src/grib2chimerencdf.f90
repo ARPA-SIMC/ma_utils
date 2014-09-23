@@ -29,7 +29,7 @@ PROGRAM grib2chimerencdf
 ! - Il programma cerca le label NetCDF corrispondenti alle specie in input in
 !   una lista di files statici (tabella_200.txt ...)
 !
-!                                         Versione 2.0.0, Enrico 04/08/2014
+!                                         Versione 2.0.1, Enrico 20/08/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -281,7 +281,17 @@ DO kt = 1,ntab
         ELSE IF (inp_par(kp,2) == 200 .AND. inp_par(kp,3) == 89) THEN
           nclab(kp) = "airm"
         ELSE IF (inp_par(kp,2) == 200) THEN
-          nclab(kp) = uppercase(dum_nclab)
+          IF (inp_par(kp,3) == 187) THEN
+            nclab(kp) = "AnA1D"
+          ELSE IF (inp_par(kp,3) == 188) THEN
+            nclab(kp) = "AnBmP"
+          ELSE IF (inp_par(kp,3) == 189) THEN
+            nclab(kp) = "BiA1D"
+          ELSE IF (inp_par(kp,3) == 190) THEN
+            nclab(kp) = "BiBmP"
+          ELSE
+            nclab(kp) = uppercase(dum_nclab)
+          ENDIF
         ELSE
           nclab(kp) = dum_nclab
         ENDIF

@@ -7,7 +7,7 @@ altipres_sim_exe_SOURCES = altipres_sim.f90
 chimere2grib_exe_SOURCES = chimere2grib.f90      
 chimeredep2grib_exe_SOURCES = chimeredep2grib.f90   
 
-chimerencdf2grib_exe_SOURCES = chimerencdf2grib.F90
+chimerencdf2grib_exe_SOURCES = chimerencdf2grib.f90
 chimerencdf2grib_exe_LDADD = $(LDADD) $(top_builddir)/chimere/src/ver2011/libchimere2011.la
 
 chmbc2cdf_exe_SOURCES = chmbc2cdf.F90

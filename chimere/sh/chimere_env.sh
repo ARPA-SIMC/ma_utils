@@ -8,6 +8,18 @@
 # Note:
 # Chiamato da tutti gli script della catena Chimere-SIM
 #
+# TODO:
+# Aggiornamento di tutti i path delle utility simc, elimiando le variabili:
+# - util_dir, grib_util, lm_util, split_out: introdurre in tutti gli script la 
+#   gestione di /usr/libexec/ma_utils o MA_UTILS_SVN
+# - lm_lsm_dir: mettere in svn le LSM COSMO
+# - dat_dir:  sostituire con varibile chimere_inp_template (verificare che 
+#   venga usata solo per riferirsi a pre_chimere.inp.template)
+# - date_util, days, delta_days, cong: verificare che nessuna procedura le usi 
+#   piu' ed eventualmente sostituire con utility piu' recenti
+# - valutare se mettere negli script che lavorano sui grib un comando per 
+#   scaricare il file degli alias (arki-scan --aliases)
+#
 #                         Versione 7.0.0 (V200709C), Michele & Enrico 03/10/2012
 #-------------------------------------------------------------------------------
 #set -x

@@ -32,7 +32,7 @@
 #   richiederebbe l'introduzione di nuovi alias per le scadenze previste 
 #   (c0124 -> c0124ph, ...); per le analisi dovrebbe bastare Timedef,0,x,1h
 #
-#                                    Versione 7.3.1 (Arkimet), Enrico 11/12/2013
+#                                    Versione 7.4.0 (Arkimet), Enrico 28/08/2014
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -199,32 +199,31 @@ fi
 #-------------------------------------------------------------------------------
 # 1.4) Costruisco la stringa dei livelli richiesti (per parametri 3D)
 
-lev=$db_levs
-cnt=1
-while [ $cnt -le $nzmet ] ; do
-  levm1=`expr $lev - 1`
+cnt=0
+while [ $cnt -lt $nzmet ] ; do
+  lev=${db_lev_list[$cnt]}
+  levp1=`expr $lev + 1`
 
   if [ $lev -lt 10 ] ; then 
     slev=0${lev}
   else
     slev=$lev
   fi
-  if [ $levm1 -lt 10 ] ; then 
-    slevm1=0${levm1}
+  if [ $levp1 -lt 10 ] ; then 
+    slevp1=0${levm1}
   else
-    slevm1=$levm1
-  fi
-  if [ $cnt -eq 1 ] ; then
-    str_lev3d=hld${slevm1}${slev}
-  else
-    str_lev3d=${str_lev3d}" or "hld${slevm1}${slev}
+    slevp1=$levm1
   fi
 
-  lev=$levm1
+  if [ $cnt -eq 1 ] ; then
+    str_lev3d=hld${slev}${slevp1}
+  else
+    str_lev3d=${str_lev3d}" or "hld${slev}${slevp1}
+  fi
+
   cnt=`expr $cnt + 1`
 done
 str_lev3d=`echo $str_lev3d | sed 's/,$//g'`
-
 
 ################################################################################
 # 2) Estrazione

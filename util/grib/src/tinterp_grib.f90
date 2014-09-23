@@ -19,7 +19,7 @@ PROGRAM tinterp_grib
 ! - il programma dovrebbe funzionare anche per sfoltire un file, ma in 
 !   questa modalita' potrebbe non essere ottimizzato.
 !
-!                                         Versione 1.0.2, Enrico 13/01/2014
+!                                         Versione 1.1.0, Enrico 15/09/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -29,18 +29,18 @@ USE grib2_utilities
 IMPLICIT NONE
 
 ! Variabili locali
-TYPE(datetime) :: vtime0,vtime1,vtime2,vtime_rq,rtime1,rtime2,rtime_out
+TYPE(datetime) :: vtime0,vtime1,vtime2,vtime_rq,rtime1,rtime2,rtime_rq
 REAL, ALLOCATABLE :: values1(:),values2(:),valuesout(:)
 REAL :: w1,w2
 INTEGER :: scad1(4),scad2(4)
 INTEGER :: ifin,ifout,igi0=0,igi1=0,igi2=0,igout=0
-INTEGER :: step,delta_2r,delta_r1,delta_21,ni,nj,yy,mm,dd,hh
-INTEGER :: ft,en,gnov,nocv,nom
-INTEGER :: kp,cntg,k,cnt_eqt,cnt_int,cnt_unc
+INTEGER :: step,delta_2r,delta_r1,delta_21,ni,nj,hh
+INTEGER :: ft,ft1,ft2,en,gnov,nocv,nom
+INTEGER :: kp,cntg,k,cnt_eqt,cnt_int,cnt_unc,idum
 INTEGER :: idp,ios,iret,clret(0:5)
 CHARACTER (LEN=200) :: chdum,filein,fileout
-CHARACTER (LEN=13) :: ch13(3)
-CHARACTER (LEN=10) :: ch10
+CHARACTER (LEN=10) :: ch10(6)
+CHARACTER (LEN=8) :: ch8
 LOGICAL :: verbose
 
 !==========================================================================
@@ -106,7 +106,8 @@ ENDIF
 CALL get_grib_time(igi1,rtime=rtime1,vtime=vtime1,iret=iret)
 IF (iret /= 0) GOTO 9996
 CALL get_grib1_header(igi1,scad=scad1)
-IF (scad1(4) /= 0) GOTO 9991
+IF (scad1(4)/=0 .AND. (scad1(4)/=13 .OR. scad1(2)/=0 .OR. scad1(3)/=0)) &
+  GOTO 9991
 
 ! Alloco gli arrays di lavoro
 CALL grib_get(igi1,"numberOfPointsAlongAParallel",ni)
@@ -117,8 +118,10 @@ ALLOCATE (values1(ni*nj),values2(ni*nj),valuesout(ni*nj))
 CALL grib_write(igi1,ifout)
 cnt_unc = 1
 IF (verbose) THEN
-  ch13(1) = to_char(vtime1)
-  WRITE (*,*) "unchanged: VTime ",ch13(1)
+  CALL getval (vtime1, simpledate=ch10(1))
+  CALL getval (rtime1, simpledate=ch10(2))
+  CALL getval(vtime1-rtime1, AHOUR=ft1)
+  WRITE (*,'(3a,i3.3,3a)') "unchanged (t1): ",ch10(2)," +",ft1," (",ch10(1),")"  
 ENDIF
 
 ! Estraggo i valori e salvo i dati che serviranno in seguito
@@ -161,7 +164,8 @@ CALL get_grib_time(igi2,rtime=rtime2,vtime=vtime2,iret=iret)
 IF (iret /= 0) GOTO 9996
 IF (vtime2 < vtime1) GOTO 9994
 CALL get_grib1_header(igi2,scad=scad2)
-IF (scad2(4) /= 0) GOTO 9990
+IF (scad2(4)/=0 .AND. (scad2(4)/=13 .OR. scad2(2)/=0 .OR. scad2(3)/=0)) &
+  GOTO 9990
 IF (vtime2 == vtime1) cnt_eqt = cnt_eqt + 1
 
 ! Estraggo i valori 
@@ -189,10 +193,13 @@ main: DO k = 1,HUGE(0)
 !--------------------------------------------------------------------------
 ! 2.1) Se l'istante richiesto non e' compreso tra i due istanti in memoria, 
 !      scorro filein fino a raggiungere vtime_rq
+!      Se la frequenza dei dati in input corrisponde alla frequenza 
+!      richiesta, il ciclo viene eseguito una sola volta.
 
   IF (vtime_rq > vtime2) THEN
     DO
       igi1 = igi2
+      rtime1 = rtime2
       vtime1 = vtime2
       values1(:) = values2(:)  
 
@@ -215,11 +222,12 @@ main: DO k = 1,HUGE(0)
       IF (ANY(clret(:) == 1)) GOTO 9995
       
 !     Calcolo verifcation time, reference time, scadenza
-      CALL get_grib_time(igi2,rtime=rtime1,vtime=vtime2,iret=iret)
+      CALL get_grib_time(igi2,rtime=rtime2,vtime=vtime2,iret=iret)
       IF (iret /= 0) GOTO 9996
       IF (vtime2 < vtime1) GOTO 9994
       CALL get_grib1_header(igi2,scad=scad2)
-      IF (scad2(4) /= 0) GOTO 9990
+      IF (scad2(4)/=0 .AND. (scad2(4)/=13 .OR. scad2(2)/=0 .OR. scad2(3)/=0)) &
+        GOTO 9990
       IF (vtime2 == vtime1) cnt_eqt = cnt_eqt + 1
 
 !     Estraggo i valori 
@@ -246,22 +254,27 @@ main: DO k = 1,HUGE(0)
 !--------------------------------------------------------------------------
 ! 2.2) Interpolo i dati all'istante richiesto e scrivo il campo risultante
 
+  CALL getval(vtime1-rtime1, AHOUR=ft1)
+  CALL getval(vtime2-rtime2, AHOUR=ft2)
   IF (verbose) THEN
-    ch13(1) = to_char(vtime1)
-    ch13(2) = to_char(vtime2)
-    ch13(3) = to_char(vtime_rq)
+    CALL getval(vtime1, simpledate=ch10(1))
+    CALL getval(rtime1, simpledate=ch10(2))
+    CALL getval(vtime2, simpledate=ch10(3))
+    CALL getval(rtime2, simpledate=ch10(4))
   ENDIF
 
 ! 2.2.1 Istante coincidente con un dato in input
   IF (vtime_rq == vtime1) THEN
     CALL grib_write(igi1,ifout)
     cnt_unc = cnt_unc + 1
-    IF (verbose) WRITE (*,*) "unchanged: VTime ",ch13(3)
+    IF (verbose) WRITE (*,'(3a,i3.3,3a)') &
+      "unchanged (t1): ",ch10(2)," +",ft1," (",ch10(1),")"
 
   ELSE IF (vtime_rq == vtime2) THEN
     CALL grib_write(igi2,ifout)
     cnt_unc = cnt_unc + 1
-    IF (verbose) WRITE (*,*) "unchanged: VTime ",ch13(3)
+    IF (verbose) WRITE (*,'(3a,i3.3,3a)') &
+      "unchanged (t2): ",ch10(4)," +",ft2," (",ch10(3),")"
 
 ! 2.2.2 Istante da interpolare
   ELSE
@@ -272,12 +285,20 @@ main: DO k = 1,HUGE(0)
 !   analisi, cambio solo reference time, negli alti casi interpolo il 
 !   forecast time
     IF (vtime1 == rtime1 .AND. vtime2 == rtime2) THEN 
-      CALL getval(vtime_rq,year=yy,month=mm,day=dd,hour=hh)
-      CALL grib_set(igout,"year",yy)
-      CALL grib_set(igout,"month",mm)
-      CALL grib_set(igout,"day",dd)
-      CALL grib_set(igout,"hour",hh)
+      rtime_rq = vtime_rq
+      ft = 0
+      CALL getval(vtime_rq,simpledate=ch8,hour=hh)
+      READ (ch8,*) idum
+      CALL grib_set(igout,"dataDate",idum)
+      CALL grib_set(igout,"hour",hh)   
+
+!      CALL getval(vtime_rq,simpledate=ch8,year=yy,month=mm,day=dd,hour=hh)
+!      CALL grib_set(igout,"year",yy)
+!      CALL grib_set(igout,"month",mm)
+!      CALL grib_set(igout,"day",dd)
+
     ELSE
+      rtime_rq = rtime1
       CALL getval(vtime_rq - rtime1, ahour=ft)
       CALL grib_get(igi1,"editionNumber",en)
       IF (en == 1) THEN
@@ -285,6 +306,7 @@ main: DO k = 1,HUGE(0)
       ELSE
         CALL grib_set(igout,"forecastTime",ft)
       ENDIF
+
     ENDIF
 
 !   Calcolo i valori in output
@@ -305,8 +327,16 @@ main: DO k = 1,HUGE(0)
 !   Lo scrivo
     CALL grib_write(igout,ifout)
     cnt_int = cnt_int + 1
-    IF (verbose) WRITE (*,'(7a,2(1x,f5.3))') "VTime ",ch13(3), &
-      "   interp. from ",ch13(1)," and ",ch13(2),"   weights",w1,w2
+
+    IF (verbose) THEN
+      CALL getval(vtime_rq, simpledate=ch10(5))
+      CALL getval(rtime_rq, simpledate=ch10(6))
+      WRITE (*,'(3(3a,i3.3,3a),3x,a,f5.3,1x,f5.3)') &
+      "interpolated ",ch10(6)," +",ft, " (",ch10(5),")", & 
+      " from ",       ch10(2)," +",ft1," (",ch10(1),")", &
+      " and ",        ch10(4)," +",ft2," (",ch10(3),")", &
+      "weights ",w1,w2
+    ENDIF
 
   ENDIF
 
@@ -351,10 +381,10 @@ STOP 3
 
 9994 CONTINUE
 WRITE (*,*) "Trovati verification times non consecutivi:"
-CALL getval(vtime1,simpledate=ch10)
-WRITE (*,*) " Campo ",cntg-1," vtime ",ch10
-CALL getval(vtime2,simpledate=ch10)
-WRITE (*,*) " Campo ",cntg," vtime ",ch10
+CALL getval(vtime1,simpledate=ch10(1))
+CALL getval(vtime2,simpledate=ch10(2))
+WRITE (*,*) " Campo ",cntg-1," vtime ",ch10(1)
+WRITE (*,*) " Campo ",cntg," vtime ",ch10(2)
 STOP 3
 
 9993 CONTINUE
@@ -366,11 +396,11 @@ WRITE (*,*) "Errore inatteso nel calcolo dei pesi, informare il code owner"
 STOP 4
 
 9991 CONTINUE
-WRITE (*,*) "Il campo ",cntg," ha un timerange non istantaneo: ",scad2(4)
+WRITE (*,*) "Il campo ",cntg," ha un timerange non istantaneo: ",scad1(4)
 STOP 3
 
 9990 CONTINUE
-WRITE (*,*) "Il campo ",cntg," ha un timerange non istantaneo: ",scad1(4)
+WRITE (*,*) "Il campo ",cntg," ha un timerange non istantaneo: ",scad2(4)
 STOP 3
 
 9988 CONTINUE

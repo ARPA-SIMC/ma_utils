@@ -12,7 +12,7 @@ PROGRAM proc_seriet_surf
 !   staz,net,anno,mese,giorno,ora, ff, dd, ceil,  tcc, tt, rh, prs,cod_prc 
 !                                 [m/s grd ft*100 10i  K   %   mb  Calmet ]
 !
-!                                         Versione 2.0.2, Enrico 13/01/2014
+!                                         Versione 2.0.3, Enrico 23/09/2014
 !--------------------------------------------------------------------------
 IMPLICIT NONE
 
@@ -21,11 +21,17 @@ INTEGER, PARAMETER :: nf_in = 10      ! n.ro di parametri richiesti in input
 REAL, PARAMETER :: rmis_in = -9999.   ! dato mancante nei files seriet
 REAL, PARAMETER :: rmis_out = 9999.   ! dato mancante nei files .st2a
 
-! Label seriet dei parametri in input
+! Label seriet dei parametri in input: vecchia codifica delle nubi H,M,L
+! CHARACTER(LEN=fw) :: reqlab(nf_in) = &
+!   (/"pr        ","Temp      ","td        ","Dir-wind  ","Mod-wind  ", &
+!     "tp        ","tcc       ","clcl      ","clcm      ","clch      "/)
+! INTEGER, PARAMETER :: reqlev(nf_in) = (/0,2,2,10,10,0,0,0,0,0/)
+
+! Label seriet dei parametri in input: nuova codifica delle nubi H,M,L
 CHARACTER(LEN=fw) :: reqlab(nf_in) = &
   (/"pr        ","Temp      ","td        ","Dir-wind  ","Mod-wind  ", &
-    "tp        ","tcc       ","clcl      ","clcm      ","clch      "/)
-INTEGER, PARAMETER :: reqlev(nf_in) = (/0,2,2,10,10,0,0,0,0,0/)
+    "tp        ","tcc       ","tcc       ","tcc       ","tcc       "/)
+INTEGER, PARAMETER :: reqlev(nf_in) = (/0,2,2,10,10,0,0,1,2,3/)
 
 ! Header files .st2 (output)
 CHARACTER(LEN=87), PARAMETER :: head_out = &

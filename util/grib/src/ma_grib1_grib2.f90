@@ -27,8 +27,8 @@ INTEGER :: ifin,ifout,igin=0,igout=0,igtemp_utm=0,igtemp_geo=0,igtemp_rot=0
 INTEGER :: datah_in(4),datah_ref(4),datah_end(4)
 INTEGER :: scad(4),lev(3),ni,nj
 INTEGER :: cem,sc,par,tab,sortx,togp,igen,gd,topd,dig,uvrtg,sm,pdtn,dd, &
-  dt,ft,toffs,sfoffs,svoffs,tosfs,sfosfs,svosfs,toti,lotr,bp,bpv,bmi,bmp, &
-  nv,tosp,ct,drtn,en,gnov,nocv,nom
+  dt,ft,toffs,sfoffs,svoffs,tosfs,sfosfs,svosfs,toti,lotr,bp,bpv,bmi, &
+  nv,tosp,ct,en,gnov,nocv,nom
 CHARACTER(LEN=200) :: chpar,filein,fileout
 CHARACTER(LEN=80) :: grid_type
 LOGICAL :: lforc,lmacc

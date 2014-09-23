@@ -18,7 +18,7 @@ PROGRAM chimerencdf2grib
 ! - i dati ENS hanno campi mancanti qua e la' (file *additional*, livello 2)
 ! NB I dati sono il ug/m3, ma la codifica grib dei gas richiederebbe ppb!!
 !
-!                               Versione 3.1.0, Michele & Enrico 20/05/2014
+!                               Versione 3.1.2, Michele & Enrico 10/09/2014
 !--------------------------------------------------------------------------
 use calendar 
 use netcdf
@@ -493,6 +493,7 @@ ELSE IF (inp_fmt /= 1) THEN
    ksec1(5) = 128
 ENDIF
 
+ksec1(14) = 0
 ksec1(15) = 1
 ksec1(17) = 0
 ksec1(18) = 0
@@ -807,7 +808,6 @@ ELSE IF (inp_fmt == 4) THEN
   ksec1(11) = 1
   ksec1(12) = 1
   ksec1(13) = 0
-  ksec1(14) = 0
   ksec1(21) = 20
 
   ksec1(16) = 0
@@ -1027,7 +1027,6 @@ ELSE IF (inp_fmt == 7) THEN
           ksec1(10) = 100
           ksec1(11) = mm
           ksec1(12) = kday
-          ksec1(14) = 0
           ksec1(21) = 20
           ksec1(16) = 0
           DO klev = 1,nlev
@@ -1128,51 +1127,51 @@ STOP
 !==========================================================================
 ! 3) Gestione errori
 
-9999       CONTINUE
-           WRITE (*,*) "Errore aprendo ",TRIM(fileinfo)
-           STOP
+9999 CONTINUE
+WRITE (*,*) "Errore aprendo ",TRIM(fileinfo)
+STOP 1
 
-9998       CONTINUE
-           WRITE (*,*) "Record illegale o mal posizionato in ",TRIM(fileinfo)
-           WRITE (*,*) "Numero record (esclusi commenti) ",k
-           WRITE (*,*) TRIM(chrec)
-           STOP
+9998 CONTINUE
+WRITE (*,*) "Record illegale o mal posizionato in ",TRIM(fileinfo)
+WRITE (*,*) "Numero record (esclusi commenti) ",k
+WRITE (*,*) TRIM(chrec)
+STOP 2
 
-9997       CONTINUE
-           WRITE (*,*) "Parametri illegali leggendo ",TRIM(fileinfo)
-           STOP
+9997 CONTINUE
+WRITE (*,*) "Parametri illegali leggendo ",TRIM(fileinfo)
+STOP 2
 
-9995       CONTINUE
-           WRITE (*,*) "Errore leggendo ",TRIM(filein)
-           STOP
+9995 CONTINUE
+WRITE (*,*) "Errore leggendo ",TRIM(filein)
+STOP 2
 
-9994       CONTINUE
-           WRITE (*,*) "Errore numero specie ",TRIM(filein)
-           STOP
+9994 CONTINUE
+WRITE (*,*) "Errore numero specie ",TRIM(filein)
+STOP 3
 
-9993       CONTINUE
-           WRITE (*,*) "Errore aprendo ",TRIM(tab_file)
-           STOP
+9993 CONTINUE
+WRITE (*,*) "Errore aprendo ",TRIM(tab_file)
+STOP 1
 
-9992       CONTINUE
-           WRITE (*,*) "Errore leggendo ",TRIM(tab_file)
-           STOP
+9992 CONTINUE
+WRITE (*,*) "Errore leggendo ",TRIM(tab_file)
+STOP 2
 
-9991       CONTINUE
+9991 CONTINUE
 WRITE (*,*) "Dati inconsistenti in ",TRIM(tab_file)," e ",TRIM(filein)
 IF (nx /= nzonal) WRITE (*,*) "Nx: ",nx,nzonal
 IF (ny /= nmerid) WRITE (*,*) "Nx: ",ny,nmerid
 IF (ABS(x2r-x2) > eps) WRITE (*,*) "x2 ",x2r,x2
 IF (ABS(y2r-y2) > eps) WRITE (*,*) "y2 ",y2r,y2
-STOP
+STOP 4
 
-9990       CONTINUE
-           WRITE (*,*) "Area ",TRIM(domain),"non trovata in ",TRIM(tab_file)
-
+9990 CONTINUE
+WRITE (*,*) "Area ",TRIM(domain)," non trovata in ",TRIM(tab_file)
+STOP 5
 
 9989 CONTINUE
 WRITE (*,*) "Reference time non trovato in ",TRIM(filein)," usare parametro -rtm"
-STOP
+STOP 6
 
 END PROGRAM chimerencdf2grib
 

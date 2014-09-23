@@ -26,7 +26,7 @@ unset LANG
 # Con opzione -noint, suppone che l'area di Chimere sia la stessa dei grib, e
 #   non effettua l'interpolazione orizzontale (la procedura NON fa controlli!!)
 #
-#                         Versione 7.0.0 (V200709C), Michele & Enrico 30/11/2012
+#                         Versione 7.1.0 (V200709C), Michele & Enrico 28/08/2014
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -255,11 +255,13 @@ while [ $cnt -lt $ndays ] ; do
   case $ptopmet in
   500)
     if   [ $metmod = "LM" -a $datac_ref -lt 20060126 ] ; then
-      nzmet=21
+      nzmet=22
       db_levs=36
+      db_lev_list=( 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 13 11 9 7 5 3 1 )
     elif [ $metmod = "LM" -a $datac_ref -ge 20060126 ] ; then
-      nzmet=24
+      nzmet=25
       db_levs=41
+      db_lev_list=( 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 15 13 11 9 7 5 3 1 )
     elif [ $metmod = "ECMWF" ] ; then
       nzmet=23
       db_levs=61

@@ -2,9 +2,10 @@ PROGRAM math_grib
 !--------------------------------------------------------------------------
 ! Programma per compiere operazioni matematiche su tutti i campi contenuti
 ! in due files grib. 
+! Gestisce GRIB1 e GRIB"
 ! Sostituisce ed integra somma_grib.f90 e moltiplica_grib.f90
 !
-!                                         Versione 1.0.5, Enrico 31/03/2014
+!                                         Versione 1.1.0, Enrico 15/09/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -16,17 +17,19 @@ IMPLICIT NONE
 REAL, ALLOCATABLE :: valuesa(:),valuesb(:),valuesout(:)
 REAL :: coeffa,coeffb
 INTEGER :: ifa,ifb,ifout,iga=0,igb=0,igout=0
-INTEGER :: idp,kp,ios1,ios2,ier,iret,kga,k
+INTEGER :: idp,kp,ios(3),ier,iret,kga,k,bpv
 INTEGER :: clret(0:6),cllog(0:6),nmiss,ni,nj,ni_sav,nj_sav,en,gnov,nom,nocv
 CHARACTER (LEN=250) :: filea,fileb,fileout,chdum,check_list
 CHARACTER(LEN=40) :: gta
 CHARACTER (LEN=5) :: oper
+CHARACTER (LEN=3) :: next_arg
 LOGICAL :: cl_grid,cl_time,cl_vtime,cl_lev,cl_var,lbconst,lforce,lverbose
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
 
 ! 1.1 Default
+next_arg = ""
 cl_grid  = .TRUE.
 cl_time  = .TRUE.
 cl_vtime = .FALSE.
@@ -35,10 +38,12 @@ cl_var   = .FALSE.
 lbconst = .FALSE.
 lforce = .FALSE.
 lverbose = .FALSE.
+bpv = imiss
 
 ! 1.2 Parametri da riga comando
 check_list = ""
 idp = 0
+ios(:) = 0
 DO kp = 1,HUGE(0)
   CALL getarg(kp,chdum)
   IF (TRIM(chdum) == "") THEN
@@ -46,8 +51,13 @@ DO kp = 1,HUGE(0)
   ELSE IF (TRIM(chdum) == "-h") THEN
     CALL write_help
     STOP 1
+  ELSE IF (next_arg == "bpv") THEN
+    READ (chdum,*,IOSTAT=ios(1)) bpv
+    next_arg = ""
   ELSE IF (chdum(1:7) == "-check=") THEN
     check_list = chdum(8:)
+  ELSE IF (TRIM(chdum) == "-nbit") THEN
+    next_arg = "bpv"
   ELSE IF (TRIM(chdum) == "-bconst") THEN
     lbconst = .TRUE.
   ELSE IF (TRIM(chdum) == "-force") THEN
@@ -58,17 +68,17 @@ DO kp = 1,HUGE(0)
     idp = idp + 1
     SELECT CASE (idp)
     CASE (1)
-      READ (chdum,*,IOSTAT=ios1) coeffa
+      READ (chdum,*,IOSTAT=ios(2)) coeffa
     CASE (2)
       filea = chdum
     CASE (3)
-      READ (chdum,*,IOSTAT=ios2) coeffb
+      READ (chdum,*,IOSTAT=ios(3)) coeffb
     CASE (4)
       fileb = chdum
     CASE (5)
       fileout = chdum
     CASE (6)
-      oper = chdum
+      oper = chdum(1:5)
     CASE DEFAULT
       CALL write_help
       STOP 1
@@ -81,7 +91,7 @@ ier = 0
 IF (check_list /= "") CALL parse_check_list(check_list,cl_grid,cl_time, &
   cl_vtime,cl_lev,cl_var,ier)
 
-IF (ios1 /= 0 .OR. ios2 /= 0 .OR. ier /= 0 .OR. idp /= 6 .OR. &
+IF (ANY(ios(:) /= 0) .OR. ier /= 0 .OR. idp /= 6 .OR. &
     (oper/="sum" .AND. oper/="mul" .AND. oper/="div" .AND. oper/="div2")) &
     THEN
   CALL write_help
@@ -223,6 +233,11 @@ DO kga = 1,HUGE(0)
     ENDIF
     CALL grib_set(igout,"missingValue",rmiss)
   ENDIF
+
+  IF (c_e(bpv)) THEN
+    CALL grib_set(igout,"bitsPerValue",bpv)
+  ENDIF
+
   CALL grib_set(igout,"values",valuesout(:))
 
   CALL grib_write (igout,ifout)
@@ -367,7 +382,7 @@ SUBROUTINE write_help
 
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 WRITE (*,*) "Uso: math_grib.exe a fileA b fileB fileout oper [-check=check_list]"
-WRITE (*,*) "  [-bconst] [-force] [-verbose] [-h]" 
+WRITE (*,*) "  [-nbit N] [-bconst] [-force] [-verbose] [-h]" 
 WRITE (*,*) ""
 WRITE (*,*) "Scorre i grib contenuti in fileA e fileB, scrive su fileout il risultato di"
 WRITE (*,*) "  un'operazione aritmetica compiuta su ciascun punto dei campi corrispondenti."
@@ -394,6 +409,7 @@ WRITE (*,*) "    lev       : livello"
 WRITE (*,*) "    var       : parametro"
 WRITE (*,*) "    nil       : solo la forma della griglia (nx, ny)"
 WRITE (*,*) ""
+WRITE (*,*) "-nbit N     : forza il numero di bit nel grib in output (def: come fileA)"
 WRITE (*,*) "-bconst     : legge solo il primo campo di fileB, e applica queti valori a"
 WRITE (*,*) "              tutti i campi contenuti in fileA"
 WRITE (*,*) "-force      : se trova due grib inconsistenti, scrive un campo interamente"
@@ -406,3 +422,4 @@ RETURN
 END SUBROUTINE write_help
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
