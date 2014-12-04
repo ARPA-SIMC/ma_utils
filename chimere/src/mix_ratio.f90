@@ -1,6 +1,6 @@
 PROGRAM mix_ratio
 !--------------------------------------------------------------------------
-! Dati i campi di Umidita' specifica, T e P, calcola il mixing ratio.
+! Dato un campo di Umidita' specifica (3D), calcola il mixing ratio.
 !
 ! Uso: mix_ratio.exe [-h] np nz
 !

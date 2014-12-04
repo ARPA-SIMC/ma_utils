@@ -9,7 +9,7 @@ PROGRAM grib_uv2ffdd
 !   (sez 1)
 ! - Le altre sezioni sono prese dall'utlimo grib del file
 !
-!                                         Versione 1.3.2, Enrico 13/01/2014
+!                                         Versione 1.3.3, Enrico 27/11/2014
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -48,7 +48,7 @@ CALL getarg(4,fileout2)
 IF (filein1 == "" .OR. filein2 == "" .OR. &
     fileout1 == "" .OR. fileout2 == "" .OR. &
     TRIM(filein1) == "-h") THEN
-  WRITE (*,*) "Uso: grib_ave.exe [-h] file_uu file_vv file_dd file_ff" 
+  WRITE (*,*) "Uso: grib_uv2ffdd.exe [-h] file_uu file_vv file_dd file_ff" 
   STOP
 ENDIF
 

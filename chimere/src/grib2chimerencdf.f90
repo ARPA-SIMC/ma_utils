@@ -33,7 +33,7 @@ PROGRAM grib2chimerencdf
 !--------------------------------------------------------------------------
 
 USE grib_api
-use netcdf
+USE netcdf
 USE datetime_class
 USE char_utilities
 USE missing_values

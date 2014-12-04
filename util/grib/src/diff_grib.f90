@@ -17,7 +17,7 @@ PROGRAM diff_grib
 ! - Gestione dei campi con dati mancanti implementata ma non testata
 ! - Versione 1.* rinominata come diff_gribex.f90
 !
-!                                         Versione 2.0.2, Enrico 31/03/2013
+!                                         Versione 2.2.0, Enrico 02/12/2014
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -25,31 +25,66 @@ USE missing_values
 IMPLICIT NONE
 
 INTEGER :: ifin,ifout,igin,igout,iret,kg
-CHARACTER(LEN=250) :: filea,fileb
+CHARACTER(LEN=250) :: filea,fileb,chdum
 
 REAL, ALLOCATABLE :: fielda(:),fieldb(:)
-REAL :: ad,ads,avea,aveb,rms,rms_mx,rms_sig,rms_sig_mx,bias,bias_sig
+REAL :: ad,ads,avea,aveb,rms,rms_mx,rms_sig,rms_sig_mx,ppdif,ppdif_mx
+REAL :: bias,abias_mx,bias_sig,abias_sig_mx
 REAL :: abs_diff,abs_diff_mx,abs_diff_sig,abs_diff_sig_mx
-REAL :: abs_diff_sig_norm,abs_diff_sig_norm_mx
+REAL :: abs_diff_norm_sig,abs_diff_norm_sig_mx,abs_diff_norm,abs_diff_norm_mx
 REAL :: rva,rvb,stepa,stepb,step,rangea,rangeb
 INTEGER :: ifa,ifb,iga,igb
-INTEGER :: nia,nja,nib,njb,npa,npb,noka,nokb,nok,kp
+INTEGER :: nia,nja,nib,njb,npa,npb,noka,nokb,nok,npdif,kp,lstep,idp,ios
 INTEGER :: gnova,noma,nocva,gnovb,nomb,nocvb
 INTEGER :: ena,bpva,dsfa,bsfa
 INTEGER :: enb,bpvb,dsfb,bsfb
+CHARACTER (LEN=34) :: ch34
 CHARACTER (LEN=14) :: str_nok
-CHARACTER (LEN=1) :: eq_ksec(4),worse_eq_ksec(4)
-LOGICAL :: lnok
+CHARACTER (LEN=11) :: ch11(6)
+CHARACTER (LEN=9) :: ch9
+CHARACTER (LEN=1) :: eq_ksec(4),worse_eq_ksec(4),next_arg
+LOGICAL :: lnok,lsig
 
-!--------------------------------------------------------------------------
+!==========================================================================
 ! 1) Preliminari
 
 ! Parametri da riga comando
-CALL getarg(1,filea)
-CALL getarg(2,fileb)
-IF (TRIM(filea) == "" .OR. TRIM(fileb) == "" .OR. &
-  TRIM(filea) == "-h" .OR. TRIM(filea) == "--help") THEN
-  CALL scrive_help
+lstep = 0
+lsig = .TRUE.
+
+idp = 0
+ios = 0
+next_arg = ""
+DO kp = 1,HUGE(0)
+  CALL getarg(kp,chdum)
+  IF (TRIM(chdum) == "") THEN
+    EXIT
+  ELSE IF (TRIM(chdum) == "-h") THEN
+    CALL write_help
+    STOP
+  ELSE IF (TRIM(chdum) == "-lstep") THEN
+    next_arg = "s"
+  ELSE IF (next_arg == "s") THEN
+    next_arg = ""
+    READ (chdum,*,IOSTAT=ios) lstep
+  ELSE IF (TRIM(chdum) == "-nosig") THEN
+    lsig = .FALSE.
+  ELSE 
+    idp = idp + 1
+    SELECT CASE (idp)
+    CASE (1)
+      filea = chdum
+    CASE (2)
+      fileb = chdum
+    CASE DEFAULT
+      CALL write_help
+      STOP
+    END SELECT
+  ENDIF
+ENDDO
+
+IF (ios/=0 .OR. idp < 2 .OR. (lstep/=-1 .AND. lstep /=0 .AND. lstep/=1)) THEN
+  CALL write_help
   STOP
 ENDIF
 
@@ -59,19 +94,28 @@ IF (iret /= GRIB_SUCCESS) GOTO 9999
 CALL grib_open_file(ifb,fileb,"r",iret)
 IF (iret /= GRIB_SUCCESS) GOTO 9998
 
-!--------------------------------------------------------------------------
+!==========================================================================
 ! 2) Elaborazioni (ciclo sui grib)
 !
 
 worse_eq_ksec(:) = "Y"
 lnok = .TRUE.
+ppdif_mx = 0.
+abias_mx = 0.
+abias_sig_mx = 0.
 rms_mx = 0.
 rms_sig_mx = 0.
 abs_diff_mx = 0.
 abs_diff_sig_mx = 0.
+abs_diff_norm_mx = 0.
+abs_diff_norm_sig_mx = 0.
 
-!                123456---1234567---123456-123456---1234567890-1234567890-1234567890-1234567890-1234567890-(123456)
-WRITE (*,'(a)') " ngrib   ksec ==     nok1   nok2         ave1      BiasS       rmsS    absDmxS absDmxS/rg    (nok)"
+!                  123456---1234567---123456-123456---1234567890-1234567890-1234567890-1234567890-1234567890-1234567890-(123456)
+IF (lsig) THEN
+  WRITE (*,'(a)') " ngrib   ksec ==     nok1   nok2         ave1    BiasSig     rmsSig  MxAbsDifS MADS/range  FrPtsDiff (nok)"
+ELSE
+  WRITE (*,'(a)') " ngrib   ksec ==     nok1   nok2         ave1       Bias        rms   MxAbsDif  MAD/range  FrPtsDiff (nok)"
+ENDIF
 
 OPEN (UNIT=90, FILE="diff_grib_sez4.log", STATUS="REPLACE")
 !                123456---1234-1234-1234-1234567890-12345678901234---1234-1234-1234-1234567890-12345678901234
@@ -115,7 +159,7 @@ DO kg = 1,HUGE(0)
 ! La codifica dei Grib segue l'algortimo Y * 10^D = R + 2^E * X, con:
 ! Y = valore originale            X = valore scritto nel grib
 ! D = decimal scale factor        E = binary scale factor
-! R = reference value = valore minimo di (Y * 10^D) 
+! R = reference value = valore minimo di (Y * 10^D)
 
   CALL grib_get(iga,"bitsPerValue",bpva)
   CALL grib_get(iga,"referenceValue",rva)
@@ -127,7 +171,15 @@ DO kg = 1,HUGE(0)
   CALL grib_get(igb,"binaryScaleFactor",bsfb)
   stepa = 2.**bsfa / 10.**dsfa
   stepb = 2.**bsfb / 10.**dsfb
-  step = MIN(stepa,stepb)
+  IF (lstep == -1) THEN
+    step = MIN(stepa,stepb)
+  ELSE IF (lstep == 1) THEN
+    step = MAX(stepa,stepb)
+  ELSE IF (bsfa==bsfb .AND. dsfa==dsfb) THEN
+    step = stepa
+  ELSE
+    step = rmiss
+  ENDIF
 
   IF (bpva == bpvb .AND. dsfa == dsfb .AND. bsfa == bsfb .AND. &
       ABS(rva-rvb) < 2*step) THEN
@@ -140,7 +192,14 @@ DO kg = 1,HUGE(0)
 
 !--------------------------------------------------------------------------
 ! 2.3 Confronto i campi
+!
+! Per "differenze significative" (suffissi "sig" o "S") si intendono le
+! differenze a meno del troncamento GRIB, ie. maggiori dello "step".
+! Lo step e' calcolato al paragrafo 2.2: se e' diverso nei due files, viene
+! gestito in base al parametro da riga comando "step"
  
+! 2.3.0 Preliminari
+
   CALL grib_get(iga,"getNumberOfValues",gnova)    ! totale di punti nel grib
   CALL grib_get(iga,"numberOfMissing",noma)       ! n.ro dati mancanti
   CALL grib_get(iga,"numberOfCodedValues",nocva)  ! n.ro dati validi
@@ -167,9 +226,7 @@ DO kg = 1,HUGE(0)
   IF (nomb + nocvb /= gnovb .OR. &
       (nocvb /= 0 .AND. nocvb /= COUNT(fieldb(1:npb) /= rmiss))) GOTO 9994
 
-! Differenze significative (ie. a meno del troncamento GRIB)
-
-! N.ro punti e valori medi
+! 2.3.1: Numero di punti e valori medi
   noka = nocva
   nokb = nocvb
 
@@ -184,7 +241,7 @@ DO kg = 1,HUGE(0)
     aveb = rmiss
   ENDIF
 
-  IF (avea /= rmiss .AND. aveb /= rmiss) THEN
+  IF (avea /= rmiss .AND. aveb /= rmiss .AND. step /= rmiss) THEN
     bias = aveb - avea
     bias_sig = REAL(INT(bias/step))*step
   ELSE
@@ -192,63 +249,83 @@ DO kg = 1,HUGE(0)
     bias_sig = rmiss
   ENDIF
 
-! RMS, MAX(abs_diff), MAX(abs_diff_sig)
+! 2.3.2: RMS, MAX(abs_diff), MAX(abs_diff_sig), % pti diversi
   IF (npa == npb) THEN
     nok = 0
+    npdif = 0
     rms = 0.
     rms_sig = 0.
     abs_diff = 0.
     abs_diff_sig = 0.
     DO kp = 1,npa
-      IF (fielda(kp) /= rmiss .AND. fieldb(kp) /= rmiss) THEN
+      IF (fielda(kp) /= rmiss .AND. fieldb(kp) /= rmiss .AND. step /= rmiss) THEN
         nok = nok + 1
         ad = ABS(fielda(kp)- fieldb(kp))
+        IF (ad > 2*step) npdif = npdif + 1
         ads = REAL(INT(ad/step))*step
         abs_diff = MAX(abs_diff,ad)
         abs_diff_sig = MAX(abs_diff_sig,ads)
         rms = rms + ad*ad
         rms_sig = rms_sig + ads*ads
 
-! if (kg==756) write (92,*) kp,fielda(kp),fieldb(kp),step,ad,ads,abs_diff_sig
+!deb if (kg==756) write (92,*) kp,fielda(kp),fieldb(kp),step,ad,ads,abs_diff_sig
 
       ENDIF
     ENDDO
 
     IF (nok > 0) THEN
+      rangea = MAXVAL(fielda(1:npa),MASK=fielda(kp)/=rmiss) - &
+         MINVAL(fielda(1:npa),MASK=fielda(kp)/=rmiss)
+      rangeb = MAXVAL(fieldb(1:npb),MASK=fieldb(kp)/=rmiss) - &
+         MINVAL(fieldb(1:npb),MASK=fieldb(kp)/=rmiss)
+
+      ppdif = REAL(npdif)/REAL(nok)
+
       rms = SQRT(rms / REAL(nok))
       rms_sig = SQRT(rms_sig / REAL(nok))
-      IF (dsfa == dsfb .AND. bsfa == bsfb) THEN
+      IF (MAX(rangea,rangeb) <= 0.) THEN
+        abs_diff_norm = rmiss
+      ELSE
+        abs_diff_norm = abs_diff / MAX(rangea,rangeb)
+      ENDIF
+
+      IF (step /= rmiss) THEN
         IF (abs_diff_sig < EPSILON(0.)) THEN
-          abs_diff_sig_norm = 0.
+          abs_diff_norm_sig = 0.
+        ELSE IF (MAX(rangea,rangeb) <= 0.) THEN
+          abs_diff_norm_sig = rmiss
         ELSE
-          rangea = MAXVAL(fielda(1:npa),MASK=fielda(kp)/=rmiss) - &
-             MINVAL(fielda(1:npa),MASK=fielda(kp)/=rmiss)
-          rangeb = MAXVAL(fieldb(1:npb),MASK=fieldb(kp)/=rmiss) - &
-             MINVAL(fieldb(1:npb),MASK=fieldb(kp)/=rmiss)
-          abs_diff_sig_norm = abs_diff_sig / MAX(rangea,rangeb)
+          abs_diff_norm_sig = abs_diff_sig / MAX(rangea,rangeb)
         ENDIF
       ELSE
         abs_diff_sig = rmiss
-        abs_diff_sig_norm = rmiss
+        abs_diff_norm_sig = rmiss
       ENDIF
     ELSE
+      ppdif = rmiss
       rms = rmiss
       rms_sig = rmiss
       abs_diff = rmiss
       abs_diff_sig = rmiss
-      abs_diff_sig_norm = rmiss
+      abs_diff_norm = rmiss
+      abs_diff_norm_sig = rmiss
     ENDIF
 
   ELSE
+    ppdif = rmiss
     rms = rmiss
     rms_sig = rmiss
     abs_diff = rmiss
     abs_diff_sig = rmiss
-    abs_diff_sig_norm = rmiss
+    abs_diff_norm = rmiss
+    abs_diff_norm_sig = rmiss
 
   ENDIF
 
-! Salvo i risultati con piu' differenze
+!--------------------------------------------------------------------------
+! 2.4 Salvo i risultati relativi a questo campo
+
+! Salvo i risultati con le differenze maggiori
   WHERE (worse_eq_ksec(1:4) /= "-" .AND. eq_ksec(1:4) == "N") 
     worse_eq_ksec(1:4) = "N"
   ENDWHERE
@@ -256,22 +333,44 @@ DO kg = 1,HUGE(0)
     worse_eq_ksec(1:4) = "-"
   ENDWHERE
   IF (noka /= nokb) lnok = .FALSE.
+  IF (ppdif /= rmiss .AND. ppdif > ppdif_mx) ppdif_mx = ppdif
+  IF (bias /= rmiss .AND. ABS(bias) > abias_mx) abias_mx = ABS(bias)  
+  IF (bias_sig /= rmiss .AND. ABS(bias_sig) > abias_sig_mx) &
+    abias_sig_mx = ABS(bias_sig)  
   IF (rms /= rmiss .AND. rms > rms_mx) rms_mx = rms
   IF (rms_sig /= rmiss .AND. rms_sig > rms_sig_mx) rms_sig_mx = rms_sig
   IF (abs_diff /= rmiss .AND. abs_diff > abs_diff_mx) &
     abs_diff_mx = abs_diff
   IF (abs_diff_sig /= rmiss .AND. abs_diff_sig > abs_diff_sig_mx) &
     abs_diff_sig_mx = abs_diff_sig
-  IF (abs_diff_sig_norm /= rmiss .AND. &
-    abs_diff_sig_norm > abs_diff_sig_norm_mx) &
-    abs_diff_sig_norm_mx = abs_diff_sig_norm
+  IF (abs_diff_norm /= rmiss .AND. abs_diff_norm > abs_diff_norm_mx) &
+    abs_diff_norm_mx = abs_diff_norm
+  IF (abs_diff_norm_sig /= rmiss .AND. &
+    abs_diff_norm_sig > abs_diff_norm_sig_mx) &
+    abs_diff_norm_sig_mx = abs_diff_norm_sig
 
-! Le visualizzo
-  IF (abs_diff_sig_norm == rmiss) abs_diff_sig_norm = -9.99999
-  WRITE (*, &
-    '(i6,2x,4(1x,a1),2x,2(1x,i6),2x,4(1x,e10.3),1x,f10.5,1x,a1,i6,a1)') &
-    kg,eq_ksec(1:4),noka,nokb,avea,bias_sig,rms_sig,abs_diff_sig, &
-    abs_diff_sig_norm,"(",nok,")"
+! Scrivo le differenze relative a questo campo
+  ch34 = ""
+  ch11(:) = ""
+  ch9 = ""
+  WRITE (ch34,'(i6,2x,4(1x,a1),2x,2(1x,i6),2x)') kg,eq_ksec(1:4),noka,nokb
+  IF (avea/=rmiss)              WRITE (ch11(1),'(1x,e10.3)') avea
+
+  IF (lsig) THEN
+    IF (bias_sig/=rmiss)          WRITE (ch11(2),'(1x,e10.3)') bias_sig
+    IF (rms_sig/=rmiss)           WRITE (ch11(3),'(1x,e10.3)') rms_sig
+    IF (abs_diff_sig/=rmiss)      WRITE (ch11(4),'(1x,e10.3)') abs_diff_sig
+    IF (abs_diff_norm_sig/=rmiss) WRITE (ch11(5),'(1x,f10.5)') abs_diff_norm_sig
+  ELSE
+    IF (bias/=rmiss)          WRITE (ch11(2),'(1x,e10.3)') bias
+    IF (rms/=rmiss)           WRITE (ch11(3),'(1x,e10.3)') rms
+    IF (abs_diff/=rmiss)      WRITE (ch11(4),'(1x,e10.3)') abs_diff
+    IF (abs_diff_norm/=rmiss) WRITE (ch11(5),'(1x,f10.5)') abs_diff_norm
+  ENDIF
+
+  WRITE (ch11(6),'(1x,f10.6)') ppdif
+  WRITE (ch9,'(1x,a1,i6,a1)') "(",nok,")"
+  WRITE (*,'(8a)') ch34,ch11(1:6),ch9
 
 ! Libero memoria
   DEALLOCATE (fielda,fieldb)
@@ -291,13 +390,24 @@ ENDIF
 
 WRITE (*,*)
 WRITE (*,'(a)') "Caso peggiore:"
-WRITE (*,'(6x,2x,4(1x,a1),2x,a14,2x,2(1x,10x),2(1x,e10.3),1x,f10.5)') &
-  worse_eq_ksec(1:4),str_nok,rms_sig_mx,abs_diff_sig_mx, &
-  abs_diff_sig_norm_mx
+
+!                  123456---1234567---123456-123456---1234567890-1234567890-1234567890-1234567890-1234567890-1234567890-(123456)
+IF (lsig) THEN
+  WRITE (*,'(a)') " ngrib   ksec ==     nok1   nok2                 BiasSig     rmsSig  MxAbsDifS MADS/range  FrPtsDiff"
+  WRITE (*,'(6x,2x,4(1x,a1),2x,a14,2x,1x,10x,3(1x,e10.3),1x,f10.5,1x,f10.6)') &
+    worse_eq_ksec(1:4),str_nok,abias_sig_mx,rms_sig_mx,abs_diff_sig_mx, &
+    abs_diff_norm_sig_mx,ppdif_mx
+ELSE
+  WRITE (*,'(a)') " ngrib   ksec ==     nok1   nok2                    Bias        rms   MxAbsDif  MAD/range  FrPtsDiff"
+  WRITE (*,'(6x,2x,4(1x,a1),2x,a14,2x,1x,10x,3(1x,e10.3),1x,f10.5,1x,f10.6)') &
+    worse_eq_ksec(1:4),str_nok,abias_mx,rms_mx,abs_diff_mx, &
+    abs_diff_norm_mx,ppdif_mx
+ENDIF
 
 CALL grib_close_file(ifa)
 CALL grib_close_file(ifb)
 
+WRITE (*,*)
 WRITE (*,*) "Elaborazioni completate, elaborati ",kg-1," campi"
 STOP
 
@@ -339,12 +449,13 @@ STOP
 END PROGRAM diff_grib
 
 !==========================================================================
-SUBROUTINE scrive_help
+SUBROUTINE write_help
 
 !            12345678901234567890123456789012345678901234567890123456789012345678901234567890
-WRITE (*,*) "Uso: diff_grib.exe file1 file2"
+WRITE (*,*) "Uso: diff_grib.exe file1 file2 [-h] [-nosig] [-lstep N]"
 WRITE (*,*) ""
-WRITE (*,*) "Programma che cerca le differnze significative tra 2 file grib."
+WRITE (*,*) "Programma che cerca le differenze significative tra 2 file grib."
+WRITE (*,*) ""
 WRITE (*,*) "Per ciascun campo scrive:"
 WRITE (*,*) "- numero progressivo;"
 WRITE (*,*) "- 4 flag che indicano se gli header coincidono. Per i campi in cui ci sono "
@@ -352,8 +463,18 @@ WRITE (*,*) "  differenze, scrive un record nei files diff_grib_sez*.log (INCOMP
 WRITE (*,*) "- numero di dati validi in ciascuno dei due files;"
 WRITE (*,*) "- media del campo nel primo file;"
 WRITE (*,*) "- Bias, RMS, max della differenza assoluta, calcolati in modo da ignorare le"
-WRITE (*,*) "  differnze dovute al troncamento GRIB;"
+WRITE (*,*) "  differenze dovute al troncamento GRIB;"
 WRITE (*,*) "- (max della differenza assoluta) / (range di valori presenti nel GRIB);"
 WRITE (*,*) "- numero di dati simultaneamente validi in entrambi i files."
+WRITE (*,*) 
+WRITE (*,*) "-nosig: calcola le differenze con i valori esatti, senza correggere per il"
+WRITE (*,*) "  troncamento dei grib"
+WRITE (*,*) "-lstep gestisce il calcolo della soglia per considerare significative le"
+WRITE (*,*) "  differenze tra due campi, nel caso in cui questi siano codificiati con un"
+WRITE (*,*) "  numero di bit diversi:"
+WRITE (*,*) "  0 : considera le statistiche mancanti (default)"
+WRITE (*,*) "  1 : prende lo step piu' grande (criterio lasco)"
+WRITE (*,*) "  -1: prende lo step piu' piccolo (criterio stringente)"
+WRITE (*,*) 
 
-END SUBROUTINE scrive_help
+END SUBROUTINE write_help

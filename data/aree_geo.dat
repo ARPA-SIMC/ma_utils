@@ -5,14 +5,15 @@
 ! - Per le aree Chimere, "codice" deve avere al max 6 caratteri 
 ! - Usato da sel_punti.f90 (catena crea_progetto_estra)
 !
-!                                               Ultimo aggiornamento: 05/03/2014
+!                                               Ultimo aggiornamento: 05/11/2014
 !-------------------------------------------------------------------------------
 !234567890-1234-1234-12345678-12345678-12345678-12345678-12345678-12345678-123-!- ...
 !Codice      Nx   Ny     Xmin     Ymin     Xmax     Ymax     Xrot     Yrot smf ! Note (testo, non letto dai programmi)
                                                                                
 aladin1      51   51    7.000   43.000   12.000   48.000    0.000    0.000 000 ! Dati operativi Aladin per City-Delta (0.1 x 0.1)
-arpacmet     57   41    1.875  -17.875    5.375  -15.375   10.000   57.500 010 ! Distribuzione COSMO per ARPA Campania
-arpaumet     80   63   -0.563  -16.625    4.375  -12.750   10.000   57.500 010 ! Distribuzione COSMO per ARPA Umbria
+arpacamp     59   45    1.875  -18.000    5.500  -15.250   10.000   57.500 010 ! Distribuzione COSMO per ARPA Campania
+arpatosc     36   38   -0.313  -15.250    1.875  -12.938   10.000   57.500 010 ! Distribuzione COSMO per ARPA Toscana
+arpaumbr     80   63   -0.563  -16.625    4.375  -12.750   10.000   57.500 010 ! Distribuzione COSMO per ARPA Umbria
 as2pm_bpa   136   60    6.255   43.095   14.355   46.635    0.000    0.000 010 ! Stime di PM da satellite, dominio BPA 
 cont1        65   33  -10.000   40.500   22.000   56.500    0.000    0.000 010 ! Chimere continentale piccolo (0.5 x 0.5)
 cont2        65   65  -10.000   40.500   22.000   56.500    0.000    0.000 010 ! Chimere continentale piccolo (0.25 x 0.5)

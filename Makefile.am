@@ -44,6 +44,12 @@ pkgdataroot_DATA = \
 	$(top_srcdir)/data/tabella_201_ser.txt \
 	$(top_srcdir)/data/tabella_201.txt \
 	$(top_srcdir)/data/tabella_203_ser.txt \
-	$(top_srcdir)/data/tabella_203.txt 
+	$(top_srcdir)/data/tabella_203.txt \
+	$(top_srcdir)/data/LAMAZ_layers_20120606.grb \
+	$(top_srcdir)/data/LAMAZ_orog_20120606.grb \
+	$(top_srcdir)/data/LMSMR4_layers_20120606.grb \
+	$(top_srcdir)/data/LMSMR4_orog_20120606.grb \
+	$(top_srcdir)/data/LMSMR5_layers_20120606.grb \
+	$(top_srcdir)/data/LMSMR5_orog_20120606.grb
 
 EXTRA_DIST = $(pkgdataroot_DATA)

@@ -26,7 +26,11 @@ unset LANG
 # Con opzione -noint, suppone che l'area di Chimere sia la stessa dei grib, e
 #   non effettua l'interpolazione orizzontale (la procedura NON fa controlli!!)
 #
-#                         Versione 7.1.0 (V200709C), Michele & Enrico 28/08/2014
+#                         Versione 7.1.1 (V200709C), Michele & Enrico 03/11/2014
+#
+# NOTE PER NUOVA VERSIONE
+# - gestire caso ECMWF (disponibile GEOP_3D, varibile nel tempo; estra_grib_ecmwf?)
+#
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -207,7 +211,7 @@ while [ $cnt -lt $ndays ] ; do
 # 2.2) Costruisco la lista dei parametri e seleziono i livelli da estrarre
 
 # Parametri obbligatori
-  plist_3d="ZWIN_3D MWIN_3D TEMP_3D SPHU_3D"
+  plist_3d="ALTI_3D PRES_3D ZWIN_3D MWIN_3D TEMP_3D SPHU_3D"
   plist_2d="SURP_2D TEM2_2D TOPC_2D SWRD_2D ALB_2D"
 
 # Parametri opzionali
@@ -256,22 +260,19 @@ while [ $cnt -lt $ndays ] ; do
   500)
     if   [ $metmod = "LM" -a $datac_ref -lt 20060126 ] ; then
       nzmet=22
-      db_levs=36
-      db_lev_list=( 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 13 11 9 7 5 3 1 )
+      db_lev_list="35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 13 11 9 7 5 3 1"
     elif [ $metmod = "LM" -a $datac_ref -ge 20060126 ] ; then
       nzmet=25
-      db_levs=41
-      db_lev_list=( 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 15 13 11 9 7 5 3 1 )
+      db_lev_list="40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 15 13 11 9 7 5 3 1"
     elif [ $metmod = "ECMWF" ] ; then
       nzmet=23
-      db_levs=61
     fi ;;
   *)
     echo "Top pressure "$ptopmet " not yet implemented"
     exit 2
   esac
 
-  export nzmet db_levs
+  export nzmet db_lev_list
   np3d=`expr $np \* $nzmet`
 
 #-------------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 ! accessorie Lokal Modell)
 ! Altri parametri Lokal Model sono nelle tabelle 002 e 203
 !
-!                                          Ultimo aggiornamento: 22/11/2013
+!                                          Ultimo aggiornamento: 21/11/2014
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890--12345
 !Cod  Sigla     Descrizione e unita'                      B-Tab 
@@ -42,7 +42,7 @@
  171  tch       transfer coefficient for heat/moisture
  187  vmax      maximal windspeed (10m) [m/s]             11041
  197  tso       multi-layer soil temperature [K]
- 198  wso       multi-layer soil moisture [m H2O]         13203
+ 198  wso       multi-layer soil moisture [m H2O]         13206
  199  wice      multi-layer soil ice [m H2O]
  200  wi        water content of intercep. [m H2O] 
  203  tsnow     temperature of the snow-surface [K]       12101      
