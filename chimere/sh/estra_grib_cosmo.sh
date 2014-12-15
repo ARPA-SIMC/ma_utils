@@ -355,7 +355,6 @@ EOF2
 done
 
 # 2.2.4 copio le quote dei livelli per tutti gli istanti richiesti
-set -x
   echo "Copio le quote dei livelli per gli istanti richiesti"
   mv ALTI_3D.grb zlay.grb
   rm -f tranges.lst 

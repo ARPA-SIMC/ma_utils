@@ -1170,7 +1170,7 @@ WRITE (*,*) "Area ",TRIM(domain)," non trovata in ",TRIM(tab_file)
 STOP 5
 
 9989 CONTINUE
-WRITE (*,*) "Reference time non trovato in ",TRIM(filein)," usare parametro -rtm"
+WRITE (*,*) "Riferimenti temporali non trovati in ",TRIM(filein)," usare parametro -vt"
 STOP 6
 
 END PROGRAM chimerencdf2grib
@@ -1263,7 +1263,7 @@ SUBROUTINE write_help
 !
 ! Scrive a scehmo l'help del programma
 !
-!            123456789012345678901234567890123456789012345678901234567890123456789012345
+!            12345678901234567890123456789012345678901234567890123456789012345678901234567890
 WRITE (*,*) "Uso: chimere2grib.exe filein fileout fileinfo igen "
 WRITE (*,*) "     [-out/-met/-bio/-ini/-bc/-emibio/-eminv/-aodem]"
 WRITE (*,*) "     [-grd DOM] [-vt YYYYMMDDHH] [-rmis VAL]"
@@ -1284,12 +1284,13 @@ WRITE (*,*) "  -eminv: analizza un file EMISSIONS-area.mm (profili giorn. di emi
 WRITE (*,*) "  -aodem: analizza l'output di AODEM (solo AOD, 2-dim)"
 WRITE (*,*) ""
 WRITE (*,*) "Opzioni per convertire i dati MACC:"
-WRITE (*,*) "-grd DOM: usa i parametri griglia relativi all'aera DOM (default: legge DOM"
-WRITE (*,*) "          da filein). DOM deve essere incluso in domainlist.nml" 
-WRITE (*,*) "-vt YYYYMMDDHH: specifica il verification time del primo istante in output"
-WRITE (*,*) "          (def: lo legge da filein)"
+WRITE (*,*) "-grd DOM: usa i parametri griglia relativi all'aera DOM (default: legge DOM da"
+WRITE (*,*) "          filein). DOM deve essere incluso in domainlist.nml" 
+WRITE (*,*) "-vt YYYYMMDDHH: specifica il verification time del primo istante in output;"
+WRITE (*,*) "          la scadenza viene letta da fileinfo. Se si sta elaborando l'output"
+WRITE (*,*) "          standard di Chimere (default) queste informazioni sono lette da filein"
 WRITE (*,*) "-rmis VAL: considera mancanti i valori pari a VAL (in MACC -999.)"
-!            123456789012345678901234567890123456789012345678901234567890123456789012345
+!            12345678901234567890123456789012345678901234567890123456789012345678901234567890
 
 RETURN
 

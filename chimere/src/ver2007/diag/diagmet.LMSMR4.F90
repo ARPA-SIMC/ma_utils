@@ -771,8 +771,6 @@ contains
     if (dl/=dlen) stop 'diagmet : date format error in input file'
     ncstat=nf90_inquire_dimension(m_id, m_zonal_dimid, len=we)
     NCERR(__LINE__)
-
-print *,"we,nzonal ",we,nzonal
     if (we/=nzonal) stop 'diagmet : WE dimension error in input file'
     ncstat=nf90_inquire_dimension(m_id, m_merid_dimid, len=sn    )
     NCERR(__LINE__)
