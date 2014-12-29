@@ -33,6 +33,7 @@ lmsmr4      297  313   -8.500  -25.000   10.000   -5.500   10.000   57.500 010 !
 lmsmr5      447  532   -3.500  -21.925    7.650   -8.650   10.000   57.500 010 ! Area operativa LAMI 2.8 km (0.025 x 0.025)
 lmtosc       46   44   -8.120  -15.563    2.000  -12.875   10.000   57.500 010 ! Distribuzione LM per Toscana (zoom da LMSMR2: 68,136,113,179)
 maccaod     181   91    6.000   43.000   15.000   47.500    0.000    0.000 000 ! Dati AOD-MACC nell'archivio locale radicchio (0.05 x 0.05)
+maccbpa      90   55    5.500   42.550   14.450   47.450    0.000    0.000 000 ! Dati PM10-MACC per verifica ENS 2014 (0.1 x 0.1)
 med025      173   65   -6.000   30.000   37.000   46.000    0.000    0.000 000 ! Area IFS-ECMWF Mediterraneo (0.25 x 0.25)
 prvbpa       24   16    4.000   41.500   15.500   49.000    0.000    0.000 010 ! Area Prev'Air richiesta da CTN per BC su BPA (0.5 x 0.5)
 prvemr       19   11    5.500   42.500   14.500   47.500    0.000    0.000 010 ! Area Prev'Air richiesta da EmR, operativa (0.5 x 0.5)

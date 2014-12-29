@@ -18,7 +18,7 @@ PROGRAM chimerencdf2grib
 ! - i dati ENS hanno campi mancanti qua e la' (file *additional*, livello 2)
 ! NB I dati sono il ug/m3, ma la codifica grib dei gas richiederebbe ppb!!
 !
-!                               Versione 3.1.2, Michele & Enrico 10/09/2014
+!                               Versione 3.2.0, Michele & Enrico 17/12/2014
 !--------------------------------------------------------------------------
 use calendar 
 use netcdf
@@ -56,7 +56,7 @@ REAL    :: psec2(512),psec3(2)
 REAL, ALLOCATABLE :: conc_out(:,:,:),tot(:),conc_miss(:,:,:)
 REAL :: x1,y1,x2,y2,dx,dy,xrot,yrot,x2r,y2r,rmis
 INTEGER :: version
-INTEGER :: nvarout,nx,ny,np,nl,slen,mm,nxi,nyi,ntrov,nscri
+INTEGER :: nvarout,nx,ny,np,nl,slen,mm,nxi,nyi,ntrov,ntrovs,nscri,nscris
 INTEGER :: code_var(maxvar),tab_var(maxvar),lev_out(maxlev)
 INTEGER :: cem,igen,idata,idata_ini,scad_ini
 INTEGER :: iu,k,kp,kvar,kscad,klev,kday,kh,ios,eof,eor,cnt_grb,idp
@@ -117,7 +117,6 @@ integer:: vartype1,times1_varid,typeday,biospecies,biospe_varid,latspe_varid,spe
 character(len=dlen)   :: datebuf
 
 logical::is3d1,rtm
-
 
 integer::mm5date2numeric
 character(len=6)::domain,rdomain
@@ -607,67 +606,69 @@ CALL PBOPEN (iu,fileout,'W',kret)
 IF (inp_fmt == 1) THEN
 
   cnt_grb = 0
-  ntrov=0
+  ntrov = 0
+  nscri = 0
   DO kscad = 1, times1
-     IF (.NOT. rtm) THEN
-       ncstat=nf90_get_var(ncid,times1_varid,datebuf,(/1,kscad/),(/dstrlen, 1/))
-       idata=mm5date2numeric(datebuf)
-     ENDIF
-     IF (kscad == 1) idata_ini = idata
-     CALL chdata2ksec(idata,idata_ini,scad_ini,verbose, &
-        ksec1(10),ksec1(11),ksec1(12),ksec1(13),ksec1(16),ksec1(21))
+    IF (.NOT. rtm) THEN
+      ncstat=nf90_get_var(ncid,times1_varid,datebuf,(/1,kscad/),(/dstrlen, 1/))
+      idata=mm5date2numeric(datebuf)
+    ENDIF
+    IF (kscad == 1) idata_ini = idata
+    WRITE (*,*) "Elaboro scadenza ",idata
 
-     DO ivar=1,nvarout
-        ncstat=nf90_inq_varid(ncid,namevar(ivar),ivarid)
-        IF (ncstat==NF90_NOERR) THEN
-           IF (kscad ==1) THEN
-             WRITE(*,'(2a,2(1x,i3))') "Trovata la variabile: ", &
-               namevar(ivar),ivar,ivarid
-             ntrov=ntrov+1
-           ENDIF
+    CALL chdata2ksec(idata,idata_ini,scad_ini,verbose, &
+       ksec1(10),ksec1(11),ksec1(12),ksec1(13),ksec1(16),ksec1(21))
 
-           ncstat=nf90_inquire_variable &
-             (ncid,ivarid,varids1(ivarid)%varname,vartype1,varids1(ivarid)%ndims)
-           ncstat=nf90_get_var( ncid,ivarid, buf3d1, &
-                (/     1,      1,       1, kscad/),  & ! start vector
-                (/nzonal, nmerid, nlev,     1/))    ! count vector
+    DO ivar=1,nvarout
+      ncstat=nf90_inq_varid(ncid,namevar(ivar),ivarid)
+      IF (ncstat==NF90_NOERR) THEN
+        IF (kscad ==1) ntrov = ntrov + 1
 
-           conc2 = RESHAPE(buf3d1,(/nzonal*nmerid,nlev/))
-           conc_out(:,:,ivar) = conc2(:,:)
+        ncstat=nf90_inquire_variable(ncid,ivarid,varids1(ivarid)%varname, &
+          vartype1,varids1(ivarid)%ndims)
+        ncstat=nf90_get_var(ncid,ivarid,buf3d1,(/1,1,1,kscad/),  & ! start vector
+          (/nzonal,nmerid,nlev,1/))                                ! count vector
 
-           IF (code_var(ivar) <= 0) CYCLE
-           ksec1(1) = tab_var(ivar)
-           ksec1(6) = code_var(ivar)
-           DO klev = 1,nlev
-             IF (lev_out(klev) == 0) CYCLE
-             ksec1(7) = 109
-             ksec1(8) = klev
-             ksec1(9) = 0
-             IF (ANY(conc_out(1:np,klev,ivar) == rmis)) THEN
-               ksec1(5) = 192
-             ELSE
-               ksec1(5) = 128
-             ENDIF
+        conc2 = RESHAPE(buf3d1,(/nzonal*nmerid,nlev/))
+        conc_out(:,:,ivar) = conc2(:,:)
 
-             CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
-                  conc_out(1:np,klev,ivar),np,kbuffer,maxdim,kword,'C',kret)
-
-             CALL PBWRITE(iu,kbuffer,ksec0(1),kret)
-             IF (kret <= 0) WRITE(*,*) 'Errore pbwrite, kret ',kret
-             cnt_grb = cnt_grb + 1
-           ENDDO                 ! livelli
-
-        ELSE
-           IF (kscad ==1) WRITE(*,'(2a,2(1x,i3))') &
-             "Variabile non trovata: ",namevar(ivar),ivar
-
+        IF (code_var(ivar) <= 0) CYCLE
+        IF (kscad ==1) THEN
+          WRITE (*,'(a,a4,1x,4i6)') "Trovata la variabile ", &
+            namevar(ivar),ivar,ivarid,tab_var(ivar),code_var(ivar)
+          nscri = nscri + 1
         ENDIF
-     ENDDO                       ! specie 
-  ENDDO                          ! istanti
+
+        ksec1(1) = tab_var(ivar)
+        ksec1(6) = code_var(ivar)
+        DO klev = 1,nlev
+          IF (lev_out(klev) == 0) CYCLE
+          ksec1(7) = 109
+          ksec1(8) = klev
+          ksec1(9) = 0
+          IF (ANY(conc_out(1:np,klev,ivar) == rmis)) THEN
+            ksec1(5) = 192
+          ELSE
+            ksec1(5) = 128
+          ENDIF
+
+          CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
+               conc_out(1:np,klev,ivar),np,kbuffer,maxdim,kword,'C',kret)
+          CALL PBWRITE(iu,kbuffer,ksec0(1),kret)
+          cnt_grb = cnt_grb + 1
+        ENDDO                 ! livelli
+
+      ELSE
+        IF (kscad ==1) WRITE(*,'(a,a4,1x,4i6)') "Variabile non trovata ", &
+          namevar(ivar),ivar,ivarid,tab_var(ivar),code_var(ivar)
+
+      ENDIF
+    ENDDO                      ! specie 
+  ENDDO                        ! istanti
 
   ncstat=nf90_close(ncid)
-  WRITE (*,'(3(a,i6))') "Scadenze elaborate ",kscad-1, &
-    ", variabili scritte ",ntrov,", grib scritti ",cnt_grb
+  WRITE (*,*) "Varibili (3D): input ",ntrov," output ",nscri
+  WRITE (*,*) "Scadenze elaborate ",kscad-1," grib scritti ",cnt_grb
 
 !--------------------------------------------------------------------------
 ! 2.2) Formato METEO
@@ -675,82 +676,102 @@ IF (inp_fmt == 1) THEN
 ELSE IF (inp_fmt == 2) THEN
 
   cnt_grb = 0
-  ntrov=0
-  nscri=0
+  ntrov = 0
+  ntrovs = 0
+  nscri = 0
+  nscris = 0
   DO kscad = 1, times1
-     ntrov=0
-     nscri=0  
-     ncstat=nf90_get_var(ncid,times1_varid,datebuf,(/1,kscad/),(/dstrlen, 1/))
-     idata=mm5date2numeric(datebuf)
-     write(6,*)trim(datebuf),idata
+    IF (.NOT. rtm) THEN
+      ncstat=nf90_get_var(ncid,times1_varid,datebuf,(/1,kscad/),(/dstrlen, 1/))
+      idata=mm5date2numeric(datebuf)
+    ENDIF
+    IF (kscad == 1) idata_ini = idata
+    WRITE (*,*) "Elaboro scadenza ",idata
 
-     IF (kscad == 1) idata_ini = idata
-     CALL chdata2ksec(idata,idata_ini,scad_ini,verbose, &
-          ksec1(10),ksec1(11),ksec1(12),ksec1(13),ksec1(16),ksec1(21))
-     do ivar=1,nvarout
-        ncstat=nf90_inq_varid(ncid,namevar(ivar),ivarid)
-        is3d1=(ncstat==NF90_NOERR)
-        if(is3d1) then
-           write(6,*)'ho trovato la variabile  ',namevar(ivar),ivar,ivarid,code_var(ivar)
-           ntrov=ntrov+1
-           ncstat=nf90_inquire_variable(ncid,ivarid,varids1(ivarid)%varname,vartype1,varids1(ivarid)%ndims)
-           if(varids1(ivarid)%ndims==3)  then
-              ! 2d fil
+    CALL chdata2ksec(idata,idata_ini,scad_ini,verbose, &
+      ksec1(10),ksec1(11),ksec1(12),ksec1(13),ksec1(16),ksec1(21))
 
-              ncstat=nf90_get_var( ncid,ivarid, buf2d1, &
-                   (/     1,      1,        kscad/),  & ! start vector
-                   (/nzonal, nmerid,    1/))    ! count vector
-              write(6,*)'2D ',varids1(ivarid)%varname
-              nl=1
-              conc1=reshape(buf2d1,(/nzonal*nmerid/))
-              conc_out(:,1,ivar)=conc1(:)
+    DO ivar=1,nvarout
+      ncstat=nf90_inq_varid(ncid,namevar(ivar),ivarid)
+      IF (ncstat==NF90_NOERR) THEN
 
+        ncstat=nf90_inquire_variable(ncid,ivarid,varids1(ivarid)%varname, &
+          vartype1,varids1(ivarid)%ndims)
 
-           else if(varids1(ivarid)%ndims==4)  then
+        IF (varids1(ivarid)%ndims==3) THEN           ! 2D field
+          IF (kscad == 1) ntrovs = ntrovs + 1
+          ncstat = nf90_get_var(ncid,ivarid,buf2d1,(/1,1,kscad/), &   ! start vector
+            (/nzonal,nmerid,1/))                                      ! count vector
+           nl = 1
+           conc1 = RESHAPE(buf2d1,(/nzonal*nmerid/))
+           conc_out(:,1,ivar) = conc1(:)
 
-              ncstat=nf90_get_var( ncid,ivarid, buf3d1, &
-                   (/     1,      1,       1, kscad/),  & ! start vector
-                   (/nzonal, nmerid, nlev,     1/))    ! count vector
+        ELSE IF (varids1(ivarid)%ndims==4) THEN      ! 3D field
+          IF (kscad == 1) ntrov = ntrov + 1
+          ncstat = nf90_get_var(ncid,ivarid,buf3d1,(/1,1,1,kscad/), & ! start vector
+            (/nzonal,nmerid,nlev,1/))                                 ! count vector
+           conc2 = RESHAPE(buf3d1,(/nzonal*nmerid,nlev/))
+           conc_out(:,:,ivar) = conc2(:,:)
+           nl = nlev
 
-              write(6,*)'3D ',varids1(ivarid)%varname
-              conc2=reshape(buf3d1,(/nzonal*nmerid,nlev/))
-              conc_out(:,:,ivar)=conc2(:,:)
-              nl=nlev
-           end if
+        ENDIF
 
-           IF (code_var(ivar) <= 0) CYCLE
-           write(6,*)'scrivo  la variabile  ',namevar(ivar),ivar
-           nscri=nscri+1
-           ksec1(1) = tab_var(ivar)
-           ksec1(6) = code_var(ivar)
-           DO klev = 1,nl
-              IF (lev_out(klev) == 0) CYCLE
-              IF (varids1(ivarid)%ndims==4) then
-                 ksec1(7) = 109
-                 ksec1(8) = klev
-                 ksec1(9) = 0
-              ELSE
-                 ksec1(7) = 1
-                 ksec1(8) = 0
-                 ksec1(9) = 0
-              ENDIF
+        IF (code_var(ivar) <= 0) CYCLE
+        IF (kscad ==1) THEN
+          IF (nl == 1) THEN
+            WRITE (*,'(a,a4,1x,4i6)') "Trovata la variabile (2D) ", &
+              namevar(ivar),ivar,ivarid,tab_var(ivar),code_var(ivar)
+            nscris = nscris + 1
+          ELSE
+            WRITE (*,'(a,a4,1x,4i6)') "Trovata la variabile (3D) ", &
+              namevar(ivar),ivar,ivarid,tab_var(ivar),code_var(ivar)
+            nscri = nscri + 1
+          ENDIF
+        ENDIF
 
-              CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
-                   conc_out(1:np,klev,ivar),np,kbuffer,maxdim,kword,'C',kret)
+        ksec1(1) = tab_var(ivar)
+        ksec1(6) = code_var(ivar)
+        DO klev = 1,nl
+          IF (lev_out(klev) == 0) CYCLE
+          IF (varids1(ivarid)%ndims==4) then
+            ksec1(7) = 109
+            ksec1(8) = klev
+            ksec1(9) = 0
+          ELSE IF (namevar(ivar) == "tem2" .OR. namevar(ivar) == "sreh" ) THEN
+            ksec1(7) = 105
+            ksec1(8) = 2
+            ksec1(9) = 0
+          ELSE IF (namevar(ivar) == "w10m" .OR. namevar(ivar) == "w10s" ) THEN
+            ksec1(7) = 105
+            ksec1(8) = 10
+            ksec1(9) = 0
+          ELSE IF (namevar(ivar) == "soim") THEN
+            ksec1(7) = 112
+            ksec1(8) = 0
+            ksec1(9) = 10
+          ELSE
+            ksec1(7) = 1
+            ksec1(8) = 0
+            ksec1(9) = 0
+          ENDIF
 
-              CALL PBWRITE(iu,kbuffer,ksec0(1),kret)
-              IF (kret <= 0) WRITE(*,*) 'Errore pbwrite, kret ',kret
+          CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
+               conc_out(1:np,klev,ivar),np,kbuffer,maxdim,kword,'C',kret)
+          CALL PBWRITE(iu,kbuffer,ksec0(1),kret)
+          cnt_grb = cnt_grb + 1
+        ENDDO                ! livelli
 
-              cnt_grb = cnt_grb + 1
-           ENDDO                ! livelli
-        else
-           write(6,*)'non ho trovato la variabile  ',namevar(ivar)
-        end if
-     end do                       !specie 
-  ENDDO                     ! scadenze
+      ELSE
+        IF (kscad ==1) WRITE(*,'(a,a4,1x,4i6)') "Variabile non trovata     ", &
+          namevar(ivar),ivar,ivarid,tab_var(ivar),code_var(ivar)
+
+      ENDIF
+    ENDDO                    ! specie 
+  ENDDO                      ! istanti
   ncstat=nf90_close(ncid)
-  WRITE (*,'(a,i3,a,i6,a,i3,a,i3,a)') "Elaborate ",kscad-1," scadenze, scritti ", &
-          cnt_grb," grib, Trovate ",ntrov, " N variabili  ,Scritte ",nscri ," N variabili"
+  WRITE (*,*) "Varibili (3D): input ",ntrov," output ",nscri
+  WRITE (*,*) "Varibili (2D): input ",ntrovs," output ",nscris
+  WRITE (*,*) "Scadenze elaborate ",kscad-1," grib scritti ",cnt_grb
 
 !--------------------------------------------------------------------------
 ! 2.3) Formato BIOGENIC

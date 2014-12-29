@@ -3,7 +3,7 @@
 ! Calmet e modelli fotochimici)
 ! I parametri aerosol Chimere sono nelle tabelle 196 e 199.
 !
-!                                          Ultimo aggiornamento: 22/11/2013
+!                                          Ultimo aggiornamento: 15/12/2014
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890--12345
 !Cod  Sigla     Descrizione e unita'                      B-Tab 
@@ -42,6 +42,8 @@
  112  lhf       Latent Heat Flux [W/m2]                   14193
  113  shf       Sensible Heat Flux [W/m2]                 14192
  114  tcc       Total Cloud Cover [%]                     20010
+ 115  swdown    Downward Solar Radiation [W/m2]           14018
+ 116  swup      Upward Solar Radiation [W/m2]             14199
 
 !Physiografic parametrs
  121  luse      Land Use [10-90]
