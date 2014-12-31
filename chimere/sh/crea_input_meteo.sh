@@ -26,7 +26,7 @@ unset LANG
 # Con opzione -noint, suppone che l'area di Chimere sia la stessa dei grib, e
 #   non effettua l'interpolazione orizzontale (la procedura NON fa controlli!!)
 #
-#                         Versione 7.1.1 (V200709C), Michele & Enrico 03/11/2014
+#                         Versione 7.1.2 (V200709C), Michele & Enrico 30/12/2014
 #
 # NOTE PER NUOVA VERSIONE
 # - gestire caso ECMWF (disponibile GEOP_3D, varibile nel tempo; estra_grib_ecmwf?)
@@ -117,10 +117,6 @@ fnmeteo=${tmp_dir}/METEO.nc
 diagmet_fniMETEO=${tmp_dir}/METEOINP.nc
 
 # Controlli
-if [ $dataset != "NONE" -a $nhours != 24 -a $eqestra ="Y" ] ; then
-    echo "Estrazione automatica grib solo per run di 24 ore"
-    exit 2
-fi
 if [ $dataset != "ECM_ANA" -a $dataset != "LAMAZ" -a \
      $dataset != "COSMO_I7" -a  $dataset != "LM7TMPC" -a \
      $dataset != "NONE" ] ; then

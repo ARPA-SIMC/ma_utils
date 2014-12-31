@@ -17,7 +17,7 @@
 # Uso: chiamato da crea_input_meteo.sh e feed_postcosmo.sh 
 #
 # Note:
-#   SCAD0: -1 = analisi 24h, -0.5 analisi 12h, 0/1/2 previsioni
+#   SCAD0: -1 = analisi 24h, -0.5 analisi 12h, >=0 previsioni (scad. iniziale, ore)
 #
 #   Con PROJ=none devono essere preventivamente assegnate le variabili:
 #   hh_ini, dataset, nhours, scad0;  nzmet, db_lev_list, ptopmet, metmod; 
@@ -42,7 +42,7 @@
 #   richiederebbe l'introduzione di nuovi alias per le scadenze previste 
 #   (c0124 -> c0124ph, ...); per le analisi dovrebbe bastare Timedef,0,x,1h
 #
-#                                    Versione 7.6.0 (Arkimet), Enrico 03/12/2014
+#                                    Versione 7.7.0 (Arkimet), Enrico 31/12/2014
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -54,9 +54,9 @@ function write_help
   echo "PROJ:     progetto Chimere, di cui viene letto il file pre_chimere.inp; mettere"
   echo "          \"none\" se non si vuole usare pre_chimere.inp (le variabili"
   echo "           d'environment necessarie devono essere state definite ed esportate)"
-  echo "YYYYMMDD: data iniziale (l'ora iniziale e' letta da pre_chimere.inp)."
-  echo "          Per i forecast (SCAD0 = 0, 1, 2) corrisponde al reference time;"
-  echo "          Per le analisi (SCAD0 = -1, -0.5) all'istante iniziale."
+  echo "YYYYMMDD: data iniziale (l'ora iniziale e' letta da pre_chimere.inp):"
+  echo "          per i forecast (SCAD0 >= 0) corrisponde al reference time"
+  echo "          per le analisi (SCAD0 = -1, -0.5) al primo istante da elaborare"
   return
 }
 
@@ -137,10 +137,6 @@ if [ $metmod != "LM" ] ; then
   echo "Modello meteo non gestito per estrazione arkimet [METMOD]: "$metmod
   exit 2
 fi
-if [ $nhours -ne 24 -a  $nhours -ne 12 ] ; then
-  echo "Lunghezza run Chimere non gestita [NHOURS]: "$nhours
-  exit 2
-fi
 
 if [ $scad0 = "-1" ] ; then
   if [ $hh_ini -ne 0 ] ; then
@@ -152,7 +148,7 @@ elif [ $scad0 = "-0.5" ] ; then
     echo "Le analisi 12h devono iniziare alle ore 00Z o 12Z (hh_ini="$hh_ini")"
     exit 2
   fi
-elif [ $scad0 -eq 0 -o $scad0 -eq 24 -o $scad0 -eq 48 ] ; then
+else
   if [ $hh_ini -ne 0 -a $hh_ini -ne 12 ] ; then
     echo "Sono gestiti solo forecast con inizio alle 00Z o 12Z (hh_ini="$hh_ini")"
     exit 2
@@ -161,10 +157,10 @@ elif [ $scad0 -eq 0 -o $scad0 -eq 24 -o $scad0 -eq 48 ] ; then
     echo "Dataset non gestito per le previsioni [DATASET]: "$dataset
     exit 2
   fi
-
-else
-  echo "Scadenza iniziale non gestita [scad0]: "$scad0
-  exit 2
+  if [ $nhours -gt 72 ] ; then
+    echo "Previsioni COSMO gestite solo fino a +72 ore (richieste: +"$nhours")"
+    exit 2
+  fi
 fi
 
 if [ $hmix -eq 0 ] ; then
@@ -182,58 +178,71 @@ if [ $scad0 = "-1" -o $scad0 = "-0.5" ] ; then                       # analisi
   datacm1_akq=`date -d "${datac_ref} - 1day" +%Y-%m-%d`
   datacp1_akq=`date -d "${datac_ref} + 1day" +%Y-%m-%d`
   if [ $scad0 = "-1" ] ; then
-    str_reftime_ist=">="${datac_akq}" 00, <="${datacp1_akq}" 00"
-    str_reftime_cum=">="${datacm1_akq}" 23, <="${datacp1_akq}" 01"
-    str_reftime_med=">="${datacm1_akq}" 23, <="${datacp1_akq}" 01"
+    expr_reftime_ist=">="${datac_akq}" 00, <="${datacp1_akq}" 00"
+    expr_reftime_cum=">="${datacm1_akq}" 23, <="${datacp1_akq}" 01"
+    expr_reftime_med=">="${datacm1_akq}" 23, <="${datacp1_akq}" 01"
   elif [ $scad0 = "-0.5" -a $hh_ini -eq 0 ] ; then
-    str_reftime_ist=">="${datac_akq}" 00, <="${datac_akq}" 12"
-    str_reftime_cum=">="${datacm1_akq}" 23, <="${datac_akq}" 13"
-    str_reftime_med=">="${datacm1_akq}" 23, <="${datac_akq}" 13"
+    expr_reftime_ist=">="${datac_akq}" 00, <="${datac_akq}" 12"
+    expr_reftime_cum=">="${datacm1_akq}" 23, <="${datac_akq}" 13"
+    expr_reftime_med=">="${datacm1_akq}" 23, <="${datac_akq}" 13"
   elif [ $scad0 = "-0.5" -a $hh_ini -eq 12 ] ; then
-    str_reftime_ist=">="${datac_akq}" 12, <="${datacp1_akq}" 00"
-    str_reftime_cum=">="${datacm1_akq}" 11, <="${datacp1_akq}" 01"
-    str_reftime_med=">="${datacm1_akq}" 11, <="${datacp1_akq}" 01"
+    expr_reftime_ist=">="${datac_akq}" 12, <="${datacp1_akq}" 00"
+    expr_reftime_cum=">="${datacm1_akq}" 11, <="${datacp1_akq}" 01"
+    expr_reftime_med=">="${datacm1_akq}" 11, <="${datacp1_akq}" 01"
   fi
 
-# str_timerange_ist="an"               # patch fino a ricostruzione indice LAMAZ
+# expr_trange_ist="an"               # patch fino a ricostruzione indice LAMAZ
   if [ $dataset = "lamaz" ] ; then
-    str_timerange_ist="Timedef"        # patch fino a ricostruzione indice LAMAZ
-    str_timerange_cum="ac0001"
-    str_timerange_med="aa0001"
-    str_proddef=""
+    expr_trange_ist="Timedef"        # patch fino a ricostruzione indice LAMAZ
+    expr_trange_cum="ac0001"
+    expr_trange_med="aa0001"
+    expr_proddef=""
   elif [ $dataset = "lm7tmpc" -o $dataset = "COSMO_I7" ] ; then
-    str_timerange_ist="an"             # patch fino a ricostruzione indice LAMAZ
-    str_timerange_cum="Timedef"
-    str_timerange_med="Timedef"
-    str_proddef="proddef: GRIB: tod=0"
+    expr_trange_ist="an"             # patch fino a ricostruzione indice LAMAZ
+    expr_trange_cum="Timedef"
+    expr_trange_med="Timedef"
+    expr_proddef="GRIB: tod=0"
   fi
 
-elif [ $scad0 = "0" ] ; then                                        # previ d+0
-  str_reftime_ist="="${datac_akq}" "${hh_ini}
-  str_reftime_cum="="${datac_akq}" "${hh_ini}
-  str_reftime_med="="${datac_akq}" "${hh_ini}
-  str_timerange_ist="an or f0124"
-  str_timerange_cum="an or c0124 or c025"
-  str_timerange_med="an or a0124 or a025"
-  str_proddef="proddef: GRIB: tod=1"
+else
+  expr_reftime_ist="="${datac_akq}" "${hh_ini}
+  expr_reftime_cum="="${datac_akq}" "${hh_ini}
+  expr_reftime_med="="${datac_akq}" "${hh_ini}
+  expr_proddef="GRIB: tod=1"
 
-elif [ $scad0 = "24" ] ; then                                       # previ d+1
-  str_reftime_ist="="${datac_akq}" "${hh_ini}
-  str_reftime_cum="="${datac_akq}" "${hh_ini}
-  str_reftime_med="="${datac_akq}" "${hh_ini}
-  str_timerange_ist="f024 or f2548"
-  str_timerange_cum="c023 or c024 or c2548 or c049"
-  str_timerange_med="a023 or a024 or a2548 or a049"
-  str_proddef="proddef: GRIB: tod=1"
+  sc1=$scad0
+  sc2=`expr $scad0 + $nhours`
+  if [ $sc1 -eq 0 ] ; then
+    sc1_proc=0
+  else
+    sc1_proc=`expr $sc1 - 1`
+  fi
+  if [ $sc2 -eq 72 ] ; then
+    sc2_proc=72
+    proc72="Y"
+  else
+    sc2_proc=`expr $sc2 + 1`
+    proc72="N"
+  fi
 
-elif [ $scad0 = "48" ] ; then                                       # previ d+2
-  str_reftime_ist="="${datac_akq}" "${hh_ini}
-  str_reftime_cum="="${datac_akq}" "${hh_ini}
-  str_reftime_med="="${datac_akq}" "${hh_ini}
-  str_timerange_ist="f048 or f4972"
-  str_timerange_cum="c047 or c048 or c4972"
-  str_timerange_med="a047 or a048 or a4972"
-  str_proddef="proddef: GRIB: tod=1"
+  expr_trange_ist=""
+  expr_trange_cum=""
+  expr_trange_med=""
+  for scad in `seq $sc1 $sc2` ; do
+    expr_trange_ist=$expr_trange_ist" or Timedef,${scad}h,254"
+  done
+  for scad in `seq $sc1_proc $sc2_proc` ; do
+    if [ $scad -eq 0 ] ; then
+      expr_trange_cum=$expr_trange_cum" or Timedef,${scad}h,254"
+      expr_trange_med=$expr_trange_med" or Timedef,${scad}h,254"
+    else
+      expr_trange_cum=$expr_trange_cum" or Timedef,${scad}h,1,${scad}h"
+      expr_trange_med=$expr_trange_med" or Timedef,${scad}h,0,${scad}h"
+    fi
+  done
+  expr_trange_ist=`echo ${expr_trange_ist# or }`
+  expr_trange_cum=`echo ${expr_trange_cum# or }`
+  expr_trange_med=`echo ${expr_trange_med# or }`
 
 fi
 
@@ -257,14 +266,14 @@ while [ $cnt -le $nzmet ] ; do
   fi
 
   if [ $cnt -eq 1 ] ; then
-    str_lev3d=hld${slev}${slevp1}
+    expr_lev3d=hld${slev}${slevp1}
   else
-    str_lev3d=${str_lev3d}" or "hld${slev}${slevp1}
+    expr_lev3d=${expr_lev3d}" or "hld${slev}${slevp1}
   fi
 
   cnt=`expr $cnt + 1`
 done
-str_lev3d=`echo $str_lev3d | sed 's/,$//g'`
+expr_lev3d=`echo $expr_lev3d | sed 's/,$//g'`
 
 ################################################################################
 # 2) Estrazione
@@ -322,16 +331,16 @@ for param in $plist_3d ; do
   if [ $param = "ALTI_3D" ] ; then
     cat <<EOF1 > ${param}.query
     product: $var
-    level: $str_lev3d
+    level: $expr_lev3d
 EOF1
 
   else
     cat <<EOF2 > ${param}.query
-    reftime: $str_reftime_ist
+    reftime: $expr_reftime_ist
     product: $var
-    level: $str_lev3d
-    timerange: $str_timerange_ist
-    $str_proddef
+    level: $expr_lev3d
+    timerange: $expr_trange_ist
+    proddef: $expr_proddef
 EOF2
 
   fi
@@ -432,81 +441,81 @@ for param in $plist_2d ; do
   case $param in 
   SURP_2D)
     tipo_sca="ist"
-    str_levsup="g00"
+    expr_levsup="g00"
     var="pr" ;;
   TEM2_2D) 
     tipo_sca="ist"
-    str_levsup="g02"
+    expr_levsup="g02"
     var="t" ;;
   TOPC_2D)
     tipo_sca="cum"
-    str_levsup="g00"
+    expr_levsup="g00"
     var="tp" ;;
   SSHF_2D) 
     tipo_sca="med"
-    str_levsup="g00"
+    expr_levsup="g00"
     var="bflhs" ;;
   SLHF_2D) 
     tipo_sca="med"
-    str_levsup="g00"
+    expr_levsup="g00"
     var="bflqds" ;;
   SOIM_2D)
     tipo_sca="ist"
-    str_levsup="lug000010 or ug0001 or ug0002 or ug0006"
+    expr_levsup="lug000010 or ug0001 or ug0002 or ug0006"
     var="ssw or qsoil" ;;
   LOWC_2D)
     tipo_sca="ist"
-    str_levsup="g00"
+    expr_levsup="g00"
     var="cl" ;;
   MEDC_2D)
     tipo_sca="ist"
-    str_levsup="g00"
+    expr_levsup="g00"
     var="cm" ;;
   HIGC_2D)
     tipo_sca="ist"
-    str_levsup="g00"
+    expr_levsup="g00"
     var="ch" ;;
   U10M_2D)
     tipo_sca="ist"
-    str_levsup="g10"
+    expr_levsup="g10"
     var="u" ;;
   V10M_2D)
     tipo_sca="ist"
-    str_levsup="g10"
+    expr_levsup="g10"
     var="v" ;;
   USTA_2D)
     tipo_sca="ist"
-    str_levsup="g00"
+    expr_levsup="g00"
     var="ustar" ;;
   SWRD_2D)
     tipo_sca="med"
-    str_levsup="g00"
+    expr_levsup="g00"
     var="sosbs" ;;
   ALB_2D)
     tipo_sca="ist"
-    str_levsup="g00"
+    expr_levsup="g00"
     var="alb" ;;
   esac
 
 # 2.3.2 Costruisco la query
   if [ $tipo_sca = "ist" ] ; then
-    str_reftime=$str_reftime_ist
-    str_timerange=$str_timerange_ist
+    expr_reftime=$expr_reftime_ist
+    expr_trange=$expr_trange_ist
   elif [ $tipo_sca = "cum" ] ; then
-    str_reftime=$str_reftime_cum
-    str_timerange=$str_timerange_cum
+    expr_reftime=$expr_reftime_cum
+    expr_trange=$expr_trange_cum
   elif [ $tipo_sca = "med" ] ; then
-    str_reftime=$str_reftime_med
-    str_timerange=$str_timerange_med
+    expr_reftime=$expr_reftime_med
+    expr_trange=$expr_trange_med
   fi  
 
   rm -f ${param}.query
   cat <<EOF2 > ${param}.query
-  reftime: $str_reftime
+  reftime: $expr_reftime
   product: $var
-  level: $str_levsup
-  timerange: $str_timerange
-  $str_proddef
+  level: $expr_levsup
+  timerange: $expr_trange
+  proddef: $expr_proddef
 EOF2
 
 # 2.3.3 Estraggo dall' archivio
@@ -574,20 +583,20 @@ EOF2
 
       $grib_runmean ${param}.grb.p1 ${param}.grb.ext \
         2 -nval 1 -istout 1 || ier=38
-      arki-query  --data "reftime: $str_reftime_ist" grib1:${param}.grb.ext \
+      arki-query  --data "reftime: $expr_reftime_ist" grib1:${param}.grb.ext \
         > ${param}.grb || ier=39
 
     else
       $grib_runmean ${param}.grb.p1 ${param}.grb.ext \
         2 -nval 1 -istout 1 -forc || ier=40
-      if [ $scad0 -eq 48 ]  ; then
+      if [ $proc72 = "Y" ]  ; then
         arki-query  --data "timerange: Timedef,72h,,1h" grib1:${param}.grb.p1 \
           > ${param}.grb.f7172 || ier=41
         grib_set -s timeRangeIndicator=0,P1=72,P2=0 ${param}.grb.f7172 \
           ${param}.grb.f072 || ier=42
         cat ${param}.grb.f072 >> ${param}.grb.ext
       fi
-      arki-query  --data "timerange: $str_timerange_ist" grib1:${param}.grb.ext \
+      arki-query  --data "timerange: $expr_trange_ist" grib1:${param}.grb.ext \
         > ${param}.grb || ier=43
     fi
   fi
@@ -626,9 +635,9 @@ fi
 # cong TOPC_2D.grb.org TOPC_2D.patch.grb +"setkey sca:1,0,1,13"
 # 
 # if [ $scad0 = "-1" ] ; then
-#   arki-query --data "reftime: $str_reftime_ist" grib1:TOPC_2D.patch.grb > TOPC_2D.grb
+#   arki-query --data "reftime: $expr_reftime_ist" grib1:TOPC_2D.patch.grb > TOPC_2D.grb
 # else
-#   arki-query --data "reftime: $str_timerange_ist" grib1:TOPC_2D.patch.grb > TOPC_2D.grb
+#   arki-query --data "reftime: $expr_trange_ist" grib1:TOPC_2D.patch.grb > TOPC_2D.grb
 # fi
 
 exit $ier

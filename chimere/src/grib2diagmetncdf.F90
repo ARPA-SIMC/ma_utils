@@ -10,7 +10,7 @@ PROGRAM grib2diagmetncdf
 ! - check the consitency of grid extremes and scanning mode in input files
 ! - read model grid from input file (instead of namelist)
 !
-!                                    Versione 3.0.0, Michele & Enrico 08/10/2014
+!                                    Versione 3.0.1, Michele & Enrico 30/12/2014
 !-------------------------------------------------------------------------------
 
 USE netcdf
@@ -23,7 +23,7 @@ USE ifposix
 
 IMPLICIT NONE 
 
-#define NCERR(lnum) if(ncstat/=NF90_NOERR) call nc_err(ncstat,lnum,'lm2ncf.f90')
+#define NCERR(lnum) if(ncstat/=NF90_NOERR) call nc_err(ncstat,lnum,'grib2diagmetncdf.F90')
 	
 !-------------------------------------------------------------------------------
 
@@ -649,126 +649,124 @@ CONTAINS
       allocate(HTOP(nzonal,nmerid,nlev),hbase(nzonal,nmerid,nlev))
 
 ! determination of levels just below separation altitudes
-        do ime=1,nmerid
-        do izo=1,nzonal
-     do nl=1,nlev-1
-     if(alti(izo,ime,nl).lt.topl .and. alti(izo,ime,nl+1).ge.topl) levl(izo,ime) = nl
-     if(alti(izo,ime,nl).lt.topm .and. alti(izo,ime,nl+1).ge.topm) levm(izo,ime) = nl
-     if(alti(izo,ime,nl).lt.toph .and. alti(izo,ime,nl+1).ge.toph) levh(izo,ime) = nl
-             enddo
-             enddo
-             enddo
 
-        do ime=1,nmerid
-        do izo=1,nzonal
-             if(alti(izo,ime,nlev).lt.topl) levl(izo,ime) = nlev
-             if(alti(izo,ime,nlev).lt.topm) levm(izo,ime) = nlev
-             if(alti(izo,ime,nlev).lt.toph) levh(izo,ime) = nlev
-        end do
-        end do
-!            print *,'cloud level height 1',levl(np),levm(np),levh(np)
-!          print *,'cloud level height 2',topl,topm,toph
+! ENR 30/12/2014
+! Qui sembra che faccia un gran casino: 
+! - i livelli in ingresso sono ordinati dall'alto, quindi nel primo ciclo la condizone non si verifica mai
+! - quando tutti i livelli sono piu' in alto di topl (2500m, ad esempio con area LMSMR4 nel punto 100,195), 
+!   gli array lev* sono indefiniti e il programma esplode
+! segue patch (solo per farlo girare)
+!print *,alti(100,195,:)
+!print *,topl,topm,toph
 
-        do ime=1,nmerid
-        do izo=1,nzonal
-           do nl=1,nlev  
-         vapp = 611.*exp(17.27*(temp(izo,ime,nl)-273.15)/(temp(izo,ime,nl)-35.86))
-         qsbt = 0.622*vapp/(pres(izo,ime,nl)-vapp)
-         sat(izo,ime,nl)=7.223*(1E-3*vapp)*(mixr(izo,ime,nl)/qsbt)&
-          *(300/temp(izo,ime,nl))*1E-3/(pres(izo,ime,nl)/(R*temp(izo,ime,nl)))
-         relhum(izo,ime,nl)=mixr(izo,ime,nl)/qsbt
-         enddo
-         enddo
-         enddo
+levl(:,:) = nlev
+levm(:,:) = nlev
+levh(:,:) = nlev
 
+do ime=1,nmerid
+do izo=1,nzonal
+do nl=1,nlev-1
+  if(alti(izo,ime,nl).lt.topl .and. alti(izo,ime,nl+1).ge.topl) levl(izo,ime) = nl
+  if(alti(izo,ime,nl).lt.topm .and. alti(izo,ime,nl+1).ge.topm) levm(izo,ime) = nl
+  if(alti(izo,ime,nl).lt.toph .and. alti(izo,ime,nl+1).ge.toph) levh(izo,ime) = nl
+enddo
+enddo
+enddo
 
-        do ime=1,nmerid
-        do izo=1,nzonal
-             do nl=1,nlev-1
+do ime=1,nmerid
+do izo=1,nzonal
+  if(alti(izo,ime,nlev).lt.topl) levl(izo,ime) = nlev
+  if(alti(izo,ime,nlev).lt.topm) levm(izo,ime) = nlev
+  if(alti(izo,ime,nlev).lt.toph) levh(izo,ime) = nlev
+enddo
+enddo
+! print *,'cloud level height 1',levl(np),levm(np),levh(np)
+! print *,'cloud level height 2',topl,topm,toph
 
-             if (nl.eq.1) then
-             n(izo,ime)=1
-             endif
-      
+ do ime=1,nmerid
+ do izo=1,nzonal
+ do nl=1,nlev  
+   vapp = 611.*exp(17.27*(temp(izo,ime,nl)-273.15)/(temp(izo,ime,nl)-35.86))
+   qsbt = 0.622*vapp/(pres(izo,ime,nl)-vapp)
+   sat(izo,ime,nl)=7.223*(1E-3*vapp)*(mixr(izo,ime,nl)/qsbt)&
+      *(300/temp(izo,ime,nl))*1E-3/(pres(izo,ime,nl)/(R*temp(izo,ime,nl)))
+   relhum(izo,ime,nl)=mixr(izo,ime,nl)/qsbt
+ enddo
+ enddo
+ enddo
 
-             if (alti(izo,ime,nl).ge.alti(izo,ime,1).and. alti(izo,ime,nl).le.alti(izo,ime,levl(izo,ime))) then
-              crit(izo,ime,nl)=crhl
-!           print *,'low cloud ',crit(izo,ime,nl),crhl
-            endif
+ do ime=1,nmerid
+ do izo=1,nzonal
+ do nl=1,nlev-1
 
+   if (nl.eq.1) then
+     n(izo,ime)=1
+   endif
 
-           if (levm(izo,ime).le.nlev.and.levm(izo,ime).gt.levl(izo,ime)+1) then
-             if (alti(izo,ime,nl).ge.alti(izo,ime,levl(izo,ime)+1).and.alti(izo,ime,nl).le.alti(izo,ime,levm(izo,ime))) then
-             crit(izo,ime,nl)=crhm
-!            print *,'medium cloud',crit(izo,ime,nl),crhm 
-             endif
-            endif
+   if (alti(izo,ime,nl).ge.alti(izo,ime,1).and. alti(izo,ime,nl).le.alti(izo,ime,levl(izo,ime))) then
+     crit(izo,ime,nl)=crhl
+   endif
 
+   if (levm(izo,ime).le.nlev.and.levm(izo,ime).gt.levl(izo,ime)+1) then
+     if (alti(izo,ime,nl).ge.alti(izo,ime,levl(izo,ime)+1).and.alti(izo,ime,nl).le.alti(izo,ime,levm(izo,ime))) then
+       crit(izo,ime,nl)=crhm
+     endif
+   endif
 
-           if (levh(izo,ime).le.nlev.and.levh(izo,ime).gt.levm(izo,ime)+1) then
-             if (alti(izo,ime,nl).ge.alti(izo,ime,levm(izo,ime)+1).and.alti(izo,ime,nl).le.alti(izo,ime,levh(izo,ime))) then
-              crit(izo,ime,nl)=crhh
-!             print *,'high cloud',crit(izo,ime,nl)
-             endif
-          endif
+   if (levh(izo,ime).le.nlev.and.levh(izo,ime).gt.levm(izo,ime)+1) then
+     if (alti(izo,ime,nl).ge.alti(izo,ime,levm(izo,ime)+1).and.alti(izo,ime,nl).le.alti(izo,ime,levh(izo,ime))) then
+       crit(izo,ime,nl)=crhh
+     endif
+   endif
 
-
-         if ((relhum(izo,ime,nl)).ge.crit(izo,ime,nl)) then
-
-        if (sat(izo,ime,nl)-sat(izo,ime,nl+1).gt.0) then
-        
-         if (n(izo,ime).eq.1) then
-          Hbase_val(izo,ime)=nl
-          Hbase(izo,ime,nl)=Hbase_val(izo,ime)
-          Htop_val(izo,ime)=nl
-          Htop(izo,ime,nl)=Htop_val(izo,ime)
-         
-        else
-
-          Htop_val(izo,ime)=nl 
-          Hbase(izo,ime,nl)=Hbase_val(izo,ime)
-          if (Htop_val(izo,ime).eq.nlev-1.and.relhum(izo,ime,nlev).ge.crit(izo,ime,nl)) then
+   if ((relhum(izo,ime,nl)).ge.crit(izo,ime,nl)) then
+     if (sat(izo,ime,nl)-sat(izo,ime,nl+1).gt.0) then
+       if (n(izo,ime).eq.1) then
+         Hbase_val(izo,ime)=nl
+         Hbase(izo,ime,nl)=Hbase_val(izo,ime)
+         Htop_val(izo,ime)=nl
+         Htop(izo,ime,nl)=Htop_val(izo,ime)
+       else
+         Htop_val(izo,ime)=nl 
+         Hbase(izo,ime,nl)=Hbase_val(izo,ime)
+         if (Htop_val(izo,ime).eq.nlev-1.and.relhum(izo,ime,nlev).ge.crit(izo,ime,nl)) then
            Htop_val(izo,ime)=nlev
          else
            Hbase(izo,ime,nlev)=0
            Htop(izo,ime,nlev)=0
          endif
- 
- 
-        do j=Hbase_val(izo,ime),Htop_val(izo,ime)
-            Htop(izo,ime,j)=Htop_val(izo,ime)
-            Hbase(izo,ime,j)=Hbase_val(izo,ime)
+
+         do j=Hbase_val(izo,ime),Htop_val(izo,ime)
+           Htop(izo,ime,j)=Htop_val(izo,ime)
+           Hbase(izo,ime,j)=Hbase_val(izo,ime)
          enddo         
-        endif
-       
-         n(izo,ime)=n(izo,ime)+1
-! sat
-        endif
-! sat
-        endif
+       endif
 
-           if ((relhum(izo,ime,nl)).lt.crit(izo,ime,nl).or.(sat(izo,ime,nl)-sat(izo,ime,nl+1).lt.0)) then
-        Hbase(izo,ime,nl)=0
-        Htop(izo,ime,nl)=0
-        n(izo,ime)=1
-         endif
+       n(izo,ime)=n(izo,ime)+1
+     endif
+   endif
 
-! endif di rh.gt.0.75
-         
-          if (Hbase(izo,ime,nl).eq.Htop(izo,ime,nl)) then
-          Htop(izo,ime,nl)=0
-          Hbase(izo,ime,nl)=0
-          endif
+   if ((relhum(izo,ime,nl)).lt.crit(izo,ime,nl).or.(sat(izo,ime,nl)-sat(izo,ime,nl+1).lt.0)) then
+     Hbase(izo,ime,nl)=0
+     Htop(izo,ime,nl)=0
+     n(izo,ime)=1
+   endif
+  
+   if (Hbase(izo,ime,nl).eq.Htop(izo,ime,nl)) then
+     Htop(izo,ime,nl)=0
+     Hbase(izo,ime,nl)=0
+   endif
          
 ! Htop < Hbase
-          if (Htop(izo,ime,nl).lt.Hbase(izo,ime,nl)) then
-         print *, ' Error: Htop< Hbase', Hbase(izo,ime,nl),Htop(izo,ime,nl)
-          Htop(izo,ime,nl)=0
-          Hbase(izo,ime,nl)=0
-          endif         
-         enddo
-         end do
-         end do
+   if (Htop(izo,ime,nl).lt.Hbase(izo,ime,nl)) then
+     print *, ' Error: Htop< Hbase', Hbase(izo,ime,nl),Htop(izo,ime,nl)
+     Htop(izo,ime,nl)=0
+     Hbase(izo,ime,nl)=0
+  endif         
+
+enddo
+enddo
+enddo
 
 ! CALCULARE AQUA LIQUIDA NELLA NUOVELE
          do izo=1,nzonal

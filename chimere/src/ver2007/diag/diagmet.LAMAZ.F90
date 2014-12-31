@@ -1537,11 +1537,6 @@ contains
      write(ifn_tst,*)'wsta '       ,((d_wsta(izo,ime),izo=1,nzonal),ime=1,nmerid) 
      write(ifn_tst,*)'topc ',((d_topc(izo,ime),izo=1,nzonal),ime=1,nmerid)
 #endif 
-!     write(ifn_theta)idnow &
-!          ,(((d_tchi(izo,ime,ilay),izo=1,nzonal),ime=1,nmerid),ilay=1,nlayers)
-     write(66,*)idnow &
-          ,(((d_tchi(izo,ime,ilay),izo=1,nzonal),ime=1,nmerid),ilay=1,nlayers)
-
 
   end subroutine write_data
 

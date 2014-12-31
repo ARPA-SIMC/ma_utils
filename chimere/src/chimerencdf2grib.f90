@@ -124,7 +124,7 @@ character(len=6)::domain,rdomain
 !==========================================================================
 ! 1) Elaborazioni preliminari
 
-! Nei files NetCDF relativi ad output Chimere sono presenti 10 varibili fisse:
+! Nei files NetCDF relativi ad output Chimere sono presenti 10 variabili fisse:
 ! out_fmt=1: lon,lat,a_vcoord,b_vcoord,cut_off_diameters,Times,hlay,airm,relh,temp (10)
 ! 
 !--------------------------------------------------------------------------
@@ -667,7 +667,7 @@ IF (inp_fmt == 1) THEN
   ENDDO                        ! istanti
 
   ncstat=nf90_close(ncid)
-  WRITE (*,*) "Varibili (3D): input ",ntrov," output ",nscri
+  WRITE (*,*) "Variabili (3D): input ",ntrov," output ",nscri
   WRITE (*,*) "Scadenze elaborate ",kscad-1," grib scritti ",cnt_grb
 
 !--------------------------------------------------------------------------
@@ -769,8 +769,8 @@ ELSE IF (inp_fmt == 2) THEN
     ENDDO                    ! specie 
   ENDDO                      ! istanti
   ncstat=nf90_close(ncid)
-  WRITE (*,*) "Varibili (3D): input ",ntrov," output ",nscri
-  WRITE (*,*) "Varibili (2D): input ",ntrovs," output ",nscris
+  WRITE (*,*) "Variabili (3D): input ",ntrov," output ",nscri
+  WRITE (*,*) "Variabili (2D): input ",ntrovs," output ",nscris
   WRITE (*,*) "Scadenze elaborate ",kscad-1," grib scritti ",cnt_grb
 
 !--------------------------------------------------------------------------
