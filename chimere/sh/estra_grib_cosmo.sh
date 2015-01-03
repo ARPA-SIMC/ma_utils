@@ -42,7 +42,7 @@
 #   richiederebbe l'introduzione di nuovi alias per le scadenze previste 
 #   (c0124 -> c0124ph, ...); per le analisi dovrebbe bastare Timedef,0,x,1h
 #
-#                                    Versione 7.7.0 (Arkimet), Enrico 31/12/2014
+#                                    Versione 7.7.0 (Arkimet), Enrico 02/01/2015
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -89,12 +89,14 @@ if [ -z $MA_UTILS_SVN ] ; then
   split_grib_par=/usr/libexec/ma_utils/split_grib_par.exe
   math_grib=/usr/libexec/ma_utils/math_grib.exe
   grib_runmean=/usr/libexec/ma_utils/grib_runmean.exe
+  grib_skip_first=/usr/libexec/ma_utils/grib_skip_first.exe
 else
   echo "(estra_grib_cosmo.sh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
   post_wind_lm=${MA_UTILS_SVN}/post_lm/src/post_wind_lm.exe
   split_grib_par=${MA_UTILS_SVN}/util/grib/src/split_grib_par.exe
   math_grib=${MA_UTILS_SVN}/util/grib/src/math_grib.exe
   grib_runmean=${MA_UTILS_SVN}/util/grib/src/grib_runmean.exe
+  grib_skip_first=${MA_UTILS_SVN}/util/grib/src/grib_skip_first.exe
 fi  
 
 #-------------------------------------------------------------------------------
@@ -368,7 +370,7 @@ done
   mv ALTI_3D.grb zlay.grb
   rm -f tranges.lst 
   grib_get -p dataDate,dataTime,unitOfTimeRange,P1,P2,timeRangeIndicator \
-    TEMP_3D.grb | sort | uniq > tranges.lst
+    TEMP_3D.grb | uniq > tranges.lst
 
   while read line ; do
     dd=`echo $line | awk '{print $1}'`
@@ -397,13 +399,15 @@ if [ $dataset = "lamaz" ] ; then   # patch: in attesa del riallineamento lamaz
 
 elif [ $dataset = "lm7tmpc" -o $dataset = "COSMO_I7" ] ; then
   echo "Destag e antirotazione vento (standard)"
-  rm -f stag.grb destag.grb
-  cat TEMP_3D.grb ZWIN_3D.grb MWIN_3D.grb >> stag.grb
-  mv ZWIN_3D.grb ZWIN_3D.grb.org
-  mv MWIN_3D.grb MWIN_3D.grb.org
+  rm -f stag.grb destag.grb tmp1.grb
+  $grib_skip_first TEMP_3D.grb tmp1.grb -1
+  cat tmp.grb ZWIN_3D.grb MWIN_3D.grb >> stag.grb
+  rm ZWIN_3D.grb MWIN_3D.grb
   vg6d_transform --a-grid stag.grb destag.grb || ier=13
+  rm stag.grb
   arki-query --data "product: u" grib1:destag.grb > ZWIN_3D.grb || ier=14
   arki-query --data "product: v" grib1:destag.grb > MWIN_3D.grb || ier=15
+  rm destag.grb
 
 fi
 

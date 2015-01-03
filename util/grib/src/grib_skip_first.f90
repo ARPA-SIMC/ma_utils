@@ -1,8 +1,8 @@
 PROGRAM grib_skip_first
 !--------------------------------------------------------------------------
-! Legge un file con molti grib e lo riscrive saltando i primi N campi
+! Legge un file con molti grib, riscrive i prini o gli ultimi campi
 !
-!                                         Versione 2.0.0, Enrico 06/03/2014
+!                                         Versione 2.0.1, Enrico 02/01/2015
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -57,6 +57,7 @@ DO kg = 1,HUGE(0)
       CALL grib_write (igin,ifout)
       cnt_out = cnt_out + 1
     ELSE
+      CALL grib_release(igin)
       EXIT
     ENDIF
 
