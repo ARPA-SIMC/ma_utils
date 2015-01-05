@@ -17,7 +17,9 @@
 # Uso: chiamato da crea_input_meteo.sh e feed_postcosmo.sh 
 #
 # Note:
-#   SCAD0: -1 = analisi 24h, -0.5 analisi 12h, >=0 previsioni (scad. iniziale, ore)
+#   scad0: -1 = analisi 24h, -0.5 analisi 12h, >=0 previsioni (scad. iniziale, ore)
+#   hh_ini: solo 00 o 12 (previsioni: ora del reftime; analisi: ora ultimo istante)
+#   nhours: usato solo per previsioni (tra 1 e 72; per analisi e' definito da scad0)
 #
 #   Con PROJ=none devono essere preventivamente assegnate le variabili:
 #   hh_ini, dataset, nhours, scad0;  nzmet, db_lev_list, ptopmet, metmod; 
@@ -42,7 +44,7 @@
 #   richiederebbe l'introduzione di nuovi alias per le scadenze previste 
 #   (c0124 -> c0124ph, ...); per le analisi dovrebbe bastare Timedef,0,x,1h
 #
-#                                    Versione 7.7.0 (Arkimet), Enrico 02/01/2015
+#                                    Versione 7.7.0 (Arkimet), Enrico 04/01/2015
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -563,17 +565,17 @@ EOF2
 
 #     Analisi: verifico se esiste il dato all'istante finale + 1h;
 #     se non c'e', replico il dato all'istante finale
-      if [ $scad0 = "-0.5" -a $hh_ini -eq 0 ] ; then
+      if [ $scad0 = "-0.5" -a $hh_ini -eq 0 ] ; then   # analisi 00-12
         arki-query  --data "reftime: ="${datac_akq}" 13" grib1:${param}.grb.p1 \
           > tmp.grb || ier=32
         ng=`grib_count tmp.grb 2>/dev/null`
         if [ $ng -eq 0 ] ; then
           arki-query  --data "reftime: ="${datac_akq}" 12" grib1:${param}.grb.p1 \
             > tmp.grb || ier=33
-          grib_set -s hour=1 tmp.grb ${param}.grb.13Z || ier=34
+          grib_set -s hour=13 tmp.grb ${param}.grb.13Z || ier=34
           cat ${param}.grb.13Z >> ${param}.grb.p1
         fi
-      else
+      else                                             # analisi 12-24 o 00-24
         arki-query  --data "reftime: ="${datacp1_akq}" 01" grib1:${param}.grb.p1 \
           > tmp.grb || ier=35
         ng=`grib_count tmp.grb 2>/dev/null`
