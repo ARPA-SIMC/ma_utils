@@ -88,12 +88,6 @@ contains
 
     al(0) = 0.
     pr(0) = pr(1)+(pr(1)-pr(2))*(al(1)/(al(2)-al(1)))
-
-if (izo == 145 .AND. ime == 7) THEN
-  print *,pr
-  print *,al
-endif
-
     uw(0) = 0.0
     vw(0) = 0.0
     ww(0) = 0.0
@@ -582,7 +576,7 @@ endif
   end subroutine friction_velocity
 
   !***************************************************
-  subroutine boundary_layer_hght(izo,ime)
+  subroutine boundary_layer_hght(izo,ime,lshow)
     ! Calculation of Boundary Layer Height using a simplified version
     ! of Cheinet 2003 with one thermal mixed with Troen-Mahrt 1986
     ! in stable cases.
@@ -591,7 +585,8 @@ endif
 
     ! subroutine arguments
     integer,intent(in)       :: izo,ime
-
+    logical,intent(in)       :: lshow
+  
     ! hidden subroutine arguments
     real :: atu        ! in
     real :: az0        ! in
@@ -792,6 +787,12 @@ endif
     deallocate(dth)
 
     diag_misc%potts = potts
+  
+    if (lshow) then
+      write (90,'(a)') "Subr. boundary_layer_hght"
+      write (90,'(a,3i4,2f7.1)') "izo,ime,opt%pblh,zimax,apm",izo,ime,opt%pblh,zimax,apm
+      write (90,'(a,2(1x,f7.1))') "zh,zt",zh,zt
+    endif
 
   end subroutine boundary_layer_hght
 

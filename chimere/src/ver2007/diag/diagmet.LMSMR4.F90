@@ -293,8 +293,11 @@ program diagmet
 ! calculation of the model geometry [for deep conv. -lmbb]
   call gridsize
   
-  print*,'Number of raw meteo levels: ',nlevels
+  print*,'Number of raw meteo levels    : ',nlevels
   print*,'Number of chimere meteo levels: ',nlayers
+  print *
+!                  1234567890123456712345671234567123456712345671234567123456712345671234567
+  write (*,'(a)') "      scad  ustar   potf  wstar   hmix  atten  optical depth L,M,H topcld"
   cumnphour=0
 
   ! Loop on time
@@ -302,17 +305,17 @@ program diagmet
   do itim=1,nhourrun+1
 
      ! Date
-     write(6,*) 'reldat' ,itim
      call reldat(opt%idstart,itim-1,idnow)
-     write(6,*) 'ddate' ,itim
      call ddate(idnow,jyear,jmon,jday,jhour)
 
+     write (90,*)
+     write (90,'(a,i3,a,i10,2(a,i5))') "Elaboro istante ",itim,": ",idnow, &
+       " nlev ",nlevels," nshow ",opt%nsho
+
      ! Initialization of some optional variables
-     write(6,*) 'init' ,itim
      call init_optional
     
      ! Reading mandatory and optional data
-     write(6,*) 'date' ,itim
      call read_data
 
      ! Date check
@@ -324,10 +327,8 @@ program diagmet
      d_soim = m_soim
      ! SW radiation for MEGAN
      d_swrd = m_swrd
-  write(6,*)'windiv'
 !  Calculation of the velocity divergence, horizontal and vertical transport
      call windiv
-  write(6,*)'windiv'
 
 ! Loop on grid points
      np=0
@@ -351,9 +352,6 @@ program diagmet
 
            ! CHIMERE Layer top altitudes
            call layer_top_altitudes(izo,ime,nlayers)
-
-    ! For testing
-
              
            ! cosine of zenith angle
            czen = cosineza(xlati,xlong,idnow,jhour,izo,ime)
@@ -374,9 +372,7 @@ program diagmet
            ! Calculation of Boundary Layer Height using a simplified version
            ! of Cheinet 2003 with one thermal mixed with Troen-Mahrt 1986
            ! in stable cases.
-
-           call boundary_layer_hght(izo,ime)
-
+           call boundary_layer_hght(izo,ime,np.eq.opt%nsho)
 
            ! Obukov length and related parameters
 !           call obukov_length(izo,ime)
@@ -388,12 +384,18 @@ program diagmet
 
            ! Let us show we are alive ...
            if(np.eq.opt%nsho) then
-              print 888,idnow,d_usta(izo,ime),diag_misc%potf &
+              write (*,888) idnow,d_usta(izo,ime),diag_misc%potf &
                    ,d_wsta(izo,ime),d_hght(izo,ime),d_atte(izo,ime) &
                    ,diag_misc%opdl,diag_misc%opdm,diag_misc%opdh &
                    ,diag_misc%topcld
 888           format(i10,f7.3,f7.3,f7.3,f7.0,f7.3,f7.2,f7.2,f7.2,f7.0)
 
+              write (90,'(a,25(1x,f7.1))') "al",al(nlevels:1:-1)
+              write (90,'(a,25(1x,f7.0))') "pr",pr(nlevels:1:-1)
+              write (90,'(a,25(1x,f7.2))') "uw",uw(nlevels:1:-1)
+              write (90,'(a,25(1x,f7.2))') "vw",vw(nlevels:1:-1)
+              write (90,'(a,25(1x,f7.2))') "te",te(nlevels:1:-1)
+              write (90,'(a,25(1x,f7.2))') "wi",wi(nlevels:1:-1)
            endif
 	   
 !******************************************************************	    
@@ -460,8 +462,7 @@ program diagmet
            d_topc(izo,ime)=m_lspc(izo,ime) 
      enddo !izo=1,nzonal
      enddo !ime=1,nmerid
-          
-   write(6,*)'deep'     
+     
 ! estimation of time step using CFL criteria
 ! conversion from entrainment flux to vertical speed = *1.3 for air density in kg/m3
   dtminu=1.e20
@@ -535,7 +536,6 @@ program diagmet
   enddo
   enddo
   enddo
-   write(6,*)'deep2'     
   dtmin=dtminu
   if(dtminv.lt.dtmin)dtmin=dtminv
   if(dtminw.lt.dtmin)dtmin=dtminw
@@ -546,7 +546,7 @@ program diagmet
   ! the time step to really use is nphour*ichemstep
   ! to force nphour, divided by ichemstep
   nphourm(itim)=nint(real(3600./dtmin/ichemstep))
-  write(6,*)itim,nint(3600./dtminu/ichemstep),nint(3600./dtminv/ichemstep)
+!deb  write(6,*)itim,nint(3600./dtminu/ichemstep),nint(3600./dtminv/ichemstep)
 !             nint(3600./dtminw/ichemstep),nphour_ref,nphourm(itim)
 
     if(mod(itim,12).eq.0)print*,'  >>  ',itim,'/',nhourrun,'h',' minimum.time.step: ',int(dtmin/60.),'mn', 'ichem ',ichemstep
@@ -1408,8 +1408,6 @@ contains
     ncstat=nf90_get_var(m_id, m_cliq_varid, m_cliq, m_stvec, m_cntvec)
     NCERR(__LINE__)
 
-
-     write(6,*) 'diag  cliq' ,minval(m_cliq),minloc(m_cliq)
     ! optional
     if (cice_req) then
        ncstat=nf90_get_var(m_id, m_cice_varid, m_cice, m_stvec, m_cntvec)
@@ -1421,7 +1419,6 @@ contains
     end if
     deallocate(m_stvec)
     deallocate(m_cntvec)
-      write(6,*)'fine read_data' 
   end subroutine read_data
 
   !****************************************************

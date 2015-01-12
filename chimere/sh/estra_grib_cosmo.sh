@@ -44,7 +44,7 @@
 #   richiederebbe l'introduzione di nuovi alias per le scadenze previste 
 #   (c0124 -> c0124ph, ...); per le analisi dovrebbe bastare Timedef,0,x,1h
 #
-#                                    Versione 7.7.0 (Arkimet), Enrico 04/01/2015
+#                                    Versione 7.7.0 (Arkimet), Enrico 12/01/2015
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -349,18 +349,28 @@ EOF2
 
   fi
 
-# 2.2.3 Estraggo dall'archivio
-# NB: per gli archivi su area grande (lm7tmpc e cosmo_i7), volendo si potrebbe
-# ritagliare l'area lato server (sintassi da verificare): arki-query --postproc=\
-# "vg6d_subarea --trans-type=zoom --sub-type=index --ix=$ix --iy=$iy --fx=$fx --fy=$fy"
+# 2.2.3 Estraggo dall'archivio e ordino i livelli
+# Note:
+# - sembra che diagmet voglia i livelli ordinati dal basso: in caso contrario 
+#   gira comunque, ma alcuni calcoli danno risultati sbagliati.
+# - per gli archivi su area grande, volendo si potrebbe ritagliare l'area lato
+#   server, con sintassi (da verificare): arki-query --postproc=\
+#   "vg6d_subarea --trans-type=zoom --sub-type=index --ix=$ix --iy=$iy --fx=$fx --fy=$fy"
+
   if [ $param = "ALTI_3D" ] ; then
-    arki-query --data --file=${param}.query grib:${file_zlay} > ${param}.grb
+    arki-query --data --sort=-level --file=${param}.query grib:${file_zlay} > \
+      ${param}.grb
   else
-    arki-query --data --file=${param}.query -C ${dataset}.conf > ${param}.grb
+    arki-query --data --sort=reftime,timerange,-level --file=${param}.query \
+      -C ${dataset}.conf > ${param}.grb
   fi
 
   if [ -s ${param}.grb ] ; then
     echo "Estratti grib: "`du -h  ${param}.grb`
+#    rm -f tmp.grb
+#    mv ${param}.grb tmp.grb
+#    arki-scan --data --sort=reftime,timerange,-level grib:tmp.grb > \
+#      ${param}.grb || ier=10
   else
     echo "Errore estraendo i grib "$param
     ier=4
@@ -369,8 +379,8 @@ done
 
 # 2.2.4 copio le quote dei livelli per tutti gli istanti richiesti
   echo "Copio le quote dei livelli per gli istanti richiesti"
+  rm -f zlay.grb tranges.lst 
   mv ALTI_3D.grb zlay.grb
-  rm -f tranges.lst 
   grib_get -p dataDate,dataTime,unitOfTimeRange,P1,P2,timeRangeIndicator \
     TEMP_3D.grb | uniq > tranges.lst
 
@@ -390,25 +400,24 @@ done
 # 2.2.5 destag e antruto il vento
 if [ $dataset = "lamaz" ] ; then   # patch: in attesa del riallineamento lamaz
   echo "Destag e antirotazione vento (lamaz)"
-  rm -f ZWIN_3D.grb.org MWIN_3D.grb.org tmp1.grb tmp2.grb
-  mv ZWIN_3D.grb ZWIN_3D.grb.org
-  mv MWIN_3D.grb MWIN_3D.grb.org
-  arki-scan --data --sort=reftime,timerange,level grib1:ZWIN_3D.grb.org > \
-    tmp1.grb || ier=10
-  arki-scan --data --sort=reftime,timerange,level grib1:MWIN_3D.grb.org > \
-    tmp2.grb || ier=11
+  rm -f tmp1.grb tmp2.grb
+  mv ZWIN_3D.grb tmp1.grb
+  mv MWIN_3D.grb tmp2.grb
   $post_wind_lm tmp1.grb tmp2.grb ZWIN_3D.grb MWIN_3D.grb -dest -antir || ier=12
+  rm tmp1.grb tmp2.grb
 
 elif [ $dataset = "lm7tmpc" -o $dataset = "COSMO_I7" ] ; then
   echo "Destag e antirotazione vento (standard)"
-  rm -f stag.grb destag.grb tmp1.grb
+  rm -f stag.grb destag.grb tmp.grb tmp1.grb
   $grib_skip_first TEMP_3D.grb tmp1.grb -1
   cat tmp.grb ZWIN_3D.grb MWIN_3D.grb >> stag.grb
-  rm ZWIN_3D.grb MWIN_3D.grb
+  rm tmp.grb ZWIN_3D.grb MWIN_3D.grb
   vg6d_transform --a-grid stag.grb destag.grb || ier=13
   rm stag.grb
-  arki-query --data "product: u" grib1:destag.grb > ZWIN_3D.grb || ier=14
-  arki-query --data "product: v" grib1:destag.grb > MWIN_3D.grb || ier=15
+  arki-query --data --sort=hour:reftime,timerange,-level "product: u" \
+     grib:destag.grb > ZWIN_3D.grb || ier=14
+  arki-query --data --sort=hour:reftime,timerange,-level "product: v" \
+     grib:destag.grb > MWIN_3D.grb || ier=15
   rm destag.grb
 
 fi
@@ -418,9 +427,7 @@ if [ $dataset = "lm7tmpc" -o $dataset = "COSMO_I7" ] ; then
   if [ `echo $plist_3d | grep CLIQ_3D | wc -l` -eq 1 ] ; then
     echo "Calcolo cloud liquid water"
     rm -f sg*.grb tmp.grb
-    mv CLIQ_3D.grb CLIQ_3D.grb.org
-    arki-scan --data --sort=reftime,timerange,level grib1:CLIQ_3D.grb.org > \
-      tmp.grb || ier=20
+    mv CLIQ_3D.grb tmp.grb
     $split_grib_par tmp.grb || ier=21
     $math_grib -check=grid,time,lev \
       1. sg_200_201_031.grb 1. sg_200_201_035.grb CLIQ_3D.grb sum || ier=22
@@ -428,9 +435,7 @@ if [ $dataset = "lm7tmpc" -o $dataset = "COSMO_I7" ] ; then
   if [ `echo $plist_3d | grep CICE_3D | wc -l` -eq 1 ] ; then
     echo "Calcolo cloud ice"
     rm -f sg*.grb tmp.grb
-    mv CICE_3D.grb CICE_3D.grb.org
-    arki-scan --data --sort=reftime,timerange,level grib1:CICE_3D.grb.org > \
-      tmp.grb || ier=23
+    mv CICE_3D.grb tmp.grb
     $split_grib_par tmp.grb || ier=24
     $math_grib -check=grid,time,lev \
       1. sg_200_201_033.grb 1. sg_200_201_036.grb CICE_3D.grb sum || ier=25
