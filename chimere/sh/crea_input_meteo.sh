@@ -29,6 +29,9 @@ unset LANG
 #                         Versione 7.1.2 (V200709C), Michele & Enrico 30/12/2014
 #
 # NOTE PER NUOVA VERSIONE
+# - riprendere le elaborazioni compiute in feed_postcosmo
+# - gestione di nudging per 12/24 ore, forecast per 1-72 ore
+# - versione 2012?
 # - gestire caso ECMWF (disponibile GEOP_3D, varibile nel tempo; estra_grib_ecmwf?)
 #
 #-------------------------------------------------------------------------------
@@ -279,6 +282,17 @@ while [ $cnt -lt $ndays ] ; do
   echo ""
   if [ $rqestra = "Y" ] ; then 
 
+    if [ $dataset = "COSMO_I7" -o $dataset = "lm7tmpc" ] ; then
+      ds_area="LMSMR4"
+    elif [ $dataset = "lamaz" ] ; then
+      ds_area="LAMAZ"
+    elif [ $dataset = "lm28tmpc" ] ; then
+      ds_area="LMSMR5"
+    fi
+    file_layersSup=/usr/share/ma_utils/${ds_area}_layersSup_20120606.grb
+    export file_layersSup
+
+# Verificare che le variabili richieste siano tutte espoertate!!
     case ${dataset} in
     LAMAZ | COSMO_I7 | LM7TMPC )  
       echo "*** Estrazione GRIB ("$estra_grib_cosmo")"

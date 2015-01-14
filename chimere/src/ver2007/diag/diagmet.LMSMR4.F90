@@ -390,12 +390,13 @@ program diagmet
                    ,diag_misc%topcld
 888           format(i10,f7.3,f7.3,f7.3,f7.0,f7.3,f7.2,f7.2,f7.2,f7.0)
 
-              write (90,'(a,25(1x,f7.1))') "al",al(nlevels:1:-1)
-              write (90,'(a,25(1x,f7.0))') "pr",pr(nlevels:1:-1)
-              write (90,'(a,25(1x,f7.2))') "uw",uw(nlevels:1:-1)
-              write (90,'(a,25(1x,f7.2))') "vw",vw(nlevels:1:-1)
-              write (90,'(a,25(1x,f7.2))') "te",te(nlevels:1:-1)
-              write (90,'(a,25(1x,f7.2))') "wi",wi(nlevels:1:-1)
+              write (90,'(a,25(1x,f7.1))') "al",al(1:nlevels)
+              write (90,'(a,25(1x,f7.0))') "pr",pr(1:nlevels)
+              write (90,'(a,25(1x,f7.2))') "uw",uw(1:nlevels)
+              write (90,'(a,25(1x,f7.2))') "vw",vw(1:nlevels)
+              write (90,'(a,25(1x,f7.2))') "te",te(1:nlevels)
+              write (90,'(a,25(1x,f7.2))') "wi",wi(1:nlevels)
+              write (90,'(a,25(1x,f7.2))') "po",po(1:nlevels)
            endif
 	   
 !******************************************************************	    

@@ -790,7 +790,11 @@ contains
   
     if (lshow) then
       write (90,'(a)') "Subr. boundary_layer_hght"
-      write (90,'(a,3i4,2f7.1)') "izo,ime,opt%pblh,zimax,apm",izo,ime,opt%pblh,zimax,apm
+      write (90,'(a,3i4,4f7.1)') &
+        "izo,ime,opt%pblh,zimax,apm,zii,potfm ", &
+        izo,ime,opt%pblh,zimax,apm,zii,potfm
+      write (90,'(a,i3,3f7.1,i3)') "levstart,potts,wlf,tlf,nit ", &
+        levstart,potts,wlf,tlf,nit
       write (90,'(a,2(1x,f7.1))') "zh,zt",zh,zt
     endif
 

@@ -13,6 +13,8 @@
 #   - trasformazione dei dati cumulati/medi in istantanei;
 #   - calcolo contenuto d'acqua nei primi 10 cm si suolo;
 #   - calcolo di acqua e ghiaccio totali delle nubi.
+#   L'interpolazione orizzontale e' compiuta successivamente negli script 
+#   chiamanti (volendo potrebbe essere spostata qui, vedi nota al par. 2.2.3)
 #
 # Uso: chiamato da crea_input_meteo.sh e feed_postcosmo.sh 
 #
@@ -23,7 +25,11 @@
 #
 #   Con PROJ=none devono essere preventivamente assegnate le variabili:
 #   hh_ini, dataset, nhours, scad0;  nzmet, db_lev_list, ptopmet, metmod; 
-#   hmix, run_sync, tmp_root; plist_3d, plist_2d
+#   hmix, run_sync, tmp_root; plist_3d, plist_2d, file_layersSup
+#
+#   file_layersSup e' il nome (con path) di un file grib contenente le quote di 
+#   tutti i livelli COSMO, in m dalla superficie, sul dominio dei dati in input 
+#   ($dataset).
 #
 # Exit codes:
 # 1: errore nei parametri da riga comando
@@ -44,7 +50,7 @@
 #   richiederebbe l'introduzione di nuovi alias per le scadenze previste 
 #   (c0124 -> c0124ph, ...); per le analisi dovrebbe bastare Timedef,0,x,1h
 #
-#                                    Versione 7.7.0 (Arkimet), Enrico 12/01/2015
+#                                    Versione 7.7.0 (Arkimet), Enrico 14/01/2015
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -125,16 +131,6 @@ fi
 if [ $dataset = "cosmo_i7" ] ; then
   dataset="COSMO_I7"
 fi
-
-if [ $dataset = "COSMO_I7" -o $dataset = "lm7tmpc" ] ; then
-  ds_area="LMSMR4"
-elif [ $dataset = "lamaz" ] ; then
-  ds_area="LAMAZ"
-elif [ $dataset = "lm28tmpc" ] ; then
-  ds_area="LMSMR5"
-fi
-#dev file_zlay=/usr/share/ma_utils/${ds_area}_layers_20120606.grb
-file_zlay=/home/eminguzzi/svn/ma_utils/data/${ds_area}_layers_20120606.grb
 
 # Controlli sui parametri
 if [ $metmod != "LM" ] ; then
@@ -351,14 +347,15 @@ EOF2
 
 # 2.2.3 Estraggo dall'archivio e ordino i livelli
 # Note:
-# - sembra che diagmet voglia i livelli ordinati dal basso: in caso contrario 
+# - diagmet richiede che i livelli siano ordinati dal basso: in caso contrario 
 #   gira comunque, ma alcuni calcoli danno risultati sbagliati.
-# - per gli archivi su area grande, volendo si potrebbe ritagliare l'area lato
-#   server, con sintassi (da verificare): arki-query --postproc=\
+# - volendo si potrebbe mettere qui il ritaglio dell'area (al momento e' fatto 
+#   successivmente negli script chiamanti). La sintassi del ritaglio lato server
+#   dovrebbe essere: arki-query --postproc=\
 #   "vg6d_subarea --trans-type=zoom --sub-type=index --ix=$ix --iy=$iy --fx=$fx --fy=$fy"
 
   if [ $param = "ALTI_3D" ] ; then
-    arki-query --data --sort=-level --file=${param}.query grib:${file_zlay} > \
+    arki-query --data --sort=-level --file=${param}.query grib:${file_layersSup} > \
       ${param}.grb
   else
     arki-query --data --sort=reftime,timerange,-level --file=${param}.query \
