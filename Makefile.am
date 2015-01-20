@@ -27,6 +27,7 @@ pkgdataroot_DATA = \
 	$(top_srcdir)/data/aree_geo.dat \
 	$(top_srcdir)/data/aree_utm.dat \
 	$(top_srcdir)/data/arkimet_aree.dat \
+	$(top_srcdir)/data/domainlist.nml \
 	$(top_srcdir)/data/param_arkioss.csv \
 	$(top_srcdir)/data/param_shortnames.csv \
 	$(top_srcdir)/data/tabella_002_ser.txt \
@@ -46,10 +47,13 @@ pkgdataroot_DATA = \
 	$(top_srcdir)/data/tabella_203_ser.txt \
 	$(top_srcdir)/data/tabella_203.txt \
 	$(top_srcdir)/data/LAMAZ_layers_20120606.grb \
+	$(top_srcdir)/data/LAMAZ_layersSup_20120606.grb \
 	$(top_srcdir)/data/LAMAZ_orog_20120606.grb \
 	$(top_srcdir)/data/LMSMR4_layers_20120606.grb \
+	$(top_srcdir)/data/LMSMR4_layersSup_20120606.grb \
 	$(top_srcdir)/data/LMSMR4_orog_20120606.grb \
 	$(top_srcdir)/data/LMSMR5_layers_20120606.grb \
+	$(top_srcdir)/data/LMSMR5_layersSup_20120606.grb \
 	$(top_srcdir)/data/LMSMR5_orog_20120606.grb
 
 EXTRA_DIST = $(pkgdataroot_DATA)
