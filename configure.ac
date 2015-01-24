@@ -58,6 +58,7 @@ AC_CONFIG_FILES([Makefile
 		chimere/sh/Makefile
 		fisiog/src/Makefile
 		osservazioni/src/Makefile
+		osservazioni/sh/Makefile
 		post_lm/src/Makefile
 		util/grads/src/Makefile
 		util/grib/src/Makefile])
