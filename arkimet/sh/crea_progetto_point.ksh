@@ -30,7 +30,7 @@
 function write_help
 {
 #       123456789012345678901234567890123456789012345678901234567890123456789012345
-  echo "Uso: crea_progetto_ak.ksh PROGETTO [-seropt=\"OPT1 OPT2 ...\"] "
+  echo "Uso: crea_progetto_point.ksh PROGETTO [-seropt=\"OPT1 OPT2 ...\"] "
   echo "  [-debug] [-batch] [-list] [-h]"
   echo
   echo "PROGETTO: nome del progetto di estrazione"

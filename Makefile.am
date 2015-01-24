@@ -13,6 +13,7 @@ SUBDIRS = \
 	chimere/sh \
 	fisiog/src \
 	osservazioni/src \
+	osservazioni/sh \
 	post_lm/src \
 	util/grads/src \
 	util/grib/src
