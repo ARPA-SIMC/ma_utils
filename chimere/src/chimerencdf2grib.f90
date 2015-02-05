@@ -12,13 +12,13 @@ PROGRAM chimerencdf2grib
 ! I grib in quota sono codificati come livelli ibridi, ma senza includere i
 !   vertical coordinate parameters. 
 !
-! Uso per leggere dati MACC:
-! - occorrono le opzioni: -grd MACCEU -rmis -999. -vt YYYYMMDDHH
-! - i dati Chimere sembrano avere solo 4 livelli (dagli header risultano 8)
-! - i dati ENS hanno campi mancanti qua e la' (file *additional*, livello 2)
-! NB I dati sono il ug/m3, ma la codifica grib dei gas richiederebbe ppb!!
+! Per leggere dati MACC:
+! - occorre specificare le opzioni: -grd MACCEU -rmis -999. -vt YYYYMMDDHH
+! - i dati operativi Copernicus sono scritti con Scanning mode 000 (par. 1.6)
+! - tutti i dati sono scritti in ug/m3, anche se la codifica grib-SIMC dei gas 
+!   richiederebbe ppb.
 !
-!                               Versione 3.2.0, Michele & Enrico 17/12/2014
+!                               Versione 3.2.1, Michele & Enrico 05/02/2015
 !--------------------------------------------------------------------------
 use calendar 
 use netcdf
@@ -56,7 +56,7 @@ REAL    :: psec2(512),psec3(2)
 REAL, ALLOCATABLE :: conc_out(:,:,:),tot(:),conc_miss(:,:,:)
 REAL :: x1,y1,x2,y2,dx,dy,xrot,yrot,x2r,y2r,rmis
 INTEGER :: version
-INTEGER :: nvarout,nx,ny,np,nl,slen,mm,nxi,nyi,ntrov,ntrovs,nscri,nscris
+INTEGER :: nvarout,nx,ny,np,smf,nl,slen,mm,nxi,nyi,ntrov,ntrovs,nscri,nscris
 INTEGER :: code_var(maxvar),tab_var(maxvar),lev_out(maxlev)
 INTEGER :: cem,igen,idata,idata_ini,scad_ini
 INTEGER :: iu,k,kp,kvar,kscad,klev,kday,kh,ios,eof,eor,cnt_grb,idp
@@ -343,6 +343,12 @@ dx = (x2-x1)/REAL(nx-1)
 dy = (y2-y1)/REAL(ny-1)
 np = nx*ny
 
+IF (domain == "MACCEU") THEN
+  smf = 0
+ELSE
+  smf = 64
+ENDIF
+
 IF (nx /= nzonal .OR. ny /= nmerid .OR. ABS(x2r-x2) > eps .OR. ABS(y2r-y2) > eps) &
   GOTO 9991
 
@@ -469,6 +475,7 @@ WRITE (*,*) "Parametri griglia: (",TRIM(domain),")"
 WRITE (*,*) "  proj,nx,ny,nz: ",proj,nx,ny,nlev
 WRITE (*,*) "  x1,y1,x2,y2:   ",x1,y1,x2,y2
 WRITE (*,*) "  dx,dy:         ",dx,dy
+WRITE (*,*) "  scanning mode  ",smf
 WRITE (*,*) ""
 WRITE (*,*) "Numero di parametri:"
 WRITE (*,*) "variabili totali in input:  ",nvarin
@@ -503,12 +510,17 @@ ksec1(22:) = 0
 ! Sezione 2
 ksec2(2) = nx
 ksec2(3) = ny
-ksec2(4) = NINT(y1 * 1000.)
 ksec2(5) = NINT(x1 * 1000.)
-ksec2(7) = NINT(y2 * 1000.)
 ksec2(8) = NINT(x2 * 1000.)
-ksec2(11)=64
-ksec2(12)=0
+IF (smf == 64) THEN
+  ksec2(4) = NINT(y1 * 1000.)
+  ksec2(7) = NINT(y2 * 1000.)
+ELSE IF (smf == 0) THEN
+  ksec2(4) = NINT(y2 * 1000.)
+  ksec2(7) = NINT(y1 * 1000.)
+ENDIF
+ksec2(11)= smf
+ksec2(12)= 0
 
 IF (proj == "UTM" .OR. proj == "GEO") THEN
    ksec2(1) = 0
@@ -634,7 +646,7 @@ IF (inp_fmt == 1) THEN
 
         IF (code_var(ivar) <= 0) CYCLE
         IF (kscad ==1) THEN
-          WRITE (*,'(a,a4,1x,4i6)') "Trovata la variabile ", &
+          WRITE (*,'(2a,1x,4i6)') "Trovata la variabile ", &
             namevar(ivar),ivar,ivarid,tab_var(ivar),code_var(ivar)
           nscri = nscri + 1
         ENDIF
@@ -659,7 +671,7 @@ IF (inp_fmt == 1) THEN
         ENDDO                 ! livelli
 
       ELSE
-        IF (kscad ==1) WRITE(*,'(a,a4,1x,4i6)') "Variabile non trovata ", &
+        IF (kscad ==1) WRITE(*,'(2a,1x,4i6)') "Variabile non trovata ", &
           namevar(ivar),ivar,ivarid,tab_var(ivar),code_var(ivar)
 
       ENDIF
@@ -719,11 +731,11 @@ ELSE IF (inp_fmt == 2) THEN
         IF (code_var(ivar) <= 0) CYCLE
         IF (kscad ==1) THEN
           IF (nl == 1) THEN
-            WRITE (*,'(a,a4,1x,4i6)') "Trovata la variabile (2D) ", &
+            WRITE (*,'(2a,1x,4i6)') "Trovata la variabile (2D) ", &
               namevar(ivar),ivar,ivarid,tab_var(ivar),code_var(ivar)
             nscris = nscris + 1
           ELSE
-            WRITE (*,'(a,a4,1x,4i6)') "Trovata la variabile (3D) ", &
+            WRITE (*,'(2a,1x,4i6)') "Trovata la variabile (3D) ", &
               namevar(ivar),ivar,ivarid,tab_var(ivar),code_var(ivar)
             nscri = nscri + 1
           ENDIF
@@ -762,7 +774,7 @@ ELSE IF (inp_fmt == 2) THEN
         ENDDO                ! livelli
 
       ELSE
-        IF (kscad ==1) WRITE(*,'(a,a4,1x,4i6)') "Variabile non trovata     ", &
+        IF (kscad ==1) WRITE(*,'(2a,1x,4i6)') "Variabile non trovata     ", &
           namevar(ivar),ivar,ivarid,tab_var(ivar),code_var(ivar)
 
       ENDIF
