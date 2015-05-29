@@ -134,7 +134,10 @@ grib: DO kg = 1,HUGE(0)
   IF (kg == 1) THEN
     ksec2_sav(:) = ksec2(:)
     np_sav = ksec4(1) 
-  ELSE IF (ANY( ksec2(:) /= ksec2_sav(:) ) .OR. ksec4(1) /= np_sav) THEN
+
+  ELSE IF (ANY( ksec2((/1,2,3,4,5,7,8,11,13,14/)) /= &
+       ksec2_sav((/1,2,3,4,5,7,8,11,13,14/)) ) .OR. &
+       ksec4(1) /= np_sav) THEN
     WRITE (*,*) "Errore, grib ",kg," definito su un'area diversa!"
     STOP
   ENDIF  

@@ -18,7 +18,7 @@ PROGRAM chimerencdf2grib
 ! - tutti i dati sono scritti in ug/m3, anche se la codifica grib-SIMC dei gas 
 !   richiederebbe ppb.
 !
-!                               Versione 3.2.1, Michele & Enrico 05/02/2015
+!                               Versione 3.2.2, Michele & Enrico 10/04/2015
 !--------------------------------------------------------------------------
 use calendar 
 use netcdf
@@ -64,7 +64,7 @@ INTEGER :: inp_fmt,info_fmt,p1,p2,nhead,iproj
 CHARACTER (LEN=120) :: filein,fileout,fileinfo,chrec,chdum,arg(4),tab_file,tab_path
 CHARACTER (LEN=3) :: proj
 CHARACTER (LEN=1) :: next_arg
-LOGICAL :: verbose
+LOGICAL :: verbose,dok
 
 CHARACTER(LEN=20):: namevar(maxvar)
 !
@@ -326,6 +326,7 @@ WRITE (tab_file,'(2a)') TRIM(tab_path),"/domainlist.nml"
 
 OPEN (UNIT=31, FILE=tab_file, STATUS="OLD", ERR= 9993)
 READ (31,*)
+dok = .FALSE.
 DO
   READ (31,'(a)',IOSTAT=ios) chrec
   IF (ios /= 0) GOTO 9990
@@ -333,9 +334,11 @@ DO
   IF (ADJUSTL(rdomain) == ADJUSTL(domain)) THEN
     READ (chrec(7:),*,IOSTAT=ios) nx,ny,dx,dy,x1,y1,x2r,y2r,iproj
     IF (ios /= 0) GOTO 9992
+    dok = .TRUE.
     EXIT
   ENDIF
 ENDDO
+IF (.NOT. dok) GOTO 9988
 
 x2 = x1+(nx-1)*dx
 y2 = y1+(ny-1)*dy
@@ -1205,6 +1208,10 @@ STOP 5
 9989 CONTINUE
 WRITE (*,*) "Riferimenti temporali non trovati in ",TRIM(filein)," usare parametro -vt"
 STOP 6
+
+9988 CONTINUE
+WRITE (*,*) "Area ",TRIM(domain)," non trovata in ",TRIM(tab_file)
+STOP 7
 
 END PROGRAM chimerencdf2grib
 

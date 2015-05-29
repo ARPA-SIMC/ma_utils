@@ -6,7 +6,7 @@ PROGRAM split_grib_par
 ! Note:
 ! Versioni <4.0 rinominate in split_gribex_par.f90
 !
-!                                         Versione 4.1.0, Enrico 31/03/2014
+!                                         Versione 4.1.1, Enrico 24/03/2015
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -14,7 +14,7 @@ USE grib2_utilities
 IMPLICIT NONE
 
 ! Parametri costanti
-INTEGER, PARAMETER :: maxpar = 75       ! n.ro max di parametri diversi 
+INTEGER, PARAMETER :: maxpar = 200      ! n.ro max di parametri diversi 
 INTEGER, PARAMETER :: maxlev = 75       ! n.ro max di livelli diversi 
 
 ! Altre variabili del programma

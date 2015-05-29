@@ -14,7 +14,7 @@
 # LIBSIM_SVN:   eseguibili (ad esempio: /home/eminguzzi/svn/libsim; se non 
 #               specificato, usa gli eseguibili in path)
 #
-#                                         Versione 2.0.0, Enrico 10/06/2014
+#                                         Versione 2.0.1, Enrico 29/04/2015
 #--------------------------------------------------------------------------
 #set -x
 
@@ -143,9 +143,9 @@ if [ $is_local -eq 0 ] ; then
 fi
 
 # Maiuscole/minuscole nel nome del dataset (arkimet: minusc.; maialinux: maiusc.)
-if [ `echo $akurl | grep "arkimet" | wc -l` -eq 1 ] ; then      # arkimet
+if [ `echo $akurl | grep "arkimet.metarpa" | wc -l` -eq 1 ] ; then      # arkimet
   ds=`echo $ds | tr '[:upper:]' '[:lower:]'`
-elif [ `echo $akurl | grep "maialinux" | wc -l` -eq 1 ] ; then  # maialinux
+elif [ `echo $akurl | grep "maialinux.metarpa" | wc -l` -eq 1 ] ; then  # maialinux
   ds=`echo $ds | tr '[:lower:]' '[:upper:]'`
 fi 
 

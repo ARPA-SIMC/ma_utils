@@ -200,7 +200,7 @@ done < ds.lst
 
 #-------------------------------------------------------------------------------
 # 2.3 Elaboro il file con la lista dei prarmetri: ordino, tolgo i doppioni, 
-#     aggiungo la lista delle reti in cui e' presente ciscun parametro
+#     aggiungo la lista delle reti in cui e' presente ciascun parametro
 
 echo "Produco la lista dei parametri"
 sort -u -t , -k 2 all.pd > sorted.pd

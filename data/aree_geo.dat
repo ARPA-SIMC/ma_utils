@@ -18,6 +18,8 @@ as2pm_bpa   136   60    6.255   43.095   14.355   46.635    0.000    0.000 010 !
 cont1        65   33  -10.000   40.500   22.000   56.500    0.000    0.000 010 ! Chimere continentale piccolo (0.5 x 0.5)
 cont2        65   65  -10.000   40.500   22.000   56.500    0.000    0.000 010 ! Chimere continentale piccolo (0.25 x 0.5)
 cont3        67   46  -10.500   35.000   22.500   57.500    0.000    0.000 010 ! Chimere continentale allargato (0.5 x 0.5)
+copz_ita    136  111    6.550   35.950   20.050   46.950    0.000    0.000 000 ! RAQ Copernicus, ritaglio SIMC su Italia
+copz_bpa     91   51    5.550   42.450   14.550   47.450    0.000    0.000 000 ! RAQ Copernicus, ritaglio SIMC su BPA
 dwd_fisiog  961  769  -26.750  -38.750   33.250    9.250   10.000   57.500 010 ! Area del dataset fisiografico europeo DWD (0.0625 x 0.0625)
 emrgeo      101   41    9.000   43.600   13.000   45.200    0.000    0.000 010 ! Emilia Romagna a 5 km, lat-lon (0.04 x 0.04)
 lama28      241  161   -3.000  -14.400    3.000  -10.400   10.000   57.500 010 ! Sottoarea di LMSMR5 e RUC, usata per l'archivio LAMA28 (2.8 km)

@@ -1,11 +1,101 @@
-! Modulo per tipo derivato "parametro meteo"
+! Modulo per tipi derivati
 MODULE local
+
+! 1.1) Tipo derivato "parametro meteo"
   TYPE metpar
     INTEGER :: idvar,l1,lt1,p1,p2,tr
     CHARACTER (LEN=200) :: long_name,short_name,unit
     CHARACTER (LEN=6) :: bcode
   END TYPE metpar
+
+! 1.2) Tipo derivato "angrafica stazione"
+  TYPE anag
+    REAL :: lon,lat,quo
+    CHARACTER (LEN=100) :: rete,nome
+  END TYPE anag
+
+  CONTAINS
+
+! 2.1) Copia in anag2 i campi validi di anag1; se trova valori validi e 
+!      diversi, non li copia e manda un warning
+  SUBROUTINE copy_anag(anag1,anag2)
+  USE missing_values
+  IMPLICIT NONE
+  TYPE(anag), INTENT(IN) :: anag1
+  TYPE(anag), INTENT(INOUT) :: anag2
+
+  IF (c_e(anag1%lon)) THEN
+    IF (c_e(anag2%lon)) THEN
+      IF (anag1%lon /= anag2%lon) WRITE (*,*) &
+       "Warning anagrafica: lon trovata ",anag1%lon," attesa ",anag2%lon
+    ELSE
+      anag2%lon = anag1%lon
+    ENDIF
+  ENDIF
+
+  IF (c_e(anag1%lat)) THEN
+    IF (c_e(anag2%lat)) THEN
+      IF (anag1%lat /= anag2%lat) WRITE (*,*) &
+       "Warning anagrafica: lat trovata ",anag1%lat," attesa ",anag2%lat
+    ELSE
+      anag2%lat = anag1%lat
+    ENDIF
+  ENDIF
+
+  IF (c_e(anag1%quo)) THEN
+    IF (c_e(anag2%quo)) THEN
+      IF (anag1%quo /= anag2%quo) WRITE (*,*) &
+       "Warning anagrafica: quo trovata ",anag1%quo," attesa ",anag2%quo
+    ELSE
+      anag2%quo = anag1%quo
+    ENDIF
+  ENDIF
+  IF (anag1%rete /= "") THEN
+    IF (anag2%rete /= "") THEN
+      IF (anag1%rete /= anag2%rete) WRITE (*,*) &
+       "Warning anagrafica: rete trovata ",TRIM(anag1%rete)," attesa ",TRIM(anag2%rete)
+    ELSE
+      anag2%rete = anag1%rete
+    ENDIF
+  ENDIF
+
+  IF (anag1%nome /= "") THEN
+    IF (anag2%nome /= "") THEN
+      IF (anag1%nome /= anag2%nome) WRITE (*,*) &
+       "Warning anagrafica: nome trovato ",TRIM(anag1%nome)," atteso ",TRIM(anag2%nome)
+    ELSE
+      anag2%nome = anag1%nome
+    ENDIF
+  ENDIF
+
+  RETURN
+  END SUBROUTINE copy_anag
+
+! 2.2) Funzione per verificare se due variabili metpar hanno stess Bcode, 
+!      livello e timerange
+  FUNCTION metpar_equal(par_dum,par_req) RESULT(leq)
+  USE missing_values
+  IMPLICIT NONE
+  TYPE(metpar), INTENT(IN) :: par_dum,par_req
+  LOGICAL leq
+
+  IF (par_dum%bcode==par_req%bcode .AND. &
+      (par_req%l1==imiss  .OR. par_dum%l1==par_req%l1) .AND. &
+      (par_req%lt1==imiss .OR. par_dum%lt1==par_req%lt1) .AND. &
+      (par_req%p1==imiss  .OR. par_dum%p1==par_req%p1) .AND. &
+      (par_req%p2==imiss  .OR. par_dum%p2==par_req%p2) .AND. &
+      (par_req%tr==imiss  .OR. par_dum%tr==par_req%tr)) THEN
+    leq = .TRUE.
+  ELSE
+    leq = .FALSE.
+  ENDIF
+
+  RETURN  
+  END FUNCTION metpar_equal
+
 END MODULE local
+
+!==========================================================================
 
 PROGRAM bufr_csv2orari
 !--------------------------------------------------------------------------
@@ -30,9 +120,11 @@ PROGRAM bufr_csv2orari
 !   componenti con livello e timerange corrispondente; modificare l'header
 !   (shortname o nuove Btable); ricalcolare i valori prima di scrivere; 
 !   aggiungere l'opzione a estra_oss.ksh)
-! ? controllo ridondante sull'inizo dei messaggi (key: "edition")
+! - Eventualmente agigungere opzione per scrivere cloud cover Synop in 
+!   ottavi (adesso esce in %; assicurarsi che alameno sia consistente nella
+!   serie storica dei synop)
 ! 
-!                                         Versione 1.0.0, Enrico 16/09/2014
+!                                         Versione 2.0.2, Enrico 26/05/2015
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -47,19 +139,23 @@ INTEGER, PARAMETER :: maxpar = 40     ! Max numero di parametri in ouptut
 INTEGER, PARAMETER :: iu_in = 20      ! Unita' per lettura filein
 INTEGER, PARAMETER :: iu_par = 21     ! Unita' per lettura filepar
 INTEGER, PARAMETER :: iu_out = 22     ! Unita' per scrittura fileout
-INTEGER, PARAMETER :: iu_log = 23     ! Unita' per scrittura filelog
+INTEGER, PARAMETER :: iu_ana = 23     ! Unita' per scrittura anagrafica
+INTEGER, PARAMETER :: iu_log = 24     ! Unita' per scrittura filelog
 
 ! Altre variabili locali
 TYPE (metpar) :: req_par(maxpar)
+TYPE (anag) :: anag_dum,anag_out
 TYPE (csv_record) :: csvline
 TYPE (datetime) :: datah_req1,datah_req2,datah_in1,datah_in2
 TYPE (datetime) :: datah_req,datah_next,datah_dum
 REAL, ALLOCATABLE :: values(:)
 INTEGER :: idum,ios,eof,eor,ier(10),iret,k,kp,kskip,kd,kh
-INTEGER :: idp,idsta,yy,mm,dd,hh,nf,pp,npar,ndays,nok,ndec
-INTEGER :: cnt_date_in,cnt_date_miss,cnt_valok_out,cnt_istok_out
-CHARACTER (LEN=200) :: filein,fileout,filepar,filelog,chdum,chrec,chfmt1,chfmt2
-CHARACTER (LEN=10) :: ch10a,ch10b
+INTEGER :: idp,idsta,yy,mm,dd,hh,mn,nf,pp,npar,ndays,ndec
+INTEGER :: cnt_date_in,cnt_date_miss,cnt_date_skip,cnt_valok_out
+INTEGER :: cnt_istok_out,cnt_msg_skip
+CHARACTER (LEN=200) :: filein,fileout,filepar,filelog,fileana
+CHARACTER (LEN=200) :: chdum,chrec,chfmt1,chfmt2
+CHARACTER (LEN=12) :: ch12a,ch12b
 CHARACTER (LEN=3) :: inp_type,next_arg
 LOGICAL, ALLOCATABLE :: par_ok(:)
 LOGICAL :: end_inp,ldeb,ltc,lphpa,is_temp(maxpar),is_pres(maxpar)
@@ -177,10 +273,13 @@ ELSE
   WRITE (chfmt2,'(a,i3,a)') "(i4.4,3(1x,i2.2),",npar,"(1x,e10.3))"
 ENDIF
 
+WRITE (fileana,'(a3,i5.5,a4)') "eo_",idsta,".ana"
+OPEN (UNIT=iu_ana, FILE=fileana, STATUS="REPLACE", FORM="FORMATTED")
+
 IF (ldeb) THEN
   WRITE (filelog,'(a3,i5.5,a4)') "eo_",idsta,".log"
   OPEN (UNIT=iu_log, FILE=filelog, STATUS="REPLACE", FORM="FORMATTED")
-  WRITE (iu_log,'(a25,1x,a6,5(1x,a5))') "Parameteri richiesti     ",&
+  WRITE (iu_log,'(a25,1x,a6,5(1x,a5))') "Parametri richiesti      ",&
     "Bcode ","l1","lt1","p1","p2","tr"
   DO kp = 1,npar
     WRITE (iu_log,'(a25,1x,a6,5(1x,i5))') "                         ", &
@@ -193,12 +292,21 @@ IF (ldeb) THEN
 ENDIF
 
 ! 1.3 Apro filein e leggo la prima data che contiene
+anag_out = anag(rmiss,rmiss,rmiss,"","")
 cnt_date_in = 0
 cnt_date_miss = 0
+cnt_date_skip = 0
 cnt_valok_out = 0
 cnt_istok_out = 0
+cnt_msg_skip = 0
 par_ok(:) = .FALSE.
 end_inp = .FALSE.
+
+yy = imiss
+mm = imiss
+dd = imiss
+hh = imiss
+mn = imiss
 
 OPEN (UNIT=iu_in, FILE=filein, STATUS="OLD", FORM="FORMATTED", ERR=9995)
 DO k = 1,HUGE(0)
@@ -207,10 +315,21 @@ DO k = 1,HUGE(0)
   IF (ios /= 0) GOTO 9993
   pp = INDEX(chrec,",")
   IF (pp == 0) CYCLE
-  IF (chrec(1:pp-1) == "date") THEN
-    READ (chrec(pp+1:pp+13),'(i4,3(1x,i2))',IOSTAT=ios) yy,mm,dd,hh
-    IF (ios /= 0) GOTO 9993
-    datah_next =  datetime_new(YEAR=yy, MONTH=mm, DAY=dd, HOUR=hh)
+  ios = 0
+  IF (chrec(1:pp-1) == "B04001") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) yy
+  ELSE IF (chrec(1:pp-1) == "B04002") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) mm
+  ELSE IF (chrec(1:pp-1) == "B04003") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) dd
+  ELSE IF (chrec(1:pp-1) == "B04004") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) hh
+  ELSE IF (chrec(1:pp-1) == "B04005") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) mn
+  ENDIF
+  IF (ios /= 0) GOTO 9993
+  IF (c_e(yy) .AND. c_e(mm) .AND. c_e(dd) .AND. c_e(hh) .AND. c_e(mn)) THEN
+    datah_next =  datetime_new(YEAR=yy, MONTH=mm, DAY=dd, HOUR=hh, MINUTE=mn)
     cnt_date_in = cnt_date_in + 1
     EXIT
   ENDIF
@@ -243,10 +362,23 @@ DO kh = 0,23
       GOTO 9992
     ELSE IF (iret == 3) THEN
       GOTO 9991
+
     ELSE
-      datah_in2 = datah_dum
-      datah_next = datah_dum
-      cnt_date_in = cnt_date_in + 1
+      IF (datah_next == datah_dum) THEN
+        cnt_msg_skip = cnt_msg_skip + 1
+        CYCLE
+      ELSE
+        IF (ldeb) THEN
+          CALL getval(datah_next, SIMPLEDATE=ch12a)
+          WRITE (iu_log,'(3a,i5)') "Skip data: ",ch12a," prog. ",cnt_date_in
+        ENDIF
+        datah_in2 = datah_dum
+        datah_next = datah_dum
+        cnt_date_in = cnt_date_in + 1
+        cnt_date_skip = cnt_date_skip + 1
+        cnt_msg_skip = cnt_msg_skip + 1
+      ENDIF
+
     ENDIF
   ENDDO
 
@@ -261,18 +393,15 @@ DO kh = 0,23
 
   ELSE
     IF (ldeb) THEN
-      CALL getval(datah_req, SIMPLEDATE=ch10a)
+      CALL getval(datah_req, SIMPLEDATE=ch12a)
       WRITE (iu_log,*)
-      WRITE (iu_log,'(2a)') "*** Prossima data: ",ch10a
+      WRITE (iu_log,'(3a,i5)') "*** Prossima data: ",ch12a," prog. ",cnt_date_in
     ENDIF
 
-    IF (inp_type == "hfr") THEN
-      CALL get_msg_hfr(iu_in,iu_log,ldeb,eof,datah_req,npar,req_par(1:npar), &
-         values,datah_dum,iret,nok)
-    ELSE IF (inp_type == "syn") THEN
-      CALL get_msg_syn(iu_in,eof,datah_req,npar,req_par(1:npar), &
-         values,datah_dum,iret,nok)
-    ENDIF
+    CALL get_msg(iu_in,iu_log,ldeb,eof,datah_req,npar,req_par(1:npar),inp_type, &
+       values,datah_dum,anag_dum,iret)
+
+    CALL copy_anag(anag_dum,anag_out)
 
     IF (iret == 1) THEN
       end_inp = .TRUE.
@@ -280,6 +409,8 @@ DO kh = 0,23
       GOTO 9993
     ELSE IF (iret == 3) THEN
       GOTO 9991
+    ELSE IF (iret == 4) THEN
+      GOTO 9989
     ELSE
       datah_in2 = datah_dum
       datah_next = datah_dum
@@ -317,27 +448,35 @@ ENDDO
 !--------------------------------------------------------------------------
 ! 3) Conclusione
 
+! Output anagrafica
+WRITE (iu_ana,'(i5.5,a,2(f10.5,a),f6.1,a,3a)') &
+  idsta,",",anag_out%lat,",",anag_out%lon,",",anag_out%quo,",",&
+  TRIM(anag_out%rete),",",TRIM(anag_out%nome)
+
 ! Log a schermo
-CALL getval(datah_in1, SIMPLEDATE=ch10a)
-CALL getval(datah_in2, SIMPLEDATE=ch10b)
+CALL getval(datah_in1, SIMPLEDATE=ch12a)
+CALL getval(datah_in2, SIMPLEDATE=ch12b)
 WRITE (*,*)
 WRITE (*,'(3a)') "Input (",TRIM(filein),"):"
-WRITE (*,'(a,i3)') "  istanti nel file: ",cnt_date_in
-WRITE (*,'(a,i3)') "  istanti mancanti: ",cnt_date_miss
-WRITE (*,'(4a)')   "  date estreme: ",ch10a," ",ch10b
+WRITE (*,'(a,i6)') "  istanti letti:    ",cnt_date_in
+WRITE (*,'(a,i6)') "  istanti mancanti: ",cnt_date_miss
+WRITE (*,'(4a)')   "  date estreme lette: ",ch12a," ",ch12b
 WRITE (*,*)
 WRITE (*,'(3a)') "Output (",TRIM(fileout),"):"
-WRITE (*,'(2(a,i4))') "  richiesti: istanti ",ndays*24," parametri ",npar
+WRITE (*,'(2(a,i6))') "  richiesti: istanti ",ndays*24," parametri ",npar
 WRITE (*,'(2(a,i6),a,f6.2,a)') "  dati validi:        ",cnt_valok_out, &
   " su ",ndays*24*npar," (",REAL(cnt_valok_out)/REAL(ndays*24*npar)*100.," %)"
 WRITE (*,'(2(a,i6),a,f6.2,a)') "  istanti con dati:   ",cnt_istok_out, &
   " su ",ndays*24," (",REAL(cnt_istok_out)/REAL(ndays*24)*100.," %)"
 WRITE (*,'(2(a,i6))')          "  parametri con dati: ",COUNT(par_ok(1:npar)), &
   " su ",npar
+WRITE (*,'(a,2(i6,a))') "  saltati ",cnt_date_skip," istanti, ", &
+  cnt_msg_skip," messaggi"
 
 ! Chiudo files
 CLOSE(iu_in)
 CLOSE(iu_out)
+CLOSE(iu_ana)
 CLOSE(iu_log)
 
 STOP 0
@@ -380,62 +519,81 @@ WRITE (*,*) "Errore aprendo ",TRIM(filein)
 STOP 2
 
 9994 CONTINUE
-WRITE (*,*) "Errore: ",TRIM(filein)," non contiene nessun record ""date"""
+WRITE (*,*) "Errore: ",TRIM(filein)," non contiene nessuna data"
 STOP 3
 
 9993 CONTINUE
 WRITE (*,*) "Errore leggendo ",TRIM(filein),": record illegale"
-WRITE (*,*) TRIM(chrec)
+WRITE (*,'(a)') TRIM(chrec)
 STOP 3
 
 9992 CONTINUE
 WRITE (*,*) "Errore leggendo ",TRIM(filein),": date non sequenziali"
-CALL getval(datah_next, SIMPLEDATE=ch10a)
-CALL getval(datah_dum, SIMPLEDATE=ch10b)
-WRITE (*,'(a,1x,a)') ch10a,ch10b
+CALL getval(datah_next, SIMPLEDATE=ch12a)
+CALL getval(datah_dum, SIMPLEDATE=ch12b)
+WRITE (*,'(a,1x,a)') ch12a,ch12b
 STOP 3
 
 9991 CONTINUE
 WRITE (*,*) "Errore leggendo ",TRIM(filein),": date non sequenziali"
-CALL getval(datah_req, SIMPLEDATE=ch10a)
-CALL getval(datah_dum, SIMPLEDATE=ch10b)
-WRITE (*,'(a,1x,a)') ch10a,ch10b
+CALL getval(datah_req, SIMPLEDATE=ch12a)
+CALL getval(datah_dum, SIMPLEDATE=ch12b)
+WRITE (*,'(a,1x,a)') ch12a,ch12b
 STOP 3
 
 9990 CONTINUE
 WRITE (*,*) "Erroraccio gestione date (chiamare l'assistenza)"
 STOP 4
 
+9989 CONTINUE
+WRITE (*,*) "Errore leggendo ",TRIM(filein),": date intercalate ai parametri"
+CALL getval(datah_req, SIMPLEDATE=ch12a)
+WRITE (*,'(a)') ch12a
+STOP 3
+
 END PROGRAM bufr_csv2orari
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-SUBROUTINE get_msg_hfr(iu,iu_log,ldeb,eof,datah_req,npar,req_par,values,datah_next,ier,nok)
-!
+SUBROUTINE get_msg(iu,iu_log,ldeb,eof,datah_req,npar,req_par,inp_type, &
+  values,datah_next,anag_dum,ier)
+
 ! Legge dall'unita' iu (gia aperta) i dati relativi a un'istante temporale
-! Ritorna i valori relativi ai parametri richiesti e la data successiva
-! presente nel file. 
+! (uno o piu' messaggi). Ritorna i valori relativi ai parametri richiesti 
+! e la data successiva presente nel file.
+!
+! NOTE: 
+! - La subr. presuppone che le chiavi dei BUFR siano sempre ordinate per 
+!   gruppi: prima quelle relative alla data, poi quelle relative a 
+!   var-liv-anag, e da ultimo il valore della varibile fisica e le 
+!   (eventuali) flag di qualita'.
+!
+! - Di norma, i BUFR proveninti da dati ad altra frequenza, contengono un 
+!   messaggio separato per ogni parametro, mentre i BUFR Synop radunano 
+!   tutti i parametri in un unico messaggio.
+!
+! - Spesso nei dati Synop sono presenti due messaggi consecutivi che 
+!   differiscono solo per "centre" e "master table": in questo caso prendo
+!   tutti i dati disponibili, verificando che i messaggi non contengano
+!   valori diversi.
+!
+! - Per i dati Synop, attualmente livello e timerange richiesti sono 
+!   sempre mancanti (vedi estra_oss.sh), per cui i dati sono selezionati solo
+!   in base alla varibile fisica (Bcode). Se si volessero implementare i
+!   controlli (costruendo un file param_synop.csv con lo stesso tracciato di
+!   param_arkioss.csv), considerare che:
+!   * il file deve essere prodotto a mano (i synop vengono estratti solo 
+!     come messaggio completo)
+!   * nei synop, il timerange e' dato dalla B04024 (time significance), ed
+!     e' implicitamente istantaneo se la chiave non e' presente
+!   * analogamente, il livello e' e' dato dalla B07032, ed e' implicitamete
+!     "superficie" se la chiave non e' presente.
 !
 ! Codici d'errore:
 ! 1: raggiunta la fine di filein (values definiti, datah_next mancante)
 ! 2: errore di lettura in filein (fatal)
 ! 3: date non sequenziali in filein (fatal)
-!
-! Chiavi utili nei messaggi BUFR-SIMC scritti csv (dati ad alta frequenza)
-!   edition: inizio messaggio
-!   B07192 [SIM] First level type (257: introduce anagrafica ???)
-!   B07193 [SIM] Level L1
-!   B04192 [SIM] Time range type
-!   B04193 [SIM] Time range P1
-!   B04194 [SIM] Time range P2
-!   B04001 YEAR
-!   B04002 MONTH
-!   B04003 DAY
-!   B04004 HOUR
-!   B01194 [SIM] Report mnemonic (rete)
-!   B05001 LATITUDE
-!   B06001 LONGITUDE
-!   B07030 HEIGHT OF STATION GROUND ABOVE MSL
+! 4: intreccio di date e valori in filein (fatal)
 
 USE datetime_class
 USE missing_values
@@ -448,294 +606,386 @@ TYPE (datetime), INTENT(IN) :: datah_req
 TYPE (metpar), INTENT(IN) :: req_par(npar)
 INTEGER, INTENT(IN) :: iu,iu_log,eof,npar
 LOGICAL, INTENT(IN) :: ldeb
+CHARACTER (LEN=3), INTENT(IN) :: inp_type
 
+TYPE (anag), INTENT(OUT) :: anag_dum
 TYPE (datetime), INTENT(OUT) :: datah_next
 REAL, INTENT(OUT) :: values(npar)
-INTEGER, INTENT(OUT) :: ier,nok
+INTEGER, INTENT(OUT) :: ier
 
 ! Variabili locali
 TYPE (datetime) :: datah_dum
 TYPE (metpar) :: par_dum
 REAL :: val_dum
-INTEGER :: ios,k,kp,yy,mm,dd,hh,pp
+INTEGER :: ios,iosr,k,kp,yy,mm,dd,hh,mn,pp,kp_qc_pending
+INTEGER :: cnt_null,nok,ndble,ndiff,nqcmiss,nmsg,qcf
 CHARACTER (LEN=200) :: chrec,key
+CHARACTER (LEN=12) :: ch12
+CHARACTER (LEN=4) :: kty
 
 !--------------------------------------------------------------------------
 
+datah_dum = datah_req
 values(:) = rmiss
 par_dum = metpar(0,imiss,imiss,imiss,imiss,imiss,"","","","")
 val_dum = rmiss
+yy = imiss
+mm = imiss
+dd = imiss
+hh = imiss
+mn = imiss
+qcf = imiss
+kp_qc_pending = imiss
+
+IF (inp_type == "syn") THEN
+  anag_dum = anag(rmiss,rmiss,rmiss,"synop","")
+ELSE
+  anag_dum = anag(rmiss,rmiss,rmiss,"","")
+ENDIF
+
 nok = 0
+ndble = 0
+ndiff = 0
+nmsg = 0
+cnt_null = 0
+nqcmiss = 0
 
 DO k = 1,HUGE(0)
-  READ (iu,'(a)',IOSTAT=ios) chrec
 
-! Fine file: salvo l'ultimo valore letto e termino
-  IF (ios == eof) THEN
-    IF (ldeb) CALL write_log_hfr(iu_log,npar,par_dum,val_dum,req_par(1:npar))
+!--------------------------------------------------------------------------
+! 1) Leggo il prossimo record
+
+  READ (iu,'(a)',IOSTAT=iosr) chrec
+
+! Fine file: salvo l'ultimo valore letto e mando il segnale di fine programma
+  IF (iosr == eof) THEN
     DO kp = 1,npar
-      IF (par_dum%bcode==req_par(kp)%bcode .AND. &
-          par_dum%lt1==req_par(kp)%lt1 .AND. &
-          par_dum%l1==req_par(kp)%l1 .AND. par_dum%tr==req_par(kp)%tr .AND. &
-          par_dum%p1==req_par(kp)%p1 .AND. par_dum%p2==req_par(kp)%p2) THEN
-        values(kp) = val_dum
-        nok = nok + 1
+      IF (metpar_equal(par_dum,req_par(kp))) THEN
+        IF (values(kp) == rmiss) THEN
+          values(kp) = val_dum
+          nok = nok + 1
+        ELSE IF (values(kp) == val_dum) THEN
+          ndble = ndble + 1
+        ELSE
+          WRITE (*,*) "Warning: dati diversi relativi allo stesso istante: "
+          ndiff = ndiff + 1
+          IF (ldeb) THEN
+            CALL getval(datah_req, SIMPLEDATE=ch12)
+            WRITE (*,'(a10,2(2x,f10.3),i3,1x,a)') &
+              ch12,values(kp),val_dum,kp,TRIM(req_par(kp)%short_name)
+          ENDIF
+        ENDIF
+
         EXIT
       ENDIF
     ENDDO
+
+    IF (ldeb) THEN
+      IF (ANY(par_dum%bcode==req_par(1:npar)%bcode)) &
+        CALL write_log(iu_log,npar,par_dum,val_dum,req_par(1:npar))
+      CALL getval(datah_req, SIMPLEDATE=ch12)
+      WRITE (iu_log,'(2a,5(1x,a,1x,i2))') "Terminata lettura istante ",ch12, &
+        " messaggi",nmsg,"dati validi",nok,"doppi",ndble,"inconsistenti",ndiff, &
+        " mancanti per qc",nqcmiss
+     ENDIF
+
     datah_next = datetime_miss
     ier = 1
     RETURN
 
-  ELSE IF (ios /= 0) THEN
+  ELSE IF (iosr /= 0) THEN
     GOTO 9999
 
   ENDIF
 
+!--------------------------------------------------------------------------
+! 2) Interpreto la key appena letta
+
   pp = INDEX(chrec,",")
   IF (pp == 0) CYCLE
   key = chrec(1:pp-1)
+  kty = "othe"
+  ios = 0
 
-! Inizia un nuovo messaggio
-  IF (key == "date") THEN
-    READ (chrec(pp+1:pp+13),'(i4,3(1x,i2))',IOSTAT=ios) yy,mm,dd,hh
-    IF (ios /= 0) GOTO 9999
-    datah_dum = datetime_new(YEAR=yy, MONTH=mm, DAY=dd, HOUR=hh)
+! 2.0 "key" a cui non e' associato alcun valore
+  IF (pp == LEN(TRIM(chrec))) THEN
+    kty = "null"
 
-!   Data precedente a quella richiesta: fatal error
+! 2.1 Inizio di un nuovo messaggio
+  ELSE IF (key == "edition") THEN
+    kty = "head"
+
+! 2.2 "key" fa parte della codifica della data
+  ELSE IF (key == "B04001") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) yy
+    kty = "date"
+  ELSE IF (key == "B04002") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) mm
+    kty = "date"
+  ELSE IF (key == "B04003") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) dd
+    kty = "date"
+  ELSE IF (key == "B04004") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) hh
+    kty = "date"
+  ELSE IF (key == "B04005") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) mn
+    kty = "date"
+
+! 2.3 "key" contiene informazioni di anagrafica
+  ELSE IF (key == "B05001") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) anag_dum%lat
+    kty = "anag"
+  ELSE IF (key == "B06001") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) anag_dum%lon
+    kty = "anag"
+  ELSE IF (key == "B07030") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) anag_dum%quo
+    kty = "anag"
+  ELSE IF (key == "B01019" .OR. key == "B01015") THEN
+    READ (chrec(pp+1:),'(a)',IOSTAT=ios) anag_dum%nome
+    kty = "anag"
+  ELSE IF (key == "B01194") THEN
+    READ (chrec(pp+1:),'(a)',IOSTAT=ios) anag_dum%rete
+    kty = "anag"
+
+! 2.4 "key" fa parte della codifica di par/liv
+  ELSE IF (key == "B07192") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%lt1
+    kty = "varl"
+  ELSE IF (key == "B07193") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%l1
+    kty = "varl"
+  ELSE IF (key == "B04192") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%tr
+    kty = "varl"
+  ELSE IF (key == "B04193") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%p1
+    kty = "varl"
+  ELSE IF (key == "B04194") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%p2
+    kty = "varl"
+
+! 2.5 "key" contiene informazioni sul controllo di qualita'
+!     NB chiavi di futura implementazione: 33192, 33193, 33194, 33197
+  ELSE IF (key == "B33196") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) qcf
+    kty = "qflg"
+
+! 2.6 "key" corrisponde a una delle variabili fisiche richieste in output
+  ELSE
+    DO kp = 1, npar
+      IF (key == req_par(kp)%bcode) THEN
+        READ (chrec(pp+1:),*,IOSTAT=ios) val_dum
+        par_dum%bcode = key(1:6)
+        kty = "valu"
+        EXIT
+      ENDIF
+    ENDDO
+  ENDIF
+
+  IF (ios /= 0) GOTO 9999
+
+!--------------------------------------------------------------------------
+! 3) Elaborazioni e controlli
+
+! Iniziato un nuovo messaggio
+  IF (kty == "head") THEN 
+    datah_dum = datetime_miss
+    yy = imiss
+    mm = imiss
+    dd = imiss
+    hh = imiss
+    mn = imiss
+    qcf = imiss
+    kp_qc_pending = imiss
+
+! Trovata chiave relativa ai dati mentre la data e' indefinita
+  IF (datah_dum == datetime_miss .AND. &
+    (kty=="varl" .OR. kty=="valu" .OR. kty=="anag" .OR. kty=="valu")) GOTO 9998
+
+! Completata la lettura della data
+  ELSE IF (kty == "date" .AND. &
+           c_e(yy).AND.c_e(mm).AND.c_e(dd).AND.c_e(hh).AND.c_e(mn)) THEN
+    datah_dum = datetime_new(YEAR=yy, MONTH=mm, DAY=dd, HOUR=hh, MINUTE=mn)
+    nmsg = nmsg + 1
+    yy = imiss
+    mm = imiss
+    dd = imiss
+    hh = imiss
+    mn = imiss
+
+!   data precedente a quella richiesta: fatal error
     IF (datah_dum < datah_req) THEN
       datah_next = datah_dum
       ier = 3
       RETURN 
 
-!   Data successiva a quella richiesta: salvo i valori letti e concludo
+!   data successiva a quella richiesta: salvo l'ultimo valore letto e concludo
     ELSE IF (datah_dum > datah_req) THEN
-      IF (ldeb) CALL write_log_hfr(iu_log,npar,par_dum,val_dum,req_par(1:npar))
       DO kp = 1,npar
-        IF (par_dum%bcode==req_par(kp)%bcode .AND. &
-            par_dum%lt1==req_par(kp)%lt1 .AND. &
-            par_dum%l1==req_par(kp)%l1 .AND. par_dum%tr==req_par(kp)%tr .AND. &
-            par_dum%p1==req_par(kp)%p1 .AND. par_dum%p2==req_par(kp)%p2) THEN
-          values(kp) = val_dum
-          nok = nok + 1
+        IF (metpar_equal(par_dum,req_par(kp))) THEN
+          IF (values(kp) == rmiss) THEN
+            values(kp) = val_dum
+            nok = nok + 1
+          ELSE IF (values(kp) == val_dum) THEN
+            ndble = ndble + 1
+          ELSE
+            WRITE (*,*) "Warning: dati diversi relativi allo stesso istante"
+            ndiff = ndiff + 1
+            IF (ldeb) THEN
+              CALL getval(datah_req, SIMPLEDATE=ch12)
+              WRITE (*,'(a12,2(2x,f10.3),i3,1x,a)') &
+                ch12,values(kp),val_dum,kp,TRIM(req_par(kp)%short_name)
+            ENDIF
+          ENDIF
+
           EXIT
         ENDIF
       ENDDO
+
+      IF (ldeb) THEN
+        IF (ANY(par_dum%bcode==req_par(1:npar)%bcode)) &
+          CALL write_log(iu_log,npar,par_dum,val_dum,req_par(1:npar))
+        CALL getval(datah_req, SIMPLEDATE=ch12)
+        WRITE (iu_log,'(2a,5(1x,a,1x,i2))') "Terminata lettura istante ",ch12, &
+          " messaggi",nmsg,"dati validi",nok,"doppi",ndble,"inconsistenti",ndiff, &
+          " mancanti per qc",nqcmiss
+      ENDIF
+
       datah_next = datah_dum
       ier = 0
       RETURN
 
-!   Data uguale a quella richiesta: salvo il valore del parametro appena letto
-!   (se e' uno di quelli richiesti)
+!   data uguale a quella richiesta, ie. ci sono messaggi consecutivi con la
+!   stassa data: proseguo senza colpo ferire
     ELSE
-      IF (ldeb) CALL write_log_hfr(iu_log,npar,par_dum,val_dum,req_par(1:npar))
-      DO kp = 1,npar
-        IF (par_dum%bcode==req_par(kp)%bcode .AND. &
-            par_dum%lt1==req_par(kp)%lt1 .AND. &
-            par_dum%l1==req_par(kp)%l1 .AND. par_dum%tr==req_par(kp)%tr .AND. &
-            par_dum%p1==req_par(kp)%p1 .AND. par_dum%p2==req_par(kp)%p2) THEN
-          values(kp) = val_dum
-          nok = nok + 1
-          EXIT
-        ENDIF
-      ENDDO
-      par_dum = metpar(0,imiss,imiss,imiss,imiss,imiss,"","","","")
-      val_dum = rmiss
-      nok = 0
+      CONTINUE
+
     ENDIF
 
-! Prosegue la lettura del messaggio in corso
+! Se e' uno dei parametri richiesti, lo salvo
+  ELSE IF (kty == "valu") THEN
+    kp_qc_pending = imiss
+    DO kp = 1,npar
+      IF (metpar_equal(par_dum,req_par(kp))) THEN
+        IF (values(kp) == rmiss) THEN
+          values(kp) = val_dum
+          nok = nok + 1
+          kp_qc_pending = kp
+        ELSE IF (values(kp) == val_dum) THEN
+          ndble = ndble + 1
+        ELSE
+          WRITE (*,*) "Warning: dati diversi relativi allo stesso istante"
+          ndiff = ndiff + 1
+          IF (ldeb) THEN
+            CALL getval(datah_req, SIMPLEDATE=ch12)
+            WRITE (*,'(a12,2(2x,f10.3),i3,1x,a)') &
+              ch12,values(kp),val_dum,kp,TRIM(req_par(kp)%short_name)
+          ENDIF
+        ENDIF
 
-! key fa parte della codifica par/liv
-  ELSE IF (key == "B07192") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%lt1
-    IF (ios /= 0) goto 9999
-  ELSE IF (key == "B07193") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%l1
-    IF (ios /= 0) goto 9999
-  ELSE IF (key == "B04192") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%tr
-    IF (ios /= 0) goto 9999
-  ELSE IF (key == "B04193") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%p1
-    IF (ios /= 0) goto 9999
-  ELSE IF (key == "B04194") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%p2
-    IF (ios /= 0) goto 9999
-  ELSE
-
-!   key corrisponde a una delle variabili fisiche richieste in output
-    DO kp = 1, npar
-      IF (key == req_par(kp)%bcode) THEN
-        READ (chrec(pp+1:),*,IOSTAT=ios) val_dum
-        par_dum%bcode = key(1:6)
         EXIT
+
       ENDIF
     ENDDO
+
+    IF (ldeb) CALL write_log(iu_log,npar,par_dum,val_dum,req_par(1:npar))
+    par_dum = metpar(0,imiss,imiss,imiss,imiss,imiss,"","","","")
+    val_dum = rmiss
+
+! Se e' una flag di qualita', annullo l'ultimo dato letto
+  ELSE IF (kty == "qflg") THEN
+    IF (qcf == 1 .AND. c_e(kp_qc_pending)) THEN
+      IF (kp_qc_pending < 1 .OR. kp_qc_pending > npar) GOTO 9997
+      IF (ldeb) THEN
+        CALL getval(datah_dum, SIMPLEDATE=ch12)
+        WRITE (iu_log,'(4a,f10.1,3a)') "### Dato messo mancante: ",ch12," ", &
+          req_par(kp_qc_pending)%bcode, values(kp_qc_pending), &
+          " (",TRIM(req_par(kp_qc_pending)%short_name),")"
+      ENDIF
+
+      values(kp_qc_pending) = rmiss
+      nqcmiss = nqcmiss + 1
+      kp_qc_pending = imiss
+      qcf = imiss
+    ENDIF
+
+! Altrimenti proseguo senza colpo ferire  
+  ELSE IF (kty=="anag" .OR. kty=="varl" .OR. kty=="othe" .OR. kty=="null") THEN
+    CONTINUE
+
   ENDIF
 
 ENDDO
-
-RETURN
-
-9999 CONTINUE
-WRITE (*,*) TRIM(chrec)
-ier = 2
-RETURN
-
-END SUBROUTINE get_msg_hfr
-
-!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-SUBROUTINE get_msg_syn(iu,eof,datah_req,npar,req_par,values,datah_next,ier,nok)
-!
-! Legge dall'unita' iu (gia aperta) i dati relativi a un messaggio synop.
-! Ritorna i valori relativi ai parametri richiesti e la data successiva
-! presente nel file. 
-!
-! NOTE:
-! - Nei BUFR-WMO tutti i parametri sono inclusi nello stesso messaggio: 
-!   questa subr. si limita quindi a leggere un solo messaggio, e ritorna i 
-!   valori corrispondenti ai parametri richiesti.
-! - Non vengono controllati livello e timerange (suppongo che le variabili
-!   fisiche compaiano una sola volta nel messaggio)  
-! - La subroutine gestisce la presenza di chiavi senza valore (frequenti)
-! - In alcuni casi, il file bufr contiene messaggi ripetuti, che (in 
-!   apparenza) differiscono solo per "centre" e "master table" (di solito
-!   alle ore non sinottiche; approfondire)
-!
-! Chiavi utili nei messaggi BUFR-WMO scritti csv:
-!   edition: inizio messaggio
-!   B01001 WMO BLOCK NUMBER
-!   B01002 WMO STATION NUMBER
-!   B01015 Station name ?
-!   B05001 LATITUDE
-!   B06001 LONGITUDE
-!   B07030 HEIGHT OF STATION GROUND ABOVE MSL
-!   B07031 HEIGHT OF BAROMETER ABOVE MEAN SEA LEVEL 
-!   B04001 YEAR
-!   B04002 MONTH
-!   B04003 DAY
-!   B04004 HOUR
-!   B10004 PRESSURE
-!   B12101 TEMPERATURE/DRY-BULB TEMPERATURE
-!   B12103 DEW-POINT TEMPERATURE 
-!   B11001 WIND DIRECTION 
-!   B11002 WIND SPEED
-!   B20010 CLOUD COVER (TOTAL) 
-!   B13003 RELATIVE HUMIDITY
-!   B10051 SLP
-
-USE datetime_class
-USE missing_values
-USE local
-
-IMPLICIT NONE
-
-! Parametri della subroutine
-TYPE (datetime), INTENT(IN) :: datah_req
-TYPE (metpar), INTENT(IN) :: req_par(npar)
-INTEGER, INTENT(IN) :: iu,eof,npar
-
-TYPE (datetime), INTENT(OUT) :: datah_next
-REAL, INTENT(OUT) :: values(npar)
-INTEGER, INTENT(OUT) :: ier,nok
-
-! Variabili locali
-INTEGER :: ios,k,kp,yy,mm,dd,hh,pp
-CHARACTER (LEN=200) :: chrec,key
 
 !--------------------------------------------------------------------------
 
-values(:) = rmiss
-nok = 0
-
-DO k = 1,HUGE(0)
-  READ (iu,'(a)',IOSTAT=ios) chrec
-
-! Fine file: termino
-  IF (ios == eof) THEN
-    datah_next = datetime_miss
-    ier = 1
-    RETURN
-  ELSE IF (ios /= 0) THEN
-    GOTO 9999
-  ENDIF
-
-  pp = INDEX(chrec,",")
-  IF (pp == 0) CYCLE
-  key = chrec(1:pp-1)
-
-! Trovo una nuova data: termino (il messaggio e' concluso)
-! Se la nuova data e' precedente a quella in input, lo segnalo (fatal error)
-  IF (key == "date") THEN
-    READ (chrec(pp+1:pp+13),'(i4,3(1x,i2))',IOSTAT=ios) yy,mm,dd,hh
-    IF (ios /= 0) GOTO 9999
-    datah_next = datetime_new(YEAR=yy, MONTH=mm, DAY=dd, HOUR=hh)
-    IF (datah_next < datah_req) THEN
-      ier = 3
-    ELSE
-      ier = 0
-    ENDIF
-    RETURN
-
-! Cerco i parametri richiesti
-  ELSE
-    DO kp = 1,npar
-      IF (key(1:6) == req_par(kp)%bcode .AND. LEN(TRIM(chrec)) > pp+1) THEN
-        READ (chrec(pp+1:),*,IOSTAT=ios) values(kp)      
-        IF (ios /= 0) GOTO 9999
-        EXIT
-      ENDIF
-    ENDDO
-
-  ENDIF
-ENDDO
-
-RETURN
+WRITE (*,*) "Non dovrei mai passare di qui!!!"
+STOP 100
 
 9999 CONTINUE
 WRITE (*,*) TRIM(chrec)
 ier = 2
 RETURN
 
-END SUBROUTINE get_msg_syn
+9998 CONTINUE
+WRITE (*,*) TRIM(chrec)
+ier = 4
+RETURN
+
+9997 CONTINUE
+WRITE (*,*) "Errore gestione qc ",kp_qc_pending
+RETURN
+
+END SUBROUTINE get_msg
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-SUBROUTINE skip_input_time(iu,eof,datah_next,datah_dum,ier)
+SUBROUTINE skip_input_time(iu,eof,datah_in,datah_out,ier)
 !
-! Scorre il file aperto su iu fino al prossimo record "data" 
+! Scorre il file aperto sull'unita' "iu" fino al prossimo messaggio
 ! Necessaria per gestire files di input con frequenza piu' che oraria.
 !
+! datah_ini: ultima data letta prima della chiamata a questa subr.
+! datah_out: data letta dalla subr. (messaggio successivo a datah_ini)
+!
 ! Codici d'errore:
-! 1: raggiunta la fine di filein (values definiti, datah_next mancante)
+! 1: raggiunta la fine di filein (datah_next mancante)
 ! 2: errore di lettura in filein (fatal)
 ! 3: date non sequenziali in filein (fatal)
+! 4: intreccio di date e valori in filein (fatal)
 
 USE datetime_class
+USE missing_values
 
 IMPLICIT NONE
 
 ! Parametri della subroutine
 INTEGER, INTENT(IN) :: iu,eof
-TYPE (datetime), INTENT(IN) :: datah_next
+TYPE (datetime), INTENT(IN) :: datah_in
 
-TYPE (datetime), INTENT(OUT) :: datah_dum
+TYPE (datetime), INTENT(OUT) :: datah_out
 INTEGER, INTENT(OUT) :: ier
 
 ! Variabili locali
-INTEGER :: k,pp,yy,mm,dd,hh,ios
+INTEGER :: k,pp,yy,mm,dd,hh,mn,ios
 CHARACTER (LEN=200) :: chrec
 
 !-------------------------------------------------------------------------
+
+yy = imiss
+mm = imiss
+dd = imiss
+hh = imiss
+mn = imiss
 
 DO k = 1,HUGE(0)
 
   READ (iu,'(a)',IOSTAT=ios) chrec
 
   IF (ios == eof) THEN
-    datah_dum = datetime_miss
+    datah_out = datetime_miss
     ier = 1
     RETURN
 
@@ -745,11 +995,24 @@ DO k = 1,HUGE(0)
   ELSE
     pp = INDEX(chrec,",")
     IF (pp == 0) CYCLE
-    IF (chrec(1:pp-1) == "date") THEN
-      READ (chrec(pp+1:pp+13),'(i4,3(1x,i2))',IOSTAT=ios) yy,mm,dd,hh
-      IF (ios /= 0) GOTO 9999
-      datah_dum =  datetime_new(YEAR=yy, MONTH=mm, DAY=dd, HOUR=hh)
-      IF (datah_dum < datah_next) THEN
+    ios = 0
+
+    IF (chrec(1:pp-1) == "B04001") THEN
+      READ (chrec(pp+1:),*,IOSTAT=ios) yy
+    ELSE IF (chrec(1:pp-1) == "B04002") THEN
+      READ (chrec(pp+1:),*,IOSTAT=ios) mm
+    ELSE IF (chrec(1:pp-1) == "B04003") THEN
+      READ (chrec(pp+1:),*,IOSTAT=ios) dd
+    ELSE IF (chrec(1:pp-1) == "B04004") THEN
+      READ (chrec(pp+1:),*,IOSTAT=ios) hh
+    ELSE IF (chrec(1:pp-1) == "B04005") THEN
+      READ (chrec(pp+1:),*,IOSTAT=ios) mn
+    ENDIF
+
+    IF (ios /= 0) GOTO 9999
+    IF (c_e(yy) .AND. c_e(mm) .AND. c_e(dd) .AND. c_e(hh) .AND. c_e(mn)) THEN
+      datah_out =  datetime_new(YEAR=yy,MONTH=mm,DAY=dd,HOUR=hh,MINUTE=mn)
+      IF (datah_out < datah_in) THEN
         ier = 3
       ELSE
         ier = 0
@@ -771,11 +1034,21 @@ END SUBROUTINE skip_input_time
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-SUBROUTINE write_log_hfr(iu,npar,par_dum,val_dum,req_par)
-!
-! Scrive su iu le informazioni relative all'ultimo messaggio letto
-! Replica i controlli eseguti nella sub. chiamante
-!
+SUBROUTINE write_log(iu,npar,par_dum,val_dum,req_par)
+!-------------------------------------------------------------------------
+! Scrive su iu le informazioni relative all'ultimo dato letto. Viene
+! chiamata ogni volta che viene trovata una chiave corrispondente a una
+! variabile fisica richiesta.
+! 
+! NOTE:
+! - E' impossibile chiamare questa routine alla fine di ogni messaggio: nel
+!   caso dei dati Synop, il messaggio contiene molti valori, e le 
+!   informazioni relative ai ver-liv non sono conservate
+! - E' necessario passare a questa routine il vettore dei dati richiesti e 
+!   ripetere i controlli fatti nel main program, per poter distinguere i 
+!   casi in cui la varibiale fisica e' giusta, ma ha var-liv diversi da 
+!   quelli richiesti.
+!-------------------------------------------------------------------------
 
 USE local
 IMPLICIT NONE
@@ -787,41 +1060,27 @@ INTEGER, INTENT(IN) :: iu,npar
 INTEGER :: kp,idp
 CHARACTER(LEN=200) :: chrec
 
-1000 FORMAT(a25,1x,a6,5(1x,i5),1x,f10.1)
+1000 FORMAT(a35,1x,a6,5(1x,i5),1x,f10.1,1x,a)
 
-!
+!-------------------------------------------------------------------------
 
 DO kp = 1,npar
-  IF (par_dum%bcode==req_par(kp)%bcode .AND. &
-      par_dum%lt1==req_par(kp)%lt1 .AND. &
-      par_dum%l1==req_par(kp)%l1 .AND. par_dum%tr==req_par(kp)%tr .AND. &
-      par_dum%p1==req_par(kp)%p1 .AND. par_dum%p2==req_par(kp)%p2) THEN
-    WRITE (iu,1000) "msg richiesto            ", &
-      par_dum%bcode,par_dum%l1,par_dum%lt1,par_dum%p1,par_dum%p2,par_dum%tr,val_dum
+  IF (metpar_equal(par_dum,req_par(kp))) THEN
+    WRITE (iu,1000) "dato ok                           ", &
+      par_dum%bcode,par_dum%l1,par_dum%lt1,par_dum%p1,par_dum%p2, &
+      par_dum%tr,val_dum,TRIM(req_par(kp)%short_name)
     RETURN
+
   ELSE IF (par_dum%bcode==req_par(kp)%bcode) THEN
-    idp = kp
+    WRITE (iu,1000) "dato con liv-trange non richiesto ", &
+      par_dum%bcode,par_dum%l1,par_dum%lt1,par_dum%p1,par_dum%p2, &
+      par_dum%tr,val_dum,""
+
   ENDIF  
 ENDDO
 
-IF (par_dum%bcode=="") THEN
-  WRITE (iu,1000) "par non richiesto        ", &
-    "B-----",par_dum%l1,par_dum%lt1,par_dum%p1,par_dum%p2,par_dum%tr,val_dum
-
-ELSE
-  WRITE (chrec,1000) "lev/trange non richiesto ", &
-    par_dum%bcode,par_dum%l1,par_dum%lt1,par_dum%p1,par_dum%p2,par_dum%tr,val_dum
-  IF (par_dum%l1/=req_par(idp)%l1) chrec = TRIM(chrec) // " l1"
-  IF (par_dum%lt1/=req_par(idp)%lt1) chrec = TRIM(chrec) // " lt1"
-  IF (par_dum%p1/=req_par(idp)%p1) chrec = TRIM(chrec) // " p1"
-  IF (par_dum%p2/=req_par(idp)%p2) chrec = TRIM(chrec) // " p2"
-  IF (par_dum%tr/=req_par(idp)%tr) chrec = TRIM(chrec) // " tr"
-  WRITE (iu,'(a)') TRIM(chrec)
-
-ENDIF
-
 RETURN
-END SUBROUTINE write_log_hfr
+END SUBROUTINE write_log
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
@@ -901,7 +1160,7 @@ WRITE (*,*) "-ndec N: forza a N il numero di decimali in output (-1 per notazion
 WRITE (*,*) "-uv      scrive le temperature in gradi centigradi (def: K)"
 WRITE (*,*) "-tc      scrive le temperature in gradi centigradi (def: K)"
 WRITE (*,*) "-phpa    scrive le presisoni in hPa (def: Pa)"
-WRITE (*,*) "-deb:    scrive su file .log l'elenco di tutti i messaggi in input"
+WRITE (*,*) "-deb:    scrive su file .log la sequenza dei dati trovati in input"
 WRITE (*,*) "-h:      visualizza questo help"
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 

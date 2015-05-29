@@ -26,7 +26,8 @@ REAL    :: field(maxdim),field_sum(maxdim),field_frok(maxdim)
 
 ! Altre variabili del programma
 REAL :: fave,fave_sum,fract_req
-INTEGER :: ngribin,iuin,iuout,iuout2,nok,np_sav,data_sav(5),idp,nreq,ios,kp,nskip
+INTEGER :: ngribin,nskip,ngribmiss,ngribok
+INTEGER :: iuin,iuout,iuout2,nok,np_sav,data_sav(5),idp,nreq,ios,kp
 CHARACTER (LEN=200) :: filein,fileout,fileout2,chdum
 CHARACTER (LEN=3) :: next_arg
 LOGICAL :: first
@@ -97,6 +98,8 @@ fave_sum = 0.
 first = .TRUE.
 ngribin = 0
 nskip = 0
+ngribok = 0
+ngribmiss = 0
 
 grib: DO
 
@@ -108,6 +111,7 @@ grib: DO
     WRITE(*,*) "Error pbgrib: kret ",kret
     STOP
   ENDIF
+  ngribin = ngribin + 1
 
 ! Lo decodifico
   psec3(2) = rmis                !impongo di mettere i dati mancanti = rmis
@@ -126,16 +130,20 @@ grib: DO
     psec2_sav(:) = psec2(:)
     psec3_sav(:) = psec3(:)
     np_sav = ksec4(1) 
-  ELSE IF (ANY( ksec2(:) /= ksec2_sav(:) ) .OR. ksec4(1) /= np_sav) THEN
+
+  ELSE IF (ANY( ksec2((/1,2,3,4,5,7,8,11,13,14/)) /= &
+    ksec2_sav((/1,2,3,4,5,7,8,11,13,14/)) ) .OR. &
+    ksec4(1) /= np_sav) THEN
     WRITE (*,*) "Il grib ",ngribin," e' definito su un'area diversa, skippo"
+    nskip = nskip + 1
     CYCLE grib
   ENDIF  
 
   nok = COUNT(field(1:np_sav) /= rmis)
   IF (nok > 0) THEN
-    ngribin = ngribin +1
+    ngribok = ngribok +1
   ELSE
-    nskip = nskip + 1
+    ngribmiss = ngribmiss + 1
     CYCLE grib
   ENDIF
 
@@ -159,15 +167,15 @@ CALL PBCLOSE (iuin,kret)
 
 !--------------------------------------------------------------------------
 ! 3) Calcolo la media e la scrivo
-nreq = MAX(NINT(fract_req * ngribin),1)
+nreq = MAX(NINT(fract_req * ngribok),1)
 WHERE (field_nok(1:np_sav) >= nreq)
   field_sum(1:np_sav) = field_sum(1:np_sav) / REAL(field_nok(1:np_sav))
 ELSEWHERE
   field_sum(1:np_sav) = rmis
 ENDWHERE
 
-field_frok(1:np_sav) = REAL(field_nok(1:np_sav)) / REAL(ngribin)
-fave_sum = fave_sum / REAL(ngribin)
+field_frok(1:np_sav) = REAL(field_nok(1:np_sav)) / REAL(ngribok)
+fave_sum = fave_sum / REAL(ngribok)
 
 ! Confronto la media del campo medio con la media delle medie dei campi
 nok = COUNT(field_sum(1:np_sav) /= rmis)
@@ -178,9 +186,12 @@ ELSE
   fave = rmis
 ENDIF
 
+IF (ngribok+ngribmiss+nskip /= ngribin) WRITE (*,*) "Errore contatori!"
 WRITE (*,*)
-WRITE (*,*) "Campi interamente mancanti:  ",nskip
-WRITE (*,*) "Grib con dati buoni:         ",ngribin
+WRITE (*,*) "Campi totali in input        ",ngribin
+WRITE (*,*) "Campi su area diversa:       ",nskip
+WRITE (*,*) "Campi interamente mancanti:  ",ngribmiss
+WRITE (*,*) "Campi con dati validi:       ",ngribok
 WRITE (*,*) "Punti in un grib:            ",np_sav
 WRITE (*,*) "Media delle medie dei campi: ",fave_sum
 WRITE (*,*) "Media del campo medio:       ",fave

@@ -1,7 +1,7 @@
 AM_FCFLAGS = -I/usr/lib64/gfortran/modules -I$(top_builddir)/modules -DPKGDATAROOTDIR='"$(datarootdir)/$(PACKAGE)"' -cpp
 LDADD = $(top_builddir)/modules/libmautils.la
 
-pkglibexec_PROGRAMS = afa2grib.exe crea_templ_grib2_utm.exe cong2.exe diff_grib.exe diff_gribex.exe diff_header_gribex.exe grib2afa.exe grib2latlon.exe grib_ana2forc.exe grib_ave.exe grib_calc_median.exe grib_daily_stat.exe grib_dist_freq.exe grib_f2s.exe grib_forc2ana.exe grib_local_std.exe grib_runmean.exe grib_s2f.exe grib_skip_first.exe grib_stat.exe grib_step_explicit.exe grib_uniq.exe grib_uv2ffdd.exe intercala_grib.exe interp_grib.exe llgrib.exe llgribex.exe ma_grib1_grib2.exe ma_grib2_grib1.exe mask_grib.exe math_grib.exe moltiplica_grib.exe proc_flat_grib.exe replace_dat_grib.exe somma_grib.exe split_grib_par.exe split_gribex_par.exe test_1grib.exe tinterp_grib.exe zoom_grib.exe
+pkglibexec_PROGRAMS = afa2grib.exe crea_templ_grib2_utm.exe cong2.exe diff_grib.exe diff_gribex.exe diff_header_gribex.exe grib2afa.exe grib2latlon.exe grib_ana2forc.exe grib_ave.exe grib_calc_median.exe grib_daily_stat.exe grib_dist_freq.exe grib_f2s.exe grib_forc2ana.exe grib_local_std.exe grib_runmean.exe grib_s2f.exe grib_set_scanning.exe grib_skip_first.exe grib_stat.exe grib_step_explicit.exe grib_uniq.exe grib_uv2ffdd.exe intercala_grib.exe interp_grib.exe llgrib.exe llgribex.exe ma_grib1_grib2.exe ma_grib2_grib1.exe mask_grib.exe math_grib.exe moltiplica_grib.exe proc_flat_grib.exe replace_dat_grib.exe somma_grib.exe split_grib_par.exe split_gribex_par.exe test_1grib.exe tinterp_grib.exe zoom_grib.exe
 
 afa2grib_exe_SOURCES = afa2grib.f90
 crea_templ_grib2_utm_exe_SOURCES = crea_templ_grib2_utm.f90
@@ -17,6 +17,7 @@ grib_calc_median_exe_SOURCES = grib_calc_median.f90
 grib_daily_stat_exe_SOURCES = grib_daily_stat.f90
 grib_dist_freq_exe_SOURCES = grib_dist_freq.f90
 grib_f2s_exe_SOURCES = grib_f2s.f90
+grib_set_scanning_exe_SOURCES = grib_set_scanning.f90
 grib_forc2ana_exe_SOURCES = grib_forc2ana.f90
 grib_local_std_exe_SOURCES = grib_local_std.f90
 grib_runmean_exe_SOURCES = grib_runmean.f90

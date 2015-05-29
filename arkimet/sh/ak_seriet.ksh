@@ -55,7 +55,7 @@
 #   l'append di quelli dei vari segmenti, quindi o non c'e' header, oppure c'e'
 #   un header per ciascun segmento.
 #
-#                                             Versione 1.11.0, Enrico 04/12/2013
+#                                             Versione 1.11.1, Enrico 29/04/2015
 #-------------------------------------------------------------------------------
 #set -x
 #set -e
@@ -368,9 +368,9 @@ fi
 
 # Maiuscole/minuscole nel nome del dataset (arkimet: minusc.; maialinux: maiusc.)
 if [ $inpdata = "arkimet" ] ; then
-  if [ `echo $akurl | grep "arkimet" | wc -l` -eq 1 ] ; then      # arkimet
+  if [ `echo $akurl | grep "arkimet.metarpa" | wc -l` -eq 1 ] ; then   # arkimet
     ds=`echo $ds | tr '[:upper:]' '[:lower:]'`
-  elif [ `echo $ds | grep "maialinux" | wc -l` -eq 1 ] ; then  # maialinux
+  elif [ `echo $ds | grep "maialinux.metarpa" | wc -l` -eq 1 ] ; then  # maialinux
     ds=`echo $akurl | tr '[:lower:]' '[:upper:]'`
   fi 
 fi

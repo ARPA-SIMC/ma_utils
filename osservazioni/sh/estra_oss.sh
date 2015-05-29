@@ -16,30 +16,38 @@
 # - L'estrazione dei dati synop si basa solo sulla variabile fisica (Btable): se
 #   il messaggio synop contiene piu' volte la stessa varibile, viene estratto 
 #   solo l'ultimo valore.
+# - L'opzione -oracle permette di estrarre i dati dal vecchio archivo Orcale:
+#   e' meno garantita e molto piu' lenta, ma finche' non sara' completato il 
+#   trasferimento dei dati storici in arkioss e' l'unico modo per estrarre dati
+#   vecchi.
 #
 # TODO:
 # - gestire dataset lmruc_* (per dati in tempo reale)
 #
-#                                              Versione 1.0.0, Enrico 16/09/2014
+#                                              Versione 2.0.0, Enrico 28/05/2015
 #-------------------------------------------------------------------------------
-set -x
+#set -x
 
 #===============================================================================
 # Scrive a schermo l'help della procedura
 function write_help
 {
 #       12345678901234567890123456789012345678901234567890123456789012345678901234567890
-  echo "Uso: estra_oss.ksh data_ini data_end  [-syn/-temp] IDSTA / -sl FILESTA"
+  echo "Uso: estra_oss.ksh [-syn/-temp/-oracle]  data_ini data_end   IDSTA / -sl FILESTA"
   echo "     IDPAR / -pl FILEPAR   [-ndec N] [-tc] [-phpa]  [-deb] [-h]"
   echo ""
-  echo "Estrae da arkioss/arkimet i dati osservati relativi a una o piu' giornate, "
+  echo "Estrae da arkioss/arkimet/oracle i dati osservati relativi a una o piu' giornate, "
   echo "stazioni e parametri, e li scrive nei vecchi formati estra_orari/estra_temp."
+  echo ""
+  echo "Di Default, estrae da arkioss i dati relativi alle reti non GTS"
+  echo "  -syn    : estrae da arkimet i dati relativi alla rete Synop"
+  echo "  -temp   : estrae da arkimet i dati relativi alla rete TEMP"
+  echo "  -oracle : estrae da Oracle i dati relativi alle reti non GTS (obsolescente, ma"
+  echo "            necessario per estrarre dati da reti non gts precedenti il 01/04/2014)"
   echo ""
   echo "data_ini: prima data da estrarre  (AAAAMMGG)"
   echo "data_end: ultima data da estrarre (AAAAMMGG)"
   echo ""
-  echo "-syn/-temp: estrae da arkimet i dati relativi alle reti GTS (default: reti "
-  echo "          non-GTS su arkioss)"
   echo "IDSTA:    id delle stazioni da estrarre (se piu' di una, separare con virgole)"
   echo "          - con reti non-GTS usare il codice Oracle (anag_arkioss.csv)"
   echo "          - con reti synop e temp usare il codice WMO (5 cifre: anag_synop.csv)"
@@ -48,12 +56,13 @@ function write_help
   echo "IDPAR:    id dei parametri da estrarre (se piu' di uno, separare con virgole)"
   echo "          - per reti non-GTS, indicare i codici Oracle (param_shortnames.csv o"
   echo "            param_arkioss.csv)"
-  echo "          - per rete synop, indicare i codici B-table (Bxxxxx: param_synop.csv)"
+  echo "          - per rete synop, indicare i codici B-table (Bxxxxx: param_shortnames.csv)"
   echo "          - per i radiosondaggi, mettere 'temp'"
   echo "FILEPAR:  file con la lista degli id dei parametri da estrarre"
   echo ""
   echo "-tc       scrive le temperature in gradi centigradi"
-  echo "-uv       scrive le componenti del vento (invece di dierzione e modulo)"
+  echo "-phpa     scrive la pressione in hPa (invece che in Pa)"
+# echo "-uv       scrive le componenti del vento (invece di dierzione e modulo)"
   echo "-deb      salva i file intermedi, costruisce files di log"
   echo "-h        visualizza questo help"
 #       12345678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -163,6 +172,9 @@ while [ $# -ge 1 ] ; do
     id_arc="temp"
     url=$akmurl
     shift
+  elif [ `echo $1 | awk '{print $1}'` = '-oracle' ] ; then
+    id_arc="oracle"
+    shift
   elif [ `echo $1 | awk '{print $1}'` = '-ndec' ] ; then
     shift
     ndec=$1
@@ -184,11 +196,15 @@ while [ $# -ge 1 ] ; do
     elif [ $mand_par -eq 1 ] ; then
       data2=$1
     elif [ $mand_par -eq 2 ] ; then
-      sta_list_str=$1
+      if [ $input_sta = "id" ] ; then
+        sta_list_str=$1
+      else
+        par_list_str=$1
+      fi
     elif [ $mand_par -eq 3 ] ; then
       par_list_str=$1
     fi
-    mand_par=`expr $mand_par + 1`
+    mand_par=$[$mand_par + 1]
     shift
   fi
 done
@@ -227,7 +243,7 @@ fi
 # 1.4 Costruisco il file con le informazioni relative ai prametri richiesti
 
 rm -f eo_param.csv
-if [ $id_arc = "hfr" ] ; then
+if [ $id_arc = "hfr" -o $id_arc = "oracle" ] ; then
   for par in $par_list ; do
     grep ^$par $param_arkioss >> eo_param.csv
     if [ $? -ne 0 ] ; then
@@ -260,7 +276,7 @@ for id_staz in $sta_list ; do
 #-------------------------------------------------------------------------------
 # 2.1 Trovo dataset e anagrafica della stazione richiesta
 
-  if [ $id_arc = "hfr" ] ; then
+  if [ $id_arc = "hfr" -o $id_arc = "oracle" ] ; then
     grep ^${id_staz}, $anag_arkioss > /dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "Stazione "$id_staz" non trovata in "$anag_arkioss
@@ -303,50 +319,72 @@ for id_staz in $sta_list ; do
 #-------------------------------------------------------------------------------
 # 2.2 Costruisco la query
 
-  rm -f eo.query eo.out eo.bufr ${dataset}.conf eo_${id_staz2}.csv eo_${id_staz2}.dat
-  arki-mergeconf ${url}/dataset/${dataset} > ${dataset}.conf
+  rm -f eo.query eo.out eo.bufr eo.vmold eo.vm eo.query
+  rm -f ${dataset}.conf eo_${id_staz2}.csv eo_${id_staz2}.dat
+  if [ $id_arc = "hfr" -o $id_arc = "syn" -o $id_arc = "temp" ] ; then
+    arki-mergeconf ${url}/dataset/${dataset} > ${dataset}.conf
+  fi
 
 # Reftime
+  data1m1=`date -d "$data1 - 1day" +%Y%m%d`
   if [ `echo $par_list | awk '{print $1}'` = "temp" ] ; then
-    data1m1=`date -d "$data1 - 1day" +%Y%m%d`
     str_reftime=">="`date -d $data1m1 +%Y-%m-%d`" 22, <="`date -d $data2 +%Y-%m-%d`" 22"
-  else
+  elif [ $id_arc = "hfr" -o $id_arc = "syn" ] ; then
     str_reftime=">="`date -d $data1 +%Y-%m-%d`", <="`date -d $data2 +%Y-%m-%d`
+  elif [ $id_arc = "oracle" ] ; then
+    str_reftime=`date -d $data1 +"yearmin=%Y monthmin=%m daymin=%d"`" "`date -d $data2 +"yearmax=%Y monthmax=%m daymax=%d"`
   fi
 
 # Stazione e parametri
-  if [ $id_arc = "syn" -o $id_arc = "temp" ] ; then
-    str_sta="proddef: GRIB:blo=${blo},sta=${sta2}"
-    str_par=""
-  else
+  if [ $id_arc = "hfr" ] ; then
     str_sta="area: VM2,${id_staz}"
     str_dum="product:"
     for par in $par_list ; do
       str_dum=${str_dum}" VM2,${par} or"
     done
     str_par=${str_dum%or}
+
+  elif [ $id_arc = "syn" -o $id_arc = "temp" ] ; then
+    str_sta="proddef: GRIB:blo=${blo},sta=${sta2}"
+    str_par=""
+
+  elif [ $id_arc = "oracle" ] ; then
+    str_sta="ana_id=${id_staz}"
+    str_par=""
+
   fi
 
 # Query
-  cat <<EOF > eo.query
-  reftime: ${str_reftime}
-  $str_sta
-  $str_par
+  if [ $id_arc = "hfr" -o $id_arc = "syn" -o $id_arc = "temp" ] ; then
+    cat <<EOF > eo.query
+    reftime: ${str_reftime}
+    $str_sta
+    $str_par
 EOF
+  elif [ $id_arc = "oracle" ] ; then
+    echo dbavm dump --vm $str_sta $str_reftime > eo.query
+  fi
 
 #-------------------------------------------------------------------------------
 # 2.3 Estrazione e conversioni di formato
-
-  arki-query --data --config=${dataset}.conf --file=eo.query > eo.out
+# Per le estrazioni da Oracle, in teoria si potrebbero produrre direttamente i
+# dati in formato BUFR (dbamsg export o dbaexport), ma pare che non funzioni...
 
   if [ $id_arc = "hfr" ] ; then
-    meteo-vm2-to-bufr < eo.out > eo.bufr
-  else
-    ln -s eo.out eo.bufr
+    arki-query --data --config=${dataset}.conf --file=eo.query > eo.vm
+  elif [ $id_arc = "syn" -o $id_arc = "temp" ] ; then
+    arki-query --data --config=${dataset}.conf --file=eo.query > eo.bufr
+  elif [ $id_arc = "oracle" ] ; then
+    dbavm dump --vm $str_sta $str_reftime > eo.vmold
+    tail -n +2 eo.vmold | sed 's/://g;s/\///g;s/;/,/g' > eo.vm
+  fi
+
+  if [ $id_arc = "hfr" -o $id_arc = "oracle" ] ; then
+    meteo-vm2-to-bufr < eo.vm > eo.bufr 2>vm2_bufr.err
   fi
   dbamsg dump --type=bufr --csv eo.bufr > eo.csv
 
-  if [ $id_arc = "hfr" ] ; then
+  if [ $id_arc = "hfr" -o $id_arc = "oracle" ] ; then
     $bufr_csv2orari $opt eo.csv $data1 $data2 eo_param.csv $id_staz2
   elif [ $id_arc = "syn" ] ; then
     $bufr_csv2orari $opt -syn eo.csv $data1 $data2 eo_param.csv $id_staz2
@@ -357,7 +395,13 @@ EOF
   if [ $deb = "Y" ] ; then
     cp eo.csv eo_${id_staz2}.csv
     cp eo.bufr eo_${id_staz2}.bufr
+    if [ $id_arc = "hfr" -o $id_arc = "oracle" ] ; then
+      cp eo.vm eo_${id_staz2}.vm
+      cp vm2_bufr.err vm2_bufr_${id_staz2}.err
+    fi
+    if [ $id_arc = "hfr" -o $id_arc = "syn" -o $id_arc = "temp" ] ; then
+      cp eo.query eo_${id_staz2}.query
+    fi
   fi
-done
 
-# grep -E "B01001| B01002|B05001|B06001|B07030|B04001|B04002|B04003|B04004|B07004|B10009|B12101|B12103|B11001|B11002" temp.csv > temp.csv.filter
+done

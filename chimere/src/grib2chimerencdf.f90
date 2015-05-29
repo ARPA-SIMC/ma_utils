@@ -4,7 +4,7 @@ PROGRAM grib2chimerencdf
 ! corrispondenti, scritti in un unico file.
 ! Versione 1 come grb_chimere2netcdf.f90
 !
-! Uso: grib2chimere.exe filein fileout fileaero vcoord DOMAIN 
+! Uso: grib2chimere.exe filein fileout aero coord vcoord DOMAIN
 ! [-ro OROG]/[-roz OROG]
 !
 ! TODO:
@@ -25,7 +25,7 @@ PROGRAM grib2chimerencdf
 !   tra analisi e previsione)
 ! - Il programma scrive in ouptut tutti i parametri e i livelli che 
 !   compaiono almeno una volta nel file di input; eventuali dati mancanti 
-!   per alcuni istanti vengono messi a 0.!
+!   per alcuni istanti vengono messi a 0.
 ! - Il programma cerca le label NetCDF corrispondenti alle specie in input in
 !   una lista di files statici (tabella_200.txt ...)
 !
@@ -246,8 +246,10 @@ CALL grib_close_file(ifin)
 CALL getval(datah2-datah1, AHOUR=nt)
 
 ! Elaborazioni dipendenti dal contenuto di filein
-CALL grib_get(igfirst,"numberOfPointsAlongAParallel",nx)
-CALL grib_get(igfirst,"numberOfPointsAlongAMeridian",ny)
+CALL grib_get(igfirst,"Ni",nx)
+CALL grib_get(igfirst,"Nj",ny)
+!CALL grib_get(igfirst,"numberOfPointsAlongAParallel",nx)
+!CALL grib_get(igfirst,"numberOfPointsAlongAMeridian",ny)
 nt = nt + 1
 
 ALLOCATE (field(nx*ny))
