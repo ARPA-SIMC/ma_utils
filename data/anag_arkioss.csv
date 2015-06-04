@@ -1,1479 +1,1710 @@
 id_staz,dset,lon,lat,quota,nome
-11111,boa,12.476,44.215,-10,Nausicaa
-3160,burana,11.414,44.882,13,Bondeno Emissario
-3162,burana,11.287,44.824,20,Foscaglia 1
-5310,burana,11.414,44.882,13,Bondeno Mandracchio
-5305,cer,11.439,44.928,14,Palantone Impianto Po
-5306,cer,11.385,44.799,14,Sant'Agostino Cavo
-5364,cer,11.441,44.927,17,Palantone Impianto Mandracchio
-5365,cer,11.384,44.798,17,Sant'Agostino Cer
-5366,cer,12.223,44.575,6,Volta Scirocco valle
-7339,cer,11.299,44.699,32,Pieve di Cento
-7340,cer,11.749,44.449,32,Botte Sillaro
-7341,cer,12.232,44.199,32,Savio CER
-11240,coremo,10.700,44.863,22,SIRONA
-11241,coremo,10.709,44.838,25,CARTOCCIO
-11242,coremo,10.692,44.801,29,SANTA MARIA
-11243,coremo,10.642,44.798,25,VIA ARGINE
-11244,coremo,10.664,44.751,31,ROTTE
-11245,coremo,10.713,44.672,55,MASONE
-11246,coremo,10.798,44.849,25,BRUNORIA
-11247,coremo,10.764,44.768,34,CORREGGIO
-11248,coremo,10.781,44.733,36,SAN MARTINO
-11249,coremo,10.841,44.709,39,PANZANO
-11250,coremo,10.851,44.732,35,GARGALLO
-11251,coremo,10.924,44.786,22,PRATAZZOLA
-11252,coremo,10.891,44.867,19,PONTE PIETRA
-11253,coremo,10.642,44.885,21,BENTIVOGLIO
-11254,coremo,10.626,44.699,57,REGGIO EMILIA
-12863,cro,11.913,44.418,14,Lugo
-7359,cro,11.991,44.521,2,Idrovoro Dane
-7360,cro,12.036,44.470,3,Idrovoro Fossette Riunite
-7361,cro,11.869,44.549,6,Idrovoro Sabbadina
-7364,cro,11.995,44.555,6,Idrovoro Tratturo
-7365,cro,11.809,44.421,16,Mordano Bubano
-7366,cro,12.244,44.561,4,Ponte Chiavica
-7367,cro,11.864,44.401,16,Santerno Senio 1
-7368,cro,11.839,44.368,19,Santerno Senio 2
-12202,fiduli,8.169,44.006,25,Alassio
-12203,fiduli,8.181,44.068,36,Albenga-Isolabella
-12204,fiduli,8.211,44.049,6,Albenga-Molino Branca
-12205,fiduli,8.509,44.329,3,Albisola
-12209,fiduli,8.528,44.404,435,Alpicella
-12210,fiduli,8.348,44.334,470,Altare
-12213,fiduli,9.107,44.438,702,Bargagli
-12216,fiduli,8.001,43.933,281,Bestagno
-12222,fiduli,7.953,43.977,250,Borgomaro
-12223,fiduli,7.622,43.848,115,Borgonuovo
-12224,fiduli,9.410,44.424,386,Borzone
-12226,fiduli,9.716,44.231,112,Brugnato
-12234,fiduli,9.840,44.250,425,Calice al Cornoviglio-Molunghi
-12240,fiduli,9.766,44.305,1070,Casoni
-12241,fiduli,8.262,44.147,91,Castellari
-12242,fiduli,8.119,44.132,432,Castelvecchio di R.B.
-12246,fiduli,9.584,44.352,410,Cembrano
-12247,fiduli,8.134,44.076,110,Cenesi
-12248,fiduli,7.774,43.880,370,Ceriana
-12250,fiduli,9.345,44.322,6,Chiavari-Caperana
-12251,fiduli,9.322,44.421,615,Cichero
-12252,fiduli,8.146,44.085,52,Cisano sul Neva
-12253,fiduli,7.700,43.982,1357,Colle Belenda
-12254,fiduli,8.202,44.232,1004,Colle del Melogno
-12255,fiduli,8.383,44.333,385,Colle di Cadibona
-12256,fiduli,7.873,44.083,927,Colle di Nava
-12258,fiduli,9.181,44.408,560,Colonia Arnaldi
-12259,fiduli,8.104,43.980,350,Conna
-12260,fiduli,9.735,44.106,338,Corniolo
-12261,fiduli,9.007,44.475,630,Creto
-12262,fiduli,8.986,44.520,470,Crocetta D'Orero
-12264,fiduli,9.710,44.340,780,Cuccarello
-12265,fiduli,9.095,44.468,467,Davagna
-12267,fiduli,8.061,43.927,100,Diano Castello
-12270,fiduli,8.467,44.366,80,Ellera-Foglietto
-12271,fiduli,8.705,44.465,290,Fiorino
-12272,fiduli,9.093,44.403,791,Fontana Fresca
-12273,fiduli,9.906,44.138,25,Fornola
-12278,fiduli,8.896,44.455,47,Genova-Bolzaneto
-12279,fiduli,8.950,44.407,5,Genova-Borgo Incrociati
-12280,fiduli,8.934,44.428,360,Genova-Castellaccio
-12281,fiduli,8.950,44.400,30,Genova-Centro Funzionale
-12282,fiduli,8.954,44.411,10,Genova-Firpo
-12283,fiduli,8.961,44.434,30,Genova-Gavette
-12284,fiduli,8.820,44.437,20,Genova-Granara
-12285,fiduli,8.825,44.432,69,Genova-Pegli
-12286,fiduli,8.900,44.489,75,Genova-Pontedecimo
-12288,fiduli,9.062,44.385,174,Genova-Sant'Ilario
-12289,fiduli,9.395,44.463,1009,Giacopiane
-12291,fiduli,9.388,44.461,1030,Giacopiane-Lago
-12292,fiduli,8.556,44.382,90,Il Pero
-12293,fiduli,8.017,43.880,71,Imperia-Oss. Meteosismico
-12295,fiduli,8.858,44.530,300,Isoverde
-12296,fiduli,8.858,44.530,300,Isoverde 1
-12300,fiduli,9.615,44.323,270,La Macchia
-12301,fiduli,9.047,44.441,150,La Presa
-12302,fiduli,9.828,44.107,35,La Spezia
-12303,fiduli,8.480,44.335,253,Lavagnola
-12304,fiduli,8.648,44.404,110,Lerca
-12305,fiduli,9.619,44.179,85,Levanto-San Gottardo
-12306,fiduli,9.607,44.171,6,Levanto-Vallesanta
-12307,fiduli,9.284,44.554,600,Loco Carchelli
-12309,fiduli,8.742,44.434,104,Madonna delle Grazie
-12313,fiduli,10.014,44.050,2,Marinella di Sarzana
-12315,fiduli,8.733,44.474,270,Mele
-12316,fiduli,8.733,44.474,270,Mele 1
-12318,fiduli,8.938,44.540,270,Mignanego
-12319,fiduli,8.746,44.439,35,Molinetto
-12321,fiduli,7.842,43.931,240,Montalto Ligure
-12325,fiduli,9.441,44.311,175,Monte Domenico
-12327,fiduli,7.619,43.793,210,Monte Maure
-12328,fiduli,9.938,44.071,360,Monte Rocchetta
-12331,fiduli,9.656,44.278,185,Nasceto
-12333,fiduli,9.771,44.195,75,Padivarma
-12334,fiduli,9.356,44.342,25,Panesi
-12336,fiduli,7.733,43.905,931,Passo Ghimbegna
-12337,fiduli,8.736,44.486,234,Passo del Turchino
-12342,fiduli,9.849,44.198,48,Piana Battolla-Ponte
-12344,fiduli,7.915,44.050,263,Pieve di Teco
-12345,fiduli,7.793,44.042,1845,Poggio Fearza
-12348,fiduli,8.064,44.054,90,Pogli d'Ortovero idrometro
-12355,fiduli,7.866,44.064,475,Pornassio
-12357,fiduli,9.836,44.052,40,Portovenere-Comune
-12361,fiduli,9.009,44.417,234,Premanico
-12362,fiduli,8.004,44.065,343,Ranzo
-12363,fiduli,9.458,44.375,530,Reppia
-12365,fiduli,7.602,43.889,215,Rocchetta Nervina
-12369,fiduli,8.006,43.942,67,Rugge di Pontedassio
-12373,fiduli,9.660,44.275,180,S.Margherita Vara
-12375,fiduli,8.527,44.362,180,Sanda
-12376,fiduli,7.786,43.823,61,Sanremo
-12377,fiduli,8.845,44.442,310,Santuario Monte Gazzo
-12378,fiduli,8.438,44.346,90,Santuario di Savona
-12379,fiduli,9.965,44.112,26,Sarzana
-12382,fiduli,8.483,44.306,24,Savona-Istituto Nautico
-12385,fiduli,7.608,43.940,1212,Sella di Gouta
-12386,fiduli,9.737,44.264,580,Sero' di Zignago
-12387,fiduli,9.678,44.298,265,Sesta Godano
-12388,fiduli,9.410,44.274,10,Sestri Levante
-12389,fiduli,9.430,44.270,13,Sestri Levante-Sara
-12391,fiduli,8.483,44.416,349,Stella S.Giustina
-12392,fiduli,9.621,44.405,895,Taglieto
-12393,fiduli,9.549,44.313,603,Tavarone
-12394,fiduli,8.028,44.005,439,Testico
-12397,fiduli,7.762,43.995,789,Triora
-12400,fiduli,7.819,43.836,41,Valle Armea-Ponte
-12401,fiduli,8.947,44.520,407,Valleregia
-12403,fiduli,9.584,44.383,345,Varese Ligure
-12405,fiduli,7.612,43.788,21,Ventimiglia
-12407,fiduli,8.978,44.486,310,Vicomorasso
-12408,fiduli,9.063,44.428,430,Viganego
-12451,fiduli,9.950,44.198,45,CALAMAZZA
-12453,fiduli,9.897,44.362,200,PONTREMOLI-S.GIUSTINA
-12454,fiduli,10.062,44.202,107,SOLIERA
-12935,fiduli,9.348,44.346,26,Carasco
-12936,fiduli,10.007,44.104,96,Castelnuovo Magra
-12937,fiduli,9.374,44.297,100,Cavi di Lavagna
-12938,fiduli,10.009,44.075,5,Luni
-12939,fiduli,9.640,44.135,75,Monterosso
-11836,fiduma,13.452,43.047,269,Tennacola
-6491,fiduma,12.685,43.628,193,Acqualagna
-6543,fiduma,13.381,43.543,170,Agugliano
-6544,fiduma,13.508,43.610,91,Ancona Regione
-6545,fiduma,12.430,43.562,465,Biscubio
-6546,fiduma,13.343,43.364,195,Appignano
-6547,fiduma,12.937,43.497,535,Arcevia
-6548,fiduma,12.895,43.840,53,Arzilla
-6550,fiduma,13.533,43.517,25,Aspio
-6551,fiduma,13.567,43.494,18,Aspio 2
-6552,fiduma,13.165,43.663,26,Misa
-6553,fiduma,13.066,43.146,581,Camerino
-6555,fiduma,12.824,43.310,532,Campodiegoli
-6556,fiduma,13.388,43.476,84,Musone
-6557,fiduma,13.333,43.600,23,Chiaravalle
-6558,fiduma,13.371,43.232,156,Chienti 1
-6559,fiduma,13.590,43.261,741,Chienti 2
-6560,fiduma,12.475,43.858,358,Conca 1
-6561,fiduma,12.529,43.884,215,Conca 2
-6562,fiduma,13.077,43.639,59,Nevola
-6563,fiduma,13.116,43.445,510,Cupramontana
-6564,fiduma,12.964,43.251,408,Esanatoglia
-6565,fiduma,13.672,43.236,42,Ete Morto
-6566,fiduma,13.713,43.136,48,Ete Vivo
-6568,fiduma,13.714,43.158,224,Fermo
-6569,fiduma,13.403,43.226,174,Fiastra
-6570,fiduma,13.351,43.436,305,Filottrano
-6571,fiduma,12.619,43.794,112,Foglia 1
-6572,fiduma,12.787,43.852,43,Foglia 2
-6573,fiduma,12.898,43.908,9,Foglia 3
-6574,fiduma,12.726,43.471,690,Fonte Avellana
-6575,fiduma,13.508,43.363,76,Monocchia
-6576,fiduma,13.490,42.963,690,Force
-6577,fiduma,13.205,42.954,1825,Pizzo Tre Vescovi
-6578,fiduma,12.861,43.687,104,Ghilardino
-6579,fiduma,13.599,43.106,200,Grottazzolina
-6580,fiduma,13.299,42.918,1260,Isola San Biagio
-6581,fiduma,13.230,43.532,100,Jesi
-6582,fiduma,13.404,43.160,430,Loro Piceno
-6583,fiduma,13.777,43.034,60,Menocchia
-6584,fiduma,12.968,43.763,36,Metauro 1
-6585,fiduma,13.126,43.496,104,Moie
-6586,fiduma,13.189,42.912,1917,Monte Bove Sud
-6587,fiduma,13.437,43.409,215,Montefano
-6588,fiduma,13.325,42.900,1021,Montemonaco
-6589,fiduma,13.205,42.874,1813,Monte Prata
-6590,fiduma,13.291,43.609,35,Monte San Vito
-6591,fiduma,13.057,43.535,350,Montecarotto
-6593,fiduma,13.639,43.474,5,Foce Musone
-6594,fiduma,12.904,43.434,254,Sassoferrato
-6595,fiduma,13.449,43.447,60,Passatempo
-6596,fiduma,12.844,43.569,243,Pergola
-6597,fiduma,12.869,43.891,22,Villa Fastiggi
-6598,fiduma,12.252,43.827,333,Marecchia
-6599,fiduma,12.707,43.781,122,Gallo
-6600,fiduma,13.239,42.991,1360,Pintura di Bolognaola
-6601,fiduma,12.985,43.179,470,Pioraco
-6602,fiduma,13.461,42.798,290,Ponte Arli'
-6603,fiduma,13.513,42.990,325,Ponte Maglio
-6604,fiduma,13.837,43.102,10,Foce Aso
-6605,fiduma,13.171,43.750,7,Cesano Foce
-6606,fiduma,13.772,43.233,9,Porto Sant'Elpidio
-6607,fiduma,13.189,43.229,220,Potenza 1
-6608,fiduma,13.551,43.365,42,Potenza 2
-6609,fiduma,13.593,43.384,25,Recanati
-6610,fiduma,13.569,42.954,385,Rotella
-6611,fiduma,13.718,43.058,145,Rubbianello
-6612,fiduma,12.410,43.667,352,Sant'Angelo in Vado
-6614,fiduma,13.897,42.892,11,Foce Tronto
-6615,fiduma,12.513,43.809,173,Sasso Corvaro
-6616,fiduma,13.242,43.007,1365,Sassotetto
-6617,fiduma,12.659,43.406,688,Scheggia
-6618,fiduma,13.028,43.548,119,Serra de'Conti
-6619,fiduma,13.189,43.316,549,Serralta
-6620,fiduma,13.775,42.859,60,Spinetoli
-6621,fiduma,13.498,43.086,197,Tenna
-6623,fiduma,13.652,42.852,78,Tronto
-6625,fiduma,12.637,43.723,471,Urbino
-6626,fiduma,13.426,43.327,133,Villa Potenza
-6627,fiduma,13.086,42.931,655,Visso
-6628,fiduma,12.972,43.403,192,San Vittore
-6630,fiduma,13.011,43.431,166,Gola della Rossa
-6631,fiduma,12.966,43.339,243,Fabriano
-6632,fiduma,13.261,43.146,298,Fiastrone
-6633,fiduma,13.191,43.400,240,San Vettore
-6635,fiduma,13.889,42.933,6,San Benedetto
-6636,fiduma,13.143,42.944,749,Ussita
-6637,fiduma,13.270,42.895,1740,Sibilla
-6638,fiduma,13.652,43.415,11,Porto Recanati
-12637,fidupo,10.955,44.961,21,Bondanello
-12673,fidupo,7.851,44.693,290,Bra
-12674,fidupo,10.507,46.297,1640,Case Pirli
-12675,fidupo,9.111,46.092,1100,Cavargna
-12677,fidupo,9.756,46.043,1682,Foppolo
-12678,fidupo,8.590,45.425,146,Novara Agogna Q.A.
-12679,fidupo,8.203,44.284,620,Osiglia
-12680,fidupo,8.635,44.641,230,Ovada
-12681,fidupo,9.163,45.581,176,Palazzolo
-12682,fidupo,7.834,44.920,249,Poirino Banna
-12683,fidupo,8.072,44.836,185,San Damiano Borbore
-12684,fidupo,7.252,44.505,1111,San Damiano Macra
-12685,fidupo,7.539,45.406,550,Sparone
-12687,fidupo,7.687,45.070,239,Torino Giardini Reali
-12688,fidupo,7.625,45.134,258,Venaria Ceronda
-12726,fidupo,9.595,46.243,1197,Bagni di Masino
-12727,fidupo,10.037,45.383,93,Bargnano
-12728,fidupo,9.568,46.105,958,Bema
-12729,fidupo,9.709,45.718,286,Bergamo
-12730,fidupo,9.658,45.660,218,Bergamo Stezzano
-12731,fidupo,10.887,45.187,26,Bigarello
-12732,fidupo,9.550,45.303,60,Boccaserio SIAP
-12734,fidupo,10.755,45.044,29,Borgoforte SIAP
-12735,fidupo,10.260,45.524,129,Brescia ITAS
-12737,fidupo,9.657,45.898,433,Camerata Cornello
-12742,fidupo,9.275,44.940,440,Canevino
-12744,fidupo,9.317,45.847,1237,Canzo - Monte Prasanto
-12745,fidupo,10.342,46.027,362,Capo di ponte
-12746,fidupo,9.921,45.642,178,Capriolo
-12747,fidupo,9.793,46.038,1950,Carisole
-12748,fidupo,9.963,45.256,56,Casalbuttano
-12749,fidupo,10.676,45.223,28,Casale di Goito
-12750,fidupo,10.418,44.970,33,Casalmaggiore
-12751,fidupo,9.297,45.698,364,Casatenovo prato
-12752,fidupo,9.298,45.698,376,Casatenovo tetto
-12753,fidupo,8.903,45.062,231,Casei Gerola Po
-12754,fidupo,9.876,45.834,501,Casnigo
-12755,fidupo,8.699,45.246,108,Castello d'Agogna
-12756,fidupo,9.766,45.284,55,Castelleone SIAP
-12757,fidupo,10.063,45.929,1180,Castione della Presola
-12758,fidupo,8.821,45.749,379,Castronno
-12759,fidupo,8.808,45.689,274,Cavaria
-12760,fidupo,9.562,45.270,67,Cavenago d'Adda
-12762,fidupo,10.791,45.114,21,Mantova - Cerese di Virgilio
-12764,fidupo,9.380,46.008,456,Cortenova
-12766,fidupo,9.996,45.128,45,Cremona SIAP
-12769,fidupo,10.177,45.875,222,Darfo shake up
-12772,fidupo,10.845,45.131,24,Formigosa-Botte Sifone
-12776,fidupo,10.153,45.814,850,Fraine
-12779,fidupo,10.450,45.734,379,Galleria Agricoltori
-12781,fidupo,10.662,45.263,42,Goito
-12782,fidupo,10.953,45.084,22,Governolo
-12783,fidupo,9.948,46.008,738,Grabiasca
-12785,fidupo,9.320,46.361,2065,Lago Truzzo
-12788,fidupo,8.622,45.906,207,Laveno Molo
-12790,fidupo,8.974,45.705,296,Lurago Marinone
-12791,fidupo,10.531,45.112,37,Marcaria
-12792,fidupo,10.731,45.258,45,Marenghello
-12795,fidupo,8.651,45.700,204,Miorina
-12796,fidupo,9.066,45.661,247,Misinto
-12797,fidupo,9.505,45.922,1234,Moggio
-12799,fidupo,9.305,45.782,278,Molteno
-12801,fidupo,10.343,46.461,2295,Oga-S.Colombano
-12804,fidupo,9.389,45.678,234,Osnago
-12805,fidupo,8.508,45.302,121,Palestro a Vercelli SIAP
-12806,fidupo,10.757,44.959,20,Palidano di Gonzaga
-12807,fidupo,9.882,46.293,2155,Palu'
-12809,fidupo,9.216,44.683,1363,Passo del Giova'
-12811,fidupo,9.147,45.180,80,Pavia-Ponte Liberta'
-12812,fidupo,10.059,45.164,44,Persico Dosimo
-12814,fidupo,8.645,45.909,951,Poggio S.Elsa
-12815,fidupo,9.225,45.137,65,Ponte Becca Po
-12816,fidupo,9.228,45.138,62,Ponte Becca SIAP
-12817,fidupo,9.822,45.784,361,Ponte Cene
-12820,fidupo,10.084,46.035,272,Porlezza lago
-12821,fidupo,10.712,45.301,43,Pozzolo
-12822,fidupo,10.707,45.302,49,Pozzolo Monte
-12825,fidupo,9.933,45.787,512,Ranzanico
-12826,fidupo,12.333,45.054,14,Revere SIAP
-12827,fidupo,9.521,45.444,102,Rivolta d'Adda
-12829,fidupo,9.511,45.839,676,Rota d'Imagna
-12830,fidupo,9.380,45.261,60,S.Angelo Lodigiano
-12832,fidupo,9.486,45.187,80,S.Colombano al Lambro meteo
-12833,fidupo,10.318,46.247,1725,S.Giacomo Monno
-12835,fidupo,9.438,45.786,198,S.Maria Lavello
-12838,fidupo,10.710,45.394,65,Salionze monte
-12839,fidupo,10.710,45.392,64,Salionze Seriola
-12840,fidupo,10.708,45.393,64,Salionze valle
-12841,fidupo,9.393,46.251,206,Samolaco meteo (ersaf)
-12844,fidupo,9.632,46.242,927,San Martino Valmasino
-12845,fidupo,10.999,45.048,14,San Siro SIAP
-12847,fidupo,11.290,45.007,10,Sermide
-12848,fidupo,9.850,46.167,286,Sondrio
-12850,fidupo,9.351,45.100,64,Spessa Po
-12855,fidupo,10.039,46.065,965,Valbondione
-12856,fidupo,9.863,45.951,1002,Valcanale
-12858,fidupo,10.843,45.129,24,Vallazza-Fissero
-12860,fidupo,9.178,44.807,560,Varzi Nivione (ersaf)
-12861,fidupo,10.719,45.170,18,Vasarone
-12862,fidupo,9.325,46.182,980,Vercana
-12899,fidupo,10.181,45.042,29,Isola Pescaroli SIAP
-12921,fidupo,9.092,44.674,480,Cabella Ligure
-12922,fidupo,7.333,44.464,618,Dronero Maira
-12923,fidupo,8.822,45.036,71,Isola S.Antonio IdroPr
-12924,fidupo,8.754,44.607,356,Lavagnina lago
-12925,fidupo,7.679,45.001,220,Moncalieri PO
-12926,fidupo,8.409,45.874,292,Omegna lago d'Orta
-12927,fidupo,8.513,45.748,332,Paruzzaro
-12928,fidupo,7.868,44.118,832,Ponte di Nava Tanaro
-12929,fidupo,8.174,44.635,284,Rocchetta Belbo
-12930,fidupo,6.766,45.131,1975,Rochemolles
-12931,fidupo,7.943,45.173,174,San Sebastiano Po
-12932,fidupo,7.673,45.388,362,Spineto Orco
-12933,fidupo,7.673,45.388,362,Spineto Orco 1
-12934,fidupo,7.512,44.780,257,Villafranca Piemonte Po
-12966,fidupo,8.822,45.036,84,Isola S.Antonio PO 1
-12998,fidupo,10.343,44.736,91,Invaso Cassa Parma
-12999,fidupo,10.343,44.736,91,Invaso Cassa Parma 1
-3939,fidupo,8.511,45.888,900,Someraro
-3940,fidupo,8.423,45.978,201,Candoglia Toce Q.A.
-3942,fidupo,8.171,44.414,390,Bergalli
-3944,fidupo,9.411,46.149,199,Fuentes
-3945,fidupo,10.259,45.985,994,Laveno di Lozio
-3946,fidupo,10.104,45.975,750,Dezzo di Scalve
-3947,fidupo,9.534,45.977,982,Valtorta
-3948,fidupo,9.673,45.946,550,Piazza Brembana
-3949,fidupo,9.947,45.886,648,Clusone
-3950,fidupo,7.443,44.552,499,Rossana Varaita
-3951,fidupo,7.481,44.514,500,Busca Maira
-3953,fidupo,7.245,44.810,478,Luserna San Giovanni Pellice
-3954,fidupo,7.285,44.884,486,San Martino Chisone
-3956,fidupo,7.824,45.548,270,Tavagnasco Dora Baltea
-3957,fidupo,7.490,45.268,459,Lanzo Stura di Lanzo
-3958,fidupo,8.281,45.714,359,Borgosesia Sesia
-3959,fidupo,7.690,44.903,240,Carignano Po
-3960,fidupo,7.410,44.328,692,Gaiola Stura di Demonte
-3961,fidupo,8.419,44.796,122,Castelnuovo Belbo
-3962,fidupo,8.633,44.830,102,Casal Cermelli Orba
-3963,fidupo,8.865,44.722,220,Serravalle Scrivia
-3964,fidupo,8.986,44.883,182,Volpedo Curone
-3965,fidupo,9.518,44.893,193,Godiasco Staffora
-3967,fidupo,10.438,45.579,200,Gavardo
-3969,fidupo,7.121,44.548,2125,Pian delle Baracche
-3972,fidupo,7.915,44.853,295,Pralormo
-3973,fidupo,7.242,44.812,475,Luserna San Giovanni
-3974,fidupo,7.559,44.334,575,Boves
-3975,fidupo,8.303,46.110,252,Domodossola
-3976,fidupo,7.978,45.186,165,Verolengo
-3977,fidupo,8.384,45.438,155,Albano Vercellese
-3978,fidupo,8.714,44.927,90,Alessandria Lobbi
-3979,fidupo,7.775,45.462,650,Meugliano
-3980,fidupo,7.988,45.630,1186,Oropa
-3981,fidupo,7.767,45.041,631,Pino Torinese
-3982,fidupo,8.495,45.129,118,Casale Monferrato
-3984,fidupo,7.984,45.999,2820,Passo del Moro
-3985,fidupo,6.949,44.993,2320,Lago Pilone
-3986,fidupo,6.862,44.976,2701,Monte Fraiteve
-3987,fidupo,8.259,44.558,588,Serole Bric Puschera
-3988,fidupo,7.806,44.260,1741,Monte Malanotte
-3989,fidupo,7.729,44.128,1245,Upega
-3990,fidupo,8.087,44.334,700,Perlo
-3991,fidupo,8.015,44.538,640,Somano
-3992,fidupo,8.421,46.138,831,Druogno
-3993,fidupo,8.252,45.820,470,Varallo
-3994,fidupo,8.461,45.705,300,Borgomanero
-3995,fidupo,8.189,46.245,1308,Varzo
-3996,fidupo,8.248,45.560,243,Masserano
-3997,fidupo,8.093,44.687,376,Treiso
-3999,fidupo,8.538,44.522,773,Ponzone Bric Berton
-4000,fidupo,8.698,45.545,188,Cameri
-4001,fidupo,7.494,44.558,440,Costigliole Saluzzo
-4002,fidupo,7.365,44.968,332,Cumiana
-4004,fidupo,8.088,44.466,905,Mombarcaro
-4005,fidupo,8.454,45.885,1491,Mottarone
-4006,fidupo,7.053,44.781,2294,Colle Barant
-4007,fidupo,8.044,44.178,957,Colle del San Bernardo
-4008,fidupo,7.424,45.438,1120,Bertodasco
-4009,fidupo,8.768,44.563,780,Capanne Marcarolo
-4010,fidupo,8.102,45.008,200,Montechiaro d'Asti
-4011,fidupo,9.579,46.025,1845,Gerola Pescegallo
-4012,fidupo,10.159,46.149,1950,Aprica
-4013,fidupo,6.890,45.068,1010,Salbertrand
-4014,fidupo,6.728,45.076,1353,Prerichard
-4015,fidupo,7.049,45.145,500,Pietrastretta
-4016,fidupo,7.386,45.094,340,Avigliana
-4017,fidupo,7.899,45.321,226,Candia
-4018,fidupo,8.200,46.125,1142,Pizzanco
-4019,fidupo,8.332,46.222,560,Crodo
-4020,fidupo,7.874,45.514,337,Borgofranco d'Ivrea
-4021,fidupo,10.471,46.175,2325,Pantano d'Avio
-4022,fidupo,8.258,46.066,259,Villadossola Ovesca
-4023,fidupo,10.188,46.476,2650,La Vallaccia 1
-4024,fidupo,7.304,45.317,1075,Ala di Stura
-4025,fidupo,7.053,44.614,1614,Pontechianale
-4026,fidupo,7.275,44.208,1368,Valdieri
-4027,fidupo,7.689,44.887,245,Carmagnola
-4028,fidupo,8.398,45.323,130,Vercelli
-4029,fidupo,7.573,44.730,268,Villanova Solaro
-4030,fidupo,7.243,45.035,146,Coazze
-4031,fidupo,8.045,45.419,260,Piverone
-4032,fidupo,7.815,44.392,450,Mondovi'
-4033,fidupo,7.851,44.699,290,Bra
-4036,fidupo,7.668,45.284,270,Front Malone
-4037,fidupo,7.903,44.514,263,Farigliano Tanaro
-4038,fidupo,7.547,45.315,624,Corio
-4040,fidupo,8.161,45.897,873,Fobello
-4041,fidupo,8.020,44.208,603,Garessio Tanaro
-4042,fidupo,8.050,45.913,1304,Carcoforo
-4043,fidupo,7.138,45.469,2300,Lago Agnel
-4044,fidupo,7.657,44.234,859,Chiusa Pesio
-4045,fidupo,7.219,45.363,1223,Forno Alpi Graie
-4046,fidupo,7.519,45.342,870,Piano Audi
-4047,fidupo,7.959,45.692,1090,Piedicavallo
-4049,fidupo,8.156,45.677,1100,Trivero
-4050,fidupo,8.548,45.924,202,Pallanza
-4051,fidupo,10.499,45.724,1147,Cavacca
-4052,fidupo,10.466,45.730,388,Lago d'Idro
-4055,fidupo,8.239,45.862,600,Sabbia
-4056,fidupo,7.725,44.522,330,Fossano Stura di Demonte
-4057,fidupo,9.198,44.822,485,Varzi
-4058,fidupo,9.195,44.913,501,Fortunago
-4059,fidupo,9.238,44.767,562,Casanova
-4060,fidupo,8.276,45.094,443,Crea
-4061,fidupo,7.833,44.220,974,Borello
-4063,fidupo,8.337,44.565,187,Mombaldone Bormida Q.A.
-4064,fidupo,8.680,44.943,90,Montecastello Tanaro Q.A.
-4065,fidupo,8.540,45.284,121,Palestro Sesia Q.A. 1
-4067,fidupo,8.884,44.682,240,Arquata Scrivia
-4068,fidupo,8.846,44.830,154,Castellar Ponzano
-4069,fidupo,8.849,45.022,76,Isola Sant'Antonio
-4070,fidupo,8.308,46.113,271,Domodossola Toce
-4071,fidupo,8.267,46.005,252,Fomarco
-4072,fidupo,8.415,44.871,142,Masio Tanaro
-4073,fidupo,9.712,45.481,192,Mozzanica
-4074,fidupo,8.744,45.998,205,Luino
-4075,fidupo,8.579,45.770,202,Angera
-4076,fidupo,9.512,45.315,80,Lodi
-4078,fidupo,8.910,45.604,206,Castellanza
-4079,fidupo,9.106,45.709,250,Cantu' Asnago
-4081,fidupo,9.232,45.834,427,Caslino d'Erba
-4082,fidupo,9.297,45.638,180,Peregallo
-4083,fidupo,9.250,45.479,127,Milano parco Feltre
-4084,fidupo,9.081,45.821,536,Como Villa Geno
-4085,fidupo,9.592,45.708,260,Ponte Briolo
-4086,fidupo,10.711,45.390,90,Monzambano
-4087,fidupo,9.959,45.662,197,Sarnico
-4089,fidupo,10.317,45.614,399,Caino
-4090,fidupo,10.271,45.788,572,Bovegno
-4091,fidupo,10.158,45.870,205,Darfo
-4092,fidupo,9.366,45.852,222,Malgrate
-4093,fidupo,9.711,45.277,63,Montodine
-4094,fidupo,9.778,45.190,46,Pizzighettone
-4095,fidupo,9.263,45.753,248,Lambrugo
-4096,fidupo,8.743,45.903,294,Cuveglio
-4097,fidupo,8.885,45.849,369,Arcisate
-4098,fidupo,8.881,45.339,94,Vigevano
-4099,fidupo,8.615,45.518,180,Caltignaga Terdoppio
-4100,fidupo,8.040,45.633,593,Passobreve Cervo
-4101,fidupo,6.964,45.710,1495,La Thuile
-4102,fidupo,7.383,45.596,1644,Cogne - Lillaz Centrale
-4103,fidupo,7.357,45.737,583,Pollein Dora Baltea
-4104,fidupo,7.343,45.826,960,Valpelline
-4105,fidupo,7.821,45.833,1635,Gressoney La Triniti
-4107,fidupo,7.618,45.747,513,Pontey Dora Baltea
-4109,fidupo,8.280,44.399,388,Cairo Montenotte
-4110,fidupo,8.485,44.478,385,Sassello
-4111,fidupo,8.423,44.571,236,Cartosio Erro
-4112,fidupo,8.311,44.484,267,Piana Crixia Bormida
-4113,fidupo,8.660,44.567,289,Rossiglione
-4114,fidupo,8.797,44.688,215,Gavi
-4116,fidupo,8.948,44.566,358,Busalla
-4124,fidupo,8.135,44.818,116,Asti Tanaro
-4125,fidupo,6.936,44.887,1865,Sauze Cesana
-4126,fidupo,7.774,44.944,237,Santena Banna
-4127,fidupo,8.672,44.768,136,Basaluzzo
-4129,fidupo,8.431,46.347,1230,Formazza Bruggi
-4130,fidupo,7.954,45.974,1360,Macugnaga Pecetto
-4131,fidupo,8.696,46.058,201,Cannobio
-4133,fidupo,7.657,45.444,1300,Colleretto
-4134,fidupo,7.150,45.207,1800,Malciaussia
-4135,fidupo,7.073,44.959,1650,Massello
-4137,fidupo,7.208,44.342,1390,San Giacomo Demonte
-4138,fidupo,7.050,44.261,1630,Vinadio San Bernolfo
-4139,fidupo,9.150,44.726,1012,Caldirola
-4140,fidupo,6.843,45.766,2164,Courmayeur Lex Blanche
-4141,fidupo,7.065,45.884,2067,Courmayeur Pre'De Bard
-4142,fidupo,7.159,45.831,2015,St. Rhemy Crevacol
-4143,fidupo,7.301,45.881,2028,Ollomont By
-4144,fidupo,7.858,45.631,1350,Lillianes Granges
-4145,fidupo,7.623,45.844,2033,Chamois
-4146,fidupo,7.545,45.616,2110,Champorcher rifugio Dondena
-4147,fidupo,7.057,45.614,1873,Valgrisanche Menthieu
-4149,fidupo,7.835,45.769,1306,Gressoney St.Jean Lys
-4151,fidupo,6.944,45.010,1521,Pragelato Trampolino a Valle
-4153,fidupo,8.798,45.122,96,Lomello
-4154,fidupo,9.890,45.399,87,Soncino
-4156,fidupo,8.824,45.626,224,Busto Arsizio
-4157,fidupo,9.721,45.162,58,Codogno
-4158,fidupo,10.511,45.373,109,Castiglione delle Stiviere
-4159,fidupo,9.938,45.522,140,Chiari
-4160,fidupo,9.671,45.357,79,Crema
-4161,fidupo,9.266,45.905,625,Barni
-4162,fidupo,10.297,46.079,816,Paisco Loveno
-4163,fidupo,10.378,46.081,1128,Cevo
-4164,fidupo,10.415,45.216,34,Asola
-4165,fidupo,8.824,45.833,416,Varese
-4166,fidupo,9.017,44.990,93,Voghera
-4167,fidupo,7.528,44.371,575,Cuneo Cascina Vecchia
-4168,fidupo,9.534,45.576,160,Canonica d'Adda
-4169,fidupo,10.221,45.584,187,Stocchetta
-4170,fidupo,10.243,45.218,37,Ostiano
-4171,fidupo,9.821,45.662,233,Carobbio degli Angeli
-4172,fidupo,10.286,45.944,487,Bienno
-4173,fidupo,10.146,45.360,60,Manerbio
-4174,fidupo,9.244,45.762,273,Lambrugo pluvio
-5321,fidupo,12.118,44.948,4,Ariano SIAP
-5324,fidupo,11.293,45.015,16,Castelmassa SIAP
-5325,fidupo,12.152,45.028,7,Cavanella SIAP
-5328,fidupo,10.092,44.697,142,Fornovo SIAP
-5329,fidupo,10.654,44.442,228,Lugo SIAP
-5330,fidupo,8.693,44.945,216,Montecastello SIAP
-5333,fidupo,12.482,44.960,2,Pila SIAP
-5334,fidupo,11.756,44.961,9,Polesella SIAP
-5335,fidupo,11.605,44.887,8,Pontelagoscuro SIAP
-5336,fidupo,10.922,44.357,220,Ponte Samone SIAP
-5337,fidupo,8.634,45.048,90,Ponte Valenza SIAP
-5386,fidupo,8.822,45.036,84,Isola S.Antonio PO
-5387,fidupo,8.100,45.179,155,Crescentino Po
-5403,fidupo,8.448,45.142,115,Casale Monferrato Po
-5421,fidupo,8.632,45.051,90,Valenza Po
-5425,fidupo,10.339,44.722,110,Casse Espansione Parma SIAP
-12970,fiduto,9.982,44.316,320,Bagnone
-12971,fiduto,9.796,44.303,670,Bosco di Rossano
-12972,fiduto,10.534,44.018,137,Calavorno
-12973,fiduto,10.378,43.872,285,Chiatri
-12974,fiduto,10.119,44.302,734,Comano
-12975,fiduto,10.150,44.169,250,Equi Terme
-12976,fiduto,10.033,44.332,530,Iera
-12977,fiduto,10.002,44.241,165,Licciana Nardi
-12978,fiduto,10.117,44.211,454,Mazzola
-12979,fiduto,10.209,44.170,671,Minucciano
-12980,fiduto,9.863,44.282,692,Parana
-12981,fiduto,9.822,44.454,955,Passo del Brattello
-12982,fiduto,10.216,44.302,1250,Passo del Cerreto
-12983,fiduto,9.919,44.465,1014,Passo della Cisa
-12984,fiduto,9.763,44.353,744,Patigno
-12985,fiduto,9.822,44.338,955,Pietra Piccata
-12986,fiduto,9.882,44.368,226,Pontremoli depuratore
-12987,fiduto,10.533,44.107,1013,Renaio
-12988,fiduto,9.955,44.365,484,Rocca Sigillina
-12989,fiduto,10.222,43.991,57,Seravezza 2
-12990,fiduto,10.062,44.201,130,Soliera Siap
-12991,fiduto,10.034,44.156,410,Tendola
-12992,fiduto,10.152,44.247,500,Turano - Pieve S. Paolo
-12993,fiduto,9.948,44.289,118,Villafranca
-13002,fiduto,10.738,43.201,300,Canneto
-13003,fiduto,10.973,43.141,740,Gerfalco
-13004,fiduto,10.806,43.153,315,Lago
-13005,fiduto,10.797,43.184,345,Lustignano
-13008,fiduto,10.956,43.262,450,Montecastelli P.
-13009,fiduto,10.742,43.385,379,Montecatini V. Cecina
-13010,fiduto,10.632,43.325,230,Montescudaio
-13012,fiduto,10.989,43.364,340,Ponsano
-13013,fiduto,10.857,43.332,85,Ponte SR439
-13015,fiduto,10.601,43.366,230,Riparbella
-13016,fiduto,10.942,43.252,247,S. Dalmazio
-13017,fiduto,10.902,43.113,600,Santa Costanza
-13018,fiduto,10.690,43.256,398,Sassa
-13019,fiduto,10.639,43.122,351,Sassetta
-13020,fiduto,10.819,43.220,500,Serrazzano
-13022,fiduto,10.613,43.017,12,Vecchia SS Aurelia
-7653,fiduto,11.414,43.774,73,Nave di Rosano Monte
-7770,fiduto,11.127,43.923,97,Vaiano Gamberame
-7772,fiduto,11.566,43.540,134,Montevarchi
-7782,fiduto,11.128,43.470,96,Poggibonsi
-7790,fiduto,11.656,43.840,745,Vallucciole
-7791,fiduto,11.717,43.801,537,Stia Pluvio
-7792,fiduto,11.620,43.738,745,Montemignaio
-7793,fiduto,11.750,43.680,375,Ortignano
-7794,fiduto,11.816,43.809,1111,Camaldoli
-7795,fiduto,11.876,43.792,845,Badia Prataglia
-7796,fiduto,11.827,43.710,419,Pollino
-7797,fiduto,11.930,43.705,1125,La Verna
-7798,fiduto,11.814,43.620,333,Salutio
-7799,fiduto,11.931,43.181,326,Capezzine
-7800,fiduto,11.802,43.201,292,Bettolle
-7801,fiduto,11.995,43.267,427,Cortona
-7802,fiduto,11.928,43.341,270,Castiglion Fiorent.
-7803,fiduto,11.741,43.337,275,Monte S.Savino
-7804,fiduto,11.892,43.470,275,Arezzo
-7805,fiduto,11.718,43.505,240,Laterina
-7806,fiduto,11.648,43.435,270,Badia Agnano
-7807,fiduto,11.530,43.448,560,Nusenna Chianti
-7808,fiduto,11.604,43.590,300,Villa dell'Olio
-7809,fiduto,11.516,43.591,211,Renacci Fattoria
-7810,fiduto,11.429,43.613,322,Il Palagio
-7811,fiduto,11.554,43.648,395,Pian di Sco'
-7812,fiduto,11.556,43.730,980,Vallombrosa
-7813,fiduto,11.236,43.982,256,Cavallina
-7814,fiduto,11.304,44.053,538,Marcoiano
-7815,fiduto,11.279,43.911,315,Vaglia
-7816,fiduto,11.327,43.963,222,San Piero a Sieve P.
-7818,fiduto,11.467,44.030,637,Razzuolo
-7819,fiduto,11.435,44.007,380,Ronta
-7820,fiduto,11.389,43.956,196,Borgo S.Lorenzo
-7821,fiduto,11.540,43.963,365,Villore
-7822,fiduto,11.584,43.783,955,Consuma
-7823,fiduto,11.271,44.008,384,Le Croci
-7824,fiduto,11.280,44.078,820,Monte di Fo'
-7825,fiduto,11.197,44.050,525,Mangona
-7826,fiduto,11.456,43.690,108,Incisa Valle
-7827,fiduto,11.257,43.777,50,Firenze Genio Civile
-7831,fiduto,11.133,43.777,30,San Colombano
-7832,fiduto,11.193,43.758,42,San Giusto
-7833,fiduto,11.250,43.797,84,Firenze Universita'
-7835,fiduto,11.130,43.836,32,Capalle
-7837,fiduto,11.353,43.548,667,Lamole
-7838,fiduto,10.715,43.183,415,Monteverdi Marittimo
-7839,fiduto,11.313,43.663,144,Strada in Chianti
-7848,fiduto,10.300,44.283,1580,Passo Pradarena
-7849,fiduto,10.309,44.254,1035,Capanne di Sillano
-7850,fiduto,10.381,44.258,887,Monte Castellino
-7851,fiduto,10.196,44.133,1070,Orto di Donna
-7852,fiduto,10.288,44.107,581,Vagli di Sotto
-7853,fiduto,10.445,44.209,1320,Casone di Profecchia
-7855,fiduto,10.385,44.159,524,Villacollemandina
-7856,fiduto,10.452,44.089,189,Ponte di Campia
-7858,fiduto,10.258,44.057,807,Campagrina
-7859,fiduto,10.526,44.154,1618,Monte Romecchio
-7860,fiduto,10.359,44.027,493,Fornovolasco
-7861,fiduto,10.439,44.061,186,Gallicano
-7862,fiduto,10.346,43.996,880,Palagnana
-7863,fiduto,10.426,43.995,417,Fabbriche Vallico
-7865,fiduto,10.567,44.058,590,Tereglio
-7866,fiduto,10.672,44.137,1345,Boscolungo
-7867,fiduto,10.742,44.130,960,Melo
-7868,fiduto,10.777,44.130,1670,Croce Arcana
-7870,fiduto,10.751,44.096,593,Casotti di Cutigliano
-7871,fiduto,10.812,44.075,809,Selva dei Porci
-7872,fiduto,10.836,44.041,816,Monte Oppio
-7873,fiduto,10.787,44.054,618,S. Marcello Pistoiese
-7874,fiduto,10.803,44.007,960,Prunetta
-7875,fiduto,10.717,44.044,344,Ponte di Lucchio
-7876,fiduto,10.563,44.006,111,Chifenti
-7877,fiduto,10.550,43.978,100,Borgo a Mozzano
-7878,fiduto,10.416,43.936,453,Convalle
-7879,fiduto,10.513,43.928,60,Piaggione
-7880,fiduto,10.369,43.918,475,Gombitelli
-7882,fiduto,10.483,43.880,35,Mutigliano
-7884,fiduto,10.436,43.857,19,Ponte Guido
-7885,fiduto,10.512,43.840,20,Lucca
-7886,fiduto,10.493,43.822,13,Pontetetto
-7887,fiduto,10.414,43.819,9,Ripafratta
-7889,fiduto,10.398,43.779,6,Vecchiano
-7890,fiduto,10.269,43.780,1,Bocca di Serchio
-7891,fiduto,10.306,43.830,1,Torre del Lago
-7892,fiduto,10.258,43.866,0,Viareggio 1
-7893,fiduto,10.280,43.932,21,Camaiore
-7895,fiduto,10.314,43.984,600,Pomezzana
-7896,fiduto,10.270,44.003,420,Retignano
-7897,fiduto,10.227,44.022,430,Azzano
-7900,fiduto,10.184,43.971,11,Ponte Tavole
-7901,fiduto,10.245,44.037,1140,Cervaiole
-7904,fiduto,10.857,43.148,530,Monterotondo
-7906,fiduto,10.318,44.008,390,Cardoso
-7907,fiduto,10.171,44.028,477,Cerreto
-7910,fiduto,11.397,43.853,400,San Brigida all'Opaco
-7913,fiduto,11.259,43.654,149,Ferrone
-7914,fiduto,11.292,43.695,182,Ugolino
-7922,fiduto,10.855,43.994,633,Cireglio
-7926,fiduto,11.378,43.484,495,Radda in Chianti
-7927,fiduto,11.230,43.536,388,San Donato in Poggio
-7928,fiduto,11.150,43.618,308,Tenuta del Corno
-7932,fiduto,11.168,43.293,431,Simignano
-7933,fiduto,11.024,43.341,263,Casole d'Elsa
-7936,fiduto,10.830,43.682,102,San Miniato
-7937,fiduto,10.738,43.646,151,Marti
-7941,fiduto,10.938,43.833,436,San Baronto
-7943,fiduto,10.952,43.440,607,La Madonnina
-7944,fiduto,10.724,43.433,312,Orciatico
-7946,fiduto,10.795,43.535,194,Ghizzano di Peccioli
-7947,fiduto,10.618,43.523,139,Casciana Terme
-7948,fiduto,10.557,43.751,917,Monte Serra
-7952,fiduto,10.664,43.847,163,Montecarlo
-7954,fiduto,10.538,43.604,30,Cenaia
-7955,fiduto,10.527,43.532,137,Lorenzana
-7957,fiduto,10.403,43.519,300,Valle Benedetta
-7964,fiduto,10.299,43.545,0,Livorno
-7975,fiduto,10.337,43.970,716,Vallelunga
-7978,fiduto,10.926,43.305,118,Puretta
-7979,fiduto,11.519,43.887,148,Dicomano Pluvio
-8342,fiduto,10.275,44.027,840,Terrinca
-8343,fiduto,10.253,43.992,351,Gallena
-8345,fiduto,10.162,43.954,0,Forte dei Marmi
-8348,fiduto,10.986,43.214,440,Anqua
-8349,fiduto,10.170,44.093,871,Vergheto
-8350,fiduto,10.167,44.057,105,Canevara
-8356,fiduto,10.669,43.322,33,Ponte di Monterufoli
-8357,fiduto,10.806,43.280,440,Libbiano
-8361,fiduto,11.557,43.328,216,Monastero d'Ombrone
-8362,fiduto,11.165,42.763,13,Ponte Tura
-8363,fiduto,11.299,42.805,105,Granaione
-8364,fiduto,11.274,42.938,59,Paganico
-8365,fiduto,11.541,42.891,614,Castel del Piano
-8366,fiduto,11.724,43.065,495,Monticchiello
-8367,fiduto,11.691,42.966,407,Gallina
-8368,fiduto,11.832,42.949,506,Spineta
-8369,fiduto,11.166,43.063,371,Roccastrada
-8370,fiduto,11.357,42.982,75,Monte Antico
-8371,fiduto,11.491,43.049,605,Montalcino
-8372,fiduto,11.324,43.066,280,Pari
-8373,fiduto,11.149,43.071,470,Torniella
-8374,fiduto,11.274,43.148,195,S. Lorenzo a Merse
-8375,fiduto,11.074,43.191,380,Montalcinello
-8376,fiduto,11.232,43.270,227,Sovicille
-8377,fiduto,11.424,43.257,229,Monteroni d'Arbia
-8378,fiduto,11.649,43.153,400,Montisi
-8386,fiduto,10.882,43.046,231,Massa Marittima
-8387,fiduto,10.799,43.063,269,S. Ferdinando
-8389,fiduto,10.899,42.893,343,Caldana
-8390,fiduto,10.978,42.980,59,Casteani
-8391,fiduto,11.424,42.796,484,Cana
-8393,fiduto,11.341,42.688,438,Scansano
-8394,fiduto,11.516,43.413,409,Madonna a Brolio
-8396,fiduto,11.511,42.787,522,Roccalbegna
-8397,fiduto,11.545,42.583,321,Manciano
-8398,fiduto,11.230,42.532,19,S. Donato
-8399,fiduto,11.462,42.722,374,Usi
-8400,fiduto,11.347,42.545,21,Marsiliana
-8401,fiduto,11.255,42.613,86,Poggio Perotto
-8402,fiduto,11.543,42.684,400,Capanne
-8404,fiduto,11.424,42.640,170,Torricelle
-8408,fiduto,11.038,43.101,500,Campiano
-12032,fiduve,12.040,46.278,635,Agordo
-12033,fiduve,12.033,46.278,578,Agordo CMT
-12034,fiduve,11.266,45.313,24,Albaredo
-12035,fiduve,11.878,46.501,1645,Arabba CMT
-12037,fiduve,11.516,45.883,1010,Asiago CMT
-12038,fiduve,11.367,45.845,338,Astico a Pedescala
-12039,fiduve,11.489,45.099,6,Badia Polesine
-12041,fiduve,10.766,45.519,165,Bardolino CMT
-12044,fiduve,11.730,45.777,125,Barzizza
-12045,fiduve,12.228,46.127,346,Belluno
-12046,fiduve,12.246,46.165,376,Belluno Aerop. CMT
-12047,fiduve,11.966,46.352,769,Biois a Cencenighe
-12048,fiduve,11.786,45.101,6,Boara Pisani
-12049,fiduve,12.222,46.431,882,Boite a Cancia
-12050,fiduve,11.619,45.594,52,Bolzano Vicentino
-12051,fiduve,11.484,45.244,20,Borgofrassine
-12052,fiduve,11.040,45.620,1050,Boscochiesanuova CMT
-12053,fiduve,11.935,45.265,32,Bovolenta
-12054,fiduve,11.639,45.244,21,Brancaglia
-12058,fiduve,12.185,46.347,884,Campo di Zoldo CMT
-12059,fiduve,11.167,45.733,1464,Campogrosso
-12060,fiduve,11.273,45.877,1735,Campomolon
-12063,fiduve,11.991,46.441,1008,Caprile CMT
-12064,fiduve,11.644,45.137,2,Carmignano di brenta
-12065,fiduve,12.503,46.605,1960,Casera Coltrondo
-12066,fiduve,12.541,46.481,1896,Casera Doana-Razzo
-12067,fiduve,12.479,46.120,1505,Casera Palantina
-12068,fiduve,11.302,45.821,430,Castana CMT
-12069,fiduve,11.919,45.672,47,Castelfranco Veneto
-12070,fiduve,11.949,45.696,50,Castelfranco Veneto CMT
-12072,fiduve,11.327,45.032,9,Castelnovo Bariano CMT
-12075,fiduve,12.082,45.134,12,Cavarzere
-12077,fiduve,11.728,45.922,532,Cismon del Grappa
-12078,fiduve,12.058,46.418,1900,Col dei Baldi
-12079,fiduve,11.383,45.310,27,Cologna Veneta
-12080,fiduve,12.324,45.882,59,Conegliano
-12081,fiduve,12.284,45.882,83,Conegliano Veneto CMT
-12082,fiduve,12.249,44.997,16,Contarina
-12083,fiduve,12.421,45.936,59,Cordignano
-12084,fiduve,11.992,45.823,173,Cornuda
-12085,fiduve,12.147,46.519,1200,Cortina CMT
-12086,fiduve,12.412,46.463,841,Domegge CMT
-12087,fiduve,11.722,45.940,210,Enego
-12088,fiduve,12.675,45.559,12,Eraclea
-12090,fiduve,12.419,45.684,11,Fagare'd.Battaglia
-12091,fiduve,11.871,46.356,1145,Falcade CMT
-12092,fiduve,12.308,46.074,1605,Faverghera
-12093,fiduve,11.905,46.021,267,Feltre CMT
-12094,fiduve,11.426,44.945,10,Ficarolo
-12095,fiduve,12.443,45.823,19,Fontanelle
-12096,fiduve,11.805,46.003,1195,Fonzaso
-12097,fiduve,12.415,46.172,856,Funes-Bovolenta
-12098,fiduve,11.563,45.868,1193,Gallio
-12099,fiduve,12.088,45.163,1,Gesia-Cavarzere CMT
-12100,fiduve,12.539,45.773,11,Gorgo Monticano
-12101,fiduve,11.173,45.461,146,Illasi CMT
-12102,fiduve,12.800,45.656,6,La Salute di Livenza
-12103,fiduve,12.326,46.122,375,La Secca
-12104,fiduve,11.314,45.188,21,Legnago
-12105,fiduve,11.953,45.348,8,Legnaro CMT
-12106,fiduve,11.827,45.509,52,Limena
-12107,fiduve,11.651,45.954,1428,Lisser
-12108,fiduve,11.603,45.484,43,Longare
-12109,fiduve,11.388,45.389,31,Lonigo
-12110,fiduve,11.379,45.391,28,Lonigo CMT
-12111,fiduve,11.524,45.740,52,Lugo di Vicenza
-12112,fiduve,11.905,46.430,1465,Malga Ciapela CMT
-12113,fiduve,12.441,46.120,1183,Malga Col Indes CMT
-12114,fiduve,11.472,45.875,1605,Malga Larici
-12115,fiduve,11.958,46.252,1735,Malga Losch
-12116,fiduve,11.466,45.670,99,Malo CMT
-12117,fiduve,12.611,45.791,12,Meduna di Livenza
-12118,fiduve,12.118,45.437,5,Mira CMT
-12119,fiduve,12.306,45.583,5,Mogliano Veneto CMT
-12121,fiduve,10.861,45.768,1760,Monte Baldo
-12122,fiduve,12.176,46.528,2240,Monte Faloria CMT
-12123,fiduve,11.784,45.863,1545,Monte Grappa
-12124,fiduve,12.245,46.604,2265,Monte Piana
-12125,fiduve,11.069,45.683,1620,Monte Tomba
-12126,fiduve,11.287,45.414,60,Monteforte I.
-12127,fiduve,11.285,45.414,45,Monteforte P.
-12128,fiduve,11.670,45.436,25,Montegalda
-12129,fiduve,12.616,45.774,11,Motta di Livenza
-12130,fiduve,12.208,45.831,90,Nervesa d.Battaglia
-12132,fiduve,11.886,46.476,2250,Ornella
-12133,fiduve,12.023,46.516,2105,Passo Falzarego
-12136,fiduve,10.697,45.441,63,Peschiera Navigarda
-12137,fiduve,12.521,46.538,839,Piave a Ponte Lasta
-12141,fiduve,11.376,45.505,120,Ponte Arzignano
-12144,fiduve,11.369,45.583,159,Ponte Brogliano
-12146,fiduve,12.525,45.718,6,Ponte di Piave CMT
-12147,fiduve,11.391,45.493,80,Ponte Gua'
-12148,fiduve,11.537,45.575,46,Ponte Marchese
-12149,fiduve,12.127,46.146,351,Ponte Mas
-12151,fiduve,12.365,45.043,13,Porto Levante
-12153,fiduve,12.536,45.851,15,Portobuffole'
-12154,fiduve,12.838,45.786,8,Portogruaro
-12155,fiduve,12.763,45.746,2,Portogruaro CMT
-12158,fiduve,11.822,46.357,2200,Pradazzo
-12159,fiduve,12.370,44.918,0,Pradon CMT
-12160,fiduve,11.631,45.570,33,Quinto Vicentino CMT
-12161,fiduve,12.083,46.536,2615,Ra Valles
-12162,fiduve,11.212,45.696,500,Recoaro Terme
-12163,fiduve,11.179,45.718,1131,Rifugio La Guardia CMT
-12164,fiduve,12.404,46.173,1255,Roncadin
-12165,fiduve,11.255,45.267,20,Roverchiara CMT
-12166,fiduve,11.525,45.526,43,S.Agostino
-12167,fiduve,11.265,45.388,30,S.Bonifacio
-12168,fiduve,12.565,45.611,12,S.Dona'di Piave
-12171,fiduve,11.408,45.198,20,S.Salvaro
-12173,fiduve,12.556,46.560,895,S.Stefano di Cadore CMT
-12175,fiduve,11.292,45.403,38,S.Vito Veronese
-12179,fiduve,11.183,45.610,936,San Bortolo CMT
-12180,fiduve,11.827,45.035,2,Sant'Apollinare CMT
-12181,fiduve,12.709,46.555,1265,Sappada CMT
-12182,fiduve,11.953,45.918,214,Segusino
-12183,fiduve,11.010,45.219,24,Sorga' CMT
-12186,fiduve,11.998,45.403,9,Stra
-12187,fiduve,11.678,45.343,158,Teolo CMT
-12188,fiduve,12.247,45.654,47,Treviso
-12189,fiduve,12.222,45.682,20,Treviso Citta' CMT
-12190,fiduve,11.565,45.148,20,Valli Mocenighe
-12191,fiduve,11.654,45.851,160,Valstagna
-12192,fiduve,12.399,45.838,39,Vazzola
-12193,fiduve,11.722,45.445,21,Veggiano
-12194,fiduve,12.484,45.459,1,Venezia-Treporti CMT
-12195,fiduve,11.001,45.442,66,Verona
-12196,fiduve,11.547,45.541,33,Vicenza
-12197,fiduve,10.834,45.373,66,Villafranca Veronese CMT
-12198,fiduve,11.728,45.834,1167,Villaggio del Sole
-12199,fiduve,11.445,45.452,49,Vo di Brendola
-12200,fiduve,11.617,45.325,17,Vo Vecchio
-12201,fiduve,11.914,45.378,12,Voltabarozzo Valle
-12940,fiduve,12.001,45.054,7,Baricetta
-12941,fiduve,12.001,45.054,7,Baricetta 1
-12942,fiduve,13.077,45.641,1,Bibione CMT
-12943,fiduve,12.340,45.959,97,Borgo Campion
-12944,fiduve,11.728,44.997,8,Bussari
-12945,fiduve,11.728,44.997,8,Bussari 1
-12946,fiduve,11.496,45.031,10,Canda
-12947,fiduve,11.496,45.031,10,Canda 1
-12948,fiduve,12.276,45.144,-1,Chioggia S.Anna CMT
-12949,fiduve,12.707,45.603,-1,Eraclea CMT
-12950,fiduve,12.117,45.956,286,Follina CMT
-12951,fiduve,12.494,45.891,18,Gaiarine CMT
-12952,fiduve,10.924,45.547,296,Marano di Valpolicella CMT
-12953,fiduve,12.246,45.987,332,Nogarolo di Tarzo
-12954,fiduve,11.336,45.806,405,Posina a Stancari
-12955,fiduve,11.336,45.806,405,Posina a Stancari 1
-12956,fiduve,11.776,45.716,85,Rosa' CMT
-12957,fiduve,11.757,45.145,9,Stanghella
-12958,fiduve,11.757,45.145,9,Stanghella 1
-12959,fiduve,11.185,45.712,705,Turcati Recoaro CMT
-12960,fiduve,12.206,46.443,968,Villanova CMT
-12961,fiduve,12.300,45.991,132,Vittorio Veneto
-12962,fiduve,12.113,45.784,125,Volpago CMT
-5419,fiduve,11.756,44.959,9,Polesella
-11217,freati,10.754,44.824,25,RE1500
-11219,freati,10.861,44.589,65,MO7201
-11220,freati,9.895,44.927,85,PC2702
-11221,freati,10.796,44.572,92,MO8100
-11223,freati,10.183,44.827,,PRB300
-11225,freati,9.734,44.991,80,PC9600
-11228,freati,11.471,44.479,47,BO5501
-11232,freati,10.517,44.720,58,RE2500
-11234,freati,11.134,44.792,17,MO4301
-11239,freati,10.152,44.845,63,PRB400
-11815,freati,11.302,44.518,39,BOF800
-11816,freati,11.281,44.683,19,BOF900
-11818,freati,9.656,45.052,59,PC5603
-11819,freati,10.215,44.867,46,PR2302
-11821,freati,11.317,44.939,8,FE8100
-11822,freati,11.281,44.946,9,FE8000
-11823,freati,11.237,44.854,11,MO4801
-11824,freati,11.064,44.529,65,MO6400
-11825,freati,11.078,44.881,17,MO8000
-11828,freati,12.460,44.032,50,RN0300
-3721,icirfe,12.119,44.943,4,Ariano ETGFE
-3722,icirfe,12.000,44.929,1,Avanzarola
-3723,icirfe,11.720,44.848,8,Baura
-3724,icirfe,11.999,44.980,6,Berra
-3726,icirfe,12.121,44.811,1,Campello
-3727,icirfe,11.858,44.869,1,Chiavica Ruffa
-3728,icirfe,11.897,44.932,1,Cipriano
-3729,icirfe,11.876,44.931,2,Coccanile
-3730,icirfe,12.248,44.814,3,Giralda
-3731,icirfe,11.496,44.915,6,La Valletta
-3733,icirfe,12.186,44.924,1,Monticelli
-3734,icirfe,11.600,44.885,5,Nicolino
-3735,icirfe,11.921,44.839,1,Pioppo
-3737,icirfe,12.130,44.864,1,Ponte Prati
-3738,icirfe,12.044,44.868,1,Ponte Vicini
-3739,icirfe,11.546,44.872,7,Pontisette
-3740,icirfe,12.073,44.908,-2,Seminato
-3741,icirfe,12.210,44.887,1,Vallona Nuova
-11282,libere,10.806,44.637,54,Marzaglia
-12618,libere,11.651,44.248,164,Valsenio
-12619,libere,11.720,44.233,208,Vespignano
-12635,libere,10.375,44.931,32,Colorno AIPO
-12695,libere,11.727,44.622,6,Marmorta
-12696,libere,11.603,44.458,45,Castel San Pietro Gaiana
-12697,libere,11.550,44.522,30,Budrio Dondina
-12698,libere,11.429,44.490,51,Castenaso Villanova
-12699,libere,11.724,44.397,28,Sasso Morelli Beghina
-12700,libere,11.595,44.598,10,Budrio Rotta del Giardino
-12701,libere,11.520,44.509,46,Budrio Prunaro
-12709,libere,10.997,44.623,39,Ponte Sant'Ambrogio
-12712,libere,10.408,44.623,158,Guardasone
-12715,libere,10.093,44.697,139,Ramiola
-12733,libere,10.755,45.044,29,Borgoforte
-12765,libere,9.996,45.128,45,Cremona
-12865,libere,12.094,44.563,0,ANITA
-12866,libere,11.896,44.968,3,BERRA
-12867,libere,11.337,44.922,10,BONDENO
-12868,libere,11.805,44.885,5,COPPARO
-12869,libere,11.512,44.886,9,DIAMANTINA
-12870,libere,11.934,44.883,0,JOLANDADISAVOIA
-12871,libere,11.868,44.773,3,MEDELANA
-12872,libere,12.221,44.895,0,MESOLA
-12873,libere,11.722,44.668,7,OSPITALMONACALE
-12874,libere,11.943,44.748,2,OSTELLATO
-12875,libere,11.483,44.750,12,POGGIORENATICO
-12876,libere,12.205,44.813,0,POMPOSA-VOLANO
-12877,libere,11.749,44.818,5,QUARTESANA
-12878,libere,11.607,44.741,11,SANBARTOLOMEO
-12879,libere,11.673,44.686,9,SANTAMARIACODIFIUME
-3000,libere,11.085,44.347,691,Ca' Bortolani
-3007,libere,11.288,44.488,54,Casalecchio canonica
-3092,libere,12.395,44.199,2,Museo delle barche
-3138,libere,11.422,44.484,51,Ponte Caselle
-3139,libere,11.378,44.545,35,La Dozza
-3140,libere,11.815,44.394,25,Mordano
-3146,libere,11.211,44.359,121,Panico Reno
-3147,libere,11.211,44.359,121,Panico canale
-3149,libere,11.625,44.673,9,Gandazzolo Reno
-3150,libere,11.625,44.673,9,Gandazzolo Savena
-3152,libere,11.847,44.592,15,Beccara Nuova Reno
-3153,libere,11.875,44.577,10,Ponte Bastia
-3159,libere,11.292,44.268,540,Loiano Ponte Savena
-3165,libere,11.197,44.552,39,Anzola Ghironda
-3166,libere,11.419,44.632,19,Bentivoglio
-3181,libere,10.815,44.659,38,Rubiera casse monte
-5307,libere,12.223,44.575,6,Volta Scirocco monte
-5313,libere,11.288,44.825,20,Foscaglia 2
-5314,libere,11.272,44.665,24,Sostegno Reno
-5323,libere,10.446,44.728,75,Casse Espansione Enza SIAP
-5327,libere,10.049,44.870,79,Fidenza SIAP
-5339,libere,11.009,44.607,42,San Cesario SIAP
-5356,libere,11.425,44.254,708,Casoni di Romagna
-5367,libere,11.414,44.883,13,Bondeno Panaro
-5392,libere,10.673,44.190,1371,Doccia di Fiumalbo
-5433,libere,10.771,44.549,122,Ponte Veggia
-5434,libere,10.819,44.273,367,Ponte Val di Sasso
-5435,libere,10.614,44.374,339,Ponte Dolo
-5436,libere,10.962,44.589,44,San Donnino
-5437,libere,11.135,44.787,28,Camposanto
-5438,libere,10.965,44.857,32,Pioppa
-5442,libere,10.787,44.429,826,Serramazzoni
-5443,libere,12.395,44.199,2,Museo delle barche
-5444,libere,12.403,44.202,1,Cesenatico porto
-5445,libere,12.393,44.164,10,Due Tigli
-5446,libere,12.350,44.191,6,Mesola
-5448,libere,10.995,44.670,36,Navicello
-5522,libere,10.454,44.844,34,Sorbolo
-5523,libere,10.640,44.854,31,Santa Vittoria
-5524,libere,11.365,44.454,92,San Ruffillo Savena
-5550,libere,12.396,44.232,2,Cesenatico allacciamento
-5582,libere,11.366,44.454,92,San Ruffillo canale
-6251,libere,11.924,44.276,32,Reda Faenza
-7331,libere,10.350,44.944,29,Colorno
-7332,libere,10.083,44.893,58,Fidenza
-7333,libere,10.206,44.703,276,Maiatico
-7334,libere,10.259,44.952,32,Sissa
-7353,libere,10.357,44.643,258,Sivizzano
-7354,libere,10.147,44.743,104,Medesano
-7355,libere,10.226,44.877,42,Grugno
-7356,libere,10.259,44.648,347,Casatico
-12626,piattaforme,12.511,44.523,10,Garibaldi A.
-12627,piattaforme,12.271,44.479,5,Piomboni_Elisup
-12628,piattaforme,12.344,44.391,25,Angelina
-12629,piattaforme,12.661,44.405,10,Amelia A.
-12630,piattaforme,13.782,44.077,30,Barbara
-12631,piattaforme,13.712,43.827,10,Clara W
-12669,renana,11.823,44.611,5,Bassarone idro Saiarino
-12719,renana,11.280,44.534,36,Canocchia Botte monte
-12720,renana,11.168,44.520,38,Fondo Martignone
-12721,renana,11.269,44.654,22,Cassa Dosolo
-2984,renana,11.570,44.674,14,Travallino
-2985,renana,11.650,44.649,11,Alberino
-2986,renana,11.367,44.675,24,San Giorgio Deserto
-2988,renana,11.423,44.744,15,Madonna
-2989,renana,11.523,44.718,12,Malalbergo
-2990,renana,11.696,44.435,29,Molinetto
-2991,renana,11.569,44.541,18,Budrio Olmo
-2993,renana,11.368,44.534,42,Dozza
-2994,renana,11.393,44.347,411,Monte Ceresa
-2995,renana,11.342,44.264,675,Loiano
-2997,renana,11.717,44.565,10,Sant'Antonio Renana
-3008,renana,11.525,44.414,87,Varignana 2 lago
-3064,renana,11.813,44.623,8,Saiarino meteo
-3151,renana,11.847,44.592,15,Beccara Nuova Botte
-3154,renana,11.823,44.611,5,Bassarone cassa
-3155,renana,11.615,44.535,21,Massarolo
-3156,renana,11.730,44.450,25,Correcchio Sillaro
-3157,renana,11.730,44.450,25,Correcchio
-3161,renana,11.260,44.685,28,Bagnetto Canale
-3163,renana,11.272,44.665,24,Sostegno canale
-3164,renana,11.183,44.579,41,Paltrone Samoggia
-5303,renana,11.511,44.472,41,Centonara
-5304,renana,11.861,44.578,15,Chiavica Bastia Sillaro
-5311,renana,11.261,44.685,28,Bagnetto Mandracchio
-5312,renana,11.232,44.613,35,Impianto Forcelli canale
-5315,renana,11.182,44.579,41,Paltrone Martignone
-5343,renana,11.009,44.376,700,Monteombraro
-5363,renana,11.861,44.578,15,Chiavica Bastia canale
-5369,renana,11.232,44.613,28,Impianto Forcelli Mandracchio
-5370,renana,11.233,44.613,33,Impianto Forcelli Lavino
-5371,renana,11.182,44.579,41,Paltrone Mandracchio
-5384,renana,11.151,44.484,125,San Martino in Casola
-11099,rer,12.438,44.068,38,Santarcangelo di Romagna
-11100,rer,12.642,43.914,79,Morciano di Romagna
-11101,rer,12.349,43.940,163,Pietracuta
-11102,rer,11.503,44.408,99,Palesio
-11103,rer,12.274,43.820,629,Pennabilli
-11104,rer,12.739,43.958,5,Cattolica
-11105,rer,12.446,43.938,680,San Marino
-11109,rer,9.598,44.696,995,Groppallo
-11110,rer,11.495,44.390,276,Prugnolo
-11837,rer,9.603,44.540,712,Ponteceno
-12411,rer,11.298,44.479,286,Bologna San Luca
-12459,rer,12.212,44.688,1,Guagnino
-12461,rer,10.809,44.119,1794,Lago Scaffaiolo
-12462,rer,9.906,44.930,77,Fiorenzuola d'Arda
-12479,rer,12.545,44.057,10,Rimini Ausa
-12480,rer,9.379,44.711,322,Marsaglia
-12633,rer,11.508,44.214,183,Castel del Rio
-12639,rer,10.983,44.911,30,Concordia sulla Secchia
-12668,rer,10.815,44.659,38,Rubiera casse valle
-12710,rer,9.771,45.009,71,Pontenure
-12994,rer,11.311,44.456,194,Paderno
-12996,rer,9.538,45.017,81,Luretta
-12997,rer,11.691,44.148,226,San Cassiano sul Lamone
-13023,rer,11.315,44.480,76,Ravone
-13034),rer,
-13035),rer,
-13036),rer,
-3001,rer,10.906,44.054,620,Pracchia
-3004,rer,11.223,44.226,460,Invaso
-3011,rer,10.769,44.232,985,Sestola
-3012,rer,10.577,44.194,1083,Pievepelago
-3013,rer,10.828,44.320,687,Pavullo
-3014,rer,9.496,44.644,656,Ferriere Pluvio
-3015,rer,9.733,44.634,597,Bardi
-3016,rer,9.627,44.507,521,Bedonia
-3017,rer,10.395,44.435,729,Castelnovo ne' Monti
-3018,rer,10.576,44.296,1091,Frassinoro
-3019,rer,10.193,44.363,998,Succiso
-3020,rer,10.162,44.428,597,Isola Palanzano
-3021,rer,10.009,44.412,1252,Lagdei
-3022,rer,10.047,44.473,618,Marra
-3024,rer,10.261,44.604,297,Langhirano
-3025,rer,10.125,44.606,381,Calestano
-3028,rer,10.559,44.906,30,Boretto
-3029,rer,11.872,44.072,670,Monte Grosso
-3030,rer,11.738,44.227,370,Rontana
-3031,rer,12.036,43.846,1200,Corsicchie
-3032,rer,11.665,44.002,750,Pratacci
-3033,rer,11.945,43.993,460,Civitella
-3035,rer,11.993,44.263,26,Ponte Braldo
-3036,rer,12.170,44.215,21,Santa Maria Nova
-3037,rer,11.614,44.077,350,Marradi
-3039,rer,11.875,44.198,250,Lodolone
-3040,rer,11.653,44.135,705,Monte Romano
-3041,rer,11.805,44.029,405,Vallicelle
-3042,rer,12.043,44.032,270,Voltre
-3043,rer,11.901,43.904,600,Lastra
-3044,rer,11.837,44.137,570,Trebbio
-3045,rer,12.169,43.997,365,Monte Iottone
-3046,rer,12.077,43.946,600,Rullato
-3047,rer,12.193,43.893,570,Maiano
-3048,rer,12.207,44.086,175,Roversano
-3049,rer,11.513,44.130,858,Bibbiana
-3050,rer,11.793,43.924,735,Corniolo
-3051,rer,12.031,44.330,20,Ponte Vico
-3052,rer,12.111,44.298,14,Coccolia
-3053,rer,12.234,44.232,19,Matellica
-3054,rer,11.518,44.038,750,Casaglia
-3055,rer,11.949,44.170,66,Castrocaro
-3056,rer,11.958,43.923,685,Montriolo
-3057,rer,11.783,44.294,51,Tebano
-3058,rer,12.004,44.114,370,Caminate
-3060,rer,11.257,44.216,900,Madonna dei Fornelli
-3062,rer,10.887,44.136,900,Monteacuto delle Alpi
-3077,rer,9.208,44.534,744,Diga del Brugneto
-3078,rer,10.138,44.346,1151,Lago Paduli
-3080,rer,9.155,44.515,769,Torriglia
-3094,rer,11.248,44.382,105,Sasso Marconi
-3095,rer,11.282,44.473,65,Casalecchio chiusa
-3096,rer,11.084,44.508,82,Bazzano
-3097,rer,11.340,44.371,174,Pianoro
-3098,rer,11.296,44.721,26,Cento
-3099,rer,11.441,44.928,17,Opera Po
-3100,rer,11.439,44.449,64,Pizzocalvo
-3101,rer,11.282,44.480,54,Casalecchio tiro a volo
-3102,rer,11.588,44.381,74,Castel San Pietro
-3103,rer,11.616,44.284,70,Codrignano
-3104,rer,11.113,44.288,193,Vergato
-3105,rer,11.825,44.310,42,Castelbolognese
-3106,rer,11.281,44.476,63,Casalecchio canale
-3107,rer,11.712,44.576,18,Accursi Idice
-3108,rer,11.712,44.576,18,Accursi cassa
-3109,rer,11.780,44.580,15,Brocchetti
-3110,rer,11.780,44.580,15,Brocchetti cassa
-3111,rer,11.802,44.579,15,Cardinala Idice
-3112,rer,11.802,44.579,19,Cardinala Cassa
-3113,rer,11.861,44.579,14,Chiavicone Idice
-3114,rer,11.862,44.579,15,Chiavicone Reno
-3115,rer,11.333,44.506,37,Bova
-3116,rer,11.350,44.764,26,Dosso
-3117,rer,11.369,44.778,24,Opera Reno Panfilia
-3118,rer,11.371,44.783,16,Secondo Salto
-3119,rer,11.432,44.877,11,Burana
-3120,rer,11.545,44.724,21,Gallo
-3121,rer,11.348,44.540,28,Arcoveggio
-3122,rer,11.133,44.547,50,Calcara
-3123,rer,11.238,44.622,24,Forcelli
-3124,rer,11.221,44.491,75,Lavino di Sopra
-3125,rer,11.230,44.584,36,Lavino di Sotto
-3126,rer,11.366,44.557,25,Castelmaggiore
-3127,rer,11.473,44.639,18,Casoni
-3128,rer,11.470,44.507,38,Castenaso
-3129,rer,11.595,44.578,23,San Martino in Argine
-3130,rer,11.706,44.575,17,Sant'Antonio
-3131,rer,11.736,44.459,24,Sesto Imolese
-3132,rer,11.764,44.528,19,Portonovo
-3133,rer,11.866,44.439,20,Sant'Agata
-3134,rer,11.884,44.516,17,San Bernardino
-3135,rer,11.942,44.383,25,Cotignola
-3136,rer,11.968,44.465,18,Fusignano
-3137,rer,12.048,44.504,14,Alfonsine
-3141,rer,11.314,44.609,32,Bonconvento
-3142,rer,10.977,44.154,352,Porretta Terme
-3143,rer,11.713,44.345,42,Imola
-3145,rer,11.224,44.221,480,Sambro
-3148,rer,11.441,44.632,18,Saletto
-3170,rer,9.917,44.821,189,Vigoleno
-3172,rer,9.842,44.514,354,Ostia Parmense
-3173,rer,9.570,44.712,436,Farini
-3174,rer,10.099,44.487,544,Corniglio
-3176,rer,11.887,44.242,52,Rivalta RA
-3177,rer,9.499,44.644,629,Ferriere Idro
-3179,rer,10.353,44.524,296,Compiano
-3182,rer,12.280,44.324,6,Bevano Adriatica
-3183,rer,12.177,44.051,72,Borello
-3184,rer,12.296,44.113,40,Calisese
-3185,rer,12.261,44.259,14,Castiglione
-3187,rer,12.235,44.140,31,Cesena
-3189,rer,11.891,44.287,37,Faenza
-3190,rer,12.028,44.227,30,Forli'
-3193,rer,12.197,43.958,125,Mercato Saraceno
-3194,rer,12.083,44.470,12,Mezzano
-3195,rer,11.795,44.160,168,Modigliana
-3198,rer,12.010,44.164,56,Ponte Calanca
-3200,rer,11.967,44.331,27,Pieve Cesato
-3201,rer,11.983,44.105,124,Predappio
-3202,rer,12.095,43.892,247,Quarto
-3203,rer,12.273,44.394,5,Rasponi
-3204,rer,11.943,44.307,26,Reda
-3205,rer,10.599,44.655,94,Rivalta RE
-3206,rer,11.844,44.061,212,Rocca San Casciano
-3207,rer,12.087,44.203,26,Ronco
-3208,rer,12.173,44.368,11,San Bartolo
-3210,rer,12.168,44.389,11,San Marco
-3212,rer,11.905,43.941,258,Santa Sofia
-3213,rer,12.214,44.257,10,San Zaccaria
-3214,rer,11.821,44.245,57,Sarna
-3215,rer,12.396,44.094,30,Savignano
-3216,rer,12.295,44.306,10,Savio
-3217,rer,11.702,44.185,154,Strada Casale
-3219,rer,12.085,44.091,79,Teodorano
-3794,rer,9.644,44.874,207,Ponte dell'Olio
-3795,rer,9.812,44.651,341,Ponte Lamberti
-3798,rer,9.738,44.475,422,Pradella
-5301,rer,9.384,44.755,272,Bobbio
-5316,rer,11.197,44.552,37,Anzola
-5317,rer,9.450,44.546,1007,Santo Stefano d'Aveto
-5340,rer,10.987,44.748,38,Ponte Bacchello
-5342,rer,10.970,44.183,339,Silla
-5345,rer,11.169,44.110,794,Cottede
-5346,rer,11.374,44.122,476,Firenzuola
-5347,rer,11.433,44.215,500,Piancaldoli
-5348,rer,11.547,44.115,500,Palazzuolo sul Senio
-5358,rer,12.542,44.061,10,Rimini SS16
-5359,rer,12.406,43.981,116,Ponte Verucchio
-5360,rer,12.143,43.788,720,Casteldelci
-5368,rer,11.261,44.685,28,Bagnetto Reno
-5385,rer,10.674,44.259,971,Sassostorno
-5391,rer,9.610,44.547,855,Nociveglia
-5393,rer,11.608,44.888,8,Pontelagoscuro
-5398,rer,10.102,44.369,1339,Lago Ballano
-5400,rer,10.345,44.317,900,Ligonchio
-5401,rer,10.314,44.583,513,Neviano Arduini
-5402,rer,9.686,44.419,656,Montegroppo
-5404,rer,9.431,44.937,410,Pianello Val Tidone
-5405,rer,10.034,44.439,902,Bosco di Corniglio
-5406,rer,9.991,44.819,146,Salsomaggiore
-5407,rer,9.481,44.438,853,Casoni di Santa Maria di Taro
-5408,rer,10.491,44.530,729,La Stella
-5409,rer,10.427,44.298,1148,Febbio
-5410,rer,10.570,44.350,703,Farneta
-5411,rer,10.654,44.433,247,Lugo
-5412,rer,10.271,44.345,832,Collagna
-5413,rer,10.942,44.277,920,Montese
-5414,rer,10.923,44.357,226,Ponte Samone
-5415,rer,11.045,44.727,32,Bomporto
-5416,rer,9.330,44.640,462,Trebbia Valsigiara
-5417,rer,9.706,45.061,55,Piacenza
-5420,rer,12.122,44.943,4,Ariano
-5422,rer,10.523,44.409,367,Ponte Cavola
-5423,rer,9.983,44.510,758,Berceto
-5424,rer,10.460,44.363,704,Villa Minozzo
-5429,rer,12.136,43.692,850,Badia Tedalda
-5430,rer,12.062,44.121,60,Meldola
-5431,rer,12.200,44.091,54,San Carlo
-5439,rer,11.579,44.275,98,Borgo Tossignano
-5440,rer,11.587,44.249,486,Le Taverne
-5450,rer,11.035,44.261,623,Riola di Labante
-5451,rer,11.491,44.319,166,San Clemente
-5452,rer,11.398,44.061,720,Barco
-5454,rer,11.498,44.137,929,Monte Faggiola
-5455,rer,11.674,44.226,480,Monte Albano
-5458,rer,11.321,44.220,825,Monghidoro
-5459,rer,11.033,44.082,650,Treppio
-5463,rer,10.699,44.524,302,San Valentino
-5464,rer,10.276,44.411,798,Ramiseto
-5465,rer,10.447,44.484,751,Predolo
-5466,rer,10.178,44.499,982,Musiara Superiore
-5467,rer,10.276,44.521,649,Campora di Sasso
-5468,rer,10.093,44.438,980,Grammatica
-5469,rer,10.036,44.548,834,Casaselvatica
-5470,rer,9.634,44.796,600,Bettola
-5471,rer,9.482,44.587,1109,Selva Ferriere
-5472,rer,9.579,44.636,881,Cassimoreno
-5473,rer,10.465,44.403,397,Gatta
-5475,rer,10.236,44.440,474,Selvanizza
-5477,rer,10.274,44.612,263,Langhirano idro
-5478,rer,10.319,44.790,65,Parma Ponte Nuovo
-5481,rer,10.171,44.635,309,Marzolara
-5482,rer,9.702,44.763,662,San Michele
-5483,rer,9.618,44.447,852,Tarsogno
-5484,rer,10.024,44.733,434,Varano Marchesi
-5485,rer,9.441,44.964,154,Pianello Val Tidone idro
-5486,rer,9.530,45.057,65,Rottofreno
-5487,rer,9.405,44.633,408,Salsominore
-5488,rer,9.867,44.992,57,Saliceto
-5489,rer,9.814,44.909,116,Ciriano
-5490,rer,9.582,44.900,148,Rivergaro
-5491,rer,9.631,44.492,491,Tornolo
-5492,rer,10.225,44.823,64,Parma Ovest
-5493,rer,10.169,44.809,80,Noceto
-5494,rer,10.254,44.917,42,San Secondo
-5498,rer,10.899,44.670,43,Ponte Alto
-5499,rer,10.516,44.237,1219,Piandelagotti
-5500,rer,10.668,44.430,250,Rossenna
-5501,rer,10.818,44.177,1319,Lago Pratignano
-5502,rer,10.630,44.215,737,Pievepelago idro
-5503,rer,10.799,44.204,512,Fanano
-5504,rer,10.948,44.679,32,Modena Naviglio
-5505,rer,10.796,44.650,57,Rubiera SS9
-5506,rer,10.881,44.513,150,Gorzano
-5507,rer,11.030,44.534,72,Spilamberto
-5508,rer,10.649,44.179,944,Fiumalbo
-5509,rer,10.466,44.247,1051,Civago
-5510,rer,10.317,44.297,1150,Ospitaletto
-5511,rer,10.581,44.779,38,Cadelbosco
-5512,rer,10.466,44.566,516,Canossa
-5513,rer,10.474,44.633,173,Quattro Castella
-5514,rer,10.568,44.624,136,Puianello
-5516,rer,10.790,44.648,54,Rubiera Tresinaro
-5518,rer,10.325,44.467,381,Lonza
-5519,rer,10.330,44.493,342,Vetto
-5520,rer,9.490,44.878,552,Bobbiano
-5525,rer,9.333,44.905,278,Ponte Nibbiano
-5526,rer,9.722,44.870,202,Veggiola
-5527,rer,9.832,44.820,216,Lugagnano
-5528,rer,9.676,44.819,419,Riglio
-5529,rer,9.333,44.839,586,Romagnese
-5530,rer,9.797,44.943,87,Montanaro
-5531,rer,9.776,44.752,349,Case Bonini
-5532,rer,10.110,44.916,53,Castellina di Soragna
-5533,rer,10.106,44.883,61,Toccalmatto
-5534,rer,10.096,44.695,142,Fornovo
-5535,rer,9.767,44.593,541,Noveglia
-5536,rer,9.935,44.727,434,Pellegrino
-5537,rer,9.867,44.629,803,Pessola
-5538,rer,9.634,44.619,689,Pione
-5539,rer,9.985,44.815,154,Salsomaggiore sul Ghiara
-5540,rer,10.381,44.518,571,Roncovetro
-5541,rer,10.730,44.344,754,Polinago
-5544,rer,9.685,44.695,1077,Teruzzi
-5545,rer,9.497,44.819,240,Perino
-5547,rer,9.231,44.866,575,Valverde
-5548,rer,9.547,44.527,925,Casalporino
-5549,rer,9.887,44.569,556,Mormorola
-5551,rer,10.325,44.805,58,Parma Ponte Verdi
-5552,rer,9.788,44.714,800,Bore
-5553,rer,9.698,44.447,495,Albareto Parma
-5554,rer,9.680,44.567,787,Farfanaro
-5555,rer,9.821,44.649,451,Varsi
-5556,rer,9.784,44.444,762,Valdena
-5558,rer,9.585,44.582,824,Frassineto
-5559,rer,10.992,44.432,456,Guiglia
-5560,rer,10.606,44.499,550,Baiso
-5561,rer,9.346,44.495,848,Cabanne
-5562,rer,11.138,44.440,291,Monte San Pietro
-5563,rer,11.632,44.227,154,Casola Valsenio
-5564,rer,11.041,44.134,472,Suviana
-5565,rer,9.236,44.604,849,Alpe Gorreto
-5566,rer,9.242,44.481,1116,Barbagelata
-5567,rer,9.726,44.825,341,Gropparello
-5568,rer,9.285,44.573,745,Rovegno
-5569,rer,10.489,44.210,1535,Passo delle Radici
-5570,rer,10.677,44.595,98,Ca' de Caroli
-8433,rer,11.347,44.494,50,Bologna Torre Asinelli
-9889,rer,12.293,44.038,278,Santa Paola
-12465,romacq,11.838,43.832,715,Lama
-12466,romacq,11.747,43.872,1060,Campigna
-12467,romacq,11.839,43.870,565,Diga di Ridracoli
-12468,romacq,11.892,43.925,295,Capaccio
-12469,romacq,11.821,43.877,565,Bacine IDRO
-12470,romacq,11.821,43.877,565,Bacine GRONDA
-12471,romacq,11.781,43.893,570,Campigna IDRO
-12473,romacq,11.779,43.906,572,Celle IDRO
-12474,romacq,11.799,43.903,476,Corniolo
-12475,romacq,11.748,43.948,560,Fiumicello idro valle
-12476,romacq,11.748,43.948,566,Fiumicello idro deriv.
-12477,romacq,11.748,43.948,560,Fiumicello Q der.
-1,simc,12.077,44.600,-1,Camse
-10,simc,11.004,44.504,100,Vignola
-10141,simc,10.971,44.778,23,Cortile di Carpi
-11,simc,10.296,44.684,169,Panocchia
-2,simc,11.284,44.839,12,Finale Emilia
-2281,simc,11.750,44.333,68,Imola Mario Neri
-2286,simc,10.272,44.808,59,San Pancrazio
-2289,simc,10.957,44.702,28,Albareto
-2290,simc,11.030,44.631,32,Castelfranco Emilia
-2291,simc,11.241,44.440,275,Sasso Marconi
-2292,simc,11.867,44.449,10,Sant'Agata sul Santerno
-2295,simc,12.160,44.314,5,San Pietro in Vincoli
-2297,simc,12.501,44.035,36,Vergiano
-2301,simc,11.145,44.695,18,Sant'Agata Bolognese
-2303,simc,11.821,44.916,1,Copparo
-2305,simc,10.773,44.743,33,Correggio
-2306,simc,10.511,44.690,95,Cavriago
-2307,simc,12.275,44.089,113,Carpineta
-2308,simc,11.844,44.564,5,Lavezzola
-2979,simc,11.462,44.403,330,Settefonti
-2980,simc,12.250,44.813,1,Volano
-2981,simc,10.874,44.885,20,Rolo
-3,simc,11.661,44.858,4,Malborghetto di Boara
-4,simc,12.268,44.166,25,Martorano
-53010,simc,10.381,44.885,28,Gainago
-6030,simc,9.680,45.055,51,Piacenza urbana
-6031,simc,10.327,44.802,53,Parma urbana
-6032,simc,10.634,44.698,56,Reggio nell'Emilia urbana
-6033,simc,10.917,44.656,37,Modena urbana
-6034,simc,11.329,44.501,48,Bologna urbana
-6035,simc,11.621,44.832,6,Ferrara urbana
-6036,simc,12.200,44.415,2,Ravenna urbana
-6037,simc,12.042,44.220,28,Forli' urbana
-6038,simc,12.244,44.138,42,Cesena urbana
-6039,simc,12.574,44.059,7,Rimini urbana
-6227,simc,11.534,44.571,20,Mezzolara
-6228,simc,11.733,44.569,8,Sant'Antonio
-6232,simc,11.597,44.411,58,Castel San Pietro
-6233,simc,10.909,44.551,90,Formigine
-6237,simc,10.168,45.007,31,Zibello
-6238,simc,10.578,44.837,23,Castelnovo di Sotto
-6239,simc,10.509,44.476,580,Carpineti
-6240,simc,10.623,44.328,632,Montefiorino
-6242,simc,10.039,44.780,277,Pieve di Cusignano
-6245,simc,11.016,44.886,18,Mirandola
-6246,simc,11.891,44.707,0,Ostellato
-6257,simc,11.959,44.360,15,Granarolo Faentino
-6259,simc,11.982,44.041,330,Cusercoli
-6260,simc,9.590,45.041,68,San Nicolo'
-6261,simc,10.005,45.003,41,Castellazzo Villanova d'Arda
-6263,simc,11.126,44.826,16,San Felice sul Panaro
-6264,simc,11.291,44.628,25,Padulle Sala Bolognese
-6265,simc,11.754,44.420,19,Sasso Morelli
-6267,simc,12.536,43.952,190,Mulazzano
-6270,simc,12.643,43.912,65,Morciano
-6289,simc,11.808,44.120,556,Modigliana
-6640,simc,11.746,44.747,3,Sellarino Voghiera
-6643,simc,11.454,44.832,10,Mirabello
-7,simc,11.623,44.654,11,San Pietro Capofiume
-70000,simc,11.755,44.220,185,Brisighella
-7218,simc,11.200,44.496,65,Zola Predosa
-7357,simc,10.853,44.693,40,Campogalliano
-8,simc,11.326,44.261,741,Loiano
-8424,umsuol,11.623,44.654,11,San Pietro Capofiume
+11111,boa,12.47585,44.21458,-10,Nausicaa
+3160,burana,11.41416,44.88231,13,Bondeno Emissario
+3162,burana,11.28743,44.82443,20,Foscaglia 1
+5310,burana,11.41410,44.88238,13,Bondeno Mandracchio
+5305,cer,11.43941,44.92834,14,Palantone Impianto Po
+5306,cer,11.38497,44.79868,14,Sant'Agostino Cavo
+5364,cer,11.44068,44.92711,17,Palantone Impianto Mandracchio
+5365,cer,11.38430,44.79823,17,Sant'Agostino Cer
+5366,cer,12.22338,44.57492,6,Volta Scirocco valle
+7339,cer,11.29903,44.69905,32,Pieve di Cento
+7340,cer,11.74903,44.44905,32,Botte Sillaro
+7341,cer,12.23236,44.19904,32,Savio CER
+11240,coremo,10.70000,44.86278,22,SIRONA
+11241,coremo,10.70917,44.83778,25,CARTOCCIO
+11242,coremo,10.69167,44.80139,29,SANTA MARIA
+11243,coremo,10.64222,44.79806,25,VIA ARGINE
+11244,coremo,10.66417,44.75111,31,ROTTE
+11245,coremo,10.71306,44.67222,55,MASONE
+11246,coremo,10.79833,44.84944,25,BRUNORIA
+11247,coremo,10.76389,44.76806,34,CORREGGIO
+11248,coremo,10.78139,44.73306,36,SAN MARTINO
+11249,coremo,10.84083,44.70944,39,PANZANO
+11250,coremo,10.85139,44.73222,35,GARGALLO
+11251,coremo,10.92361,44.78639,22,PRATAZZOLA
+11252,coremo,10.89139,44.86694,19,PONTE PIETRA
+11253,coremo,10.64194,44.88528,21,BENTIVOGLIO
+11254,coremo,10.62639,44.69861,57,REGGIO EMILIA
+12863,cro,11.91331,44.41770,14,Lugo
+7359,cro,11.99127,44.52128,2,Idrovoro Dane
+7360,cro,12.03599,44.46988,3,Idrovoro Fossette Riunite
+7361,cro,11.86905,44.54933,6,Idrovoro Sabbadina
+7364,cro,11.99460,44.55489,6,Idrovoro Tratturo
+7365,cro,11.80877,44.42099,16,Mordano Bubano
+7366,cro,12.24389,44.56128,4,Ponte Chiavica
+7367,cro,11.86376,44.40099,16,Santerno Senio 1
+7368,cro,11.83876,44.36821,19,Santerno Senio 2
+13992,fidufv,12.76880,46.07650,142,VIVARO
+13993,fidufv,12.81500,45.89560,21,SAN VITO AL TGL.
+13994,fidufv,12.54500,45.91800,22,BRUGNERA
+13995,fidufv,13.35230,46.13450,158,FAEDIS
+13996,fidufv,13.07390,46.10170,148,FAGAGNA
+13997,fidufv,13.22670,46.03520,91,UDINE S.O.
+13998,fidufv,13.15580,45.88230,16,TALMASSONS
+13999,fidufv,13.05260,45.80570,5,PALAZZOLO D.S.
+14000,fidufv,13.51230,45.95810,85,CAPRIVA D.F.
+14001,fidufv,13.48190,45.88980,29,GRADISCA D'IS.
+14002,fidufv,13.45890,45.71480,0,FOSSALON DI GRADO
+14003,fidufv,13.33700,45.84950,8,CERVIGNANO
+14004,fidufv,13.75220,45.65000,1,TRIESTE M.BANDIERA
+14005,fidufv,13.74200,45.73800,268,SGONICO
+14006,fidufv,13.12210,46.26130,184,GEMONA
+14007,fidufv,13.00270,45.95230,37,CODROIPO
+14008,fidufv,12.68130,45.95360,23,PORDENONE
+14009,fidufv,13.14710,45.70190,7,LIGNANO
+14010,fidufv,13.42000,46.08040,127,CIVIDALE
+14011,fidufv,12.92620,46.50230,1750,MONTE ZONCOLAN
+14012,fidufv,13.52050,46.48240,1760,MONTE LUSSARI
+14013,fidufv,12.59770,46.15730,1528,PALA D'ALTEI
+14014,fidufv,13.55190,46.51070,794,TARVISIO
+14015,fidufv,12.86250,46.41040,438,ENEMONZO
+14016,fidufv,12.59370,46.40970,922,FORNI DI SOPRA
+14017,fidufv,13.30250,46.50950,590,PONTEBBA
+14018,fidufv,13.00590,46.39940,314,TOLMEZZO
+14019,fidufv,13.27460,46.31260,600,MUSI
+14020,fidufv,12.73400,46.25450,345,CHIEVOLIS
+14021,fidufv,12.52440,46.11490,1275,PIANCAVALLO
+14022,fidufv,12.57100,46.19320,468,BARCIS
+12202,fiduli,08.16930,44.00624,25,Alassio
+12203,fiduli,08.18089,44.06832,36,Albenga-Isolabella
+12204,fiduli,08.21077,44.04882,6,Albenga-Molino Branca
+12205,fiduli,08.50887,44.32931,3,Albisola
+12209,fiduli,08.52801,44.40449,435,Alpicella
+12210,fiduli,08.34782,44.33428,470,Altare
+12213,fiduli,09.10735,44.43845,702,Bargagli
+12216,fiduli,08.00070,43.93330,281,Bestagno
+12222,fiduli,07.95315,43.97713,250,Borgomaro
+12223,fiduli,07.62177,43.84803,115,Borgonuovo
+12224,fiduli,09.41013,44.42429,386,Borzone
+12226,fiduli,09.71552,44.23132,112,Brugnato
+12234,fiduli,09.84000,44.24990,425,Calice al Cornoviglio-Molunghi
+12240,fiduli,09.76581,44.30542,1070,Casoni
+12241,fiduli,08.26235,44.14665,91,Castellari
+12242,fiduli,08.11888,44.13202,432,Castelvecchio di R.B.
+12246,fiduli,09.58414,44.35237,410,Cembrano
+12247,fiduli,08.13448,44.07623,110,Cenesi
+12248,fiduli,07.77388,43.87968,370,Ceriana
+12250,fiduli,09.34547,44.32216,6,Chiavari-Caperana
+12251,fiduli,09.32194,44.42107,615,Cichero
+12252,fiduli,08.14601,44.08548,52,Cisano sul Neva
+12253,fiduli,07.69983,43.98152,1357,Colle Belenda
+12254,fiduli,08.20245,44.23234,1004,Colle del Melogno
+12255,fiduli,08.38289,44.33297,385,Colle di Cadibona
+12256,fiduli,07.87331,44.08325,927,Colle di Nava
+12258,fiduli,09.18148,44.40840,560,Colonia Arnaldi
+12259,fiduli,08.10447,43.97999,350,Conna
+12260,fiduli,09.73483,44.10632,338,Corniolo
+12261,fiduli,09.00714,44.47507,630,Creto
+12262,fiduli,08.98586,44.52014,470,Crocetta D'Orero
+12264,fiduli,09.71000,44.34000,780,Cuccarello
+12265,fiduli,09.09539,44.46781,467,Davagna
+12267,fiduli,08.06093,43.92741,100,Diano Castello
+12270,fiduli,08.46670,44.36638,80,Ellera-Foglietto
+12271,fiduli,08.70493,44.46494,290,Fiorino
+12272,fiduli,09.09318,44.40290,791,Fontana Fresca
+12273,fiduli,09.90619,44.13805,25,Fornola
+12278,fiduli,08.89561,44.45530,47,Genova-Bolzaneto
+12279,fiduli,08.94957,44.40702,5,Genova-Borgo Incrociati
+12280,fiduli,08.93448,44.42834,360,Genova-Castellaccio
+12281,fiduli,08.95000,44.40000,30,Genova-Centro Funzionale
+12282,fiduli,08.95395,44.41094,10,Genova-Firpo
+12283,fiduli,08.96109,44.43439,30,Genova-Gavette
+12284,fiduli,08.82023,44.43671,20,Genova-Granara
+12285,fiduli,08.82460,44.43227,69,Genova-Pegli
+12286,fiduli,08.90010,44.48852,75,Genova-Pontedecimo
+12288,fiduli,09.06158,44.38472,174,Genova-Sant'Ilario
+12289,fiduli,09.39525,44.46268,1009,Giacopiane
+12291,fiduli,09.38773,44.46112,1030,Giacopiane-Lago
+12292,fiduli,08.55555,44.38241,90,Il Pero
+12293,fiduli,08.01652,43.87957,71,Imperia-Oss. Meteosismico
+12295,fiduli,08.85822,44.53013,300,Isoverde
+12296,fiduli,08.85824,44.53013,300,Isoverde 1
+12300,fiduli,09.61484,44.32323,270,La Macchia
+12301,fiduli,09.04717,44.44076,150,La Presa
+12302,fiduli,09.82819,44.10703,35,La Spezia
+12303,fiduli,08.48011,44.33542,253,Lavagnola
+12304,fiduli,08.64766,44.40350,110,Lerca
+12305,fiduli,09.61870,44.17888,85,Levanto-San Gottardo
+12306,fiduli,09.60677,44.17143,6,Levanto-Vallesanta
+12307,fiduli,09.28421,44.55421,600,Loco Carchelli
+12309,fiduli,08.74155,44.43429,104,Madonna delle Grazie
+12313,fiduli,10.01381,44.05000,2,Marinella di Sarzana
+12315,fiduli,08.73312,44.47419,270,Mele
+12316,fiduli,08.73313,44.47419,270,Mele 1
+12318,fiduli,08.93816,44.54028,270,Mignanego
+12319,fiduli,08.74603,44.43946,35,Molinetto
+12321,fiduli,07.84202,43.93074,240,Montalto Ligure
+12325,fiduli,09.44102,44.31091,175,Monte Domenico
+12327,fiduli,07.61888,43.79330,210,Monte Maure
+12328,fiduli,09.93842,44.07129,360,Monte Rocchetta
+12331,fiduli,09.65595,44.27808,185,Nasceto
+12333,fiduli,09.77099,44.19514,75,Padivarma
+12334,fiduli,09.35624,44.34209,25,Panesi
+12336,fiduli,07.73328,43.90463,931,Passo Ghimbegna
+12337,fiduli,08.73602,44.48613,234,Passo del Turchino
+12342,fiduli,09.84904,44.19801,48,Piana Battolla-Ponte
+12344,fiduli,07.91473,44.04952,263,Pieve di Teco
+12345,fiduli,07.79343,44.04202,1845,Poggio Fearza
+12348,fiduli,08.06393,44.05445,90,Pogli d'Ortovero idrometro
+12355,fiduli,07.86644,44.06393,475,Pornassio
+12357,fiduli,09.83594,44.05200,40,Portovenere-Comune
+12361,fiduli,09.00911,44.41681,234,Premanico
+12362,fiduli,08.00433,44.06542,343,Ranzo
+12363,fiduli,09.45774,44.37488,530,Reppia
+12365,fiduli,07.60177,43.88859,215,Rocchetta Nervina
+12369,fiduli,08.00619,43.94153,67,Rugge di Pontedassio
+12373,fiduli,09.65964,44.27470,180,S.Margherita Vara
+12375,fiduli,08.52730,44.36189,180,Sanda
+12376,fiduli,07.78625,43.82265,61,Sanremo
+12377,fiduli,08.84485,44.44247,310,Santuario Monte Gazzo
+12378,fiduli,08.43753,44.34555,90,Santuario di Savona
+12379,fiduli,09.96546,44.11227,26,Sarzana
+12382,fiduli,08.48305,44.30620,24,Savona-Istituto Nautico
+12385,fiduli,07.60808,43.93960,1212,Sella di Gouta
+12386,fiduli,09.73698,44.26434,580,Sero' di Zignago
+12387,fiduli,09.67751,44.29848,265,Sesta Godano
+12388,fiduli,09.40992,44.27377,10,Sestri Levante
+12389,fiduli,09.42966,44.27000,13,Sestri Levante-Sara
+12391,fiduli,08.48252,44.41582,349,Stella S.Giustina
+12392,fiduli,09.62050,44.40530,895,Taglieto
+12393,fiduli,09.54859,44.31274,603,Tavarone
+12394,fiduli,08.02774,44.00538,439,Testico
+12397,fiduli,07.76242,43.99451,789,Triora
+12400,fiduli,07.81883,43.83551,41,Valle Armea-Ponte
+12401,fiduli,08.94744,44.52038,407,Valleregia
+12403,fiduli,09.58420,44.38313,345,Varese Ligure
+12405,fiduli,07.61211,43.78777,21,Ventimiglia
+12407,fiduli,08.97849,44.48555,310,Vicomorasso
+12408,fiduli,09.06348,44.42846,430,Viganego
+12451,fiduli,09.95015,44.19802,45,CALAMAZZA
+12453,fiduli,09.89656,44.36182,200,PONTREMOLI-S.GIUSTINA
+12454,fiduli,10.06207,44.20233,107,SOLIERA
+12935,fiduli,09.34833,44.34611,26,Carasco
+12936,fiduli,10.00705,44.10379,96,Castelnuovo Magra
+12937,fiduli,09.37361,44.29694,100,Cavi di Lavagna
+12938,fiduli,10.00899,44.07491,5,Luni
+12939,fiduli,09.64028,44.13472,75,Monterosso
+11831,fiduma,13.73623,43.29068,8,Foce Chienti
+11832,fiduma,13.05380,43.82633,7,Foce Metauro
+11834,fiduma,12.82464,43.69091,96,Fossombrone
+11835,fiduma,13.40032,43.01023,300,San Ruffino
+11836,fiduma,13.45162,43.04679,269,Tennacola
+13974,fiduma,13.52388,43.57445,52,Baraccola
+13975,fiduma,13.02907,43.58027,186,Barbara
+13976,fiduma,13.19233,43.36223,790,Cingoli
+13977,fiduma,12.90403,43.33027,354,Fabriano Centro
+13978,fiduma,13.15600,43.03470,747,Fiastra Tribbio
+13979,fiduma,13.61955,43.43578,45,Loreto
+13980,fiduma,13.41870,43.29223,294,Macerata Montalbano
+13981,fiduma,12.96922,43.73750,189,Piagge
+13982,fiduma,13.28157,43.08003,465,Pian di Pieca
+13983,fiduma,13.07953,43.36842,580,Poggio San Vicino
+13984,fiduma,12.95333,43.60500,160,San Lorenzo in Campo
+13985,fiduma,12.97075,43.15903,469,Sefro
+13986,fiduma,13.20577,43.70103,6,Senigallia
+13987,fiduma,12.91750,43.03055,754,Serravalle di Chienti
+13988,fiduma,12.95295,43.11957,660,Sorti
+13989,fiduma,12.90042,43.19405,484,Spindoli
+13990,fiduma,12.59110,43.84342,405,Tavoleto
+13991,fiduma,13.29552,43.20922,191,Tolentino
+6468,fiduma,13.04168,43.38863,625,San Giovanni
+6491,fiduma,12.68450,43.62828,193,Acqualagna
+6543,fiduma,13.38067,43.54328,170,Agugliano
+6544,fiduma,13.50836,43.61036,91,Ancona Regione
+6545,fiduma,12.43040,43.56213,465,Biscubio
+6546,fiduma,13.34306,43.36417,195,Appignano
+6547,fiduma,12.93669,43.49745,535,Arcevia
+6548,fiduma,12.89474,43.83988,53,Arzilla
+6549,fiduma,13.61846,43.02143,213,Aso
+6550,fiduma,13.53291,43.51722,25,Aspio
+6551,fiduma,13.56669,43.49400,18,Aspio 2
+6552,fiduma,13.16500,43.66266,26,Misa
+6553,fiduma,13.06798,43.14007,581,Camerino
+6554,fiduma,13.23818,42.73848,888,Capodacqua
+6555,fiduma,12.82428,43.31040,532,Campodiegoli
+6556,fiduma,13.38839,43.47564,84,Musone
+6557,fiduma,13.33256,43.59983,23,Chiaravalle
+6558,fiduma,13.37115,43.23236,156,Chienti 1
+6559,fiduma,13.59013,43.26095,741,Chienti 2
+6560,fiduma,12.49558,43.87112,358,Conca 1
+6561,fiduma,12.52890,43.88383,215,Conca 2
+6562,fiduma,13.07693,43.63852,59,Nevola
+6563,fiduma,13.11565,43.44538,510,Cupramontana
+6564,fiduma,12.96408,43.25149,408,Esanatoglia
+6565,fiduma,13.67208,43.23627,42,Ete Morto
+6566,fiduma,13.71314,43.13585,48,Ete Vivo
+6567,fiduma,12.86326,43.31405,371,Fabriano 2
+6568,fiduma,13.71444,43.15750,224,Fermo
+6569,fiduma,13.40283,43.22579,174,Fiastra
+6570,fiduma,13.35117,43.43583,305,Filottrano
+6571,fiduma,12.61874,43.79447,112,Foglia 1
+6572,fiduma,12.78690,43.85185,43,Foglia 2
+6573,fiduma,12.89771,43.90756,9,Foglia 3
+6574,fiduma,12.72642,43.47108,690,Fonte Avellana
+6575,fiduma,13.50763,43.36273,76,Monocchia
+6576,fiduma,13.48969,42.96297,690,Force
+6577,fiduma,13.20539,42.95402,1825,Pizzo Tre Vescovi
+6578,fiduma,12.86082,43.68697,104,Ghilardino
+6579,fiduma,13.59861,43.10611,200,Grottazzolina
+6580,fiduma,13.29862,42.91768,1260,Isola San Biagio
+6581,fiduma,13.22997,43.53194,100,Jesi
+6582,fiduma,13.40367,43.15993,430,Loro Piceno
+6583,fiduma,13.77680,43.03422,60,Menocchia
+6584,fiduma,12.96756,43.76267,36,Metauro 1
+6585,fiduma,13.12589,43.49621,104,Moie
+6586,fiduma,13.18906,42.91153,1917,Monte Bove Sud
+6587,fiduma,13.43723,43.40800,215,Montefano
+6588,fiduma,13.32611,42.89945,1021,Montemonaco
+6589,fiduma,13.20509,42.87344,1813,Monte Prata
+6590,fiduma,13.29085,43.60936,35,Monte San Vito
+6591,fiduma,13.05650,43.53480,350,Montecarotto
+6592,fiduma,13.53753,42.84965,180,Mozzano
+6593,fiduma,13.63888,43.47358,5,Foce Musone
+6594,fiduma,12.85635,43.42499,254,Sassoferrato
+6595,fiduma,13.44928,43.44736,60,Passatempo
+6596,fiduma,12.84406,43.56867,243,Pergola
+6597,fiduma,12.86939,43.89061,22,Villa Fastiggi
+6598,fiduma,12.25181,43.82655,333,Marecchia
+6599,fiduma,12.70720,43.78150,122,Gallo
+6600,fiduma,13.23909,42.99108,1360,Pintura di Bolognaola
+6601,fiduma,12.98468,43.17919,470,Pioraco
+6602,fiduma,13.46124,42.79810,290,Ponte Arli'
+6603,fiduma,13.51339,42.99048,325,Ponte Maglio
+6604,fiduma,13.83744,43.10187,10,Foce Aso
+6605,fiduma,13.17105,43.74966,7,Cesano Foce
+6606,fiduma,13.77241,43.23268,9,Porto Sant'Elpidio
+6607,fiduma,13.18852,43.22949,220,Potenza 1
+6608,fiduma,13.55072,43.36477,42,Potenza 2
+6609,fiduma,13.59325,43.38369,25,Recanati
+6610,fiduma,13.56858,42.95404,385,Rotella
+6612,fiduma,12.41022,43.66689,352,Sant'Angelo in Vado
+6613,fiduma,13.01457,43.66498,92,Cesano
+6614,fiduma,13.89659,42.89213,11,Foce Tronto
+6615,fiduma,12.51258,43.80859,173,Sasso Corvaro
+6616,fiduma,13.24157,43.00670,1365,Sassotetto
+6617,fiduma,12.65876,43.40649,688,Scheggia
+6618,fiduma,13.02817,43.54797,119,Serra de'Conti
+6619,fiduma,13.18861,43.31583,549,Serralta
+6620,fiduma,13.77547,42.85936,60,Spinetoli
+6621,fiduma,13.49803,43.08586,197,Tenna
+6622,fiduma,13.71175,42.96805,141,Tesino
+6623,fiduma,13.65152,42.85224,78,Tronto
+6624,fiduma,13.40658,42.73742,686,Umito
+6625,fiduma,12.63668,43.72317,471,Urbino
+6626,fiduma,13.42612,43.32735,133,Villa Potenza
+6627,fiduma,13.08608,42.93088,655,Visso
+6628,fiduma,12.97153,43.40256,192,San Vittore
+6629,fiduma,12.98033,43.40644,189,Camponocecchio
+6630,fiduma,13.01123,43.43086,166,Gola della Rossa
+6631,fiduma,12.96608,43.33858,243,Fabriano
+6632,fiduma,13.26128,43.14556,298,Fiastrone
+6633,fiduma,13.19107,43.39968,240,San Vettore
+6634,fiduma,12.99405,42.98368,960,Montecavallo
+6635,fiduma,13.88917,42.93322,6,San Benedetto
+6636,fiduma,13.14250,42.94364,749,Ussita
+6637,fiduma,13.27028,42.89514,1740,Sibilla
+6638,fiduma,13.65162,43.41531,11,Porto Recanati
+6639,fiduma,12.94332,43.25313,608,Esanatoglia 2
+12637,fidupo,10.95500,44.96139,21,Bondanello
+12673,fidupo,07.85050,44.69267,290,Bra
+12674,fidupo,10.50653,46.29698,1640,Case Pirli
+12675,fidupo,09.11081,46.09161,1100,Cavargna
+12677,fidupo,09.75607,46.04256,1682,Foppolo
+12678,fidupo,08.59000,45.42500,146,Novara Agogna Q.A.
+12679,fidupo,08.20300,44.28350,620,Osiglia
+12680,fidupo,08.63483,44.64133,230,Ovada
+12681,fidupo,09.16330,45.58116,176,Palazzolo
+12682,fidupo,07.83350,44.92033,249,Poirino Banna
+12683,fidupo,08.07233,44.83583,185,San Damiano Borbore
+12684,fidupo,07.25233,44.50533,1111,San Damiano Macra
+12685,fidupo,07.53933,45.40567,550,Sparone
+12687,fidupo,07.68717,45.06967,239,Torino Giardini Reali
+12688,fidupo,07.62467,45.13367,258,Venaria Ceronda
+12726,fidupo,09.59531,46.24268,1197,Bagni di Masino
+12727,fidupo,10.03663,45.38267,93,Bargnano
+12728,fidupo,09.56836,46.10462,958,Bema
+12729,fidupo,09.70948,45.71822,286,Bergamo
+12730,fidupo,09.65782,45.65961,218,Bergamo Stezzano
+12731,fidupo,10.88674,45.18738,26,Bigarello
+12732,fidupo,09.54976,45.30265,60,Boccaserio SIAP
+12734,fidupo,10.75453,45.04432,29,Borgoforte SIAP
+12735,fidupo,10.26033,45.52433,129,Brescia ITAS
+12737,fidupo,09.65726,45.89767,433,Camerata Cornello
+12742,fidupo,09.27476,44.93986,440,Canevino
+12744,fidupo,09.31697,45.84739,1237,Canzo - Monte Prasanto
+12745,fidupo,10.34248,46.02663,362,Capo di ponte
+12746,fidupo,09.92137,45.64173,178,Capriolo
+12747,fidupo,09.79282,46.03768,1950,Carisole
+12748,fidupo,09.96347,45.25601,56,Casalbuttano
+12749,fidupo,10.67646,45.22294,28,Casale di Goito
+12750,fidupo,10.41804,44.97005,33,Casalmaggiore
+12751,fidupo,09.29725,45.69794,364,Casatenovo prato
+12752,fidupo,09.29753,45.69794,376,Casatenovo tetto
+12753,fidupo,08.90309,45.06237,231,Casei Gerola Po
+12754,fidupo,09.87616,45.83406,501,Casnigo
+12755,fidupo,08.69947,45.24598,108,Castello d'Agogna
+12756,fidupo,09.76588,45.28377,55,Castelleone SIAP
+12757,fidupo,10.06330,45.92852,1180,Castione della Presola
+12758,fidupo,08.82073,45.74878,379,Castronno
+12759,fidupo,08.80776,45.68931,274,Cavaria
+12760,fidupo,09.56172,45.26989,67,Cavenago d'Adda
+12762,fidupo,10.79119,45.11432,21,Mantova - Cerese di Virgilio
+12764,fidupo,09.38037,46.00752,456,Cortenova
+12766,fidupo,09.99583,45.12783,45,Cremona SIAP
+12769,fidupo,10.17734,45.87466,222,Darfo shake up
+12772,fidupo,10.84452,45.13071,24,Formigosa-Botte Sifone
+12776,fidupo,10.15303,45.81395,850,Fraine
+12779,fidupo,10.44950,45.73434,379,Galleria Agricoltori
+12781,fidupo,10.66202,45.26266,42,Goito
+12782,fidupo,10.95258,45.08377,22,Governolo
+12783,fidupo,09.94762,46.00751,738,Grabiasca
+12785,fidupo,09.31995,46.36060,2065,Lago Truzzo
+12788,fidupo,08.62218,45.90616,207,Laveno Molo
+12790,fidupo,08.97444,45.70456,296,Lurago Marinone
+12791,fidupo,10.53090,45.11182,37,Marcaria
+12792,fidupo,10.73063,45.25766,45,Marenghello
+12795,fidupo,08.65110,45.69971,204,Miorina
+12796,fidupo,09.06636,45.66144,247,Misinto
+12797,fidupo,09.50450,45.92159,1234,Moggio
+12799,fidupo,09.30547,45.78240,278,Molteno
+12801,fidupo,10.34331,46.46119,2295,Oga-S.Colombano
+12804,fidupo,09.38853,45.67776,234,Osnago
+12805,fidupo,08.50835,45.30209,121,Palestro a Vercelli SIAP
+12806,fidupo,10.75730,44.95932,20,Palidano di Gonzaga
+12807,fidupo,09.88218,46.29257,2155,Palu'
+12809,fidupo,09.21615,44.68319,1363,Passo del Giova'
+12811,fidupo,09.14712,45.17968,80,Pavia-Ponte Liberta'
+12812,fidupo,10.05881,45.16369,44,Persico Dosimo
+12814,fidupo,08.64524,45.90921,951,Poggio S.Elsa
+12815,fidupo,09.22476,45.13737,65,Ponte Becca Po
+12816,fidupo,09.22837,45.13793,62,Ponte Becca SIAP
+12817,fidupo,09.82164,45.78410,361,Ponte Cene
+12820,fidupo,10.08421,46.03546,272,Porlezza lago
+12821,fidupo,10.71229,45.30072,43,Pozzolo
+12822,fidupo,10.70702,45.30239,49,Pozzolo Monte
+12825,fidupo,09.93273,45.78712,512,Ranzanico
+12826,fidupo,12.33317,45.05406,14,Revere SIAP
+12827,fidupo,09.52067,45.44415,102,Rivolta d'Adda
+12829,fidupo,09.51059,45.83850,676,Rota d'Imagna
+12830,fidupo,09.37965,45.26073,60,S.Angelo Lodigiano
+12832,fidupo,09.48623,45.18706,80,S.Colombano al Lambro meteo
+12833,fidupo,10.31810,46.24658,1725,S.Giacomo Monno
+12835,fidupo,09.43803,45.78617,198,S.Maria Lavello
+12838,fidupo,10.71007,45.39433,65,Salionze monte
+12839,fidupo,10.70979,45.39183,64,Salionze Seriola
+12840,fidupo,10.70840,45.39294,64,Salionze valle
+12841,fidupo,09.39314,46.25108,206,Samolaco meteo (ersaf)
+12844,fidupo,09.63214,46.24151,927,San Martino Valmasino
+12845,fidupo,10.99897,45.04794,14,San Siro SIAP
+12847,fidupo,11.29027,45.00728,10,Sermide
+12848,fidupo,09.84976,46.16657,286,Sondrio
+12850,fidupo,09.35081,45.10005,64,Spessa Po
+12855,fidupo,10.03858,46.06463,965,Valbondione
+12856,fidupo,09.86340,45.95062,1002,Valcanale
+12858,fidupo,10.84258,45.12877,24,Vallazza-Fissero
+12860,fidupo,09.17837,44.80653,560,Varzi Nivione (ersaf)
+12861,fidupo,10.71924,45.16960,18,Vasarone
+12862,fidupo,09.32465,46.18191,980,Vercana
+12899,fidupo,10.18139,45.04222,29,Isola Pescaroli SIAP
+12921,fidupo,09.09194,44.67389,480,Cabella Ligure
+12922,fidupo,07.33333,44.46417,618,Dronero Maira
+12923,fidupo,08.82194,45.03583,71,Isola S.Antonio IdroPr
+12924,fidupo,08.75361,44.60667,356,Lavagnina lago
+12925,fidupo,07.67861,45.00111,220,Moncalieri PO
+12926,fidupo,08.40917,45.87444,292,Omegna lago d'Orta
+12927,fidupo,08.51333,45.74833,332,Paruzzaro
+12928,fidupo,07.86778,44.11833,832,Ponte di Nava Tanaro
+12929,fidupo,08.17444,44.63472,284,Rocchetta Belbo
+12930,fidupo,06.76611,45.13056,1975,Rochemolles
+12931,fidupo,07.94306,45.17250,174,San Sebastiano Po
+12932,fidupo,07.67278,45.38806,362,Spineto Orco
+12933,fidupo,07.67280,45.38806,362,Spineto Orco 1
+12934,fidupo,07.51222,44.78000,257,Villafranca Piemonte Po
+12966,fidupo,08.82223,45.03611,84,Isola S.Antonio PO 1
+12998,fidupo,10.34306,44.73611,91,Invaso Cassa Parma
+12999,fidupo,10.34306,44.73611,91,Invaso Cassa Parma 1
+3939,fidupo,08.51111,45.88750,900,Someraro
+3940,fidupo,08.42333,45.97778,201,Candoglia Toce Q.A.
+3942,fidupo,08.17083,44.41389,390,Bergalli
+3944,fidupo,09.41114,46.14934,199,Fuentes
+3945,fidupo,10.25866,45.98490,994,Laveno di Lozio
+3946,fidupo,10.10414,45.97507,750,Dezzo di Scalve
+3947,fidupo,09.53420,45.97740,982,Valtorta
+3948,fidupo,09.67274,45.94617,550,Piazza Brembana
+3949,fidupo,09.94663,45.88645,648,Clusone
+3950,fidupo,07.44278,44.55222,499,Rossana Varaita
+3951,fidupo,07.48056,44.51389,500,Busca Maira
+3953,fidupo,07.24472,44.80972,478,Luserna San Giovanni Pellice
+3954,fidupo,07.28472,44.88417,486,San Martino Chisone
+3956,fidupo,07.82361,45.54806,270,Tavagnasco Dora Baltea
+3957,fidupo,07.48972,45.26778,459,Lanzo Stura di Lanzo
+3958,fidupo,08.28056,45.71389,359,Borgosesia Sesia
+3959,fidupo,07.68972,44.90250,240,Carignano Po
+3960,fidupo,07.41028,44.32806,692,Gaiola Stura di Demonte
+3961,fidupo,08.41944,44.79639,122,Castelnuovo Belbo
+3962,fidupo,08.63306,44.83000,102,Casal Cermelli Orba
+3963,fidupo,08.86500,44.72194,220,Serravalle Scrivia
+3964,fidupo,08.98611,44.88250,182,Volpedo Curone
+3965,fidupo,09.51783,44.89348,193,Godiasco Staffora
+3967,fidupo,10.43776,45.57895,200,Gavardo
+3969,fidupo,07.12111,44.54778,2125,Pian delle Baracche
+3972,fidupo,07.91528,44.85278,295,Pralormo
+3973,fidupo,07.24194,44.81194,475,Luserna San Giovanni
+3974,fidupo,07.55861,44.33444,575,Boves
+3975,fidupo,08.30278,46.11028,252,Domodossola
+3976,fidupo,07.97833,45.18556,165,Verolengo
+3977,fidupo,08.38417,45.43750,155,Albano Vercellese
+3978,fidupo,08.71389,44.92667,90,Alessandria Lobbi
+3979,fidupo,07.77500,45.46167,650,Meugliano
+3980,fidupo,07.98750,45.63028,1186,Oropa
+3981,fidupo,07.76722,45.04139,631,Pino Torinese
+3982,fidupo,08.49500,45.12917,118,Casale Monferrato
+3984,fidupo,07.98389,45.99944,2820,Passo del Moro
+3985,fidupo,06.94889,44.99333,2320,Lago Pilone
+3986,fidupo,06.86167,44.97639,2701,Monte Fraiteve
+3987,fidupo,08.25944,44.55806,588,Serole Bric Puschera
+3988,fidupo,07.80556,44.26000,1741,Monte Malanotte
+3989,fidupo,07.72917,44.12750,1245,Upega
+3990,fidupo,08.08722,44.33417,700,Perlo
+3991,fidupo,08.01500,44.53806,640,Somano
+3992,fidupo,08.42056,46.13806,831,Druogno
+3993,fidupo,08.25222,45.82028,470,Varallo
+3994,fidupo,08.46083,45.70500,300,Borgomanero
+3995,fidupo,08.18861,46.24472,1308,Varzo
+3996,fidupo,08.24806,45.56000,243,Masserano
+3997,fidupo,08.09250,44.68694,376,Treiso
+3999,fidupo,08.53833,44.52167,773,Ponzone Bric Berton
+4000,fidupo,08.69806,45.54472,188,Cameri
+4001,fidupo,07.49444,44.55750,440,Costigliole Saluzzo
+4002,fidupo,07.36500,44.96806,332,Cumiana
+4004,fidupo,08.08806,44.46611,905,Mombarcaro
+4005,fidupo,08.45389,45.88528,1491,Mottarone
+4006,fidupo,07.05306,44.78056,2294,Colle Barant
+4007,fidupo,08.04444,44.17750,957,Colle del San Bernardo
+4008,fidupo,07.42389,45.43806,1120,Bertodasco
+4009,fidupo,08.76778,44.56278,780,Capanne Marcarolo
+4010,fidupo,08.10167,45.00833,200,Montechiaro d'Asti
+4011,fidupo,09.57885,46.02506,1845,Gerola Pescegallo
+4012,fidupo,10.15942,46.14867,1950,Aprica
+4013,fidupo,06.89000,45.06833,1010,Salbertrand
+4014,fidupo,06.72778,45.07611,1353,Prerichard
+4015,fidupo,07.04944,45.14528,500,Pietrastretta
+4016,fidupo,07.38639,45.09389,340,Avigliana
+4017,fidupo,07.89917,45.32083,226,Candia
+4018,fidupo,08.20000,46.12500,1142,Pizzanco
+4019,fidupo,08.33222,46.22222,560,Crodo
+4020,fidupo,07.87361,45.51417,337,Borgofranco d'Ivrea
+4021,fidupo,10.47081,46.17507,2325,Pantano d'Avio
+4022,fidupo,08.25833,46.06639,259,Villadossola Ovesca
+4023,fidupo,10.18782,46.47630,2650,La Vallaccia 1
+4024,fidupo,07.30417,45.31667,1075,Ala di Stura
+4025,fidupo,07.05278,44.61389,1614,Pontechianale
+4026,fidupo,07.27500,44.20833,1368,Valdieri
+4027,fidupo,07.68889,44.88722,245,Carmagnola
+4028,fidupo,08.39778,45.32306,130,Vercelli
+4029,fidupo,07.57306,44.73028,268,Villanova Solaro
+4030,fidupo,07.24306,45.03472,146,Coazze
+4031,fidupo,08.04500,45.41889,260,Piverone
+4032,fidupo,07.81472,44.39167,450,Mondovi'
+4033,fidupo,07.85083,44.69917,290,Bra
+4036,fidupo,07.66806,45.28389,270,Front Malone
+4037,fidupo,07.90250,44.51417,263,Farigliano Tanaro
+4038,fidupo,07.54722,45.31528,624,Corio
+4040,fidupo,08.16056,45.89722,873,Fobello
+4041,fidupo,08.02028,44.20750,603,Garessio Tanaro
+4042,fidupo,08.05028,45.91250,1304,Carcoforo
+4043,fidupo,07.13750,45.46944,2300,Lago Agnel
+4044,fidupo,07.65722,44.23361,859,Chiusa Pesio
+4045,fidupo,07.21944,45.36250,1223,Forno Alpi Graie
+4046,fidupo,07.51944,45.34167,870,Piano Audi
+4047,fidupo,07.95889,45.69222,1090,Piedicavallo
+4049,fidupo,08.15556,45.67722,1100,Trivero
+4050,fidupo,08.54750,45.92361,202,Pallanza
+4051,fidupo,10.49914,45.72423,1147,Cavacca
+4052,fidupo,10.46637,45.72951,388,Lago d'Idro
+4055,fidupo,08.23861,45.86167,600,Sabbia
+4056,fidupo,07.72500,44.52222,330,Fossano Stura di Demonte
+4057,fidupo,09.19803,44.82200,485,Varzi
+4058,fidupo,09.19497,44.91255,501,Fortunago
+4059,fidupo,09.23810,44.76680,562,Casanova
+4060,fidupo,08.27611,45.09417,443,Crea
+4061,fidupo,07.83278,44.22000,974,Borello
+4063,fidupo,08.33722,44.56500,187,Mombaldone Bormida Q.A.
+4064,fidupo,08.68028,44.94278,90,Montecastello Tanaro Q.A.
+4065,fidupo,08.53974,45.28431,121,Palestro Sesia Q.A. 1
+4067,fidupo,08.88417,44.68194,240,Arquata Scrivia
+4068,fidupo,08.84639,44.83028,154,Castellar Ponzano
+4069,fidupo,08.84944,45.02222,76,Isola Sant'Antonio
+4070,fidupo,08.30778,46.11306,271,Domodossola Toce
+4071,fidupo,08.26694,46.00500,252,Fomarco
+4072,fidupo,08.41472,44.87139,142,Masio Tanaro
+4073,fidupo,09.71227,45.48127,192,Mozzanica
+4074,fidupo,08.74441,45.99811,205,Luino
+4075,fidupo,08.57913,45.76977,202,Angera
+4076,fidupo,09.51191,45.31533,80,Lodi
+4078,fidupo,08.90997,45.60450,206,Castellanza
+4079,fidupo,09.10636,45.70950,250,Cantu' Asnago
+4081,fidupo,09.23191,45.83394,427,Caslino d'Erba
+4082,fidupo,09.29664,45.63783,180,Peregallo
+4083,fidupo,09.24997,45.47922,127,Milano parco Feltre
+4084,fidupo,09.08107,45.82088,536,Como Villa Geno
+4085,fidupo,09.59247,45.70756,260,Ponte Briolo
+4086,fidupo,10.71109,45.39034,90,Monzambano
+4087,fidupo,09.95914,45.66200,197,Sarnico
+4089,fidupo,10.31728,45.61406,399,Caino
+4090,fidupo,10.27108,45.78784,572,Bovegno
+4091,fidupo,10.15803,45.86951,205,Darfo
+4092,fidupo,09.36635,45.85228,222,Malgrate
+4093,fidupo,09.71053,45.27673,63,Montodine
+4094,fidupo,09.77775,45.19033,46,Pizzighettone
+4095,fidupo,09.26275,45.75311,248,Lambrugo
+4096,fidupo,08.74274,45.90338,294,Cuveglio
+4097,fidupo,08.88502,45.84850,369,Arcisate
+4098,fidupo,08.88054,45.33894,94,Vigevano
+4099,fidupo,08.61528,45.51806,180,Caltignaga Terdoppio
+4100,fidupo,08.04000,45.63250,593,Passobreve Cervo
+4101,fidupo,06.96361,45.70972,1495,La Thuile
+4102,fidupo,07.38250,45.59583,1644,Cogne - Lillaz Centrale
+4103,fidupo,07.35667,45.73667,583,Pollein Dora Baltea
+4104,fidupo,07.34250,45.82556,960,Valpelline
+4105,fidupo,07.82139,45.83250,1635,Gressoney La Triniti
+4107,fidupo,07.61750,45.74722,513,Pontey Dora Baltea
+4109,fidupo,08.28028,44.39917,388,Cairo Montenotte
+4110,fidupo,08.48472,44.47833,385,Sassello
+4111,fidupo,08.42333,44.57056,236,Cartosio Erro
+4112,fidupo,08.31056,44.48444,267,Piana Crixia Bormida
+4113,fidupo,08.65972,44.56722,289,Rossiglione
+4114,fidupo,08.79722,44.68806,215,Gavi
+4116,fidupo,08.94750,44.56639,358,Busalla
+4124,fidupo,08.13472,44.81833,116,Asti Tanaro
+4125,fidupo,06.93583,44.88694,1865,Sauze Cesana
+4126,fidupo,07.77389,44.94444,237,Santena Banna
+4127,fidupo,08.67222,44.76806,136,Basaluzzo
+4129,fidupo,08.43056,46.34722,1230,Formazza Bruggi
+4130,fidupo,07.95417,45.97361,1360,Macugnaga Pecetto
+4131,fidupo,08.69583,46.05833,201,Cannobio
+4132,fidupo,07.96250,45.83333,1196,Alagna
+4133,fidupo,07.65722,45.44361,1300,Colleretto
+4134,fidupo,07.15000,45.20694,1800,Malciaussia
+4135,fidupo,07.07278,44.95917,1650,Massello
+4137,fidupo,07.20833,44.34167,1390,San Giacomo Demonte
+4138,fidupo,07.05000,44.26111,1630,Vinadio San Bernolfo
+4139,fidupo,09.14972,44.72611,1012,Caldirola
+4140,fidupo,06.84250,45.76639,2164,Courmayeur Lex Blanche
+4141,fidupo,07.06500,45.88389,2067,Courmayeur Pre'De Bard
+4142,fidupo,07.15944,45.83083,2015,St. Rhemy Crevacol
+4143,fidupo,07.30056,45.88139,2028,Ollomont By
+4144,fidupo,07.85750,45.63111,1350,Lillianes Granges
+4145,fidupo,07.62278,45.84444,2033,Chamois
+4146,fidupo,07.54528,45.61583,2110,Champorcher rifugio Dondena
+4147,fidupo,07.05722,45.61389,1873,Valgrisanche Menthieu
+4149,fidupo,07.83500,45.76917,1306,Gressoney St.Jean Lys
+4151,fidupo,06.94417,45.00972,1521,Pragelato Trampolino a Valle
+4153,fidupo,08.79803,45.12172,96,Lomello
+4154,fidupo,09.89025,45.39923,87,Soncino
+4156,fidupo,08.82385,45.62644,224,Busto Arsizio
+4157,fidupo,09.72081,45.16200,58,Codogno
+4158,fidupo,10.51090,45.37322,109,Castiglione delle Stiviere
+4159,fidupo,09.93775,45.52228,140,Chiari
+4160,fidupo,09.67137,45.35672,79,Crema
+4161,fidupo,09.26607,45.90533,625,Barni
+4162,fidupo,10.29691,46.07868,816,Paisco Loveno
+4163,fidupo,10.37775,46.08062,1128,Cevo
+4164,fidupo,10.41479,45.21599,34,Asola
+4165,fidupo,08.82358,45.83255,416,Varese
+4166,fidupo,09.01748,44.99033,93,Voghera
+4167,fidupo,07.52750,44.37056,575,Cuneo Cascina Vecchia
+4168,fidupo,09.53365,45.57600,160,Canonica d'Adda
+4169,fidupo,10.22061,45.58406,187,Stocchetta
+4170,fidupo,10.24304,45.21839,37,Ostiano
+4171,fidupo,09.82143,45.66239,233,Carobbio degli Angeli
+4172,fidupo,10.28561,45.94434,487,Bienno
+4173,fidupo,10.14554,45.35951,60,Manerbio
+4174,fidupo,09.24442,45.76200,273,Lambrugo pluvio
+5321,fidupo,12.11756,44.94840,4,Ariano SIAP
+5324,fidupo,11.29326,45.01470,16,Castelmassa SIAP
+5325,fidupo,12.15202,45.02769,7,Cavanella SIAP
+5328,fidupo,10.09250,44.69726,142,Fornovo SIAP
+5329,fidupo,10.65413,44.44197,228,Lugo SIAP
+5330,fidupo,08.69250,44.94500,216,Montecastello SIAP
+5333,fidupo,12.48198,44.96032,2,Pila SIAP
+5334,fidupo,11.75592,44.96062,9,Polesella SIAP
+5335,fidupo,11.60474,44.88689,8,Pontelagoscuro SIAP
+5336,fidupo,10.92243,44.35717,220,Ponte Samone SIAP
+5337,fidupo,08.63417,45.04750,90,Ponte Valenza SIAP
+5386,fidupo,08.82222,45.03611,84,Isola S.Antonio PO
+5387,fidupo,08.09972,45.17917,155,Crescentino Po
+5403,fidupo,08.44750,45.14222,115,Casale Monferrato Po
+5421,fidupo,08.63167,45.05083,90,Valenza Po
+5425,fidupo,10.33880,44.72164,110,Casse Espansione Parma SIAP
+12970,fiduto,09.98234,44.31569,320,Bagnone
+12971,fiduto,09.79647,44.30313,670,Bosco di Rossano
+12972,fiduto,10.53404,44.01798,137,Calavorno
+12973,fiduto,10.37777,43.87179,285,Chiatri
+12974,fiduto,10.11854,44.30208,734,Comano
+12975,fiduto,10.14885,44.16765,250,Equi Terme
+12976,fiduto,10.03255,44.33151,538,Iera
+12977,fiduto,10.00238,44.24089,121,Licciana Nardi
+12978,fiduto,10.11582,44.20934,460,Mazzola
+12979,fiduto,10.20709,44.16920,666,Minucciano
+12980,fiduto,09.86227,44.28039,695,Parana
+12981,fiduto,09.82190,44.45445,955,Passo del Brattello
+12982,fiduto,10.21569,44.30249,1250,Passo del Cerreto
+12983,fiduto,09.91932,44.46460,1014,Passo della Cisa
+12984,fiduto,09.76345,44.35292,744,Patigno
+12985,fiduto,09.82220,44.33785,955,Pietra Piccata
+12986,fiduto,09.88207,44.36753,226,Pontremoli depuratore
+12987,fiduto,10.52575,44.10702,1013,Renaio
+12988,fiduto,09.95504,44.36486,484,Rocca Sigillina
+12989,fiduto,10.22245,43.99105,57,Seravezza 2
+12990,fiduto,10.06139,44.20064,120,Soliera Siap
+12991,fiduto,10.03276,44.15423,410,Tendola
+12992,fiduto,10.15062,44.24467,500,Turano - Pieve S. Paolo
+12993,fiduto,09.94754,44.28936,118,Villafranca
+13000,fiduto,11.82982,43.71240,415,Bibbiena
+13002,fiduto,10.73823,43.20059,300,Canneto
+13003,fiduto,10.97323,43.14099,740,Gerfalco
+13004,fiduto,10.80616,43.15325,315,Lago
+13005,fiduto,10.79652,43.18415,345,Lustignano
+13006,fiduto,10.66963,43.40844,420,Miemo
+13008,fiduto,10.95571,43.26226,450,Montecastelli P.
+13009,fiduto,10.74189,43.38524,379,Montecatini V. Cecina
+13010,fiduto,10.63152,43.32498,230,Montescudaio
+13011,fiduto,10.20588,44.05525,860,Pian della Fioba
+13012,fiduto,10.98926,43.36357,340,Ponsano
+13013,fiduto,10.85699,43.33243,85,Ponte SR439
+13014,fiduto,11.09812,43.88380,65,Prato Universita'
+13015,fiduto,10.60116,43.36569,230,Riparbella
+13016,fiduto,10.94249,43.25175,247,S. Dalmazio
+13017,fiduto,10.90207,43.11325,600,Santa Costanza
+13018,fiduto,10.69030,43.25621,398,Sassa
+13019,fiduto,10.63881,43.12239,351,Sassetta
+13020,fiduto,10.81897,43.22041,500,Serrazzano
+13022,fiduto,10.61291,43.01727,12,Vecchia SS Aurelia
+13027,fiduto,12.10385,43.48776,309,Monterchi
+13028,fiduto,11.97802,43.41910,410,Palazzo del Pero
+13029,fiduto,12.04166,43.66728,434,Pieve Santo Stefano
+13031,fiduto,10.71017,43.99314,605,Stiappa Siap
+13037,fiduto,10.72158,43.06566,46,Calzalunga
+13038,fiduto,10.60818,44.11649,1674,Foce a Giovo
+13039,fiduto,11.24093,43.13264,450,Monticiano
+13040,fiduto,11.45315,44.15037,285,Santerno
+13041,fiduto,11.18123,43.74123,54,Vingone
+13062,fiduto,11.66051,42.88138,910,Abbadia S. S.
+13063,fiduto,11.62408,42.88838,1678,Abbadia S. S. - Vetta Amiata
+13064,fiduto,11.02418,44.02150,950,Acquerino
+13065,fiduto,10.85845,43.87477,465,Albano
+13066,fiduto,11.01596,42.65936,1,Alberese
+13067,fiduto,12.09625,43.55755,312,Anghiari
+13068,fiduto,10.50091,43.91192,134,Aquilea
+13069,fiduto,11.16848,42.38506,615,Argentario
+13070,fiduto,11.42636,42.99411,269,Argiano
+13071,fiduto,11.04727,43.76595,107,Artimino
+13072,fiduto,11.40490,42.79379,370,Baccinello
+13073,fiduto,10.59911,44.03247,565,Bagni di Lucca
+13074,fiduto,11.33016,43.68462,260,Bagno a Ripoli
+13075,fiduto,11.23474,43.51001,430,Barberino
+13076,fiduto,10.45774,44.06819,270,Barga
+13077,fiduto,10.59563,43.26047,70,Bibbona
+13078,fiduto,11.38860,43.98445,280,Borgo S. Lorenzo
+13079,fiduto,11.07933,42.92948,40,Braccagni
+13080,fiduto,10.10286,44.11465,960,Campocecina
+13081,fiduto,10.10851,44.04601,150,Candia Scurtarola
+13082,fiduto,11.39047,42.40368,12,Capalbio
+13083,fiduto,10.33589,44.10262,1100,Careggine
+13084,fiduto,11.54218,43.58376,200,Casa Rota
+13085,fiduto,11.04076,43.66552,198,Casa Sartori
+13086,fiduto,11.01488,42.76689,2,Casotto dei Pescatori
+13087,fiduto,10.62665,43.18740,95,Castagneto Carducci
+13088,fiduto,11.42209,43.36799,300,Castelnuovo B.ga
+13089,fiduto,10.87950,43.20249,770,Castelnuovo V. C.
+13090,fiduto,11.74245,43.53206,283,Castiglion Fibocchi
+13091,fiduto,11.61659,42.95907,672,Castiglione d'Orcia
+13092,fiduto,10.52169,43.34989,60,Cecina
+13093,fiduto,10.85461,43.73726,70,Cerreto Corliano
+13094,fiduto,10.89258,43.74022,70,Cerreto Guidi
+13095,fiduto,11.82424,43.30678,246,Cesa
+13096,fiduto,11.79583,43.31811,285,Cesa Collina
+13097,fiduto,10.46565,43.58209,15,Collesalvetti
+13099,fiduto,10.73651,44.14081,1221,Cutigliano Melo
+13100,fiduto,10.59473,43.22188,36,Donoratico
+13101,fiduto,11.26347,43.76976,48,Firenze Citta'
+13102,fiduto,11.42040,43.45477,360,Gaiole in Chianti
+13103,fiduto,11.08309,43.90822,93,Galceti
+13104,fiduto,10.99469,43.53826,170,Gambassi
+13105,fiduto,11.38822,44.04562,880,Giogo
+13106,fiduto,09.89366,43.42631,230,Gorgona
+13107,fiduto,11.73349,43.52576,275,Il Pero
+13109,fiduto,10.79956,43.56348,180,Legoli
+13110,fiduto,10.24189,43.89591,5,Lido di Camaiore
+13111,fiduto,11.32467,42.61349,179,Magliano
+13113,fiduto,10.92120,43.11993,670,Massa Marittima Filetto
+13114,fiduto,10.86432,43.01921,188,Massa Marittima Valpiana
+13115,fiduto,10.38273,43.76918,3,Metato
+13116,fiduto,11.49868,43.04550,500,Montalcino azienda
+13117,fiduto,10.19004,42.77305,713,Monte Perone
+13118,fiduto,10.52133,43.79225,216,Monte Pisano Nord
+13119,fiduto,10.92192,43.69085,90,Monteboro
+13120,fiduto,11.43836,42.94889,193,Montenero
+13121,fiduto,11.84330,43.08336,335,Montepulciano Azienda
+13122,fiduto,11.44051,43.23850,165,Monteroni Arbia Biena
+13123,fiduto,11.03718,43.62438,150,Montespertoli Lungagnana
+13124,fiduto,10.74465,43.66608,29,Montopoli
+13125,fiduto,09.89871,44.22000,420,Novegigola
+13126,fiduto,11.20155,42.43273,0,Orbetello
+13127,fiduto,10.35880,44.19858,1169,Orecchiella
+13128,fiduto,11.88925,43.37176,313,Ottavo
+13130,fiduto,11.50131,43.75729,325,Pelago
+13131,fiduto,11.73143,42.81641,341,Piancastagnaio
+13132,fiduto,10.29057,44.19054,660,Piazza al Serchio
+13133,fiduto,10.58835,43.77826,38,Pieve di Compito
+13134,fiduto,12.10081,43.67221,750,Pieve S. Stefano
+13135,fiduto,11.65319,42.63338,300,Pitigliano
+13136,fiduto,11.12532,43.45620,206,Poggibonsi Montemorli
+13137,fiduto,11.32724,43.69273,215,Poggio Casciano
+13138,fiduto,10.52804,43.88833,33,Ponte a Moriano
+13139,fiduto,09.89154,44.36779,340,Pontremoli
+13140,fiduto,11.09941,43.87933,60,Prato Citta'
+13141,fiduto,11.72310,43.56778,695,Pratomagno
+13142,fiduto,10.34663,43.47781,244,Quercianella
+13143,fiduto,11.73201,42.94656,618,Radicofani
+13144,fiduto,11.41170,43.79474,230,Remole
+13145,fiduto,11.58137,43.02555,506,Ripa d'Orcia
+13146,fiduto,11.14346,42.70445,25,Rispescia
+13147,fiduto,11.06274,43.03109,475,Roccatederighi
+13148,fiduto,10.89247,43.67775,121,S. Miniato Poggio al Pino
+13149,fiduto,10.59177,43.90425,238,S. Pietro a Marcigliano
+13150,fiduto,10.55466,43.05073,14,S. Vincenzo
+13151,fiduto,11.23315,43.59320,325,Sambuca
+13152,fiduto,11.55469,42.85276,810,Santa Fiora
+13153,fiduto,10.57728,43.53029,210,Santermo
+13154,fiduto,10.98665,43.94530,118,Santomato
+13155,fiduto,11.15033,43.36453,233,Scorgiano
+13156,fiduto,11.54792,42.90431,539,Seggiano
+13157,fiduto,11.59540,42.72926,485,Semproniano
+13158,fiduto,12.27354,43.74789,1000,Sestino
+13159,fiduto,10.54268,43.58988,41,Siberia
+13160,fiduto,10.71532,43.96733,560,Sorana
+13161,fiduto,11.70019,43.82988,838,Stia Monte
+13162,fiduto,11.17469,42.78712,53,Stiacciole
+13163,fiduto,10.20828,43.99128,124,Strettoia
+13164,fiduto,10.68453,43.06399,35,Suvereto
+13165,fiduto,11.16142,43.57016,374,Tavarnelle
+13166,fiduto,10.64841,43.54007,127,Terricciola
+13167,fiduto,11.14611,43.96307,322,Vaiano acquedotto
+13168,fiduto,10.63962,42.99173,8,Venturina
+13169,fiduto,09.96774,44.24865,156,Villafranca
+13170,fiduto,10.83861,43.42190,283,Volterra Balze
+13171,fiduto,11.78137,43.73425,417,Zoo di Poppi
+7653,fiduto,11.41965,43.77006,70,Nave di Rosano
+7680,fiduto,10.68335,43.59053,30,Capannoli
+7766,fiduto,10.27930,43.67897,1,Bocca d'Arno
+7770,fiduto,11.12705,43.92293,97,Vaiano Gamberame
+7771,fiduto,10.96732,43.60273,50,Castelfiorentino
+7772,fiduto,11.56595,43.54031,134,Montevarchi
+7777,fiduto,10.63017,43.66358,10,Pontedera
+7780,fiduto,10.89255,43.92100,67,Pontelungo
+7782,fiduto,11.12767,43.46972,88,Poggibonsi
+7788,fiduto,10.58427,43.68283,7,S. Giovanni alla Vena valle
+7790,fiduto,11.65636,43.84027,745,Vallucciole
+7791,fiduto,11.71748,43.80091,537,Stia
+7792,fiduto,11.61956,43.73848,745,Montemignaio
+7793,fiduto,11.75042,43.68018,375,Ortignano
+7794,fiduto,11.81625,43.80866,1111,Camaldoli
+7795,fiduto,11.87568,43.79245,845,Badia Prataglia
+7796,fiduto,11.82678,43.71042,419,Pollino
+7797,fiduto,11.93020,43.70516,1125,La Verna
+7798,fiduto,11.81207,43.61339,315,Salutio
+7799,fiduto,11.93098,43.18114,326,Capezzine
+7800,fiduto,11.80237,43.20118,292,Bettolle
+7801,fiduto,11.99530,43.26726,427,Cortona
+7802,fiduto,11.92783,43.34109,270,Castiglion Fiorentino
+7803,fiduto,11.74122,43.33739,275,Monte S.Savino
+7804,fiduto,11.89172,43.46984,275,Arezzo
+7805,fiduto,11.71844,43.50456,240,Laterina
+7806,fiduto,11.64796,43.43476,270,Badia Agnano
+7807,fiduto,11.53000,43.44850,560,Nusenna in Chianti
+7808,fiduto,11.60361,43.59005,300,Villa dell'Olio
+7809,fiduto,11.51567,43.59067,211,Renacci Fattoria
+7810,fiduto,11.42875,43.61319,322,Il Palagio
+7811,fiduto,11.55403,43.64822,395,Pian di Sco'
+7812,fiduto,11.55570,43.72962,980,Vallombrosa
+7813,fiduto,11.23632,43.98181,256,Cavallina
+7814,fiduto,11.30372,44.05266,538,Marcoiano
+7815,fiduto,11.27375,43.90658,340,Vaglia
+7816,fiduto,11.32691,43.96335,222,S. Piero a Sieve-Sieve
+7817,fiduto,11.33610,44.01893,357,S. Agata di Mugello
+7818,fiduto,11.46661,44.02982,637,Razzuolo
+7819,fiduto,11.43530,44.00729,380,Ronta
+7820,fiduto,11.38940,43.95612,196,Borgo S. Lorenzo
+7821,fiduto,11.53992,43.96255,365,Villore
+7822,fiduto,11.58408,43.78271,955,Consuma
+7823,fiduto,11.27044,44.00585,388,Le Croci (Barberino)
+7824,fiduto,11.27974,44.07787,820,Monte di Fo'
+7825,fiduto,11.19453,44.04830,540,Mangona
+7826,fiduto,11.45508,43.68810,107,Incisa Valle
+7827,fiduto,11.25696,43.77744,50,Firenze Genio Civile
+7828,fiduto,10.92688,43.52813,441,Poggio Aglione
+7829,fiduto,11.30330,44.04740,459,Ponte a Olmo
+7830,fiduto,11.16714,43.81799,33,Case Passerini
+7831,fiduto,11.13289,43.77678,30,San Colombano
+7832,fiduto,11.19268,43.75820,42,S. Giusto
+7833,fiduto,11.25004,43.79703,84,Firenze Universita'
+7835,fiduto,11.12983,43.83622,32,Capalle
+7836,fiduto,11.15581,44.04571,294,Vernio
+7837,fiduto,11.35438,43.54034,498,Lamole
+7838,fiduto,10.71513,43.18265,415,Monteverdi Marittimo
+7839,fiduto,11.31344,43.66257,144,Strada in Chianti
+7840,fiduto,10.84877,43.62980,50,Fornacino
+7846,fiduto,10.86115,43.40725,462,Volterra
+7847,fiduto,10.96308,43.98948,525,Baggio
+7848,fiduto,10.29998,44.28274,1580,Passo Pradarena
+7849,fiduto,10.30858,44.25425,1035,Capanne di Sillano
+7850,fiduto,10.33152,44.23410,858,Monte Castellino
+7851,fiduto,10.19630,44.13287,1070,Orto di Donna
+7852,fiduto,10.28836,44.10678,581,Vagli di Sotto
+7853,fiduto,10.44610,44.20878,1320,Casone di Profecchia
+7855,fiduto,10.38524,44.15876,524,Villacollemandina
+7856,fiduto,10.45176,44.08829,197,Ponte di Campia
+7858,fiduto,10.25828,44.05723,807,Campagrina
+7859,fiduto,10.51971,44.16176,1591,Monte Romecchio
+7860,fiduto,10.35949,44.02719,493,Fornovolasco
+7861,fiduto,10.44192,44.06236,179,Gallicano
+7862,fiduto,10.36208,43.99467,861,Palagnana
+7863,fiduto,10.43107,43.99783,345,Fabbriche Vallico
+7865,fiduto,10.56672,44.05808,590,Tereglio
+7866,fiduto,10.67246,44.13733,1345,Boscolungo
+7867,fiduto,10.74209,44.13095,1000,Melo
+7868,fiduto,10.77719,44.13015,1670,Croce Arcana
+7870,fiduto,10.75062,44.09644,593,Casotti di Cutigliano
+7871,fiduto,10.79312,44.07033,755,Selva dei Porci
+7872,fiduto,10.83165,44.04005,810,Monte Oppio
+7873,fiduto,10.78748,44.05361,618,S. Marcello Pistoiese
+7874,fiduto,10.80294,44.00671,960,Prunetta
+7875,fiduto,10.71872,44.04183,350,Ponte di Lucchio
+7876,fiduto,10.56290,44.00556,103,Chifenti
+7877,fiduto,10.55045,43.97811,100,Borgo a Mozzano
+7878,fiduto,10.42154,43.95067,285,Convalle
+7879,fiduto,10.51322,43.92759,72,Piaggione
+7880,fiduto,10.36908,43.91831,475,Gombitelli
+7882,fiduto,10.48313,43.88000,35,Mutigliano
+7884,fiduto,10.43212,43.86328,23,Ponte Guido
+7885,fiduto,10.50980,43.84010,20,Lucca
+7886,fiduto,10.46871,43.82789,12,Pontetetto
+7887,fiduto,10.41321,43.81710,11,Ripafratta
+7889,fiduto,10.39785,43.77876,6,Vecchiano
+7890,fiduto,10.26895,43.77950,1,Bocca di Serchio
+7891,fiduto,10.30579,43.83005,1,Torre del Lago
+7892,fiduto,10.25824,43.86587,0,Viareggio 1
+7893,fiduto,10.27998,43.93196,21,Camaiore
+7895,fiduto,10.31371,43.98353,600,Pomezzana
+7896,fiduto,10.27044,44.00326,420,Retignano
+7897,fiduto,10.22738,44.02183,430,Azzano
+7900,fiduto,10.18386,43.97081,5,Ponte Tavole
+7901,fiduto,10.24455,44.03749,1140,Cervaiole
+7904,fiduto,10.86171,43.14422,595,Monterotondo
+7906,fiduto,10.31792,44.00802,390,Cardoso
+7907,fiduto,10.17082,44.02837,477,Cerreto
+7909,fiduto,10.41095,43.70941,6,Pisa (Fac. Agraria)
+7910,fiduto,11.40107,43.84725,392,S. Brigida all'Opaco
+7911,fiduto,11.26040,43.84250,305,Cercina
+7912,fiduto,11.31025,43.83800,225,Caldine
+7913,fiduto,11.26305,43.64665,150,Ferrone
+7914,fiduto,11.29233,43.69458,182,Ugolino
+7916,fiduto,11.07840,44.01985,555,Cantagallo
+7917,fiduto,11.09240,44.06940,752,Gavigno
+7918,fiduto,11.21264,43.94300,421,Le Croci Calenzano
+7919,fiduto,11.15391,43.85910,60,Calenzano
+7920,fiduto,11.09587,43.77093,40,Ponte a Signa
+7922,fiduto,10.85456,43.99375,633,Cireglio
+7923,fiduto,10.82196,43.95190,385,Montagnana
+7924,fiduto,11.00276,43.88279,40,La Ferruccia
+7925,fiduto,11.06869,43.95781,518,Fattoria Iavello
+7926,fiduto,11.37800,43.48428,495,Radda in Chianti
+7927,fiduto,11.23011,43.53622,388,San Donato in Poggio
+7928,fiduto,11.14956,43.61844,308,Tenuta del Corno
+7929,fiduto,11.03483,43.71685,41,Turbone
+7930,fiduto,10.94514,43.72228,25,Empoli
+7931,fiduto,10.95844,43.78404,250,Vinci
+7932,fiduto,11.16614,43.29031,420,Simignano
+7933,fiduto,11.02400,43.34067,263,Casole d'Elsa
+7934,fiduto,11.04020,43.46961,306,S. Gimignano
+7935,fiduto,11.03455,43.54478,65,Certaldo
+7936,fiduto,10.83040,43.68228,102,S. Miniato (Cimitero)
+7937,fiduto,10.73789,43.64622,151,Marti
+7938,fiduto,10.75489,43.97055,790,Serra Pistoiese
+7939,fiduto,10.77096,43.89156,95,Montecatini Terme
+7940,fiduto,10.82436,43.81880,20,Castelmartini
+7941,fiduto,10.90516,43.84335,442,S. Baronto
+7943,fiduto,10.95179,43.44011,607,La Madonnina
+7944,fiduto,10.72368,43.43270,312,Orciatico
+7945,fiduto,10.82905,43.45389,102,Molino d'Era
+7946,fiduto,10.79481,43.53511,194,Ghizzano di Peccioli
+7947,fiduto,10.61169,43.52524,135,Casciana Terme
+7948,fiduto,10.55376,43.74539,890,Monte Serra
+7949,fiduto,10.38985,43.63620,5,Coltano
+7950,fiduto,10.58690,43.64986,4,Gello
+7952,fiduto,10.66397,43.84706,163,Montecarlo
+7953,fiduto,10.65602,43.77267,22,Orentano
+7954,fiduto,10.53842,43.60428,30,Cenaia
+7955,fiduto,10.52731,43.53178,137,Lorenzana
+7956,fiduto,10.35108,43.59822,1,Stagno
+7957,fiduto,10.40278,43.51945,300,Valle Benedetta
+7964,fiduto,10.29858,43.54450,0,Livorno Mareografo
+7975,fiduto,10.33509,43.96725,671,Vallelunga
+7977,fiduto,11.09127,43.64825,117,Montespertoli
+7978,fiduto,10.92595,43.30502,118,Puretta
+7979,fiduto,11.51875,43.88653,148,Dicomano
+8342,fiduto,10.27457,44.02677,840,Terrinca
+8343,fiduto,10.25257,43.99181,351,Gallena
+8345,fiduto,10.16228,43.95379,0,Forte dei Marmi
+8348,fiduto,10.98623,43.21350,440,Anqua
+8349,fiduto,10.16962,44.09272,871,Vergheto
+8350,fiduto,10.16707,44.05652,105,Canevara
+8356,fiduto,10.66875,43.32159,33,Ponte di Monterufoli
+8357,fiduto,10.80612,43.27955,440,Libbiano
+8358,fiduto,11.43770,43.09007,188,Buonconvento
+8361,fiduto,11.55440,43.32743,222,Monastero d'Ombrone
+8362,fiduto,11.16517,42.76297,13,Ponte Tura
+8363,fiduto,11.29905,42.80459,105,Granaione
+8364,fiduto,11.28356,42.93809,70,Paganico
+8365,fiduto,11.54070,42.89071,614,Castel del Piano
+8366,fiduto,11.72372,43.06460,495,Monticchiello
+8367,fiduto,11.69071,42.96571,407,Gallina
+8368,fiduto,11.85188,42.94949,633,Spineta
+8369,fiduto,11.16410,43.01454,504,Roccastrada
+8370,fiduto,11.36360,42.98209,82,Monte Antico
+8371,fiduto,11.49071,43.04904,605,Montalcino
+8372,fiduto,11.32144,43.06079,330,Pari
+8373,fiduto,11.14903,43.07126,470,Torniella
+8374,fiduto,11.27431,43.14828,195,S. Lorenzo a Merse
+8375,fiduto,11.07403,43.19070,380,Montalcinello
+8376,fiduto,11.22876,43.27456,260,Sovicille
+8377,fiduto,11.42403,43.25737,229,Monteroni d'Arbia
+8378,fiduto,11.64863,43.15300,400,Montisi
+8386,fiduto,10.88237,43.04626,231,Massa Marittima
+8387,fiduto,10.81376,43.06833,334,S. Ferdinando
+8389,fiduto,10.92632,42.89158,146,Caldana
+8390,fiduto,10.97777,42.97973,59,Casteani
+8391,fiduto,11.42404,42.79626,484,Cana
+8393,fiduto,11.32829,42.69211,565,Scansano
+8394,fiduto,11.51569,43.41293,409,Madonna a Brolio
+8396,fiduto,11.50462,42.78466,522,Roccalbegna
+8397,fiduto,11.54516,42.58297,330,Manciano
+8398,fiduto,11.23599,42.55202,21,S. Donato
+8399,fiduto,11.48988,42.71658,411,Usi
+8400,fiduto,11.33533,42.54238,16,Marsiliana
+8401,fiduto,11.25379,42.61196,82,Poggio Perotto
+8402,fiduto,11.54275,42.68392,400,Capanne
+8404,fiduto,11.42404,42.64040,170,Torricelle
+8408,fiduto,11.03765,43.10073,500,Campiano
+8409,fiduto,10.12860,44.08199,409,Vara
+8411,fiduto,10.07667,44.06506,55,Carrara
+12032,fiduve,12.04028,46.27778,635,Agordo
+12033,fiduve,12.03306,46.27750,578,Agordo CMT
+12034,fiduve,11.26639,45.31250,24,Albaredo
+12035,fiduve,11.87833,46.50056,1645,Arabba CMT
+12037,fiduve,11.51556,45.88333,1010,Asiago CMT
+12038,fiduve,11.36722,45.84472,338,Astico a Pedescala
+12039,fiduve,11.48917,45.09917,6,Badia Polesine
+12041,fiduve,10.76639,45.51944,165,Bardolino CMT
+12044,fiduve,11.73028,45.77722,125,Barzizza
+12045,fiduve,12.22833,46.12722,346,Belluno
+12046,fiduve,12.24583,46.16500,376,Belluno Aerop. CMT
+12047,fiduve,11.96639,46.35222,769,Biois a Cencenighe
+12048,fiduve,11.78583,45.10056,6,Boara Pisani
+12049,fiduve,12.22222,46.43111,882,Boite a Cancia
+12050,fiduve,11.61861,45.59361,52,Bolzano Vicentino
+12051,fiduve,11.48417,45.24417,20,Borgofrassine
+12052,fiduve,11.03972,45.62028,1050,Boscochiesanuova CMT
+12053,fiduve,11.93500,45.26500,32,Bovolenta
+12054,fiduve,11.63889,45.24444,21,Brancaglia
+12058,fiduve,12.18472,46.34722,884,Campo di Zoldo CMT
+12059,fiduve,11.16667,45.73250,1464,Campogrosso
+12060,fiduve,11.27306,45.87722,1735,Campomolon
+12063,fiduve,11.99083,46.44139,1008,Caprile CMT
+12064,fiduve,11.64389,45.13694,2,Carmignano di brenta
+12065,fiduve,12.50306,46.60528,1960,Casera Coltrondo
+12066,fiduve,12.54083,46.48111,1896,Casera Doana-Razzo
+12067,fiduve,12.47889,46.12028,1505,Casera Palantina
+12068,fiduve,11.30167,45.82056,430,Castana CMT
+12069,fiduve,11.91944,45.67222,47,Castelfranco Veneto
+12070,fiduve,11.94889,45.69583,50,Castelfranco Veneto CMT
+12072,fiduve,11.32694,45.03194,9,Castelnovo Bariano CMT
+12075,fiduve,12.08222,45.13361,12,Cavarzere
+12077,fiduve,11.72750,45.92222,532,Cismon del Grappa
+12078,fiduve,12.05750,46.41750,1900,Col dei Baldi
+12079,fiduve,11.38333,45.30972,27,Cologna Veneta
+12080,fiduve,12.32417,45.88167,59,Conegliano
+12081,fiduve,12.28361,45.88194,83,Conegliano Veneto CMT
+12082,fiduve,12.24861,44.99722,16,Contarina
+12083,fiduve,12.42083,45.93639,59,Cordignano
+12084,fiduve,11.99222,45.82278,173,Cornuda
+12085,fiduve,12.14667,46.51889,1200,Cortina CMT
+12086,fiduve,12.41167,46.46250,841,Domegge CMT
+12087,fiduve,11.72194,45.93972,210,Enego
+12088,fiduve,12.67500,45.55917,12,Eraclea
+12090,fiduve,12.41861,45.68361,11,Fagare'd.Battaglia
+12091,fiduve,11.87111,46.35639,1145,Falcade CMT
+12092,fiduve,12.30833,46.07417,1605,Faverghera
+12093,fiduve,11.90472,46.02139,267,Feltre CMT
+12094,fiduve,11.42556,44.94528,10,Ficarolo
+12095,fiduve,12.44250,45.82250,19,Fontanelle
+12096,fiduve,11.80528,46.00250,1195,Fonzaso
+12097,fiduve,12.41472,46.17167,856,Funes-Bovolenta
+12098,fiduve,11.56333,45.86806,1193,Gallio
+12099,fiduve,12.08806,45.16250,1,Gesia-Cavarzere CMT
+12100,fiduve,12.53889,45.77306,11,Gorgo Monticano
+12101,fiduve,11.17250,45.46111,146,Illasi CMT
+12102,fiduve,12.79972,45.65611,6,La Salute di Livenza
+12103,fiduve,12.32639,46.12167,375,La Secca
+12104,fiduve,11.31417,45.18806,21,Legnago
+12105,fiduve,11.95333,45.34778,8,Legnaro CMT
+12106,fiduve,11.82694,45.50917,52,Limena
+12107,fiduve,11.65083,45.95417,1428,Lisser
+12108,fiduve,11.60306,45.48361,43,Longare
+12109,fiduve,11.38750,45.38889,31,Lonigo
+12110,fiduve,11.37917,45.39111,28,Lonigo CMT
+12111,fiduve,11.52444,45.74000,52,Lugo di Vicenza
+12112,fiduve,11.90528,46.43000,1465,Malga Ciapela CMT
+12113,fiduve,12.44083,46.12000,1183,Malga Col Indes CMT
+12114,fiduve,11.47222,45.87472,1605,Malga Larici
+12115,fiduve,11.95778,46.25222,1735,Malga Losch
+12116,fiduve,11.46556,45.67028,99,Malo CMT
+12117,fiduve,12.61139,45.79056,12,Meduna di Livenza
+12118,fiduve,12.11806,45.43694,5,Mira CMT
+12119,fiduve,12.30639,45.58250,5,Mogliano Veneto CMT
+12121,fiduve,10.86056,45.76750,1760,Monte Baldo
+12122,fiduve,12.17556,46.52833,2240,Monte Faloria CMT
+12123,fiduve,11.78361,45.86250,1545,Monte Grappa
+12124,fiduve,12.24528,46.60444,2265,Monte Piana
+12125,fiduve,11.06917,45.68250,1620,Monte Tomba
+12126,fiduve,11.28722,45.41389,60,Monteforte I.
+12127,fiduve,11.28528,45.41389,45,Monteforte P.
+12128,fiduve,11.67028,45.43556,25,Montegalda
+12129,fiduve,12.61639,45.77417,11,Motta di Livenza
+12130,fiduve,12.20778,45.83056,90,Nervesa d.Battaglia
+12132,fiduve,11.88556,46.47583,2250,Ornella
+12133,fiduve,12.02250,46.51556,2105,Passo Falzarego
+12136,fiduve,10.69694,45.44111,63,Peschiera Navigarda
+12137,fiduve,12.52139,46.53750,839,Piave a Ponte Lasta
+12141,fiduve,11.37611,45.50500,120,Ponte Arzignano
+12144,fiduve,11.36889,45.58306,159,Ponte Brogliano
+12146,fiduve,12.52528,45.71806,6,Ponte di Piave CMT
+12147,fiduve,11.39139,45.49306,80,Ponte Gua'
+12148,fiduve,11.53667,45.57472,46,Ponte Marchese
+12149,fiduve,12.12722,46.14556,351,Ponte Mas
+12151,fiduve,12.36500,45.04306,13,Porto Levante
+12153,fiduve,12.53639,45.85056,15,Portobuffole'
+12154,fiduve,12.83750,45.78639,8,Portogruaro
+12155,fiduve,12.76250,45.74611,2,Portogruaro CMT
+12158,fiduve,11.82222,46.35667,2200,Pradazzo
+12159,fiduve,12.36972,44.91833,0,Pradon CMT
+12160,fiduve,11.63139,45.57000,33,Quinto Vicentino CMT
+12161,fiduve,12.08306,46.53639,2615,Ra Valles
+12162,fiduve,11.21167,45.69583,500,Recoaro Terme
+12163,fiduve,11.17917,45.71833,1131,Rifugio La Guardia CMT
+12164,fiduve,12.40389,46.17278,1255,Roncadin
+12165,fiduve,11.25500,45.26694,20,Roverchiara CMT
+12166,fiduve,11.52472,45.52639,43,S.Agostino
+12167,fiduve,11.26500,45.38778,30,S.Bonifacio
+12168,fiduve,12.56528,45.61139,12,S.Dona'di Piave
+12171,fiduve,11.40833,45.19806,20,S.Salvaro
+12173,fiduve,12.55556,46.55972,895,S.Stefano di Cadore CMT
+12175,fiduve,11.29194,45.40278,38,S.Vito Veronese
+12179,fiduve,11.18250,45.60972,936,San Bortolo CMT
+12180,fiduve,11.82694,45.03500,2,Sant'Apollinare CMT
+12181,fiduve,12.70917,46.55472,1265,Sappada CMT
+12182,fiduve,11.95250,45.91806,214,Segusino
+12183,fiduve,11.00972,45.21889,24,Sorga' CMT
+12186,fiduve,11.99778,45.40250,9,Stra
+12187,fiduve,11.67806,45.34333,158,Teolo CMT
+12188,fiduve,12.24694,45.65444,47,Treviso
+12189,fiduve,12.22222,45.68194,20,Treviso Citta' CMT
+12190,fiduve,11.56472,45.14833,20,Valli Mocenighe
+12191,fiduve,11.65417,45.85083,160,Valstagna
+12192,fiduve,12.39861,45.83833,39,Vazzola
+12193,fiduve,11.72222,45.44528,21,Veggiano
+12194,fiduve,12.48444,45.45861,1,Venezia-Treporti CMT
+12195,fiduve,11.00083,45.44222,66,Verona
+12196,fiduve,11.54722,45.54111,33,Vicenza
+12197,fiduve,10.83361,45.37333,66,Villafranca Veronese CMT
+12198,fiduve,11.72778,45.83444,1167,Villaggio del Sole
+12199,fiduve,11.44472,45.45167,49,Vo di Brendola
+12200,fiduve,11.61694,45.32528,17,Vo Vecchio
+12201,fiduve,11.91389,45.37778,12,Voltabarozzo Valle
+12940,fiduve,12.00139,45.05389,7,Baricetta
+12941,fiduve,12.00140,45.05389,7,Baricetta 1
+12942,fiduve,13.07722,45.64056,1,Bibione CMT
+12943,fiduve,12.34000,45.95944,97,Borgo Campion
+12944,fiduve,11.72806,44.99694,8,Bussari
+12945,fiduve,11.72807,44.99694,8,Bussari 1
+12946,fiduve,11.49611,45.03139,10,Canda
+12947,fiduve,11.49612,45.03139,10,Canda 1
+12948,fiduve,12.27611,45.14389,-1,Chioggia S.Anna CMT
+12949,fiduve,12.70722,45.60250,-1,Eraclea CMT
+12950,fiduve,12.11722,45.95639,286,Follina CMT
+12951,fiduve,12.49361,45.89139,18,Gaiarine CMT
+12952,fiduve,10.92361,45.54722,296,Marano di Valpolicella CMT
+12953,fiduve,12.24611,45.98667,332,Nogarolo di Tarzo
+12954,fiduve,11.33583,45.80583,405,Posina a Stancari
+12955,fiduve,11.33585,45.80583,405,Posina a Stancari 1
+12956,fiduve,11.77639,45.71583,85,Rosa' CMT
+12957,fiduve,11.75722,45.14528,9,Stanghella
+12958,fiduve,11.75723,45.14528,9,Stanghella 1
+12959,fiduve,11.18500,45.71167,705,Turcati Recoaro CMT
+12960,fiduve,12.20639,46.44250,968,Villanova CMT
+12961,fiduve,12.30028,45.99083,132,Vittorio Veneto
+12962,fiduve,12.11306,45.78444,125,Volpago CMT
+5419,fiduve,11.75626,44.95926,9,Polesella
+11216,freati,10.47312,44.65319,135,RE7901
+11217,freati,10.75434,44.82403,25,RE1500
+11219,freati,10.86132,44.58855,65,MO7201
+11220,freati,09.89475,44.92700,85,PC2702
+11221,freati,10.79600,44.57249,92,MO8100
+11223,freati,10.18290,44.82655,63,PRB300
+11225,freati,09.73427,44.99069,80,PC9600
+11227,freati,10.32199,44.78126,66,PR3200
+11228,freati,11.47105,44.47901,47,BO5501
+11230,freati,11.37351,44.55841,28,BO2800
+11232,freati,10.51723,44.71979,58,RE2500
+11234,freati,11.13449,44.79182,17,MO4301
+11239,freati,10.15216,44.84458,63,PRB400
+11815,freati,11.30221,44.51758,39,BOF800
+11816,freati,11.28145,44.68331,19,BOF900
+11817,freati,11.74259,44.35956,36,BOG000
+11818,freati,09.65609,45.05161,59,PC5603
+11819,freati,10.21459,44.86725,46,PR2302
+11821,freati,11.31711,44.93866,8,FE8100
+11822,freati,11.28082,44.94640,9,FE8000
+11823,freati,11.23662,44.85375,11,MO4801
+11824,freati,11.06369,44.52912,65,MO6400
+11825,freati,11.07821,44.88130,17,MO8000
+11828,freati,12.46031,44.03229,50,RN0300
+3721,icirfe,12.11928,44.94309,4,Ariano ETGFE
+3722,icirfe,11.99997,44.92927,1,Avanzarola
+3723,icirfe,11.72018,44.84849,8,Baura
+3724,icirfe,11.99852,44.98003,6,Berra
+3726,icirfe,12.12128,44.81052,1,Campello
+3727,icirfe,11.85792,44.86898,1,Chiavica Ruffa
+3728,icirfe,11.89685,44.93223,1,Cipriano
+3729,icirfe,11.87623,44.93099,2,Coccanile
+3730,icirfe,12.24842,44.81420,3,Giralda
+3731,icirfe,11.49623,44.91465,6,La Valletta
+3733,icirfe,12.18612,44.92403,1,Monticelli
+3734,icirfe,11.59973,44.88506,5,Nicolino
+3735,icirfe,11.92089,44.83853,1,Pioppo
+3737,icirfe,12.13043,44.86397,1,Ponte Prati
+3738,icirfe,12.04405,44.86796,1,Ponte Vicini
+3739,icirfe,11.54589,44.87179,7,Pontisette
+3740,icirfe,12.07329,44.90842,-2,Seminato
+3741,icirfe,12.21043,44.88678,1,Vallona Nuova
+11282,libere,10.80601,44.63711,54,Marzaglia
+12618,libere,11.65107,44.24762,164,Valsenio
+12619,libere,11.71961,44.23305,208,Vespignano
+12635,libere,10.37523,44.93058,32,Colorno AIPO
+12695,libere,11.72671,44.62220,6,Marmorta
+12696,libere,11.60264,44.45834,45,Castel San Pietro Gaiana
+12697,libere,11.54998,44.52203,30,Budrio Dondina
+12698,libere,11.42939,44.49023,51,Castenaso Villanova
+12699,libere,11.72418,44.39725,28,Sasso Morelli Beghina
+12700,libere,11.59497,44.59803,10,Budrio Rotta del Giardino
+12701,libere,11.52000,44.50927,46,Budrio Prunaro
+12709,libere,10.99703,44.62283,39,Ponte Sant'Ambrogio
+12712,libere,10.40761,44.62255,158,Guardasone
+12715,libere,10.09278,44.69725,139,Ramiola
+12733,libere,10.75452,45.04432,29,Borgoforte
+12765,libere,09.99581,45.12783,45,Cremona
+12865,libere,12.09440,44.56347,0,ANITA
+12866,libere,11.89580,44.96800,3,BERRA
+12867,libere,11.33721,44.92165,10,BONDENO
+12868,libere,11.80549,44.88458,5,COPPARO
+12869,libere,11.51165,44.88598,9,DIAMANTINA
+12870,libere,11.93436,44.88272,0,JOLANDADISAVOIA
+12871,libere,11.86753,44.77296,3,MEDELANA
+12872,libere,12.22139,44.89506,0,MESOLA
+12873,libere,11.72157,44.66825,7,OSPITALMONACALE
+12874,libere,11.94272,44.74781,2,OSTELLATO
+12875,libere,11.48317,44.74960,12,POGGIORENATICO
+12876,libere,12.20488,44.81340,0,POMPOSA-VOLANO
+12877,libere,11.74901,44.81822,5,QUARTESANA
+12878,libere,11.60660,44.74143,11,SANBARTOLOMEO
+12879,libere,11.67319,44.68607,9,SANTAMARIACODIFIUME
+3000,libere,11.08455,44.34680,691,Ca' Bortolani
+3007,libere,11.28812,44.48787,54,Casalecchio canonica
+3092,libere,12.39516,44.19904,2,Museo delle barche
+3138,libere,11.42158,44.48386,51,Ponte Caselle
+3139,libere,11.37757,44.54504,35,La Dozza
+3140,libere,11.81481,44.39378,25,Mordano
+3146,libere,11.21123,44.35856,121,Panico Reno
+3147,libere,11.21116,44.35878,121,Panico canale
+3149,libere,11.62513,44.67307,9,Gandazzolo Reno
+3150,libere,11.62491,44.67293,9,Gandazzolo Savena
+3152,libere,11.84727,44.59196,15,Beccara Nuova Reno
+3153,libere,11.87520,44.57745,10,Ponte Bastia
+3159,libere,11.29202,44.26827,540,Loiano Ponte Savena
+3165,libere,11.19653,44.55208,39,Anzola Ghironda
+3166,libere,11.41918,44.63210,19,Bentivoglio
+3181,libere,10.81495,44.65855,38,Rubiera casse monte
+5307,libere,12.22282,44.57541,6,Volta Scirocco monte
+5313,libere,11.28766,44.82459,20,Foscaglia 2
+5314,libere,11.27237,44.66547,24,Sostegno Reno
+5323,libere,10.44642,44.72830,75,Casse Espansione Enza SIAP
+5327,libere,10.04911,44.86984,79,Fidenza SIAP
+5339,libere,11.00948,44.60693,42,San Cesario SIAP
+5356,libere,11.42536,44.25360,708,Casoni di Romagna
+5367,libere,11.41434,44.88300,13,Bondeno Panaro
+5392,libere,10.67311,44.19013,1371,Doccia di Fiumalbo
+5433,libere,10.77079,44.54859,122,Ponte Veggia
+5434,libere,10.81881,44.27258,367,Ponte Val di Sasso
+5435,libere,10.61366,44.37378,339,Ponte Dolo
+5436,libere,10.96231,44.58855,44,San Donnino
+5437,libere,11.13509,44.78670,28,Camposanto
+5438,libere,10.96490,44.85676,32,Pioppa
+5442,libere,10.78707,44.42886,826,Serramazzoni
+5443,libere,12.39517,44.19904,2,Museo delle barche
+5444,libere,12.40349,44.20183,1,Cesenatico porto
+5445,libere,12.39269,44.16415,10,Due Tigli
+5446,libere,12.34962,44.19069,6,Mesola
+5448,libere,10.99531,44.66995,36,Navicello
+5522,libere,10.45405,44.84397,34,Sorbolo
+5523,libere,10.63976,44.85363,31,Santa Vittoria
+5524,libere,11.36519,44.45378,92,San Ruffillo Savena
+5550,libere,12.39571,44.23237,2,Cesenatico allacciamento
+5582,libere,11.36644,44.45353,92,San Ruffillo canale
+6251,libere,11.92381,44.27592,32,Reda Faenza
+7331,libere,10.34959,44.94378,29,Colorno
+7332,libere,10.08311,44.89347,58,Fidenza
+7333,libere,10.20620,44.70305,276,Maiatico
+7334,libere,10.25933,44.95225,32,Sissa
+7353,libere,10.35704,44.64273,258,Sivizzano
+7354,libere,10.14737,44.74272,104,Medesano
+7355,libere,10.22581,44.87717,42,Grugno
+7356,libere,10.25851,44.64820,347,Casatico
+12626,piattaforme,12.51139,44.52250,10,Garibaldi A.
+12627,piattaforme,12.27083,44.47944,5,Piomboni_Elisup
+12628,piattaforme,12.34361,44.39111,25,Angelina
+12629,piattaforme,12.66083,44.40500,10,Amelia A.
+12630,piattaforme,13.78167,44.07694,30,Barbara
+12631,piattaforme,13.71222,43.82722,10,Clara W
+12669,renana,11.82311,44.61130,5,Bassarone idro Saiarino
+12719,renana,11.28030,44.53420,36,Canocchia Botte monte
+12720,renana,11.16780,44.52030,38,Fondo Martignone
+12721,renana,11.26860,44.65390,22,Cassa Dosolo
+2984,renana,11.56957,44.67442,14,Travallino
+2985,renana,11.65006,44.64899,11,Alberino
+2986,renana,11.36710,44.67466,24,San Giorgio Deserto
+2988,renana,11.42263,44.74405,15,Madonna
+2989,renana,11.52265,44.71796,12,Malalbergo
+2990,renana,11.69647,44.43479,29,Molinetto
+2991,renana,11.56922,44.54052,18,Budrio Olmo
+2993,renana,11.36817,44.53397,42,Dozza
+2994,renana,11.39303,44.34746,411,Monte Ceresa
+2995,renana,11.34155,44.26352,675,Loiano
+2997,renana,11.71696,44.56532,10,Sant'Antonio Renana
+3008,renana,11.52486,44.41408,87,Varignana 2 lago
+3064,renana,11.81265,44.62251,8,Saiarino meteo
+3151,renana,11.84710,44.59188,15,Beccara Nuova Botte
+3154,renana,11.82300,44.61111,5,Bassarone cassa
+3155,renana,11.61491,44.53533,21,Massarolo
+3156,renana,11.72960,44.45013,25,Correcchio Sillaro
+3157,renana,11.72971,44.45019,25,Correcchio
+3161,renana,11.26022,44.68484,28,Bagnetto Canale
+3163,renana,11.27232,44.66517,24,Sostegno canale
+3164,renana,11.18259,44.57909,41,Paltrone Samoggia
+5303,renana,11.51056,44.47195,41,Centonara
+5304,renana,11.86149,44.57819,15,Chiavica Bastia Sillaro
+5311,renana,11.26059,44.68506,28,Bagnetto Mandracchio
+5312,renana,11.23154,44.61259,35,Impianto Forcelli canale
+5315,renana,11.18244,44.57900,41,Paltrone Martignone
+5343,renana,11.00875,44.37632,700,Monteombraro
+5363,renana,11.86124,44.57820,15,Chiavica Bastia canale
+5369,renana,11.23172,44.61270,28,Impianto Forcelli Mandracchio
+5370,renana,11.23298,44.61295,33,Impianto Forcelli Lavino
+5371,renana,11.18247,44.57905,41,Paltrone Mandracchio
+5384,renana,11.15124,44.48405,125,San Martino in Casola
+11099,rer,12.43751,44.06832,38,Santarcangelo di Romagna
+11100,rer,12.64204,43.91441,79,Morciano di Romagna
+11101,rer,12.34870,43.93981,163,Pietracuta
+11102,rer,11.50303,44.40798,99,Palesio
+11103,rer,12.27411,43.81986,629,Pennabilli
+11104,rer,12.73940,43.95847,5,Cattolica
+11105,rer,12.44649,43.93753,680,San Marino
+11109,rer,09.59791,44.69632,995,Groppallo
+11110,rer,11.49457,44.38998,276,Prugnolo
+11837,rer,09.60321,44.54027,712,Ponteceno
+12411,rer,11.29836,44.47870,286,Bologna San Luca
+12459,rer,12.21161,44.68840,1,Guagnino
+12461,rer,10.80903,44.11918,1794,Lago Scaffaiolo
+12462,rer,09.90647,44.93026,77,Fiorenzuola d'Arda
+12479,rer,12.54549,44.05651,10,Rimini Ausa
+12480,rer,09.37863,44.71112,322,Marsaglia
+12633,rer,11.50833,44.21417,183,Castel del Rio
+12639,rer,10.98334,44.91082,30,Concordia sulla Secchia
+12668,rer,10.81511,44.65863,38,Rubiera casse valle
+12710,rer,09.77124,45.00949,71,Pontenure
+12994,rer,11.31083,44.45556,194,Paderno
+12996,rer,09.53778,45.01694,81,Luretta
+12997,rer,11.69139,44.14833,226,San Cassiano sul Lamone
+13023,rer,11.31472,44.48000,76,Ravone
+13034,rer,10.33214,44.47766,423,Vetto Pluvio
+13035,rer,10.35510,44.53261,273,Cedogno
+13036,rer,09.33395,44.90540,280,Ponte Nibbiano Tidoncello
+3001,rer,10.90557,44.05404,620,Pracchia
+3004,rer,11.22257,44.22625,460,Invaso
+3011,rer,10.76872,44.23212,985,Sestola
+3012,rer,10.57724,44.19428,1083,Pievepelago
+3013,rer,10.82826,44.31957,687,Pavullo
+3014,rer,09.49596,44.64447,656,Ferriere Pluvio
+3015,rer,09.73284,44.63379,597,Bardi
+3016,rer,09.62675,44.50745,521,Bedonia
+3017,rer,10.39470,44.43487,729,Castelnovo ne' Monti
+3018,rer,10.57566,44.29575,1091,Frassinoro
+3019,rer,10.19253,44.36343,998,Succiso
+3020,rer,10.16217,44.42836,597,Isola Palanzano
+3021,rer,10.00854,44.41229,1252,Lagdei
+3022,rer,10.04746,44.47342,618,Marra
+3024,rer,10.26109,44.60414,297,Langhirano
+3025,rer,10.12452,44.60591,381,Calestano
+3028,rer,10.55893,44.90633,30,Boretto
+3029,rer,11.87182,44.07154,670,Monte Grosso
+3030,rer,11.73784,44.22699,370,Rontana
+3031,rer,12.03572,43.84597,1200,Corsicchie
+3032,rer,11.66516,44.00181,750,Pratacci
+3033,rer,11.94530,43.99349,460,Civitella
+3035,rer,11.99295,44.26279,26,Ponte Braldo
+3036,rer,12.16992,44.21506,21,Santa Maria Nova
+3037,rer,11.61388,44.07741,350,Marradi
+3039,rer,11.87488,44.19758,250,Lodolone
+3040,rer,11.65293,44.13487,705,Monte Romano
+3041,rer,11.80490,44.02939,405,Vallicelle
+3042,rer,12.04326,44.03248,270,Voltre
+3043,rer,11.90114,43.90358,600,Lastra
+3044,rer,11.83704,44.13657,570,Trebbio
+3045,rer,12.16866,43.99691,365,Monte Iottone
+3046,rer,12.07693,43.94648,600,Rullato
+3047,rer,12.19345,43.89269,570,Maiano
+3048,rer,12.20682,44.08571,175,Roversano
+3049,rer,11.51258,44.12958,858,Bibbiana
+3050,rer,11.79330,43.92426,735,Corniolo
+3051,rer,12.03134,44.33002,20,Ponte Vico
+3052,rer,12.11085,44.29769,14,Coccolia
+3053,rer,12.23401,44.23218,19,Matellica
+3054,rer,11.51757,44.03811,750,Casaglia
+3055,rer,11.94940,44.17012,66,Castrocaro
+3056,rer,11.95766,43.92264,685,Montriolo
+3057,rer,11.78295,44.29424,51,Tebano
+3058,rer,12.00404,44.11438,370,Caminate
+3060,rer,11.25681,44.21571,900,Madonna dei Fornelli
+3062,rer,10.88741,44.13638,900,Monteacuto delle Alpi
+3077,rer,09.20825,44.53393,744,Diga del Brugneto
+3078,rer,10.13845,44.34580,1151,Lago Paduli
+3080,rer,09.15454,44.51485,769,Torriglia
+3094,rer,11.24785,44.38151,105,Sasso Marconi
+3095,rer,11.28243,44.47318,65,Casalecchio chiusa
+3096,rer,11.08392,44.50828,82,Bazzano
+3097,rer,11.33990,44.37101,174,Pianoro
+3098,rer,11.29579,44.72121,26,Cento
+3099,rer,11.44087,44.92781,17,Opera Po
+3100,rer,11.43922,44.44914,64,Pizzocalvo
+3101,rer,11.28208,44.48023,54,Casalecchio tiro a volo
+3102,rer,11.58841,44.38103,74,Castel San Pietro
+3103,rer,11.61588,44.28425,70,Codrignano
+3104,rer,11.11313,44.28780,193,Vergato
+3105,rer,11.82482,44.31006,42,Castelbolognese
+3106,rer,11.28110,44.47563,63,Casalecchio canale
+3107,rer,11.71154,44.57611,18,Accursi Idice
+3108,rer,11.71165,44.57626,18,Accursi cassa
+3109,rer,11.78024,44.57965,15,Brocchetti
+3110,rer,11.78040,44.57979,15,Brocchetti cassa
+3111,rer,11.80184,44.57891,15,Cardinala Idice
+3112,rer,11.80191,44.57904,19,Cardinala Cassa
+3113,rer,11.86129,44.57933,14,Chiavicone Idice
+3114,rer,11.86156,44.57932,15,Chiavicone Reno
+3115,rer,11.33286,44.50636,37,Bova
+3116,rer,11.34978,44.76419,26,Dosso
+3117,rer,11.36893,44.77849,24,Opera Reno Panfilia
+3118,rer,11.37077,44.78259,16,Secondo Salto
+3119,rer,11.43194,44.87750,11,Burana
+3120,rer,11.54538,44.72410,21,Gallo
+3121,rer,11.34825,44.54028,28,Arcoveggio
+3122,rer,11.13301,44.54736,50,Calcara
+3123,rer,11.23758,44.62196,24,Forcelli
+3124,rer,11.22104,44.49076,75,Lavino di Sopra
+3125,rer,11.23027,44.58426,36,Lavino di Sotto
+3126,rer,11.36633,44.55741,25,Castelmaggiore
+3127,rer,11.47251,44.63905,18,Casoni
+3128,rer,11.47017,44.50748,38,Castenaso
+3129,rer,11.59537,44.57810,23,San Martino in Argine
+3130,rer,11.70609,44.57480,17,Sant'Antonio
+3131,rer,11.73595,44.45876,24,Sesto Imolese
+3132,rer,11.76422,44.52811,19,Portonovo
+3133,rer,11.86575,44.43880,20,Sant'Agata
+3134,rer,11.88402,44.51584,17,San Bernardino
+3135,rer,11.94246,44.38305,25,Cotignola
+3136,rer,11.96830,44.46538,18,Fusignano
+3137,rer,12.04777,44.50393,14,Alfonsine
+3141,rer,11.31382,44.60927,32,Bonconvento
+3142,rer,10.97730,44.15404,352,Porretta Terme
+3143,rer,11.71292,44.34535,42,Imola
+3145,rer,11.22350,44.22091,480,Sambro
+3148,rer,11.44114,44.63232,18,Saletto
+3170,rer,09.91691,44.82072,189,Vigoleno
+3172,rer,09.84219,44.51406,354,Ostia Parmense
+3173,rer,09.56966,44.71211,436,Farini
+3174,rer,10.09950,44.48728,544,Corniglio
+3176,rer,11.88666,44.24182,52,Rivalta RA
+3177,rer,09.49864,44.64368,629,Ferriere Idro
+3179,rer,10.35273,44.52437,296,Compiano
+3182,rer,12.27984,44.32450,6,Bevano Adriatica
+3183,rer,12.17701,44.05077,72,Borello
+3184,rer,12.29599,44.11339,40,Calisese
+3185,rer,12.26090,44.25901,14,Castiglione
+3187,rer,12.23505,44.13971,31,Cesena
+3189,rer,11.89148,44.28688,37,Faenza
+3190,rer,12.02757,44.22698,30,Forli'
+3193,rer,12.19660,43.95814,125,Mercato Saraceno
+3194,rer,12.08286,44.46959,12,Mezzano
+3195,rer,11.79515,44.15966,168,Modigliana
+3198,rer,12.00957,44.16385,56,Ponte Calanca
+3200,rer,11.96682,44.33147,27,Pieve Cesato
+3201,rer,11.98305,44.10502,124,Predappio
+3202,rer,12.09518,43.89215,247,Quarto
+3203,rer,12.27311,44.39398,5,Rasponi
+3204,rer,11.94276,44.30650,26,Reda
+3205,rer,10.59917,44.65546,94,Rivalta RE
+3206,rer,11.84440,44.06079,212,Rocca San Casciano
+3207,rer,12.08668,44.20306,26,Ronco
+3208,rer,12.17268,44.36791,11,San Bartolo
+3210,rer,12.16847,44.38896,11,San Marco
+3212,rer,11.90515,43.94133,258,Santa Sofia
+3213,rer,12.21407,44.25728,10,San Zaccaria
+3214,rer,11.82146,44.24466,57,Sarna
+3215,rer,12.39636,44.09379,30,Savignano
+3216,rer,12.29549,44.30563,10,Savio
+3217,rer,11.70181,44.18521,154,Strada Casale
+3219,rer,12.08492,44.09148,79,Teodorano
+3776,rer,09.99307,44.50358,803,Berceto Baganza
+3794,rer,09.64382,44.87378,207,Ponte dell'Olio
+3795,rer,09.81211,44.65100,341,Ponte Lamberti
+3798,rer,09.73773,44.47476,422,Pradella
+5301,rer,09.38369,44.75510,272,Bobbio
+5316,rer,11.19663,44.55208,37,Anzola
+5317,rer,09.45005,44.54591,1007,Santo Stefano d'Aveto
+5340,rer,10.98734,44.74755,38,Ponte Bacchello
+5342,rer,10.97047,44.18306,339,Silla
+5345,rer,11.16931,44.10962,794,Cottede
+5346,rer,11.37449,44.12187,476,Firenzuola
+5347,rer,11.43299,44.21480,500,Piancaldoli
+5348,rer,11.54710,44.11515,500,Palazzuolo sul Senio
+5358,rer,12.54197,44.06141,10,Rimini SS16
+5359,rer,12.40581,43.98105,116,Ponte Verucchio
+5360,rer,12.14274,43.78817,720,Casteldelci
+5368,rer,11.26147,44.68542,28,Bagnetto Reno
+5385,rer,10.67408,44.25940,971,Sassostorno
+5391,rer,09.61004,44.54710,855,Nociveglia
+5393,rer,11.60807,44.88830,8,Pontelagoscuro
+5398,rer,10.10208,44.36949,1339,Lago Ballano
+5400,rer,10.34493,44.31699,900,Ligonchio
+5401,rer,10.31376,44.58338,513,Neviano Arduini
+5402,rer,09.68641,44.41878,656,Montegroppo
+5404,rer,09.43104,44.93712,410,Pianello Val Tidone
+5405,rer,10.03353,44.43901,902,Bosco di Corniglio
+5406,rer,09.99125,44.81901,146,Salsomaggiore
+5407,rer,09.48070,44.43751,853,Casoni di Santa Maria di Taro
+5408,rer,10.49072,44.52991,729,La Stella
+5409,rer,10.42750,44.29792,1148,Febbio
+5410,rer,10.57014,44.34987,703,Farneta
+5411,rer,10.65364,44.43344,247,Lugo
+5412,rer,10.27119,44.34475,832,Collagna
+5413,rer,10.94206,44.27692,920,Montese
+5414,rer,10.92266,44.35660,226,Ponte Samone
+5415,rer,11.04508,44.72716,32,Bomporto
+5416,rer,09.33012,44.64025,462,Trebbia Valsigiara
+5417,rer,09.70554,45.06052,55,Piacenza
+5420,rer,12.12215,44.94290,4,Ariano
+5422,rer,10.52302,44.40934,367,Ponte Cavola
+5423,rer,09.98301,44.51048,758,Berceto
+5424,rer,10.46004,44.36252,704,Villa Minozzo
+5429,rer,12.13623,43.69223,850,Badia Tedalda
+5430,rer,12.06155,44.12146,60,Meldola
+5431,rer,12.19984,44.09098,54,San Carlo
+5439,rer,11.57899,44.27467,98,Borgo Tossignano
+5440,rer,11.58750,44.24923,486,Le Taverne
+5450,rer,11.03537,44.26117,623,Riola di Labante
+5451,rer,11.49065,44.31916,166,San Clemente
+5452,rer,11.39823,44.06089,720,Barco
+5454,rer,11.49792,44.13737,929,Monte Faggiola
+5455,rer,11.67395,44.22576,480,Monte Albano
+5458,rer,11.32130,44.21958,825,Monghidoro
+5459,rer,11.03296,44.08158,650,Treppio
+5463,rer,10.69920,44.52372,302,San Valentino
+5464,rer,10.27561,44.41144,798,Ramiseto
+5465,rer,10.44676,44.48442,751,Predolo
+5466,rer,10.17835,44.49854,982,Musiara Superiore
+5467,rer,10.27555,44.52122,649,Campora di Sasso
+5468,rer,10.09289,44.43826,980,Grammatica
+5469,rer,10.03564,44.54781,834,Casaselvatica
+5470,rer,09.63362,44.79551,600,Bettola
+5471,rer,09.48245,44.58677,1109,Selva Ferriere
+5472,rer,09.57935,44.63617,881,Cassimoreno
+5473,rer,10.46494,44.40260,397,Gatta
+5475,rer,10.23579,44.43978,474,Selvanizza
+5477,rer,10.27386,44.61239,263,Langhirano idro
+5478,rer,10.31883,44.79011,65,Parma Ponte Nuovo
+5481,rer,10.17139,44.63485,309,Marzolara
+5482,rer,09.70231,44.76274,662,San Michele
+5483,rer,09.61803,44.44668,852,Tarsogno
+5484,rer,10.02363,44.73340,434,Varano Marchesi
+5485,rer,09.44062,44.96427,154,Pianello Val Tidone idro
+5486,rer,09.52977,45.05668,65,Rottofreno
+5487,rer,09.40532,44.63271,408,Salsominore
+5488,rer,09.86695,44.99210,57,Saliceto
+5489,rer,09.81353,44.90883,116,Ciriano
+5490,rer,09.58211,44.90039,148,Rivergaro
+5491,rer,09.63055,44.49151,491,Tornolo
+5492,rer,10.22464,44.82263,64,Parma Ovest
+5493,rer,10.16946,44.80862,80,Noceto
+5494,rer,10.25430,44.91689,42,San Secondo
+5498,rer,10.89934,44.66967,43,Ponte Alto
+5499,rer,10.51634,44.23713,1219,Piandelagotti
+5500,rer,10.66763,44.43004,250,Rossenna
+5501,rer,10.81780,44.17740,1319,Lago Pratignano
+5502,rer,10.63017,44.21530,737,Pievepelago idro
+5503,rer,10.79909,44.20386,512,Fanano
+5504,rer,10.94756,44.67946,32,Modena Naviglio
+5505,rer,10.79554,44.65039,57,Rubiera SS9
+5506,rer,10.88088,44.51288,150,Gorzano
+5507,rer,11.03000,44.53398,72,Spilamberto
+5508,rer,10.64917,44.17934,944,Fiumalbo
+5509,rer,10.46579,44.24716,1051,Civago
+5510,rer,10.31667,44.29696,1150,Ospitaletto
+5511,rer,10.58119,44.77880,38,Cadelbosco
+5512,rer,10.46582,44.56589,516,Canossa
+5513,rer,10.47426,44.63327,173,Quattro Castella
+5514,rer,10.56793,44.62402,136,Puianello
+5516,rer,10.79000,44.64804,54,Rubiera Tresinaro
+5517,rer,10.23743,44.43794,483,Selvanizza-Enza
+5518,rer,10.32527,44.46697,381,Lonza
+5519,rer,10.32998,44.49342,342,Vetto
+5520,rer,09.49020,44.87760,552,Bobbiano
+5525,rer,09.33274,44.90506,278,Ponte Nibbiano
+5526,rer,09.72244,44.86971,202,Veggiola
+5527,rer,09.83200,44.81988,216,Lugagnano
+5528,rer,09.67559,44.81916,419,Riglio
+5529,rer,09.33254,44.83864,586,Romagnese
+5530,rer,09.79735,44.94252,87,Montanaro
+5531,rer,09.77587,44.75198,349,Case Bonini
+5532,rer,10.11014,44.91614,53,Castellina di Soragna
+5533,rer,10.10614,44.88287,61,Toccalmatto
+5534,rer,10.09579,44.69547,142,Fornovo
+5535,rer,09.76684,44.59269,541,Noveglia
+5536,rer,09.93469,44.72718,434,Pellegrino
+5537,rer,09.86698,44.62948,803,Pessola
+5538,rer,09.63400,44.61946,689,Pione
+5539,rer,09.98511,44.81497,154,Salsomaggiore sul Ghiara
+5540,rer,10.38135,44.51770,571,Roncovetro
+5541,rer,10.72977,44.34365,754,Polinago
+5544,rer,09.68524,44.69503,1077,Teruzzi
+5545,rer,09.49708,44.81869,240,Perino
+5547,rer,09.23149,44.86567,575,Valverde
+5548,rer,09.54738,44.52711,925,Casalporino
+5549,rer,09.88653,44.56880,556,Mormorola
+5551,rer,10.32468,44.80548,58,Parma Ponte Verdi
+5552,rer,09.78830,44.71422,800,Bore
+5553,rer,09.69847,44.44686,495,Albareto Parma
+5554,rer,09.67953,44.56668,787,Farfanaro
+5555,rer,09.82106,44.64942,451,Varsi
+5556,rer,09.78421,44.44414,762,Valdena
+5558,rer,09.58508,44.58157,824,Frassineto
+5559,rer,10.99243,44.43249,456,Guiglia
+5560,rer,10.60571,44.49907,550,Baiso
+5561,rer,09.34647,44.49520,848,Cabanne
+5562,rer,11.13837,44.44030,291,Monte San Pietro
+5563,rer,11.63234,44.22714,154,Casola Valsenio
+5564,rer,11.04081,44.13444,472,Suviana
+5565,rer,09.23553,44.60370,849,Alpe Gorreto
+5566,rer,09.24207,44.48098,1116,Barbagelata
+5567,rer,09.72550,44.82510,341,Gropparello
+5568,rer,09.28496,44.57337,745,Rovegno
+5569,rer,10.48864,44.20976,1535,Passo delle Radici
+5570,rer,10.67689,44.59550,98,Ca' de Caroli
+8433,rer,11.34677,44.49420,148,Bologna Torre Asinelli
+9889,rer,12.29318,44.03796,278,Santa Paola
+12465,romacq,11.83771,43.83175,715,Lama
+12466,romacq,11.74720,43.87178,1060,Campigna
+12467,romacq,11.83866,43.87008,565,Diga di Ridracoli
+12468,romacq,11.89186,43.92525,295,Capaccio
+12469,romacq,11.82058,43.87728,565,Bacine IDRO
+12470,romacq,11.82059,43.87728,565,Bacine GRONDA
+12471,romacq,11.78121,43.89252,570,Campigna IDRO
+12473,romacq,11.77881,43.90596,572,Celle IDRO
+12474,romacq,11.79916,43.90315,476,Corniolo
+12475,romacq,11.74772,43.94760,560,Fiumicello idro valle
+12476,romacq,11.74773,43.94760,566,Fiumicello idro deriv.
+12477,romacq,11.74827,43.94813,560,Fiumicello Q der.
+1,simc,12.07738,44.60016,-1,Camse
+10,simc,11.00414,44.50405,100,Vignola
+10141,simc,10.97129,44.77839,23,Cortile di Carpi
+11,simc,10.29584,44.68370,169,Panocchia
+2,simc,11.28402,44.83906,12,Finale Emilia
+2281,simc,11.74953,44.33320,68,Imola Mario Neri
+2286,simc,10.27245,44.80806,59,San Pancrazio
+2289,simc,10.95670,44.70214,28,Albareto
+2290,simc,11.02953,44.63130,32,Castelfranco Emilia
+2291,simc,11.24125,44.43967,275,Sasso Marconi
+2292,simc,11.86667,44.44853,10,Sant'Agata sul Santerno
+2295,simc,12.16020,44.31392,5,San Pietro in Vincoli
+2297,simc,12.50050,44.03456,36,Vergiano
+2301,simc,11.14493,44.69500,18,Sant'Agata Bolognese
+2303,simc,11.82130,44.91630,1,Copparo
+2305,simc,10.77293,44.74325,33,Correggio
+2306,simc,10.51062,44.68953,95,Cavriago
+2307,simc,12.27459,44.08903,113,Carpineta
+2308,simc,11.84403,44.56350,5,Lavezzola
+2979,simc,11.46158,44.40258,330,Settefonti
+2980,simc,12.25036,44.81287,1,Volano
+2981,simc,10.87400,44.88481,20,Rolo
+3,simc,11.66134,44.85799,4,Malborghetto di Boara
+4,simc,12.26798,44.16614,25,Martorano
+53010,simc,10.38070,44.88547,28,Gainago
+6030,simc,09.67965,45.05492,71,Piacenza urbana
+6031,simc,10.32739,44.80178,79,Parma urbana
+6032,simc,10.63370,44.69781,72,Reggio nell'Emilia urbana
+6033,simc,10.91699,44.65639,73,Modena urbana
+6034,simc,11.32879,44.50075,78,Bologna urbana
+6035,simc,11.62114,44.83250,26,Ferrara urbana
+6036,simc,12.20003,44.41500,27,Ravenna urbana
+6037,simc,12.04182,44.22039,51,Forli' urbana
+6038,simc,12.24364,44.13820,77,Cesena urbana
+6039,simc,12.57354,44.05919,16,Rimini urbana
+6227,simc,11.53379,44.57105,20,Mezzolara
+6228,simc,11.73270,44.56861,8,Sant'Antonio
+6232,simc,11.59701,44.41112,58,Castel San Pietro
+6233,simc,10.90937,44.55123,90,Formigine
+6237,simc,10.16786,45.00695,31,Zibello
+6238,simc,10.57823,44.83695,23,Castelnovo di Sotto
+6239,simc,10.50865,44.47562,580,Carpineti
+6240,simc,10.62267,44.32806,632,Montefiorino
+6242,simc,10.03873,44.78042,277,Pieve di Cusignano
+6245,simc,11.01631,44.88612,18,Mirandola
+6246,simc,11.89117,44.70739,0,Ostellato
+6257,simc,11.95861,44.36013,15,Granarolo Faentino
+6259,simc,11.98190,44.04111,330,Cusercoli
+6260,simc,09.58959,45.04139,68,San Nicolo'
+6261,simc,10.00494,45.00253,41,Castellazzo Villanova d'Arda
+6263,simc,11.12578,44.82606,16,San Felice sul Panaro
+6264,simc,11.29056,44.62775,25,Padulle Sala Bolognese
+6265,simc,11.75408,44.41953,19,Sasso Morelli
+6267,simc,12.53622,43.95249,190,Mulazzano
+6270,simc,12.64294,43.91182,65,Morciano
+6289,simc,11.80825,44.12022,556,Modigliana
+6640,simc,11.74639,44.74656,3,Sellarino Voghiera
+6643,simc,11.45436,44.83186,10,Mirabello
+7,simc,11.62264,44.65378,11,San Pietro Capofiume
+70000,simc,11.75545,44.21978,185,Brisighella
+7218,simc,11.20006,44.49614,65,Zola Predosa
+7357,simc,10.85326,44.69345,40,Campogalliano
+8,simc,11.32646,44.26093,741,Loiano
+8424,umsuol,11.62267,44.65378,11,San Pietro Capofiume

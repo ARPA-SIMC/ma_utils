@@ -22,6 +22,9 @@
 #   vecchi.
 #
 # TODO:
+# - opzione -summary, che non estrae i dati ma ritorna solo il numero di dati 
+#   presenti per ciascuna stazione (utilita' discutibilie; non gestirebbe le 
+#   flag di qualita'; verificare come gestire le query relative a piu' parametri)
 # - gestire dataset lmruc_* (per dati in tempo reale)
 #
 #                                              Versione 2.0.0, Enrico 28/05/2015

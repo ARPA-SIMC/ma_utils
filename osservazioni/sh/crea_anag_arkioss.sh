@@ -3,150 +3,216 @@
 # Estre da arkioss le infomrazioni relative alle stazioni e ai prarametri 
 # presenti in ciascuna rete, e le scrive in due files .csv
 #
-# Per modificare i path del pacchetto ma_utils, assegnare le variabili:
-# MA_UTILS_DAT: tabelle ma_utils (ad esempio: /home/eminguzzi/svn/ma_utils/data;
-#               se non specificato, usa: /usr/share/ma_utils)
-# MA_UTILS_SVN: eseguibili ma_utils (ad esempio: /home/eminguzzi/svn/ma_utils;
-#               se non specificato, usa: /usr/libexec/ma_utils)
+# NOTE:
+# - Causa bug arkimet, le query con intervallo di date ritornano meno dati di 
+#   quelle sull'intero dataset (non e' chiaro quale sia quella giusta...)
 #
-# Per modificare i path di pacchetti libsim/dballe, assegnare le variabili:
-# LIBSIM_DATA:  tabelle libsim, ie. file vargrib2bufr.csv 
-#               (se non specificato usa: /usr/share/libsim)
-# DBA_TABLES:   tabelle dballe, ie. file dballe.txt 
-#               (se non specificato usa: /usr/share/wreport)
-# LIBSIM_SVN:   eseguibili libsim (ad esempio:  
-#               /home/eminguzzi/svn/vol7d, /home/dcesari/program/f90/svn/trunk; 
-#               se non specificato, usa: /usr/bin)
-#
-# TODO:
-# - Aggiungere parmaetro -reft, per limitarsi alle stazioni che hanno dati in un
-#   certo periodo (arki-scan ... -> arki-query "" ...)
-# - Estrarre un dato qualsiasi da ciascuna stazione, e ricavare lat,lon,quota,nome
-#   senza passare da anag_oracle (aspettare che Emanuele implementi la funzione)
-# - aggiungere campo "rete"
-#
-# Note:
-# - L'unica informazione di anagrafica contnuta in arkioss e' il codice stazione 
-#  (id_oracle): le altre informazioni sono desunte dall'anagrafica ORACLE 
-#  (file anag_oracle.dat - ex db_anagrafica.dat, prodotto da crea_anag_oracle.sql)
-# - Si potrebbe aggiungere un controllo sull'unicita' dell'id_oracle in 
-#   anag_oracle.dat
-# - Si potrebbere aggiungere a fileout le colonne relative al nome rete e id_usr
-#   (nel mondo Oracle: per collegamento con pagine "caricamenti" su infomet)
-#
-#                                              Versione 1.0.0, Enrico 16/09/2014
+#                                              Versione 2.0.0, Enrico 03/06/2015
 #-------------------------------------------------------------------------------
 #set -x
 
 #===============================================================================
-# Funzione per riformattare "csv" la descrizione delle varibili Oracle, gestendo
-# il fatto che alcuni campi (es. l1) possono essere mancanti
+function write_help
+{
+#       123456789012345678901234567890123456789012345678901234567890123456789012345678
+  echo "Costruisce la lsita completa di parametri e stazioni presenti in arkioss"
+  echo "Uso: crea_anag_arkioss [-h] [data_ini data_fin] [-ope] "
+  echo "data_ini, data_fin: intervallo di date in cui cercare (intero dataset)"
+  echo "-ope: aggiorna l'anagrafica in /home/eminguzzi/svn/ma_utils/data"
+}
 
-function parse_prod
+#===============================================================================
+function intfill
+{
+#----------------------------------------------------------------------
+# USO: intfill str_in len_req
+# Ritorna la variabile d'ambiente str_out, che contiene len_req
+# caratteri, di cui i primi sono "0" e gli ulitmi conicidonocon str_in
+#----------------------------------------------------------------------
+
+  str_in=$1
+  len_req=$2
+
+  len_in=`echo $str_in | awk '{print length($1)}'`
+  nzeri=`expr $len_req - $len_in`
+
+  str_out=""
+  cnt_private=0
+  while [ $cnt_private -lt $nzeri ] ; do
+    str_out=${str_out}"0"
+    cnt_private=`expr $cnt_private + 1`
+  done
+  str_out=${str_out}${str_in}
+}
+
+#===============================================================================
+function parse_area
+#
+# Riformatta (da yaml a csv) la stringa "Area" estratta da arkioss e relativa
+# a una stazione.
+#
+# Note:
+# - Questa funzione e' usata  anche da crea_anag_arkioss.sh; la funzione gemella
+#   (parse_product) e' usata anche da get_var_staz.sh.
+
+{
+line2=$(echo $line | sed 's/"//g')
+
+# id_staz (Oracle)
+pp=$(echo "" | awk '{print index("'"${line2}"'","(")}')
+id_staz=$(echo $line2 | cut -c $[pp+1]- | cut -d , -f 1)
+
+# Coordinate (in archvio in gradi*10^5)
+pp=$(echo "" | awk '{print index("'"${line2}"'","lon=")}')
+dummy=$(echo $line2 | cut -c $[pp+4]- | cut -d , -f 1)
+intfill $dummy 7
+lon=$(echo $str_out | awk '{print substr($1,1,2) "." substr($1,3,5)}')
+
+pp=$(echo "" | awk '{print index("'"${line2}"'","lat=")}')
+dummy=$(echo $line2 | cut -c $[pp+4]- | cut -d , -f 1)
+intfill $dummy 7
+lat=$(echo $str_out | awk '{print substr($1,1,2) "." substr($1,3,5)}')
+
+# Quota (in archvio in dm)
+pp=$(echo "" | awk '{print index("'"${line2}"'","B07030=")}')
+dummy=$(echo $line2 | cut -c $[pp+7]- | cut -d , -f 1)
+quo=$[$dummy/10]
+
+# Nome 
+pp=$(echo "" | awk '{print index("'"${line2}"'","B01019=")}')
+nome=$(echo $line2 | cut -c $[pp+7]- | cut -d , -f 1)
+
+str_area_csv=${id_staz},${net},${lon},${lat},${quo},${nome}
+}
+
+#===============================================================================
+function parse_product
+#
+# Riformatta (da yaml a csv) la stringa "Product" estratta da arkioss e relativa
+# a una stazione. 
+#
+# Note:
+# - Questa funzione e' usata  anche da crea_anag_arkioss.sh; una funzione simile 
+#   e' usata da get_staz_var.sh
+# - Per mortivi misteriosi, questo comando e' necessario al corretto funzionamento
+#   del comando "... print index ...", nonostante $line non contenga caratteri ".
+#   In alternativa, pare che si possa usare $line, modificando i comandi awk:
+#     pp=$(echo $line | awk '{print index("'"${line2}"'","bcode=")}')
+
 {
 
-# id-var (Oracle)
-id_var=`echo $line|cut -d \( -f 2 | cut -d , -f 1 | cut -d \) -f 1`
+line2=$(echo $line | sed 's/"//g')
+
+# id_var (Oracle)
+id_var=$(echo $line|cut -d \( -f 2 | cut -d , -f 1 | cut -d \) -f 1)
 
 # Bcode (codice parametro fisico)
-idx=`echo $line | awk '{print index("'"${line}"'","bcode=")}'`
-if [ $idx -gt 0 ] ; then
-  p1=`expr $idx + 6`
-  str_dum=`echo $line | cut -c $p1-`
-  bcode=`echo $str_dum | cut -d , -f 1 | cut -d \) -f 1`
+pp=$(echo "" | awk '{print index("'"${line2}"'","bcode=")}')
+if [ $pp -gt 0 ] ; then
+  bcode=$(echo $line2 | cut -c $[pp+6]- | cut -d , -f 1)
 else
   bcode="-9999"
 fi
-bcode2=`echo $bcode | sed 's/B/0/'`
 
 # Long Name (nome esteso variabile fisica, da dballe.txt)
-long_name=`grep ^\ $bcode2 $dballe_txt | cut -c 9-72 | sed 's/ *$//g;s/,/-/g'`
+bcode2=`echo $bcode | sed 's/B/0/'`
+long_name=$(grep ^\ $bcode2 $dballe_txt | cut -c 9-72 | sed 's/ *$//g;s/,/-/g')
 
 # Short Name (nome del parametro per output estra_orari, solo metamb)
 str_dum=`grep ^$id_var $product_shortnames`
 if [ $? -ne 0 ] ; then
-  short_name=$id_var
+  short_name="var"${id_var}
 else
-  short_name=`echo $str_dum | cut -d , -f 3`
+  short_name=$(echo $str_dum | cut -d , -f 3)
 fi 
 
-# Livello e Timerange
-lev_trange=""
+# Livello, timerange, unit
+ltru=""
 keys="l1 lt1 p1 p2 tr unit"
 for key in $keys ; do
-  idx=`echo $line | awk '{print index("'"${line}"'","'"${key}="'")}'`
+  idx=$(echo "" | awk '{print index("'"${line2}"'","'"${key}="'")}')
   if [ $idx -gt 0 ] ; then
-    p1=`expr length $key + $idx + 1`
-    str_dum=`echo $line | cut -c $p1-`
-    lev_trange=${lev_trange}","`echo $str_dum | cut -d , -f 1 | cut -d \) -f 1`
+    pp=$(expr length $key + $idx + 1)
+    str_dum=$(echo $line | cut -c $pp-)
+    ltru=${ltru}","$(echo $str_dum | cut -d , -f 1 | cut -d \) -f 1)
   else
-    lev_trange=${lev_trange}","
+    ltru=${ltru}","
   fi
 done
 
 # Compongo la stringa di output
-out_string=${id_var}","${bcode}","${long_name}${lev_trange}","${short_name}
+str_product_csv=${id_var}","${bcode}","${long_name}${ltru}","${short_name}
 
 }
 
-#===============================================================================
+################################################################################
 # 1) Preliminari
 
-#-------------------------------------------------------------------------------
-# 1.1 Path, costanti, utility
+# Parametri da riga comando
+today=$(date +%Y%m%d)
+data1="nil"
+data2="nil"
+ope="N"
 
-# URL di arkioss
+idp=0
+while [ $# -ge 1 ] ; do
+  if [ $1 = -h ] ; then
+    write_help
+    exit 1
+  elif [ $1 = "-ope" ] ; then
+    ope="Y"
+    shift
+  else
+    if [ $idp -eq 0 ] ; then
+      data1=$1
+    elif [ $idp -eq 1 ] ; then
+      data2=$1
+    fi
+    idp=$[idp+1]
+    shift
+  fi
+done
+
+# URL dell'archivio arkioss
 akurl=http://arkioss.metarpa:8090/
 
 # Assegno l'ambiente ma_utils
 if [ -z $MA_UTILS_DAT ] ; then
-  anag_oracle=/usr/share/ma_utils/anag_oracle.dat
   product_shortnames=/usr/share/ma_utils/param_shortnames.csv
-  fileout1=./anag_arkioss.csv
-  fileout2=./param_arkioss.csv
 else
   echo "(crea_anag_arkioss.ksh) Tabelle ma_utils: copia di lavoro in "$MA_UTILS_DAT
-  anag_oracle=${MA_UTILS_DAT}/anag_oracle.dat
   product_shortnames=${MA_UTILS_DAT}/param_shortnames.csv
-  fileout1=${MA_UTILS_DAT}/anag_arkioss.csv
-  fileout2=${MA_UTILS_DAT}/param_arkioss.csv
 fi
 
 # Assegno l'ambiente dballe
 if [ -z $DBA_TABLES ] ; then
   dballe_txt=/usr/share/wreport/dballe.txt
 else
-  echo "(acrea_anag_arkioss.ksh) Tabelle dballe: copia di lavoro in "$DBA_TABLES
+  echo "(crea_anag_arkioss.ksh) Tabelle dballe: copia di lavoro in "$DBA_TABLES
   dballe_txt=${DBA_TABLES}/dballe.txt
 fi
 
-# Segnalo eventuali variabili d'ambiente assegnate a valori non di default
-if [ ! -z $MA_UTILS_SVN ] ; then
-  echo "(crea_anag_arkioss.ksh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
+# Dir di lavoro e nome files di output
+if [ $ope = "Y" ] ; then
+  fileout1=/home/eminguzzi/svn/ma_utils/data/anag_arkioss.csv
+  fileout2=/home/eminguzzi/svn/ma_utils/data/param_arkioss.csv
+  if [ -z $AK_TEMP ] ; then
+    AK_TEMP=$TEMP
+  fi
+  cd $AK_TEMP
+  qid=`mktemp -d ako.XXXXXX | cut -d . -f 2` 2>&1
+  work_dir=${AK_TEMP}/ako.${qid}
+else
+  fileout1=./anag_arkioss.csv
+  fileout2=./param_arkioss.csv
+  work_dir=./
 fi
-if [ ! -z $LIBSIM_SVN ] ; then
-  echo "(crea_anag_arkioss.ksh) Eseguibili libsim: copia di lavoro in "$LIBSIM_SVN
-fi
-if [ ! -z $LIBSIM_DATA ] ; then
-  echo "(crea_anag_arkioss.ksh) Tabelle libsim: copia di lavoro in "$LIBSIM_DATA
-fi
-
-#-------------------------------------------------------------------------------
-# 1.2 Altri preliminari
-
-# Costruisco la dir di lavoro
-if [ -z $AK_TEMP ] ; then
-  AK_TEMP=$TEMP
-fi
-cd $AK_TEMP
-qid=`mktemp -d ako.XXXXXX | cut -d . -f 2` 2>&1
-work_dir=${AK_TEMP}/ako.${qid}
 
 if [ -d $work_dir ] ; then
   cd $work_dir
-  echo "Dir di lavoro "$work_dir
+  echo "Dir di lavoro "$(pwd)
 else
-  echo "Dir di lavoro dell'estrazione non trovata "$work_dir
+  echo "Dir di lavoro non trovata "$work_dir
   exit 2
 fi
 
@@ -155,11 +221,18 @@ rm -f $fileout1 $fileout2
 echo "id_staz,dset,lon,lat,quota,nome" > $fileout1
 echo "id_var,bcode,long_name,l1,lt1,p1,p2,tr,unit,short_name,net_number,net_list" > $fileout2
 
-# Seleziono i campi utili dall'anagrafica Oracle 
-# Passo da foramto ASCII tabellare a csv delimitato da virgole
-tail -n +4 $anag_oracle  | cut -c 12-42 | sed 's/  */,/g' | cut -d , -f 2-5 > tmp1.csv
-tail -n +4 $anag_oracle  | cut -c 43- > tmp2.csv
-paste -d , tmp1.csv tmp2.csv > anag.csv
+# Costruisco la query arkioss
+rm -f caa.query
+if [ $data1 = "nil" -o $data2 = "nil" ] ; then
+  echo "Cerco dati con reftime qualsiasi"
+  touch caa.query
+else
+  echo "Cerco dati con reftime tra "$data1" e "$data2
+  str_reftime=">="$(date -d $data1 +%Y-%m-%d)", <="$(date -d $data2 +%Y-%m-%d)
+  cat <<EOF > caa.query
+  reftime: ${str_reftime}
+EOF
+fi
 
 #===============================================================================
 # 2) Elaborazioni
@@ -175,27 +248,29 @@ grep /dataset/ tmp.ds | cut -d / -f 3 | cut -d \' -f 1 | grep -v error > ds.lst
 
 #-------------------------------------------------------------------------------
 # 2.2 Trovo i parametri (Product) e le stazioni (Area) presenti in archivio per 
-#     ciascuna rete
+#     ciascun dataset
 
-rm -f *.prod.id *.prod.desc *.staz *.yml *.pd
+rm -f all.pd
+
 while read net ; do
   echo "Cerco stazioni e parametri per il dataset "$net
+  rm -f ${net}.yml ${net}.varlist tmp1.yml tmp2.yml 
+  arki-query --summary --yaml --file=caa.query ${akurl}/dataset/${net} > ${net}.yml
 
-  arki-scan --summary --yaml ${akurl}/dataset/${net} > ${net}.yml
-  grep Area ${net}.yml | cut -d \( -f 2 | cut -d , -f 1 | sort -u > ${net}.staz
-  grep Product ${net}.yml | cut -d \( -f 2 | cut -d , -f 1 | sort -u > ${net}.prod.id
-  grep Product ${net}.yml | cut -d : -f 2 | sort -u | sed 's/ //g' > ${net}.prod.desc
-  while read id_staz ; do
-    str=`grep ^${id_staz}, anag.csv | cut -d , -f 2-`
-    echo ${id_staz},${net},$str >> $fileout1
-  done < ${net}.staz
-
-  rm -f tmp.pd
-  tail -n +2 ${net}.prod.desc > tmp.pd
+# Elaboro le stazioni (area)
+  grep Area ${net}.yml | sort -u > tmp1.yml
   while read line ; do
-    parse_prod
-    echo $out_string >> all.pd
-  done < tmp.pd
+    parse_area $line
+    echo $str_area_csv >> $fileout1
+  done < tmp1.yml
+
+# Elaboro i parametri (product)
+  grep Product ${net}.yml | sort -t "," -k 2,3 | uniq > tmp2.yml
+  cut tmp2.yml -d \( -f 2 | cut -d , -f 1 > ${net}.varlist
+  while read line ; do
+    parse_product
+    echo $str_product_csv >> all.pd
+  done < tmp2.yml
 done < ds.lst
 
 #-------------------------------------------------------------------------------
@@ -203,11 +278,12 @@ done < ds.lst
 #     aggiungo la lista delle reti in cui e' presente ciascun parametro
 
 echo "Produco la lista dei parametri"
+rm -f sorted.pd
 sort -u -t , -k 2 all.pd > sorted.pd
 while read line ; do
-  id_var=`echo $line | cut -d , -f 1`
-  var_list=`grep -l "^VM2(${id_var}" *.prod.desc | cut -d . -f 1`
-  var_number=`grep -l "^VM2(${id_var}" *.prod.desc | wc -l`
-  line_out=${line}","${var_number}","${var_list}
+  id_var=$(echo $line | cut -d , -f 1)
+  net_list=$(grep -l $id_var *.varlist | cut -d . -f 1)
+  net_number=$(grep -l $id_var *.varlist | wc -l | awk '{print $1}')
+  line_out=${line}","${net_number}","${net_list}
   echo $line_out >> $fileout2
 done < sorted.pd

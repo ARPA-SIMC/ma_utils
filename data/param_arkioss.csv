@@ -1,153 +1,155 @@
 id_var,bcode,long_name,l1,lt1,p1,p2,tr,unit,short_name,net_number,net_list
-692,-9999,,,,,,,,692,1,romacq
-82,B04195,[SIM] Temperature event - time of occurrence,2000,103,0,3600,2,MINUTE,82,2,libere simc
-81,B04195,[SIM] Temperature event - time of occurrence,2000,103,0,3600,3,MINUTE,81,2,libere simc
-88,B04195,[SIM] Temperature event - time of occurrence,500,103,0,3600,2,MINUTE,88,1,simc
-87,B04195,[SIM] Temperature event - time of occurrence,500,103,0,3600,3,MINUTE,87,1,simc
-99,B04196,[SIM] Relative humidity event - time of occurrence,2000,103,0,3600,3,MINUTE,99,2,libere simc
-275,B08192,[SIM] Number of wind velocity mean values present,10000,103,86400,86400,1,NUMERIC,275,2,libere simc
-276,B08193,[SIM] Number of wind velocity minimum values present,10000,103,86400,86400,1,NUMERIC,276,2,libere simc
-277,B08194,[SIM] Number of wind velocity maximum values present,10000,103,86400,86400,1,NUMERIC,277,2,libere simc
-299,B08196,[SIM] Number of mean temperature values present,150,106,86400,86400,1,NUMERIC,299,2,libere simc
-279,B08196,[SIM] Number of mean temperature values present,2000,103,86400,86400,1,NUMERIC,279,2,libere simc
-282,B08196,[SIM] Number of mean temperature values present,500,103,86400,86400,1,NUMERIC,282,1,simc
-300,B08197,[SIM] Number of minimum temperature values present,150,106,86400,86400,1,NUMERIC,300,2,libere simc
-280,B08197,[SIM] Number of minimum temperature values present,2000,103,86400,86400,1,NUMERIC,280,2,libere simc
-283,B08197,[SIM] Number of minimum temperature values present,500,103,86400,86400,1,NUMERIC,283,1,simc
-301,B08198,[SIM] Number of maximum temperature values present,150,106,86400,86400,1,NUMERIC,301,2,libere simc
-281,B08198,[SIM] Number of maximum temperature values present,2000,103,86400,86400,1,NUMERIC,281,2,libere simc
-284,B08198,[SIM] Number of maximum temperature values present,500,103,86400,86400,1,NUMERIC,284,1,simc
-288,B08199,[SIM] Number of mean relative humidity values present,2000,103,86400,86400,1,NUMERIC,288,2,libere simc
-289,B08200,[SIM] Number of minimum relative humidity values present,2000,103,86400,86400,1,NUMERIC,289,2,libere simc
-290,B08201,[SIM] Number of maximum relative humidity values present,2000,103,86400,86400,1,NUMERIC,290,2,libere simc
-291,B08202,[SIM] Number of mean pressure values present,2000,103,86400,86400,1,NUMERIC,291,2,libere simc
-292,B08203,[SIM] Number of minimum pressure values present,2000,103,86400,86400,1,NUMERIC,292,1,simc
-293,B08204,[SIM] Number of maximum pressure values present,2000,103,86400,86400,1,NUMERIC,293,1,simc
-298,B08205,[SIM] Number of precipitation values present,,1,86400,86400,1,NUMERIC,298,4,cer cro libere simc
-305,B08206,[SIM] Number of leaf wetness values present,2000,103,86400,86400,1,NUMERIC,305,2,libere simc
-315,B08207,[SIM] Number of scalar wind velocity mean values present,10000,103,86400,86400,1,NUMERIC,315,1,libere
+82,B04195,[SIM] Temperature event - time of occurrence,2000,103,0,3600,2,mn,var82,2,libere simc
+81,B04195,[SIM] Temperature event - time of occurrence,2000,103,0,3600,3,mn,var81,2,libere simc
+88,B04195,[SIM] Temperature event - time of occurrence,500,103,0,3600,2,mn,var88,3,libere simc umsuol
+87,B04195,[SIM] Temperature event - time of occurrence,500,103,0,3600,3,mn,var87,3,libere simc umsuol
+100,B04196,[SIM] Relative humidity event - time of occurrence,2000,103,0,3600,2,mn,var100,2,libere simc
+99,B04196,[SIM] Relative humidity event - time of occurrence,2000,103,0,3600,3,mn,var99,2,libere simc
+275,B08192,[SIM] Number of wind velocity mean values present,10000,103,86400,86400,1,numero,var275,2,libere simc
+276,B08193,[SIM] Number of wind velocity minimum values present,10000,103,86400,86400,1,numero,var276,2,libere simc
+277,B08194,[SIM] Number of wind velocity maximum values present,10000,103,86400,86400,1,numero,var277,2,libere simc
+299,B08196,[SIM] Number of mean temperature values present,150,106,86400,86400,1,numero,var299,2,libere simc
+279,B08196,[SIM] Number of mean temperature values present,2000,103,86400,86400,1,numero,var279,2,libere simc
+282,B08196,[SIM] Number of mean temperature values present,500,103,86400,86400,1,numero,var282,1,simc
+300,B08197,[SIM] Number of minimum temperature values present,150,106,86400,86400,1,numero,var300,2,libere simc
+280,B08197,[SIM] Number of minimum temperature values present,2000,103,86400,86400,1,numero,var280,2,libere simc
+283,B08197,[SIM] Number of minimum temperature values present,500,103,86400,86400,1,numero,var283,1,simc
+301,B08198,[SIM] Number of maximum temperature values present,150,106,86400,86400,1,numero,var301,2,libere simc
+281,B08198,[SIM] Number of maximum temperature values present,2000,103,86400,86400,1,numero,var281,2,libere simc
+284,B08198,[SIM] Number of maximum temperature values present,500,103,86400,86400,1,numero,var284,1,simc
+288,B08199,[SIM] Number of mean relative humidity values present,2000,103,86400,86400,1,numero,var288,2,libere simc
+289,B08200,[SIM] Number of minimum relative humidity values present,2000,103,86400,86400,1,numero,var289,2,libere simc
+290,B08201,[SIM] Number of maximum relative humidity values present,2000,103,86400,86400,1,numero,var290,2,libere simc
+291,B08202,[SIM] Number of mean pressure values present,2000,103,86400,86400,1,numero,var291,2,libere simc
+292,B08203,[SIM] Number of minimum pressure values present,2000,103,86400,86400,1,numero,var292,1,simc
+293,B08204,[SIM] Number of maximum pressure values present,2000,103,86400,86400,1,numero,var293,1,simc
+298,B08205,[SIM] Number of precipitation values present,,1,86400,86400,1,numero,var298,4,cer cro libere simc
+305,B08206,[SIM] Number of leaf wetness values present,2000,103,86400,86400,1,numero,var305,2,libere simc
+315,B08207,[SIM] Number of scalar wind velocity mean values present,10000,103,86400,86400,1,numero,var315,1,libere
 167,B10004,PRESSURE,,1,0,0,254,hPa,Prs ist,11,cer cro fiduli fiduma fidupo fiduto fiduve piattaforme rer romacq simc
-444,B10004,PRESSURE,,1,0,3600,0,hPa,444,2,libere simc
-447,B10004,PRESSURE,,1,0,3600,2,hPa,447,1,simc
-446,B10004,PRESSURE,,1,0,3600,3,hPa,446,1,simc
-445,B10004,PRESSURE,,1,0,3600,6,hPa,445,1,simc
-243,B10004,PRESSURE,,1,86400,86400,0,hPa,243,3,libere rer simc
-245,B10004,PRESSURE,,1,86400,86400,2,hPa,245,2,rer simc
-244,B10004,PRESSURE,,1,86400,86400,3,hPa,244,2,rer simc
-165,B11001,WIND DIRECTION,10000,103,0,0,254,gsess,DD ist,10,fiduli fiduma fidupo fiduto fiduve libere piattaforme renana rer simc
-440,B11001,WIND DIRECTION,10000,103,0,3600,200,gsess,440,2,libere simc
-441,B11001,WIND DIRECTION,10000,103,0,3600,202,gsess,441,2,libere simc
-230,B11001,WIND DIRECTION,10000,103,86400,86400,201,OCTANTS,230,4,libere renana rer simc
-166,B11002,WIND SPEED,10000,103,0,0,254,M/S,FF ist,10,fiduli fiduma fidupo fiduto fiduve libere piattaforme renana rer simc
-69,B11002,WIND SPEED,10000,103,0,3600,0,M/S,69,4,libere romacq simc umsuol
-73,B11002,WIND SPEED,10000,103,0,3600,2,M/S,73,2,libere simc
-431,B11002,WIND SPEED,10000,103,0,3600,200,M/S,431,2,libere simc
-432,B11002,WIND SPEED,10000,103,0,3600,202,M/S,432,2,libere simc
-433,B11002,WIND SPEED,10000,103,0,3600,203,M/S,433,2,libere simc
-434,B11002,WIND SPEED,10000,103,0,3600,204,M/S,434,2,libere simc
-72,B11002,WIND SPEED,10000,103,0,3600,3,M/S,72,2,libere simc
-436,B11002,WIND SPEED,10000,103,0,3600,6,M/S,436,2,libere simc
-227,B11002,WIND SPEED,10000,103,86400,86400,0,M/S,227,4,libere renana rer simc
-324,B11002,WIND SPEED,10000,103,86400,86400,1,M/S,324,4,libere renana rer simc
-229,B11002,WIND SPEED,10000,103,86400,86400,2,M/S,229,4,libere renana rer simc
-228,B11002,WIND SPEED,10000,103,86400,86400,3,M/S,228,4,libere renana rer simc
-258,B11002,WIND SPEED,2000,103,86400,86400,0,M/S,258,1,libere
-351,B11041,MAXIMUM WIND GUST SPEED,10000,103,0,600,205,M/S,351,7,fidupo fiduto fiduve libere piattaforme renana rer
-353,B11043,MAXIMUM WIND GUST DIRECTION,10000,103,0,600,205,gsess,353,6,fidupo fiduto fiduve libere piattaforme rer
-326,B11208,[SIM] Distance covered by the hourly mean wind,10000,103,86400,86400,1,KM,326,4,libere renana rer simc
-522,B12030,SOIL TEMPERATURE,100,106,0,0,254,C,522,2,libere umsuol
-251,B12030,SOIL TEMPERATURE,100,106,86400,86400,0,C,251,2,libere simc
-253,B12030,SOIL TEMPERATURE,100,106,86400,86400,2,C,253,2,libere simc
-252,B12030,SOIL TEMPERATURE,100,106,86400,86400,3,C,252,2,libere simc
-526,B12030,SOIL TEMPERATURE,1000,106,0,0,254,C,526,1,umsuol
-527,B12030,SOIL TEMPERATURE,1350,106,0,0,254,C,527,1,umsuol
-115,B12030,SOIL TEMPERATURE,150,106,0,0,254,C,115,2,libere simc
-116,B12030,SOIL TEMPERATURE,150,106,0,3600,0,C,116,2,libere simc
-118,B12030,SOIL TEMPERATURE,150,106,0,3600,2,C,118,2,libere simc
-117,B12030,SOIL TEMPERATURE,150,106,0,3600,3,C,117,2,libere simc
-562,B12030,SOIL TEMPERATURE,150,106,0,3600,6,C,562,2,libere simc
-528,B12030,SOIL TEMPERATURE,1800,106,0,0,254,C,528,1,umsuol
-523,B12030,SOIL TEMPERATURE,250,106,0,0,254,C,523,1,umsuol
-524,B12030,SOIL TEMPERATURE,450,106,0,0,254,C,524,2,libere umsuol
-525,B12030,SOIL TEMPERATURE,700,106,0,0,254,C,525,1,umsuol
-158,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,0,254,C,T ist,14,cer cro fiduli fiduma fidupo fiduto fiduve icirfe libere piattaforme renana rer romacq simc
-78,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,0,C,78,2,libere simc
-80,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,2,C,80,2,libere simc
-79,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,3,C,79,2,libere simc
-403,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,6,C,403,2,libere simc
-231,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,86400,86400,0,C,231,7,cro icirfe libere renana rer romacq simc
-233,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,86400,86400,2,C,233,7,cro icirfe libere renana rer romacq simc
-232,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,86400,86400,3,C,232,7,cro icirfe libere renana rer romacq simc
-83,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,0,254,C,83,1,simc
-84,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,0,C,84,1,simc
-86,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,2,C,86,1,simc
-85,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,3,C,85,1,simc
-563,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,6,C,563,1,simc
-234,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,86400,86400,0,C,234,1,simc
-236,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,86400,86400,2,C,236,1,simc
-235,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,86400,86400,3,C,235,1,simc
-240,B13003,RELATIVE HUMIDITY,1800,103,86400,86400,0,%,240,4,libere renana rer simc
-242,B13003,RELATIVE HUMIDITY,1800,103,86400,86400,2,%,242,4,libere renana rer simc
-241,B13003,RELATIVE HUMIDITY,1800,103,86400,86400,3,%,241,4,libere renana rer simc
-139,B13003,RELATIVE HUMIDITY,2000,103,0,0,254,%,RH ist,11,fiduli fiduma fidupo fiduto fiduve libere piattaforme renana rer romacq simc
-140,B13003,RELATIVE HUMIDITY,2000,103,0,3600,0,%,140,2,libere simc
-142,B13003,RELATIVE HUMIDITY,2000,103,0,3600,2,%,142,2,libere simc
-141,B13003,RELATIVE HUMIDITY,2000,103,0,3600,3,%,141,2,libere simc
-406,B13003,RELATIVE HUMIDITY,2000,103,0,3600,6,%,406,2,libere simc
-159,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,1800,1,mm,159,10,cer coremo cro fiduma fidupo fiduto icirfe libere renana rer
-160,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,3600,1,mm,Prc 1hr,14,cer coremo cro fiduli fiduma fidupo fiduto fiduve icirfe libere renana rer romacq simc
-172,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,900,1,mm,172,8,coremo cro fidupo icirfe libere renana rer simc
-473,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,32400,86400,1,mm,473,11,cer coremo cro fiduli fiduto icirfe libere renana rer romacq simc
-250,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,86400,86400,1,mm,250,9,cer coremo cro icirfe libere renana rer romacq simc
-162,B13013,TOTAL SNOW DEPTH,,1,0,0,254,cm,162,6,fiduma fidupo fiduve libere rer simc
-518,B13013,TOTAL SNOW DEPTH,,1,0,3600,0,cm,518,1,simc
-521,B13013,TOTAL SNOW DEPTH,,1,0,3600,2,cm,521,1,simc
-520,B13013,TOTAL SNOW DEPTH,,1,0,3600,3,cm,520,1,simc
-519,B13013,TOTAL SNOW DEPTH,,1,0,3600,6,cm,519,1,simc
-662,B13081,WATER CONDUCTIVITY,,192,0,0,254,mS/cm,662,1,freati
-169,B13082,WATER TEMPERATURE,,1,0,0,254,C,169,2,cer rer
-670,B13194,[SIM] Water table depth,,1,0,0,254,m,670,1,freati
-144,B13212,[SIM] Leaf wetness duration,2000,103,0,3600,1,MINUTE,144,3,fiduli libere simc
-257,B13212,[SIM] Leaf wetness duration,2000,103,86400,86400,0,MINUTE,257,2,libere simc
-161,B13215,[SIM] River level,,1,0,0,254,m,161,11,burana cer fiduli fiduma fidupo fiduve icirfe libere renana rer romacq
-512,B13226,[SIM] River discharge,,1,0,0,254,M**3/S,512,4,fidupo libere rer romacq
-529,B13227,[SIM] Soil volumetric water content,100,106,0,0,254,RATIO,529,2,libere umsuol
-685,B13227,[SIM] Soil volumetric water content,100,106,86400,86400,0,RATIO,685,1,umsuol
-533,B13227,[SIM] Soil volumetric water content,1000,106,0,0,254,RATIO,533,1,umsuol
-689,B13227,[SIM] Soil volumetric water content,1000,106,86400,86400,0,RATIO,689,1,umsuol
-534,B13227,[SIM] Soil volumetric water content,1350,106,0,0,254,RATIO,534,1,umsuol
-690,B13227,[SIM] Soil volumetric water content,1350,106,86400,86400,0,RATIO,690,1,umsuol
-535,B13227,[SIM] Soil volumetric water content,1800,106,0,0,254,RATIO,535,1,umsuol
-691,B13227,[SIM] Soil volumetric water content,1800,106,86400,86400,0,RATIO,691,1,umsuol
-530,B13227,[SIM] Soil volumetric water content,250,106,0,0,254,RATIO,530,3,libere simc umsuol
-686,B13227,[SIM] Soil volumetric water content,250,106,86400,86400,0,RATIO,686,3,libere simc umsuol
-531,B13227,[SIM] Soil volumetric water content,450,106,0,0,254,RATIO,531,3,libere simc umsuol
-687,B13227,[SIM] Soil volumetric water content,450,106,86400,86400,0,RATIO,687,3,libere simc umsuol
-532,B13227,[SIM] Soil volumetric water content,700,106,0,0,254,RATIO,532,3,libere simc umsuol
-688,B13227,[SIM] Soil volumetric water content,700,106,86400,86400,0,RATIO,688,3,libere simc umsuol
-248,B14018,INSTANTANEOUS SHORT-WAVE RADIATION (incoming),,1,86400,86400,2,W/m**2,248,3,libere rer simc
-246,B14021,GLOBAL SOLAR RADIATION- INTEGRATED OVER PERIOD SPECIFIED,,1,86400,86400,1,MJ/M**2,246,3,libere rer simc
-357,B14193,[SIM] Instantenous latent heat flux,,1,0,600,254,W/m**2,357,4,fidupo fiduto fiduve libere
+444,B10004,PRESSURE,,1,0,3600,0,hPa,var444,2,libere simc
+447,B10004,PRESSURE,,1,0,3600,2,hPa,var447,1,simc
+446,B10004,PRESSURE,,1,0,3600,3,hPa,var446,1,simc
+445,B10004,PRESSURE,,1,0,3600,6,hPa,var445,1,simc
+243,B10004,PRESSURE,,1,86400,86400,0,hPa,var243,3,libere rer simc
+245,B10004,PRESSURE,,1,86400,86400,2,hPa,var245,2,rer simc
+244,B10004,PRESSURE,,1,86400,86400,3,hPa,var244,2,rer simc
+165,B11001,WIND DIRECTION,10000,103,0,0,254,gsess,DD ist,11,fidufv fiduli fiduma fidupo fiduto fiduve libere piattaforme renana rer simc
+440,B11001,WIND DIRECTION,10000,103,0,3600,200,gsess,var440,2,libere simc
+441,B11001,WIND DIRECTION,10000,103,0,3600,202,gsess,var441,2,libere simc
+230,B11001,WIND DIRECTION,10000,103,86400,86400,201,ottavi,var230,4,libere renana rer simc
+166,B11002,WIND SPEED,10000,103,0,0,254,M/S,FF ist,11,fidufv fiduli fiduma fidupo fiduto fiduve libere piattaforme renana rer simc
+69,B11002,WIND SPEED,10000,103,0,3600,0,M/S,var69,7,cer fidufv libere rer romacq simc umsuol
+73,B11002,WIND SPEED,10000,103,0,3600,2,M/S,var73,11,cer coremo cro fiduli fiduto icirfe libere renana rer romacq simc
+431,B11002,WIND SPEED,10000,103,0,3600,200,M/S,var431,2,libere simc
+432,B11002,WIND SPEED,10000,103,0,3600,202,M/S,var432,2,libere simc
+433,B11002,WIND SPEED,10000,103,0,3600,203,M/S,var433,2,libere simc
+434,B11002,WIND SPEED,10000,103,0,3600,204,M/S,var434,2,libere simc
+72,B11002,WIND SPEED,10000,103,0,3600,3,M/S,var72,8,coremo cro fidupo icirfe libere renana rer simc
+436,B11002,WIND SPEED,10000,103,0,3600,6,M/S,var436,2,libere simc
+227,B11002,WIND SPEED,10000,103,86400,86400,0,M/S,var227,4,libere renana rer simc
+324,B11002,WIND SPEED,10000,103,86400,86400,1,M/S,var324,4,libere renana rer simc
+229,B11002,WIND SPEED,10000,103,86400,86400,2,M/S,var229,4,libere renana rer simc
+228,B11002,WIND SPEED,10000,103,86400,86400,3,M/S,var228,4,libere renana rer simc
+258,B11002,WIND SPEED,2000,103,86400,86400,0,M/S,var258,1,libere
+351,B11041,MAXIMUM WIND GUST SPEED,10000,103,0,600,205,M/S,var351,7,fidupo fiduto fiduve libere piattaforme renana rer
+353,B11043,MAXIMUM WIND GUST DIRECTION,10000,103,0,600,205,gsess,var353,6,fidupo fiduto fiduve libere piattaforme rer
+326,B11208,[SIM] Distance covered by the hourly mean wind,10000,103,86400,86400,1,Km,var326,4,libere renana rer simc
+522,B12030,SOIL TEMPERATURE,100,106,0,0,254,C,var522,2,libere umsuol
+251,B12030,SOIL TEMPERATURE,100,106,86400,86400,0,C,var251,2,libere simc
+253,B12030,SOIL TEMPERATURE,100,106,86400,86400,2,C,var253,2,libere simc
+252,B12030,SOIL TEMPERATURE,100,106,86400,86400,3,C,var252,2,libere simc
+526,B12030,SOIL TEMPERATURE,1000,106,0,0,254,C,var526,1,umsuol
+527,B12030,SOIL TEMPERATURE,1350,106,0,0,254,C,var527,1,umsuol
+115,B12030,SOIL TEMPERATURE,150,106,0,0,254,C,var115,2,libere simc
+116,B12030,SOIL TEMPERATURE,150,106,0,3600,0,C,var116,2,libere simc
+118,B12030,SOIL TEMPERATURE,150,106,0,3600,2,C,var118,2,libere simc
+117,B12030,SOIL TEMPERATURE,150,106,0,3600,3,C,var117,2,libere simc
+562,B12030,SOIL TEMPERATURE,150,106,0,3600,6,C,var562,2,libere simc
+528,B12030,SOIL TEMPERATURE,1800,106,0,0,254,C,var528,1,umsuol
+523,B12030,SOIL TEMPERATURE,250,106,0,0,254,C,var523,1,umsuol
+524,B12030,SOIL TEMPERATURE,450,106,0,0,254,C,var524,2,libere umsuol
+525,B12030,SOIL TEMPERATURE,700,106,0,0,254,C,var525,1,umsuol
+158,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,0,254,C,T ist,15,cer cro fidufv fiduli fiduma fidupo fiduto fiduve icirfe libere piattaforme renana rer romacq simc
+78,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,0,C,var78,2,libere simc
+80,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,2,C,var80,2,libere simc
+79,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,3,C,var79,2,libere simc
+403,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,6,C,var403,2,libere simc
+231,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,86400,86400,0,C,var231,7,cro icirfe libere renana rer romacq simc
+233,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,86400,86400,2,C,var233,7,cro icirfe libere renana rer romacq simc
+232,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,86400,86400,3,C,var232,7,cro icirfe libere renana rer romacq simc
+83,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,0,254,C,var83,2,piattaforme simc
+84,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,0,C,var84,2,piattaforme simc
+86,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,2,C,var86,3,libere simc umsuol
+85,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,3,C,var85,2,simc umsuol
+563,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,6,C,var563,1,simc
+234,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,86400,86400,0,C,var234,1,simc
+236,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,86400,86400,2,C,var236,1,simc
+235,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,86400,86400,3,C,var235,1,simc
+240,B13003,RELATIVE HUMIDITY,1800,103,86400,86400,0,%,var240,4,libere renana rer simc
+242,B13003,RELATIVE HUMIDITY,1800,103,86400,86400,2,%,var242,4,libere renana rer simc
+241,B13003,RELATIVE HUMIDITY,1800,103,86400,86400,3,%,var241,4,libere renana rer simc
+139,B13003,RELATIVE HUMIDITY,2000,103,0,0,254,%,RH ist,12,fidufv fiduli fiduma fidupo fiduto fiduve libere piattaforme renana rer romacq simc
+140,B13003,RELATIVE HUMIDITY,2000,103,0,3600,0,%,var140,2,libere simc
+142,B13003,RELATIVE HUMIDITY,2000,103,0,3600,2,%,var142,2,libere simc
+141,B13003,RELATIVE HUMIDITY,2000,103,0,3600,3,%,var141,2,libere simc
+406,B13003,RELATIVE HUMIDITY,2000,103,0,3600,6,%,var406,2,libere simc
+159,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,1800,1,mm,var159,9,cer coremo cro fidupo fiduto icirfe libere renana rer
+160,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,3600,1,mm,Prc 1hr,15,cer coremo cro fidufv fiduli fiduma fidupo fiduto fiduve icirfe libere renana rer romacq simc
+172,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,900,1,mm,var172,8,coremo cro fidupo icirfe libere renana rer simc
+473,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,32400,86400,1,mm,var473,11,cer coremo cro fiduli fiduto icirfe libere renana rer romacq simc
+250,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,86400,86400,1,mm,var250,9,cer coremo cro icirfe libere renana rer romacq simc
+162,B13013,TOTAL SNOW DEPTH,,1,0,0,254,cm,var162,6,fiduma fidupo fiduve libere rer simc
+518,B13013,TOTAL SNOW DEPTH,,1,0,3600,0,cm,var518,1,simc
+521,B13013,TOTAL SNOW DEPTH,,1,0,3600,2,cm,var521,1,simc
+520,B13013,TOTAL SNOW DEPTH,,1,0,3600,3,cm,var520,1,simc
+519,B13013,TOTAL SNOW DEPTH,,1,0,3600,6,cm,var519,1,simc
+662,B13081,WATER CONDUCTIVITY,,192,0,0,254,mS/cm,var662,1,freati
+169,B13082,WATER TEMPERATURE,,1,0,0,254,C,var169,2,cer rer
+661,B13082,WATER TEMPERATURE,,192,0,0,254,C,var661,1,freati
+670,B13194,[SIM] Water table depth,,1,0,0,254,m,var670,1,freati
+692,B13211,,,1,0,0,254,mc,var692,1,romacq
+144,B13212,[SIM] Leaf wetness duration,2000,103,0,3600,1,minuti,var144,3,fiduli libere simc
+257,B13212,[SIM] Leaf wetness duration,2000,103,86400,86400,0,minuti,var257,2,libere simc
+161,B13215,[SIM] River level,,1,0,0,254,m,var161,12,burana cer fiduli fiduma fidupo fiduto fiduve icirfe libere renana rer romacq
+512,B13226,[SIM] River discharge,,1,0,0,254,mc/s,var512,4,fidupo libere rer romacq
+529,B13227,[SIM] Soil volumetric water content,100,106,0,0,254,numero,var529,2,libere umsuol
+685,B13227,[SIM] Soil volumetric water content,100,106,86400,86400,0,numero,var685,1,umsuol
+533,B13227,[SIM] Soil volumetric water content,1000,106,0,0,254,numero,var533,1,umsuol
+689,B13227,[SIM] Soil volumetric water content,1000,106,86400,86400,0,numero,var689,1,umsuol
+534,B13227,[SIM] Soil volumetric water content,1350,106,0,0,254,numero,var534,1,umsuol
+690,B13227,[SIM] Soil volumetric water content,1350,106,86400,86400,0,numero,var690,1,umsuol
+535,B13227,[SIM] Soil volumetric water content,1800,106,0,0,254,numero,var535,1,umsuol
+691,B13227,[SIM] Soil volumetric water content,1800,106,86400,86400,0,numero,var691,1,umsuol
+530,B13227,[SIM] Soil volumetric water content,250,106,0,0,254,numero,var530,3,libere simc umsuol
+686,B13227,[SIM] Soil volumetric water content,250,106,86400,86400,0,numero,var686,3,libere simc umsuol
+531,B13227,[SIM] Soil volumetric water content,450,106,0,0,254,numero,var531,3,libere simc umsuol
+687,B13227,[SIM] Soil volumetric water content,450,106,86400,86400,0,numero,var687,3,libere simc umsuol
+532,B13227,[SIM] Soil volumetric water content,700,106,0,0,254,numero,var532,3,libere simc umsuol
+688,B13227,[SIM] Soil volumetric water content,700,106,86400,86400,0,numero,var688,3,libere simc umsuol
+248,B14018,INSTANTANEOUS SHORT-WAVE RADIATION (incoming),,1,86400,86400,2,W/m**2,var248,3,libere rer simc
+246,B14021,GLOBAL SOLAR RADIATION- INTEGRATED OVER PERIOD SPECIFIED,,1,86400,86400,1,Mj/m**2,var246,3,libere rer simc
+357,B14193,[SIM] Instantenous latent heat flux,,1,0,600,254,W/m**2,var357,4,fidupo fiduto fiduve libere
 164,B14198,[SIM] Visible radiation (downward),,1,0,0,254,W/m**2,Rad ist,8,fiduli fiduma fidupo fiduto fiduve libere piattaforme rer
 409,B14198,[SIM] Visible radiation (downward),,1,0,3600,0,W/m**2,Rad 1hr,2,libere simc
-411,B14198,[SIM] Visible radiation (downward),,1,0,3600,2,W/m**2,411,2,libere simc
-410,B14198,[SIM] Visible radiation (downward),,1,0,3600,3,W/m**2,410,2,libere simc
-414,B14199,[SIM] Visible radiation (upward),,1,0,3600,0,W/m**2,414,1,simc
-416,B14199,[SIM] Visible radiation (upward),,1,0,3600,2,W/m**2,416,1,simc
-415,B14199,[SIM] Visible radiation (upward),,1,0,3600,3,W/m**2,415,1,simc
-419,B14200,[SIM] Infrared radiation (downward),,1,0,3600,0,W/m**2,419,1,simc
-421,B14200,[SIM] Infrared radiation (downward),,1,0,3600,2,W/m**2,421,1,simc
-420,B14200,[SIM] Infrared radiation (downward),,1,0,3600,3,W/m**2,420,1,simc
-423,B14201,[SIM] Infrared radiation (upward),,1,0,3600,0,W/m**2,423,1,simc
-425,B14201,[SIM] Infrared radiation (upward),,1,0,3600,2,W/m**2,425,1,simc
-424,B14201,[SIM] Infrared radiation (upward),,1,0,3600,3,W/m**2,424,1,simc
-630,B22001,DIRECTION OF WAVES,,1,0,1800,0,gsess,630,1,boa
-684,B22021,HEIGHT OF WAVES,,1,0,1800,2,m,684,1,piattaforme
-489,B22031,SPEED OF CURRENT,5000,106,0,0,254,M/S,489,1,piattaforme
-683,B22038,Tidal elevation with respect to local chart datum,,101,0,0,254,m,683,1,piattaforme
-633,B22049,SEA-SURFACE TEMPERATURE,,1,0,1800,0,C,633,1,boa
-629,B22070,SIGNIFICANT WAVE HEIGHT,,1,0,1800,0,M,629,2,boa piattaforme
-632,B22071,SPECTRAL PEAK WAVE PERIOD,,1,0,1800,205,S,632,2,boa piattaforme
-631,B22074,AVERAGE WAVE PERIOD,,1,0,1800,0,S,631,2,boa piattaforme
-493,B22192,[SIM] Current X component,5000,106,0,0,254,M/S,493,1,piattaforme
-494,B22193,[SIM] Current Y component,5000,106,0,0,254,M/S,494,1,piattaforme
+411,B14198,[SIM] Visible radiation (downward),,1,0,3600,2,W/m**2,var411,2,libere simc
+410,B14198,[SIM] Visible radiation (downward),,1,0,3600,3,W/m**2,var410,2,libere simc
+414,B14199,[SIM] Visible radiation (upward),,1,0,3600,0,W/m**2,var414,1,simc
+416,B14199,[SIM] Visible radiation (upward),,1,0,3600,2,W/m**2,var416,1,simc
+415,B14199,[SIM] Visible radiation (upward),,1,0,3600,3,W/m**2,var415,1,simc
+419,B14200,[SIM] Infrared radiation (downward),,1,0,3600,0,W/m**2,var419,1,simc
+421,B14200,[SIM] Infrared radiation (downward),,1,0,3600,2,W/m**2,var421,1,simc
+420,B14200,[SIM] Infrared radiation (downward),,1,0,3600,3,W/m**2,var420,1,simc
+423,B14201,[SIM] Infrared radiation (upward),,1,0,3600,0,W/m**2,var423,1,simc
+425,B14201,[SIM] Infrared radiation (upward),,1,0,3600,2,W/m**2,var425,1,simc
+424,B14201,[SIM] Infrared radiation (upward),,1,0,3600,3,W/m**2,var424,1,simc
+630,B22001,DIRECTION OF WAVES,,1,0,1800,0,gsess,var630,1,boa
+489,B22031,SPEED OF CURRENT,5000,106,0,0,254,M/S,var489,1,piattaforme
+683,B22038,Tidal elevation with respect to local chart datum,,101,0,0,254,m,var683,1,piattaforme
+633,B22049,SEA-SURFACE TEMPERATURE,,1,0,1800,0,C,var633,1,boa
+629,B22070,SIGNIFICANT WAVE HEIGHT,,1,0,1800,0,M,var629,2,boa piattaforme
+632,B22071,SPECTRAL PEAK WAVE PERIOD,,1,0,1800,205,S,var632,2,boa piattaforme
+684,B22073,,,1,0,1800,2,m,var684,1,piattaforme
+631,B22074,AVERAGE WAVE PERIOD,,1,0,1800,0,S,var631,2,boa piattaforme
+493,B22192,[SIM] Current X component,5000,106,0,0,254,numero,var493,1,piattaforme
+494,B22193,[SIM] Current Y component,5000,106,0,0,254,numero,var494,1,piattaforme

@@ -1,19 +1,42 @@
 function wrom(args)
+*-------------------------------------------------------------------------------
+* Script per disegnare rose dei venti su mappa; chiamato da wrom.sh.
+* Uso: wrom.gs [-t typ -a area -xo xout]
+* I parametri typ e area vengono passati a draw_orog
+* Il parametro xout determina la dimesione della mappa di output, che dipende
+*   dal numero di wroses da inserire nella mappa: con una decina di wroses, va
+*   bene il default (1000), con un centinaio (es. NIta) provare fra 3000 e 5000.
+* 
+* NOTE:
+* Lo script "ovelray" (by Johnny) aggiunge le wroses e salva il png; si basa sui
+* programmi composite, pngtopnm, pnmscale e pnmtopng (pacchetti ImageMagick e 
+* netpbm)
+*
+*                                      Versione 2.0.0 Jhonny & Enrico 04/06/2015
+*-------------------------------------------------------------------------------
 
-* impostazioni
+* Abilito funzioni .gsf
+rc=gsfallow('on')
+
+* Impostazioni
 'reinit'
 'set mpdset hires'
 'white'
 'set parea 0.5 10.5 0.5 7'
 'c'
 
-* argomenti
-typ=subwrd(args,1)
-area=subwrd(args,2)
-if(typ="") ;typ=4 ;endif
-if(area="");area=5;endif
+* Argomenti
+ok_typ=parseopt(args,'-','t','ttt')
+ok_area=parseopt(args,'-','a','aaa')
+ok_xout=parseopt(args,'-','xo','xxx')
 
-* ritaglia area, disegna orografia
+if(ok_typ=1);  typ=_.ttt.1;  else; typ=4;  endif
+if(ok_area=1); area=_.aaa.1; else; area=7; endif
+if(ok_xout=1); xout=_.xxx.1; else; xout=1000; endif
+
+say 'typ='typ', area='area', xout='xout
+
+* Ritaglia area, disegna orografia
 'draw_orog 'typ' 'area
 'c'
 ok=0
@@ -57,7 +80,7 @@ endif
 'draw_orog 'typ' 'area
 res=close("wrom.lst")
 
-* individua posizione legenda
+* Individua posizione legenda
 'q gxinfo'
 line=sublin(result,2)
 xpag=subwrd(line,4)
@@ -71,11 +94,10 @@ ybl=subwrd(result,6)
 legx=xbl+0.35*(xtr-xbl)
 legy=ybl+0.7*(ytr-ybl)
 
-* aggiunge eventuali dettagli
-* eseguendo i comandi di tmp.gs
+* Aggiunge eventuali dettagli (esegue i comandi di wrtmp.gs)
 res=read(wrtmp.gs)
 ok=sublin(res,1)
-if(ok=0);'wrtmp';endif
+if(ok=0); say 'plot wrtmp.gs'; 'wrtmp'; endif
 
 * sovrappone rose dei venti e legenda
 ok=0
@@ -83,6 +105,7 @@ j=0
 flag=0
 while(ok=0)
   j=j+1
+  say 'wrom.gs: elaboro wrose 'j
   res=read("wrom.lst")
   ok=sublin(res,1)
   if(ok=0)
@@ -93,11 +116,11 @@ while(ok=0)
     respng=read(file)
     okpng=sublin(respng,1)
     if(flag=0)
-     'overlay -i legend -o wrom -D 1000 -d 700 -s -7 -4 -p 'legx' 'legy
-     flag=1
+      'overlay -i legend -o wrom -D 'xout' -d 700 -s -7 -4 -p 'legx' 'legy
+      flag=1
     endif
     if(okpng=0)  
-     'overlay -i 'j' -o wrom -r wrom -D 1000 -d 300 -s -7 -4 -p 'lon' 'lat
+      'overlay -i 'j' -o wrom -r wrom -D 'xout' -d 300 -s -7 -4 -p 'lon' 'lat
     endif
   endif
 endwhile
