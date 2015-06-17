@@ -18,39 +18,46 @@ MODULE local
 
 ! 2.1) Copia in anag2 i campi validi di anag1; se trova valori validi e 
 !      diversi, manda un warning
-  SUBROUTINE copy_anag(anag1,anag2)
+  SUBROUTINE copy_anag(anag1,anag2,datah)
+  USE datetime_class
   USE missing_values
   IMPLICIT NONE
   TYPE(anag), INTENT(IN) :: anag1
   TYPE(anag), INTENT(INOUT) :: anag2
+  TYPE (datetime), INTENT(IN) :: datah
+  CHARACTER (LEN=12) :: ch12
+
+  CALL getval(datah, SIMPLEDATE=ch12)
 
   IF (c_e(anag1%lon)) THEN
     IF (c_e(anag2%lon) .AND. anag1%lon /= anag2%lon) WRITE (*,*) &
-       "Warning anagrafica: lon passa da ",anag2%lon," a ",anag1%lon
+       "Warning anagrafica: ",ch12," lon passa da ",anag2%lon," a ",anag1%lon
     anag2%lon = anag1%lon
   ENDIF
 
   IF (c_e(anag1%lat)) THEN
     IF (c_e(anag2%lat) .AND. anag1%lat /= anag2%lat) WRITE (*,*) &
-       "Warning anagrafica: lat passa da ",anag2%lat," a ",anag1%lat
+       "Warning anagrafica: ",ch12," lat passa da ",anag2%lat," a ",anag1%lat
     anag2%lat = anag1%lat
   ENDIF
 
   IF (c_e(anag1%quo)) THEN
     IF (c_e(anag2%quo) .AND. anag1%quo /= anag2%quo) WRITE (*,*) &
-       "Warning anagrafica: quota passa da ",anag2%quo," a ",anag1%quo
+       "Warning anagrafica: ",ch12," quota passa da ",anag2%quo," a ",anag1%quo
     anag2%quo = anag1%quo
   ENDIF
 
   IF (anag1%rete /= "") THEN
     IF (anag2%rete /= "" .AND. anag1%rete /= anag2%rete) WRITE (*,*) &
-       "Warning anagrafica: rete passa da ",TRIM(anag2%rete)," a ",TRIM(anag1%rete)
+      "Warning anagrafica: ",ch12," rete passa da ",TRIM(anag2%rete), &
+      " a ",TRIM(anag1%rete)
     anag2%rete = anag1%rete
   ENDIF
 
   IF (anag1%nome /= "") THEN
     IF (anag2%nome /= "" .AND. anag1%nome /= anag2%nome) WRITE (*,*) &
-       "Warning anagrafica: nome passa da ",TRIM(anag2%nome)," a ",TRIM(anag1%nome)
+      "Warning anagrafica: ",ch12," nome passa da ",TRIM(anag2%nome), &
+      " a ",TRIM(anag1%nome)
     anag2%nome = anag1%nome
   ENDIF
 
@@ -174,7 +181,7 @@ PROGRAM bufr_csv2orari
 !   ottavi (adesso esce in %; assicurarsi che alameno sia consistente nella
 !   serie storica dei synop)
 ! 
-!                                         Versione 2.0.4, Enrico 17/06/2015
+!                                         Versione 2.0.5, Enrico 17/06/2015
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -371,7 +378,9 @@ DO k = 1,HUGE(0)
   pp = INDEX(chrec,",")
   IF (pp == 0) CYCLE
   ios = 0
-  IF (chrec(1:pp-1) == "B04001") THEN
+  IF (pp == LEN(TRIM(chrec))) THEN
+    CYCLE
+  ELSE IF (chrec(1:pp-1) == "B04001") THEN
     READ (chrec(pp+1:),*,IOSTAT=ios) yy
   ELSE IF (chrec(1:pp-1) == "B04002") THEN
     READ (chrec(pp+1:),*,IOSTAT=ios) mm
@@ -460,7 +469,7 @@ DO kh = 0,23
       cnt_diff = cnt_diff + ndiff
       cnt_ist_diff = cnt_ist_diff + 1
     ENDIF
-    CALL copy_anag(anag_dum,anag_out)
+    CALL copy_anag(anag_dum,anag_out,datah_req)
 
     IF (iret == 1) THEN
       end_inp = .TRUE.
