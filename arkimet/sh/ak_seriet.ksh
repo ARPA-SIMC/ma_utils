@@ -55,7 +55,7 @@
 #   l'append di quelli dei vari segmenti, quindi o non c'e' header, oppure c'e'
 #   un header per ciascun segmento.
 #
-#                                             Versione 1.11.1, Enrico 29/04/2015
+#                                             Versione 1.11.2, Enrico 11/06/2015
 #-------------------------------------------------------------------------------
 #set -x
 #set -e
@@ -113,7 +113,7 @@ function write_help
   echo "-arc=URL  accede al server Arkimet specificato:"
   echo "          archivio centrale SIMC: http://arkimet.metarpa:8090 (default)"
   echo "          archivio backup maialinux: http://maialinux.metarpa:8090"
-  echo "          archivio locale MA: /autofs/scratch2/eminguzzi/tmp/local_arkimet"
+  echo "          archivio locale MA su radicchio: /scratch/eminguzzi/local_arkimet"
   echo ""
   echo "-debug    non cancella i files temporanei (dir $TEMP/akq.*)"
   echo "-tdeb     visualizza i tempi di esecuzione delle singole elaborazioni"

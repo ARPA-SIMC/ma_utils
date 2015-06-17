@@ -22,12 +22,10 @@
 #   vecchi.
 #
 # TODO:
-# - opzione -summary, che non estrae i dati ma ritorna solo il numero di dati 
-#   presenti per ciascuna stazione (utilita' discutibilie; non gestirebbe le 
-#   flag di qualita'; verificare come gestire le query relative a piu' parametri)
+# - miglioare gestione errori quando non trova nessun dato
 # - gestire dataset lmruc_* (per dati in tempo reale)
 #
-#                                              Versione 2.0.0, Enrico 28/05/2015
+#                                              Versione 2.2.1, Enrico 17/06/2015
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -52,8 +50,10 @@ function write_help
   echo "data_end: ultima data da estrarre (AAAAMMGG)"
   echo ""
   echo "IDSTA:    id delle stazioni da estrarre (se piu' di una, separare con virgole)"
-  echo "          - con reti non-GTS usare il codice Oracle (anag_arkioss.csv)"
-  echo "          - con reti synop e temp usare il codice WMO (5 cifre: anag_synop.csv)"
+  echo "          - con reti non-GTS usare il codice Oracle (intero < 100000, oppure"
+  echo "            Hxxxxx; vedi file anag_arkioss.csv)"
+  echo "          - con reti synop e temp usare il codice WMO (formato xxxxx, oppure"
+  echo "            Sxxxxx o Txxxxx; vedi file anag_synop.csv)"
   echo "FILESTA:  file con la lista degli id delle stazioni da estrarre"
   echo ""
   echo "IDPAR:    id dei parametri da estrarre (se piu' di uno, separare con virgole)"
@@ -225,7 +225,7 @@ if [ $input_sta = "lst" ] ; then
     echo "file "$file_sta" non trovato"
     exit 2
   else
-    sta_list=`cat $file_sta`
+    sta_list=`grep -v "id_staz,lat,lon,quota" $file_sta | cut -d , -f 1`
   fi 
 else
   sta_list=`echo $sta_list_str | sed 's/,/ /g'`
@@ -267,6 +267,16 @@ elif [ $id_arc = "syn" ] ; then
 
 fi
 
+#-------------------------------------------------------------------------------
+# 1.5 Carattere identificativo del tipo di rete
+if [ $id_arc = "hfr" -o $id_arc = "oracle" ] ; then
+  chid="H"
+elif [ $id_arc = "syn" ] ; then
+  chid="S"
+elif [ $id_arc = "temp" ] ; then
+  chid="T"
+fi
+
 #===============================================================================
 # 2) Elaborazioni (ciclo sulle stazioni)
 
@@ -274,7 +284,21 @@ nsta=`echo $sta_list | wc -w`
 npar=`echo $par_list | wc -w`
 echo "Estraggo ${npar} parametri da ${nsta} stazioni"
 
-for id_staz in $sta_list ; do
+for id in $sta_list ; do
+
+# 2.0 Costuisco id_staz (Xsssss)
+  ch1=$(echo $id | awk '{print substr($1,1,1)}')
+  if [ $ch1 = $chid ] ; then      # id e' gia' nel formato Xsssss
+    id_staz=$id
+  else                            # id e' il codice stazione
+    echo $ch1 | grep [0-9] > /dev/null  2>&1 
+    if [ $? -ne 0 ] ; then
+      echo "Stazione illegale "$id
+      exit 3
+    fi
+    intfill $id 5
+    id_staz=${chid}${str_out}
+  fi
 
 #-------------------------------------------------------------------------------
 # 2.1 Trovo dataset e anagrafica della stazione richiesta
@@ -290,10 +314,7 @@ for id_staz in $sta_list ; do
     nome_sta=`echo $str_anag | cut -d , -f 6`
 
   elif [ $id_arc = "syn" ] ; then
-    blo=`echo $id_staz | awk '{print substr($1,1,2)}'`
-    sta=`echo $id_staz | awk '{print substr($1,3,3)}'`
-    sta2=`echo $sta | sed 's/^0*//'`
-    grep ^${blo},${sta} $anag_synop > /dev/null 2>&1
+    grep ^${id_staz} $anag_synop > /dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "Stazione "$id_staz" non trovata in "$anag_synop
       exit 3
@@ -302,10 +323,8 @@ for id_staz in $sta_list ; do
     nome_sta=$id_staz
 
   elif [ $id_arc = "temp" ] ; then
-    blo=`echo $id_staz | awk '{print substr($1,1,2)}'`
-    sta=`echo $id_staz | awk '{print substr($1,3,3)}'`
     sta2=`echo $sta | sed 's/^0*//'`
-    grep ^${blo},${sta} $anag_temp > /dev/null 2>&1
+    grep ^${id_staz} $anag_temp > /dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "Stazione "$id_staz" non trovata in "$anag_temp
       exit 3
@@ -315,15 +334,13 @@ for id_staz in $sta_list ; do
 
   fi
 
-  intfill $id_staz 5
-  id_staz2=$str_out
   echo "Elaboro stazione "$id_staz": "\"$nome_sta\"", dataset "$dataset
 
 #-------------------------------------------------------------------------------
 # 2.2 Costruisco la query
 
-  rm -f eo.query eo.out eo.bufr eo.vmold eo.vm eo.query
-  rm -f ${dataset}.conf eo_${id_staz2}.csv eo_${id_staz2}.dat
+  rm -f eo.query eo.out eo.csv vm2_bufr.err eo.bufr eo.vmold eo.vm eo.query
+  rm -f ${dataset}.conf eo_${id_staz}.csv eo_${id_staz}.dat
   if [ $id_arc = "hfr" -o $id_arc = "syn" -o $id_arc = "temp" ] ; then
     arki-mergeconf ${url}/dataset/${dataset} > ${dataset}.conf
   fi
@@ -340,7 +357,8 @@ for id_staz in $sta_list ; do
 
 # Stazione e parametri
   if [ $id_arc = "hfr" ] ; then
-    str_sta="area: VM2,${id_staz}"
+    id_staz_acr=$(echo $id_staz | awk '{print substr($1,2,5)}' | sed 's/^0*//')
+    str_sta="area: VM2,${id_staz_arc}"
     str_dum="product:"
     for par in $par_list ; do
       str_dum=${str_dum}" VM2,${par} or"
@@ -348,11 +366,15 @@ for id_staz in $sta_list ; do
     str_par=${str_dum%or}
 
   elif [ $id_arc = "syn" -o $id_arc = "temp" ] ; then
+    blo=`echo $id_staz | awk '{print substr($1,2,2)}'`
+    sta=`echo $id_staz | awk '{print substr($1,4,3)}'`
+    sta2=`echo $sta | sed 's/^0*//'`
     str_sta="proddef: GRIB:blo=${blo},sta=${sta2}"
     str_par=""
 
   elif [ $id_arc = "oracle" ] ; then
-    str_sta="ana_id=${id_staz}"
+    id_staz_arc=$(echo $id_staz | awk '{print substr($1,2,5)}' | sed 's/^0*//')
+    str_sta="ana_id=${id_staz_arc}"
     str_par=""
 
   fi
@@ -375,36 +397,43 @@ EOF
 
   if [ $id_arc = "hfr" ] ; then
     arki-query --data --config=${dataset}.conf --file=eo.query > eo.vm
+    work_file=eo.vm
   elif [ $id_arc = "syn" -o $id_arc = "temp" ] ; then
     arki-query --data --config=${dataset}.conf --file=eo.query > eo.bufr
+    work_file=eo.bufr
   elif [ $id_arc = "oracle" ] ; then
     dbavm dump --vm $str_sta $str_reftime > eo.vmold
     tail -n +2 eo.vmold | sed 's/://g;s/\///g;s/;/,/g' > eo.vm
+    work_file=eo.vm
   fi
 
-  if [ $id_arc = "hfr" -o $id_arc = "oracle" ] ; then
-    meteo-vm2-to-bufr < eo.vm > eo.bufr 2>vm2_bufr.err
-  fi
-  dbamsg dump --type=bufr --csv eo.bufr > eo.csv
-
-  if [ $id_arc = "hfr" -o $id_arc = "oracle" ] ; then
-    $bufr_csv2orari $opt eo.csv $data1 $data2 eo_param.csv $id_staz2
-  elif [ $id_arc = "syn" ] ; then
-    $bufr_csv2orari $opt -syn eo.csv $data1 $data2 eo_param.csv $id_staz2
-  elif [ $id_arc = "temp" ] ; then
-    $bufr_csv2temp eo.csv
-  fi
-
-  if [ $deb = "Y" ] ; then
-    cp eo.csv eo_${id_staz2}.csv
-    cp eo.bufr eo_${id_staz2}.bufr
+  if [ -s $work_file ] ; then
     if [ $id_arc = "hfr" -o $id_arc = "oracle" ] ; then
-      cp eo.vm eo_${id_staz2}.vm
-      cp vm2_bufr.err vm2_bufr_${id_staz2}.err
+      meteo-vm2-to-bufr < eo.vm > eo.bufr 2>vm2_bufr.err
     fi
-    if [ $id_arc = "hfr" -o $id_arc = "syn" -o $id_arc = "temp" ] ; then
-      cp eo.query eo_${id_staz2}.query
+    dbamsg dump --type=bufr --csv eo.bufr > eo.csv
+  
+    if [ $id_arc = "hfr" -o $id_arc = "oracle" ] ; then
+      $bufr_csv2orari $opt eo.csv $data1 $data2 eo_param.csv $id_staz
+    elif [ $id_arc = "syn" ] ; then
+      $bufr_csv2orari $opt -syn eo.csv $data1 $data2 eo_param.csv $id_staz
+    elif [ $id_arc = "temp" ] ; then
+      $bufr_csv2temp eo.csv
     fi
-  fi
+  
+    if [ $deb = "Y" ] ; then
+      cp eo.csv eo_${id_staz}.csv
+      cp eo.bufr eo_${id_staz}.bufr
+      if [ $id_arc = "hfr" -o $id_arc = "oracle" ] ; then
+        cp eo.vm eo_${id_staz}.vm
+        cp vm2_bufr.err vm2_bufr_${id_staz}.err
+      fi
+      if [ $id_arc = "hfr" -o $id_arc = "syn" -o $id_arc = "temp" ] ; then
+        cp eo.query eo_${id_staz}.query
+      fi
+    fi
 
+  else
+    echo "Nessun dato estratto per la stazione "$id_staz
+  fi
 done

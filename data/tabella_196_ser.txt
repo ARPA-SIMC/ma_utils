@@ -16,7 +16,7 @@
 !          -4 (se cloud cover); -5 (se flussi di calore); 
 !          -6 (se specie chimiche); 0 (altri casi)
 !
-!                                          Ultimo aggiornamento: 06/12/2013
+!                                          Ultimo aggiornamento: 10/06/2015
 !--------------------------------------------------------------------------
 !123--12345678--123--1234567890--1234567890--123
 !Cod  Sigla     dec     val.min     val.max  cp2
@@ -187,6 +187,48 @@
  158  p08BiA0D  exp        0.00      100.00   -6
  159  p08BiA2D  exp        0.00      100.00   -6
  160  p08ISOP2  exp        0.00      100.00   -6
+
+ 161  p09BCAR   exp        0.00      100.00   -6
+ 162  p09DUST   exp        0.00      100.00   -6
+ 163  p09OCAR   exp        0.00      100.00   -6
+ 164  p09PPM    exp        0.00      100.00   -6
+ 165  p09SALT   exp        0.00      100.00   -6
+ 166  p09AnA1D  exp        0.00      100.00   -6
+ 167  p09AnBmP  exp        0.00      100.00   -6
+ 168  p09BiA1D  exp        0.00      100.00   -6
+ 169  p09BiBmP  exp        0.00      100.00   -6
+ 170  p09H2SO4  exp        0.00      100.00   -6
+ 171  p09HNO3   exp        0.00      100.00   -6
+ 172  p09NH3    exp        0.00      100.00   -6
+ 173  p09WATER  exp        0.00      100.00   -6
+ 174  p09ISOPA1 exp        0.00      100.00   -6
+ 175  p09AnA0D  exp        0.00      100.00   -6
+ 176  p09AnA2D  exp        0.00      100.00   -6
+ 177  p09AnBIP  exp        0.00      100.00   -6
+ 178  p09BiA0D  exp        0.00      100.00   -6
+ 179  p09BiA2D  exp        0.00      100.00   -6
+ 180  p09ISOP2  exp        0.00      100.00   -6
+
+ 181  pxxBCAR   exp        0.00      100.00   -6
+ 182  pxxDUST   exp        0.00      100.00   -6
+ 183  pxxOCAR   exp        0.00      100.00   -6
+ 184  pxxPPM    exp        0.00      100.00   -6
+ 185  pxxSALT   exp        0.00      100.00   -6
+ 186  pxxAnA1D  exp        0.00      100.00   -6
+ 187  pxxAnBmP  exp        0.00      100.00   -6
+ 188  pxxBiA1D  exp        0.00      100.00   -6
+ 189  pxxBiBmP  exp        0.00      100.00   -6
+ 190  pxxH2SO4  exp        0.00      100.00   -6
+ 191  pxxHNO3   exp        0.00      100.00   -6
+ 192  pxxNH3    exp        0.00      100.00   -6
+ 193  pxxWATER  exp        0.00      100.00   -6
+ 194  pxxISOPA1 exp        0.00      100.00   -6
+ 195  pxxAnA0D  exp        0.00      100.00   -6
+ 196  pxxAnA2D  exp        0.00      100.00   -6
+ 197  pxxAnBIP  exp        0.00      100.00   -6
+ 198  pxxBiA0D  exp        0.00      100.00   -6
+ 199  pxxBiA2D  exp        0.00      100.00   -6
+ 200  pxxISOP2  exp        0.00      100.00   -6
 
  201  BCARAQ    exp        0.00      100.00   -6
  202  DUSTAQ    exp        0.00      100.00   -6

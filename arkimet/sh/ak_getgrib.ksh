@@ -14,7 +14,7 @@
 # LIBSIM_SVN:   eseguibili (ad esempio: /home/eminguzzi/svn/libsim; se non 
 #               specificato, usa gli eseguibili in path)
 #
-#                                         Versione 2.0.1, Enrico 29/04/2015
+#                                         Versione 2.0.2, Enrico 11/06/2015
 #--------------------------------------------------------------------------
 #set -x
 
@@ -34,7 +34,7 @@ function write_help
   echo "-arc=URL  accede al server Arkimet specificato:"
   echo "          archivio centrale SIMC: http://arkimet.metarpa:8090 (default)"
   echo "          archivio backup maialinux: http://maialinux.metarpa:8090"
-  echo "          archivio locale MA: /autofs/scratch2/eminguzzi/tmp/local_arkimet"
+  echo "          archivio locale MA su radicchio: /scratch/eminguzzi/local_arkimet"
   echo "-zoom=LON_MIN,LAT_MIN,LON_MAX,LAT_MAX: ritaglia (lato client) una sottoarea "
   echo "-mon=FILE scrive su FILE le date estratte, man man che vengono elaborate"
   echo "          (se usato senza opzione -zoom potrebbe rallentare l'estrazione)"

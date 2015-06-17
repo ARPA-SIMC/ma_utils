@@ -4,7 +4,7 @@
 ! I parametri aerosol di Chimere 2005 sono nella tab. 199
 ! I parametri Chimere gas sono nella tabella 200
 !
-!                                          Ultimo aggiornamento: 06/12/2013
+!                                          Ultimo aggiornamento: 10/06/2015
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890
 !Cod  Sigla     Descrizione e unita'
@@ -177,6 +177,48 @@
  158  p08BiA0D  p08BiA0D (ppb; classe 5-10 um)
  159  p08BiA2D  p08BiA2D (ppb; classe 5-10 um)
  160  p08ISOP2  p08ISOP2 (ppb; classe 5-10 um)
+
+ 161  p09BCAR   p09BCAR  (ppb; classe 10-20 um)
+ 162  p09DUST   p09DUST  (ppb; classe 10-20 um)
+ 163  p09OCAR   p09OCAR  (ppb; classe 10-20 um)  
+ 164  p09PPM    p09PPM   (ppb; classe 10-20 um)  
+ 165  p09SALT   p09SALT  (ppb; classe 10-20 um)  
+ 166  p09AnA1D  p09AnA1D (ppb; classe 10-20 um)  
+ 167  p09AnBmP  p09AnBmP (ppb; classe 10-20 um)  
+ 168  p09BiA1D  p09BiA1D (ppb; classe 10-20 um)  
+ 169  p09BiBmP  p09BiBmP (ppb; classe 10-20 um)  
+ 170  p09H2SO4  p09H2SO4 (ppb; classe 10-20 um)  
+ 171  p09HNO3   p09HNO3  (ppb; classe 10-20 um)  
+ 172  p09NH3    p09NH3   (ppb; classe 10-20 um)  
+ 173  p09WATER  p09WATER (ppb; classe 10-20 um)  
+ 174  p09ISOP1  p09ISOPA1(ppb; classe 10-20 um)
+ 175  p09AnA0D  p09AnA0D (ppb; classe 10-20 um)
+ 176  p09AnA2D  p09AnA2D (ppb; classe 10-20 um)
+ 177  p09AnBIP  p09AnBIP (ppb; classe 10-20 um)
+ 178  p09BiA0D  p09BiA0D (ppb; classe 10-20 um)
+ 179  p09BiA2D  p09BiA2D (ppb; classe 10-20 um)
+ 180  p09ISOP2  p09ISOP2 (ppb; classe 10-20 um)
+
+ 181  pxxBCAR   pxxBCAR  (ppb; classe 20-40 um)
+ 182  pxxDUST   pxxDUST  (ppb; classe 20-40 um)
+ 183  pxxOCAR   pxxOCAR  (ppb; classe 20-40 um)  
+ 184  pxxPPM    pxxPPM   (ppb; classe 20-40 um)  
+ 185  pxxSALT   pxxSALT  (ppb; classe 20-40 um)  
+ 186  pxxAnA1D  pxxAnA1D (ppb; classe 20-40 um)  
+ 187  pxxAnBmP  pxxAnBmP (ppb; classe 20-40 um)  
+ 188  pxxBiA1D  pxxBiA1D (ppb; classe 20-40 um)  
+ 189  pxxBiBmP  pxxBiBmP (ppb; classe 20-40 um)  
+ 190  pxxH2SO4  pxxH2SO4 (ppb; classe 20-40 um)  
+ 191  pxxHNO3   pxxHNO3  (ppb; classe 20-40 um)  
+ 192  pxxNH3    pxxNH3   (ppb; classe 20-40 um)  
+ 193  pxxWATER  pxxWATER (ppb; classe 20-40 um)  
+ 194  pxxISOP1  pxxISOPA1(ppb; classe 20-40 um)
+ 195  pxxAnA0D  pxxAnA0D (ppb; classe 20-40 um)
+ 196  pxxAnA2D  pxxAnA2D (ppb; classe 20-40 um)
+ 197  pxxAnBIP  pxxAnBIP (ppb; classe 20-40 um)
+ 198  pxxBiA0D  pxxBiA0D (ppb; classe 20-40 um)
+ 199  pxxBiA2D  pxxBiA2D (ppb; classe 20-40 um)
+ 200  pxxISOP2  pxxISOP2 (ppb; classe 20-40 um)
 
  201  BCARAQ    BCARAQ  
  202  DUSTAQ    DUSTAQ  

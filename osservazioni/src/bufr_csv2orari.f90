@@ -17,7 +17,7 @@ MODULE local
   CONTAINS
 
 ! 2.1) Copia in anag2 i campi validi di anag1; se trova valori validi e 
-!      diversi, non li copia e manda un warning
+!      diversi, manda un warning
   SUBROUTINE copy_anag(anag1,anag2)
   USE missing_values
   IMPLICIT NONE
@@ -25,51 +25,101 @@ MODULE local
   TYPE(anag), INTENT(INOUT) :: anag2
 
   IF (c_e(anag1%lon)) THEN
-    IF (c_e(anag2%lon)) THEN
-      IF (anag1%lon /= anag2%lon) WRITE (*,*) &
-       "Warning anagrafica: lon trovata ",anag1%lon," attesa ",anag2%lon
-    ELSE
-      anag2%lon = anag1%lon
-    ENDIF
+    IF (c_e(anag2%lon) .AND. anag1%lon /= anag2%lon) WRITE (*,*) &
+       "Warning anagrafica: lon passa da ",anag2%lon," a ",anag1%lon
+    anag2%lon = anag1%lon
   ENDIF
 
   IF (c_e(anag1%lat)) THEN
-    IF (c_e(anag2%lat)) THEN
-      IF (anag1%lat /= anag2%lat) WRITE (*,*) &
-       "Warning anagrafica: lat trovata ",anag1%lat," attesa ",anag2%lat
-    ELSE
-      anag2%lat = anag1%lat
-    ENDIF
+    IF (c_e(anag2%lat) .AND. anag1%lat /= anag2%lat) WRITE (*,*) &
+       "Warning anagrafica: lat passa da ",anag2%lat," a ",anag1%lat
+    anag2%lat = anag1%lat
   ENDIF
 
   IF (c_e(anag1%quo)) THEN
-    IF (c_e(anag2%quo)) THEN
-      IF (anag1%quo /= anag2%quo) WRITE (*,*) &
-       "Warning anagrafica: quo trovata ",anag1%quo," attesa ",anag2%quo
-    ELSE
-      anag2%quo = anag1%quo
-    ENDIF
+    IF (c_e(anag2%quo) .AND. anag1%quo /= anag2%quo) WRITE (*,*) &
+       "Warning anagrafica: quota passa da ",anag2%quo," a ",anag1%quo
+    anag2%quo = anag1%quo
   ENDIF
+
   IF (anag1%rete /= "") THEN
-    IF (anag2%rete /= "") THEN
-      IF (anag1%rete /= anag2%rete) WRITE (*,*) &
-       "Warning anagrafica: rete trovata ",TRIM(anag1%rete)," attesa ",TRIM(anag2%rete)
-    ELSE
-      anag2%rete = anag1%rete
-    ENDIF
+    IF (anag2%rete /= "" .AND. anag1%rete /= anag2%rete) WRITE (*,*) &
+       "Warning anagrafica: rete passa da ",TRIM(anag2%rete)," a ",TRIM(anag1%rete)
+    anag2%rete = anag1%rete
   ENDIF
 
   IF (anag1%nome /= "") THEN
-    IF (anag2%nome /= "") THEN
-      IF (anag1%nome /= anag2%nome) WRITE (*,*) &
-       "Warning anagrafica: nome trovato ",TRIM(anag1%nome)," atteso ",TRIM(anag2%nome)
-    ELSE
-      anag2%nome = anag1%nome
-    ENDIF
+    IF (anag2%nome /= "" .AND. anag1%nome /= anag2%nome) WRITE (*,*) &
+       "Warning anagrafica: nome passa da ",TRIM(anag2%nome)," a ",TRIM(anag1%nome)
+    anag2%nome = anag1%nome
   ENDIF
 
   RETURN
   END SUBROUTINE copy_anag
+
+!!!! Vecchia versione !!!!
+!! 2.1.2) Copia in anag2 i campi validi di anag1; se trova valori validi e 
+!!        diversi, non li copia e manda un warning
+!  SUBROUTINE copy_anag(anag1,anag2)
+!  USE missing_values
+!  IMPLICIT NONE
+!  TYPE(anag), INTENT(IN) :: anag1
+!  TYPE(anag), INTENT(INOUT) :: anag2
+!
+!  IF (c_e(anag1%lon)) THEN
+!    IF (c_e(anag2%lon) .AND. anag1%lon /= anag2%lon) WRITE (*,*) &
+!       "Warning anagrafica: lon passa da ",anag2%lon," a ",anag1%lon
+!    anag2%lon = anag1%lon
+!  ENDIF
+!
+!
+!
+!  IF (c_e(anag1%lon)) THEN
+!    IF (c_e(anag2%lon)) THEN
+!      IF (anag1%lon /= anag2%lon) WRITE (*,*) &
+!       "Warning anagrafica: lon trovata ",anag1%lon," attesa ",anag2%lon
+!    ELSE
+!      anag2%lon = anag1%lon
+!    ENDIF
+!  ENDIF
+!
+!  IF (c_e(anag1%lat)) THEN
+!    IF (c_e(anag2%lat)) THEN
+!      IF (anag1%lat /= anag2%lat) WRITE (*,*) &
+!       "Warning anagrafica: lat trovata ",anag1%lat," attesa ",anag2%lat
+!    ELSE
+!      anag2%lat = anag1%lat
+!    ENDIF
+!  ENDIF
+!
+!  IF (c_e(anag1%quo)) THEN
+!    IF (c_e(anag2%quo)) THEN
+!      IF (anag1%quo /= anag2%quo) WRITE (*,*) &
+!       "Warning anagrafica: quo trovata ",anag1%quo," attesa ",anag2%quo
+!    ELSE
+!      anag2%quo = anag1%quo
+!    ENDIF
+!  ENDIF
+!  IF (anag1%rete /= "") THEN
+!    IF (anag2%rete /= "") THEN
+!      IF (anag1%rete /= anag2%rete) WRITE (*,*) &
+!       "Warning anagrafica: rete trovata ",TRIM(anag1%rete)," attesa ",TRIM(anag2%rete)
+!    ELSE
+!      anag2%rete = anag1%rete
+!    ENDIF
+!  ENDIF
+!
+!  IF (anag1%nome /= "") THEN
+!    IF (anag2%nome /= "") THEN
+!      IF (anag1%nome /= anag2%nome) WRITE (*,*) &
+!       "Warning anagrafica: nome trovato ",TRIM(anag1%nome)," atteso ",TRIM(anag2%nome)
+!    ELSE
+!      anag2%nome = anag1%nome
+!    ENDIF
+!  ENDIF
+!
+!  RETURN
+!  END SUBROUTINE copy_anag
 
 ! 2.2) Funzione per verificare se due variabili metpar hanno stess Bcode, 
 !      livello e timerange
@@ -124,7 +174,7 @@ PROGRAM bufr_csv2orari
 !   ottavi (adesso esce in %; assicurarsi che alameno sia consistente nella
 !   serie storica dei synop)
 ! 
-!                                         Versione 2.0.2, Enrico 26/05/2015
+!                                         Versione 2.0.4, Enrico 17/06/2015
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -150,12 +200,15 @@ TYPE (datetime) :: datah_req1,datah_req2,datah_in1,datah_in2
 TYPE (datetime) :: datah_req,datah_next,datah_dum
 REAL, ALLOCATABLE :: values(:)
 INTEGER :: idum,ios,eof,eor,ier(10),iret,k,kp,kskip,kd,kh
-INTEGER :: idp,idsta,yy,mm,dd,hh,mn,nf,pp,npar,ndays,ndec
+INTEGER :: idp,yy,mm,dd,hh,mn,nf,pp,npar,ndays,ndec,ndiff
 INTEGER :: cnt_date_in,cnt_date_miss,cnt_date_skip,cnt_valok_out
-INTEGER :: cnt_istok_out,cnt_msg_skip
+INTEGER :: cnt_istok_out,cnt_msg_skip,cnt_diff,cnt_ist_diff
 CHARACTER (LEN=200) :: filein,fileout,filepar,filelog,fileana
 CHARACTER (LEN=200) :: chdum,chrec,chfmt1,chfmt2
+CHARACTER (LEN=20) :: idsta
 CHARACTER (LEN=12) :: ch12a,ch12b
+CHARACTER (LEN=10) :: ch10a,ch10b
+CHARACTER (LEN=6) :: ch6
 CHARACTER (LEN=3) :: inp_type,next_arg
 LOGICAL, ALLOCATABLE :: par_ok(:)
 LOGICAL :: end_inp,ldeb,ltc,lphpa,is_temp(maxpar),is_pres(maxpar)
@@ -209,7 +262,7 @@ DO kp = 1,HUGE(0)
     CASE (4)
       filepar = chdum
     CASE (5)
-      READ (chdum,*,IOSTAT=ios) idsta
+      READ (chdum,'(a)',IOSTAT=ios) idsta
       IF (ios /= 0) GOTO 9999
     CASE DEFAULT
       CALL write_help
@@ -273,11 +326,11 @@ ELSE
   WRITE (chfmt2,'(a,i3,a)') "(i4.4,3(1x,i2.2),",npar,"(1x,e10.3))"
 ENDIF
 
-WRITE (fileana,'(a3,i5.5,a4)') "eo_",idsta,".ana"
+WRITE (fileana,'(a3,a,a4)') "eo_",TRIM(idsta),".ana"
 OPEN (UNIT=iu_ana, FILE=fileana, STATUS="REPLACE", FORM="FORMATTED")
 
 IF (ldeb) THEN
-  WRITE (filelog,'(a3,i5.5,a4)') "eo_",idsta,".log"
+  WRITE (filelog,'(a3,a,a4)') "eo_",TRIM(idsta),".log"
   OPEN (UNIT=iu_log, FILE=filelog, STATUS="REPLACE", FORM="FORMATTED")
   WRITE (iu_log,'(a25,1x,a6,5(1x,a5))') "Parametri richiesti      ",&
     "Bcode ","l1","lt1","p1","p2","tr"
@@ -299,6 +352,8 @@ cnt_date_skip = 0
 cnt_valok_out = 0
 cnt_istok_out = 0
 cnt_msg_skip = 0
+cnt_diff = 0
+cnt_ist_diff = 0
 par_ok(:) = .FALSE.
 end_inp = .FALSE.
 
@@ -337,9 +392,9 @@ ENDDO
 datah_in1 = datah_next
 
 ! 1.4 Apro fileout e scrivo gli header
-WRITE (fileout,'(a3,i5.5,a4)') "eo_",idsta,".dat"
+WRITE (fileout,'(a3,a,a4)') "eo_",TRIM(idsta),".dat"
 OPEN (UNIT=iu_out, FILE=fileout, STATUS="REPLACE", FORM="FORMATTED")
-WRITE (iu_out,'(i5.5)') idsta
+WRITE (iu_out,'(a)') TRIM(idsta)
 WRITE (iu_out,*)
 WRITE (iu_out,chfmt1) "aaaa mm gg hh",ADJUSTR(req_par(1:npar)%short_name(1:10))
 
@@ -399,8 +454,12 @@ DO kh = 0,23
     ENDIF
 
     CALL get_msg(iu_in,iu_log,ldeb,eof,datah_req,npar,req_par(1:npar),inp_type, &
-       values,datah_dum,anag_dum,iret)
+       values,datah_dum,anag_dum,ndiff,iret)
 
+    IF (ndiff > 0) THEN
+      cnt_diff = cnt_diff + ndiff
+      cnt_ist_diff = cnt_ist_diff + 1
+    ENDIF
     CALL copy_anag(anag_dum,anag_out)
 
     IF (iret == 1) THEN
@@ -449,9 +508,14 @@ ENDDO
 ! 3) Conclusione
 
 ! Output anagrafica
-WRITE (iu_ana,'(i5.5,a,2(f10.5,a),f6.1,a,3a)') &
-  idsta,",",anag_out%lat,",",anag_out%lon,",",anag_out%quo,",",&
-  TRIM(anag_out%rete),",",TRIM(anag_out%nome)
+ch10a = ""
+ch10b = ""
+ch6 = ""
+IF (c_e(anag_out%lat)) WRITE (ch10a,'(f10.5)') anag_out%lat
+IF (c_e(anag_out%lon)) WRITE (ch10b,'(f10.5)') anag_out%lon
+IF (c_e(anag_out%quo)) WRITE (ch6,'(f6.1)') anag_out%quo
+WRITE (iu_ana,'(a,2(a1,a10),a1,a6,2(a1,a))') TRIM(idsta),",",ch10a,",",ch10b,",", &
+  ch6,",",TRIM(anag_out%rete),",",TRIM(anag_out%nome)
 
 ! Log a schermo
 CALL getval(datah_in1, SIMPLEDATE=ch12a)
@@ -472,6 +536,9 @@ WRITE (*,'(2(a,i6))')          "  parametri con dati: ",COUNT(par_ok(1:npar)), &
   " su ",npar
 WRITE (*,'(a,2(i6,a))') "  saltati ",cnt_date_skip," istanti, ", &
   cnt_msg_skip," messaggi"
+IF (cnt_diff > 0) WRITE (*,'(2(a,i5))') &
+  "Dati diversi relativi allo stesso istante: dati ",cnt_diff, &
+  " istanti ",cnt_ist_diff
 
 ! Chiudo files
 CLOSE(iu_in)
@@ -556,7 +623,7 @@ END PROGRAM bufr_csv2orari
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 SUBROUTINE get_msg(iu,iu_log,ldeb,eof,datah_req,npar,req_par,inp_type, &
-  values,datah_next,anag_dum,ier)
+  values,datah_next,anag_dum,ndiff,ier)
 
 ! Legge dall'unita' iu (gia aperta) i dati relativi a un'istante temporale
 ! (uno o piu' messaggi). Ritorna i valori relativi ai parametri richiesti 
@@ -611,14 +678,14 @@ CHARACTER (LEN=3), INTENT(IN) :: inp_type
 TYPE (anag), INTENT(OUT) :: anag_dum
 TYPE (datetime), INTENT(OUT) :: datah_next
 REAL, INTENT(OUT) :: values(npar)
-INTEGER, INTENT(OUT) :: ier
+INTEGER, INTENT(OUT) :: ndiff,ier
 
 ! Variabili locali
 TYPE (datetime) :: datah_dum
 TYPE (metpar) :: par_dum
 REAL :: val_dum
 INTEGER :: ios,iosr,k,kp,yy,mm,dd,hh,mn,pp,kp_qc_pending
-INTEGER :: cnt_null,nok,ndble,ndiff,nqcmiss,nmsg,qcf
+INTEGER :: cnt_null,nok,ndble,nqcmiss,nmsg,qcf
 CHARACTER (LEN=200) :: chrec,key
 CHARACTER (LEN=12) :: ch12
 CHARACTER (LEN=4) :: kty
@@ -667,7 +734,6 @@ DO k = 1,HUGE(0)
         ELSE IF (values(kp) == val_dum) THEN
           ndble = ndble + 1
         ELSE
-          WRITE (*,*) "Warning: dati diversi relativi allo stesso istante: "
           ndiff = ndiff + 1
           IF (ldeb) THEN
             CALL getval(datah_req, SIMPLEDATE=ch12)
@@ -831,7 +897,6 @@ DO k = 1,HUGE(0)
           ELSE IF (values(kp) == val_dum) THEN
             ndble = ndble + 1
           ELSE
-            WRITE (*,*) "Warning: dati diversi relativi allo stesso istante"
             ndiff = ndiff + 1
             IF (ldeb) THEN
               CALL getval(datah_req, SIMPLEDATE=ch12)
@@ -876,7 +941,6 @@ DO k = 1,HUGE(0)
         ELSE IF (values(kp) == val_dum) THEN
           ndble = ndble + 1
         ELSE
-          WRITE (*,*) "Warning: dati diversi relativi allo stesso istante"
           ndiff = ndiff + 1
           IF (ldeb) THEN
             CALL getval(datah_req, SIMPLEDATE=ch12)
@@ -1155,7 +1219,7 @@ WRITE (*,*) "filein:  BUFR riscritto csv, prodotto da ""dbamsg dump -csv"""
 WRITE (*,*) "data_ini: prima data richiesta in output (AAAAMMGG)"
 WRITE (*,*) "data_fin: ultima data richiesta in output (AAAAMMGG)"
 WRITE (*,*) "filepar: lista dei parametri richiesti in output (formato param_arkioss.csv)"
-WRITE (*,*) "idsta:   codice stazione (per header e nome file output)"
+WRITE (*,*) "idsta:   codice stazione (per header e nome file output; char, len<=20)"
 WRITE (*,*) "-ndec N: forza a N il numero di decimali in output (-1 per notazione exp)"
 WRITE (*,*) "-uv      scrive le temperature in gradi centigradi (def: K)"
 WRITE (*,*) "-tc      scrive le temperature in gradi centigradi (def: K)"

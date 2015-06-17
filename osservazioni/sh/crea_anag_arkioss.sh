@@ -4,10 +4,13 @@
 # presenti in ciascuna rete, e le scrive in due files .csv
 #
 # NOTE:
+# - Nei files di output, id_staz e' composto come: Hxxxxx, dove xxxxx e' il 
+#   codice Oracle della stazione, sempre a 5 cifre; il carattere "H" serve a 
+#   evitare conflitti con i codici WMO delle stazioni GTS.
 # - Causa bug arkimet, le query con intervallo di date ritornano meno dati di 
 #   quelle sull'intero dataset (non e' chiaro quale sia quella giusta...)
 #
-#                                              Versione 2.0.0, Enrico 03/06/2015
+#                                              Versione 2.2.0, Enrico 15/06/2015
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -16,8 +19,10 @@ function write_help
 {
 #       123456789012345678901234567890123456789012345678901234567890123456789012345678
   echo "Costruisce la lsita completa di parametri e stazioni presenti in arkioss"
-  echo "Uso: crea_anag_arkioss [-h] [data_ini data_fin] [-ope] "
-  echo "data_ini, data_fin: intervallo di date in cui cercare (intero dataset)"
+  echo "Uso: crea_anag_arkioss [-z xmin ymin xmax ymax] [-d data_ini data_fin]"
+  echo "     [-h] [-ope] "
+  echo "xmin ymin xmax ymax: estremi dell'aera geografica di ricerca (def: ovunque)"
+  echo "data_ini, data_fin: intervallo di date in cui cercare (def: qualsiasi data)"
   echo "-ope: aggiorna l'anagrafica in /home/eminguzzi/svn/ma_utils/data"
 }
 
@@ -34,13 +39,13 @@ function intfill
   len_req=$2
 
   len_in=`echo $str_in | awk '{print length($1)}'`
-  nzeri=`expr $len_req - $len_in`
+  nzeri=$[${len_req}-${len_in}]
 
   str_out=""
   cnt_private=0
   while [ $cnt_private -lt $nzeri ] ; do
     str_out=${str_out}"0"
-    cnt_private=`expr $cnt_private + 1`
+    cnt_private=$[$cnt_private+1]
   done
   str_out=${str_out}${str_in}
 }
@@ -52,37 +57,55 @@ function parse_area
 # a una stazione.
 #
 # Note:
-# - Questa funzione e' usata  anche da crea_anag_arkioss.sh; la funzione gemella
-#   (parse_product) e' usata anche da get_var_staz.sh.
+# - Se il record di anagrafica e' incompleto, i campi mancanti sono messi a ""
+# - La funzione parse_area e' usata da crea_anag_arkioss.sh e get_staz_var.sh
+# - La funzione parse_product e' usata da crea_anag_arkioss.sh e get_var_staz.sh
 
 {
 line2=$(echo $line | sed 's/"//g')
+id_staz=""
+lon=""
+lat=""
+quo=""
+nome=""
 
 # id_staz (Oracle)
 pp=$(echo "" | awk '{print index("'"${line2}"'","(")}')
-id_staz=$(echo $line2 | cut -c $[pp+1]- | cut -d , -f 1)
+if [ $pp -gt 0 ] ; then
+  dummy=$(echo $line2 | cut -c $[pp+1]- | cut -d , -f 1 | cut -d \) -f 1)
+  intfill $dummy 5
+  id_staz="H"${str_out}
+fi
 
 # Coordinate (in archvio in gradi*10^5)
 pp=$(echo "" | awk '{print index("'"${line2}"'","lon=")}')
-dummy=$(echo $line2 | cut -c $[pp+4]- | cut -d , -f 1)
-intfill $dummy 7
-lon=$(echo $str_out | awk '{print substr($1,1,2) "." substr($1,3,5)}')
+if [ $pp -gt 0 ] ; then
+  dummy=$(echo $line2 | cut -c $[pp+4]- | cut -d , -f 1 | cut -d \) -f 1)
+  intfill $dummy 7
+  lon=$(echo $str_out | awk '{print substr($1,1,2) "." substr($1,3,5)}')
+fi
 
 pp=$(echo "" | awk '{print index("'"${line2}"'","lat=")}')
-dummy=$(echo $line2 | cut -c $[pp+4]- | cut -d , -f 1)
-intfill $dummy 7
-lat=$(echo $str_out | awk '{print substr($1,1,2) "." substr($1,3,5)}')
+if [ $pp -gt 0 ] ; then
+  dummy=$(echo $line2 | cut -c $[pp+4]- | cut -d , -f 1 | cut -d \) -f 1)
+  intfill $dummy 7
+  lat=$(echo $str_out | awk '{print substr($1,1,2) "." substr($1,3,5)}')
+fi
 
 # Quota (in archvio in dm)
 pp=$(echo "" | awk '{print index("'"${line2}"'","B07030=")}')
-dummy=$(echo $line2 | cut -c $[pp+7]- | cut -d , -f 1)
-quo=$[$dummy/10]
+if [ $pp -gt 0 ] ; then
+  dummy=$(echo $line2 | cut -c $[pp+7]- | cut -d , -f 1 | cut -d \) -f 1)
+  quo=$[$dummy/10]
+fi
 
 # Nome 
 pp=$(echo "" | awk '{print index("'"${line2}"'","B01019=")}')
-nome=$(echo $line2 | cut -c $[pp+7]- | cut -d , -f 1)
+if [ $pp -gt 0 ] ; then
+  nome=$(echo $line2 | cut -c $[pp+7]- | cut -d , -f 1 | cut -d \) -f 1)
+fi
 
-str_area_csv=${id_staz},${net},${lon},${lat},${quo},${nome}
+str_area_csv=${id_staz},${lat},${lon},${quo},${net},${nome}
 }
 
 #===============================================================================
@@ -149,9 +172,8 @@ str_product_csv=${id_var}","${bcode}","${long_name}${ltru}","${short_name}
 # 1) Preliminari
 
 # Parametri da riga comando
-today=$(date +%Y%m%d)
-data1="nil"
-data2="nil"
+data_restrict="N"
+area_restrict="N"
 ope="N"
 
 idp=0
@@ -159,6 +181,24 @@ while [ $# -ge 1 ] ; do
   if [ $1 = -h ] ; then
     write_help
     exit 1
+  elif [ $1 = "-z" ] ; then
+    area_restrict="Y"
+    shift
+    xmin=$1
+    shift
+    ymin=$1
+    shift
+    xmax=$1
+    shift
+    ymax=$1
+    shift
+  elif [ $1 = "-d" ] ; then
+    data_restrict="Y"
+    shift
+    data1=$1
+    shift
+    data2=$1
+    shift
   elif [ $1 = "-ope" ] ; then
     ope="Y"
     shift
@@ -218,21 +258,30 @@ fi
 
 # Scrivo l'header dei files di output
 rm -f $fileout1 $fileout2
-echo "id_staz,dset,lon,lat,quota,nome" > $fileout1
+echo "id_staz,lat,lon,quota,dataset,nome" > $fileout1
 echo "id_var,bcode,long_name,l1,lt1,p1,p2,tr,unit,short_name,net_number,net_list" > $fileout2
 
 # Costruisco la query arkioss
 rm -f caa.query
-if [ $data1 = "nil" -o $data2 = "nil" ] ; then
+if [ $data_restrict = "N" ] ; then
   echo "Cerco dati con reftime qualsiasi"
   touch caa.query
 else
   echo "Cerco dati con reftime tra "$data1" e "$data2
-  str_reftime=">="$(date -d $data1 +%Y-%m-%d)", <="$(date -d $data2 +%Y-%m-%d)
-  cat <<EOF > caa.query
-  reftime: ${str_reftime}
-EOF
+  echo "reftime: >="$(date -d $data1 +%Y-%m-%d)", <="$(date -d $data2 +%Y-%m-%d) \
+    >> caa.query
 fi
+
+if [ $area_restrict = "N" ] ; then
+  echo "Cerco dati con coordinate qualsiasi"
+else
+  echo "Cerco dati nel rettangolo "$xmin" "$ymin" "$xmax" "$ymax
+  echo "area: bbox coveredby POLYGON(($xmin $ymin, $xmax $ymin, $xmax $ymax, $xmin $ymax, $xmin $ymin))" \
+    >> caa.query
+fi
+
+# Varie
+unset http_proxy
 
 #===============================================================================
 # 2) Elaborazioni
@@ -242,7 +291,6 @@ fi
 
 echo "Scarico l'elenco dei dataset"
 rm -f tmp.ds ds.lst
-unset http_proxy
 curl $akurl 2>/dev/null > tmp.ds
 grep /dataset/ tmp.ds | cut -d / -f 3 | cut -d \' -f 1 | grep -v error > ds.lst
 
@@ -271,6 +319,7 @@ while read net ; do
     parse_product
     echo $str_product_csv >> all.pd
   done < tmp2.yml
+
 done < ds.lst
 
 #-------------------------------------------------------------------------------
