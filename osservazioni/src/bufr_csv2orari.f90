@@ -181,7 +181,7 @@ PROGRAM bufr_csv2orari
 !   ottavi (adesso esce in %; assicurarsi che alameno sia consistente nella
 !   serie storica dei synop)
 ! 
-!                                         Versione 2.0.5, Enrico 17/06/2015
+!                                         Versione 2.1.0, Enrico 29/06/2015
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -352,7 +352,11 @@ IF (ldeb) THEN
 ENDIF
 
 ! 1.3 Apro filein e leggo la prima data che contiene
-anag_out = anag(rmiss,rmiss,rmiss,"","")
+IF (inp_type == "syn") THEN
+  anag_out = anag(rmiss,rmiss,rmiss,"synop","")
+ELSE
+  anag_out = anag(rmiss,rmiss,rmiss,"","")
+ENDIF
 cnt_date_in = 0
 cnt_date_miss = 0
 cnt_date_skip = 0
@@ -380,6 +384,8 @@ DO k = 1,HUGE(0)
   ios = 0
   IF (pp == LEN(TRIM(chrec))) THEN
     CYCLE
+
+! Chiavi relative alla data
   ELSE IF (chrec(1:pp-1) == "B04001") THEN
     READ (chrec(pp+1:),*,IOSTAT=ios) yy
   ELSE IF (chrec(1:pp-1) == "B04002") THEN
@@ -390,7 +396,20 @@ DO k = 1,HUGE(0)
     READ (chrec(pp+1:),*,IOSTAT=ios) hh
   ELSE IF (chrec(1:pp-1) == "B04005") THEN
     READ (chrec(pp+1:),*,IOSTAT=ios) mn
+
+! Eventuali chiavi relative all'anagrafica
+  ELSE IF (chrec(1:pp-1) == "B05001") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) anag_out%lat
+  ELSE IF (chrec(1:pp-1) == "B06001") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) anag_out%lon
+  ELSE IF (chrec(1:pp-1) == "B07030") THEN
+    READ (chrec(pp+1:),*,IOSTAT=ios) anag_out%quo
+  ELSE IF (chrec(1:pp-1) == "B01019" .OR. chrec(1:pp-1) == "B01015") THEN
+    READ (chrec(pp+1:),'(a)',IOSTAT=ios) anag_out%nome
+  ELSE IF (chrec(1:pp-1) == "B01194") THEN
+    READ (chrec(pp+1:),'(a)',IOSTAT=ios) anag_out%rete
   ENDIF
+
   IF (ios /= 0) GOTO 9993
   IF (c_e(yy) .AND. c_e(mm) .AND. c_e(dd) .AND. c_e(hh) .AND. c_e(mn)) THEN
     datah_next =  datetime_new(YEAR=yy, MONTH=mm, DAY=dd, HOUR=hh, MINUTE=mn)
@@ -555,7 +574,14 @@ CLOSE(iu_out)
 CLOSE(iu_ana)
 CLOSE(iu_log)
 
-STOP 0
+! Codice d'errore finale
+IF (cnt_valok_out == 0) THEN
+  STOP 103                        ! tutti i dati richiesti sono mancanti
+ELSE IF (cnt_valok_out < ndays*24*npar) THEN
+  STOP 102                        ! alcuni dei dati richiesti sono mancanti
+ELSE                               
+  STOP 0                          ! trovati tutti i dati richiesti
+ENDIF
 
 !--------------------------------------------------------------------------
 ! 4) Gestione errori
@@ -571,7 +597,7 @@ WRITE (*,*) "Errore aprendo ",TRIM(filepar)
 STOP 2
 
 9997 CONTINUE
-WRITE (*,*) "Errore leggendo ",TRIM(filepar)," record ",k
+WRITE (*,*) "Errore leggendo ",TRIM(filepar)," record ",kp
 IF (ios /= 0) THEN
   IF (ios /= 0) WRITE (*,*) "ios ",ios
 ELSE
@@ -746,8 +772,8 @@ DO k = 1,HUGE(0)
           ndiff = ndiff + 1
           IF (ldeb) THEN
             CALL getval(datah_req, SIMPLEDATE=ch12)
-            WRITE (*,'(a10,2(2x,f10.3),i3,1x,a)') &
-              ch12,values(kp),val_dum,kp,TRIM(req_par(kp)%short_name)
+            WRITE (iu_log,'(a,a10,2(2x,f10.3),i3,1x,a)') &
+              "get_msg",ch12,values(kp),val_dum,kp,TRIM(req_par(kp)%short_name)
           ENDIF
         ENDIF
 
@@ -909,8 +935,8 @@ DO k = 1,HUGE(0)
             ndiff = ndiff + 1
             IF (ldeb) THEN
               CALL getval(datah_req, SIMPLEDATE=ch12)
-              WRITE (*,'(a12,2(2x,f10.3),i3,1x,a)') &
-                ch12,values(kp),val_dum,kp,TRIM(req_par(kp)%short_name)
+              WRITE (iu_log,'(a,a12,2(2x,f10.3),i3,1x,a)') &
+                "get_msg",ch12,values(kp),val_dum,kp,TRIM(req_par(kp)%short_name)
             ENDIF
           ENDIF
 
@@ -953,8 +979,8 @@ DO k = 1,HUGE(0)
           ndiff = ndiff + 1
           IF (ldeb) THEN
             CALL getval(datah_req, SIMPLEDATE=ch12)
-            WRITE (*,'(a12,2(2x,f10.3),i3,1x,a)') &
-              ch12,values(kp),val_dum,kp,TRIM(req_par(kp)%short_name)
+            WRITE (iu_log,'(a,a12,2(2x,f10.3),i3,1x,a)') &
+              "get_msg",ch12,values(kp),val_dum,kp,TRIM(req_par(kp)%short_name)
           ENDIF
         ENDIF
 
@@ -995,7 +1021,7 @@ ENDDO
 !--------------------------------------------------------------------------
 
 WRITE (*,*) "Non dovrei mai passare di qui!!!"
-STOP 100
+STOP 10
 
 9999 CONTINUE
 WRITE (*,*) TRIM(chrec)
@@ -1235,6 +1261,12 @@ WRITE (*,*) "-tc      scrive le temperature in gradi centigradi (def: K)"
 WRITE (*,*) "-phpa    scrive le presisoni in hPa (def: Pa)"
 WRITE (*,*) "-deb:    scrive su file .log la sequenza dei dati trovati in input"
 WRITE (*,*) "-h:      visualizza questo help"
+WRITE (*,*)
+WRITE (*,*) "Codici d'errore:"
+WRITE (*,*) "0:     trovati tutti i dati richiesti"
+WRITE (*,*) "102:   alcuni dei dati richiesti sono mancanti"
+WRITE (*,*) "103:   tutti i dati richiesti sono mancanti"
+WRITE (*,*) "altro: fatal error"
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 
 RETURN

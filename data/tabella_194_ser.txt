@@ -1,0 +1,250 @@
+!--------------------------------------------------------------------------
+! Parametri richiesti da gacsv2seriet relativi alla tabella 194: 
+! "Variabili prognostiche aerosol, Chimere versioni 2008-2014, ug/m3"
+!
+! Contenuto dei campi
+! Cod:     condice GRIB del parametro
+! Sigla:   identificativo del parametro nell'output seriet
+! dec:     numero di decimali nell'output seriet
+! val.min: valore minimo accettabile
+! val.max: valore massimo accettabile
+! cp2:     codice 2a componente (se vento U); 
+!          500 + codice 1a componente (se vento V);
+!          -1 (se temperatura); -2 (se lugh.MO); -3 (se sw budget); 
+!          -4 (se cloud cover); -5 (se flussi di calore); 
+!          -6 (se specie chimiche); 0 (altri casi)
+!
+!                                          Ultimo aggiornamento: 10/06/2015
+!--------------------------------------------------------------------------
+!123--12345678--123--1234567890--1234567890--123
+!Cod  Sigla     dec     val.min     val.max  cp2
+   1  p01BCAR   exp        0.00      100.00   -6
+   2  m01DUST   exp        0.00      100.00   -6
+   3  m01OCAR   exp        0.00      100.00   -6
+   4  m01PPM    exp        0.00      100.00   -6
+   5  m01SALT   exp        0.00      100.00   -6
+   6  m01AnA1D  exp        0.00      100.00   -6
+   7  m01AnBmP  exp        0.00      100.00   -6
+   8  m01BiA1D  exp        0.00      100.00   -6
+   9  m01BiBmP  exp        0.00      100.00   -6
+  10  m01H2SO4  exp        0.00      100.00   -6
+  11  m01HNO3   exp        0.00      100.00   -6
+  12  m01NH3    exp        0.00      100.00   -6
+  13  m01WATER  exp        0.00      100.00   -6
+  14  m01ISOPA1 exp        0.00      100.00   -6
+  15  m01AnA0D  exp        0.00      100.00   -6
+  16  m01AnA2D  exp        0.00      100.00   -6
+  17  m01AnBIP  exp        0.00      100.00   -6
+  18  m01BiA0D  exp        0.00      100.00   -6
+  19  m01BiA2D  exp        0.00      100.00   -6
+  20  m01ISOP2  exp        0.00      100.00   -6
+
+  21  m02BCAR   exp        0.00      100.00   -6
+  22  m02DUST   exp        0.00      100.00   -6
+  23  m02OCAR   exp        0.00      100.00   -6
+  24  m02PPM    exp        0.00      100.00   -6
+  25  m02SALT   exp        0.00      100.00   -6
+  26  m02AnA1D  exp        0.00      100.00   -6
+  27  m02AnBmP  exp        0.00      100.00   -6
+  28  m02BiA1D  exp        0.00      100.00   -6
+  29  m02BiBmP  exp        0.00      100.00   -6
+  30  m02H2SO4  exp        0.00      100.00   -6
+  31  m02HNO3   exp        0.00      100.00   -6
+  32  m02NH3    exp        0.00      100.00   -6
+  33  m02WATER  exp        0.00      100.00   -6
+  34  m02ISOPA1 exp        0.00      100.00   -6
+  35  m02AnA0D  exp        0.00      100.00   -6
+  36  m02AnA2D  exp        0.00      100.00   -6
+  37  m02AnBIP  exp        0.00      100.00   -6
+  38  m02BiA0D  exp        0.00      100.00   -6
+  39  m02BiA2D  exp        0.00      100.00   -6
+  40  m02ISOP2  exp        0.00      100.00   -6
+
+  41  m03BCAR   exp        0.00      100.00   -6
+  42  m03DUST   exp        0.00      100.00   -6
+  43  m03OCAR   exp        0.00      100.00   -6
+  44  m03PPM    exp        0.00      100.00   -6
+  45  m03SALT   exp        0.00      100.00   -6
+  46  m03AnA1D  exp        0.00      100.00   -6
+  47  m03AnBmP  exp        0.00      100.00   -6
+  48  m03BiA1D  exp        0.00      100.00   -6
+  49  m03BiBmP  exp        0.00      100.00   -6
+  50  m03H2SO4  exp        0.00      100.00   -6
+  51  m03HNO3   exp        0.00      100.00   -6
+  52  m03NH3    exp        0.00      100.00   -6
+  53  m03WATER  exp        0.00      100.00   -6
+  54  m03ISOPA1 exp        0.00      100.00   -6
+  55  m03AnA0D  exp        0.00      100.00   -6
+  56  m03AnA2D  exp        0.00      100.00   -6
+  57  m03AnBIP  exp        0.00      100.00   -6
+  58  m03BiA0D  exp        0.00      100.00   -6
+  59  m03BiA2D  exp        0.00      100.00   -6
+  60  m03ISOP2  exp        0.00      100.00   -6
+
+  61  m04BCAR   exp        0.00      100.00   -6
+  62  m04DUST   exp        0.00      100.00   -6
+  63  m04OCAR   exp        0.00      100.00   -6
+  64  m04PPM    exp        0.00      100.00   -6
+  65  m04SALT   exp        0.00      100.00   -6
+  66  m04AnA1D  exp        0.00      100.00   -6
+  67  m04AnBmP  exp        0.00      100.00   -6
+  68  m04BiA1D  exp        0.00      100.00   -6
+  69  m04BiBmP  exp        0.00      100.00   -6
+  70  m04H2SO4  exp        0.00      100.00   -6
+  71  m04HNO3   exp        0.00      100.00   -6
+  72  m04NH3    exp        0.00      100.00   -6
+  73  m04WATER  exp        0.00      100.00   -6
+  74  m04ISOPA1 exp        0.00      100.00   -6
+  75  m04AnA0D  exp        0.00      100.00   -6
+  76  m04AnA2D  exp        0.00      100.00   -6
+  77  m04AnBIP  exp        0.00      100.00   -6
+  78  m04BiA0D  exp        0.00      100.00   -6
+  79  m04BiA2D  exp        0.00      100.00   -6
+  80  m04ISOP2  exp        0.00      100.00   -6
+
+  81  m05BCAR   exp        0.00      100.00   -6
+  82  m05DUST   exp        0.00      100.00   -6
+  83  m05OCAR   exp        0.00      100.00   -6
+  84  m05PPM    exp        0.00      100.00   -6
+  85  m05SALT   exp        0.00      100.00   -6
+  86  m05AnA1D  exp        0.00      100.00   -6
+  87  m05AnBmP  exp        0.00      100.00   -6
+  88  m05BiA1D  exp        0.00      100.00   -6
+  89  m05BiBmP  exp        0.00      100.00   -6
+  90  m05H2SO4  exp        0.00      100.00   -6
+  91  m05HNO3   exp        0.00      100.00   -6
+  92  m05NH3    exp        0.00      100.00   -6
+  93  m05WATER  exp        0.00      100.00   -6
+  94  m05ISOPA1 exp        0.00      100.00   -6
+  95  m05AnA0D  exp        0.00      100.00   -6
+  96  m05AnA2D  exp        0.00      100.00   -6
+  97  m05AnBIP  exp        0.00      100.00   -6
+  98  m05BiA0D  exp        0.00      100.00   -6
+  99  m05BiA2D  exp        0.00      100.00   -6
+ 100  m05ISOP2  exp        0.00      100.00   -6
+
+ 101  m06BCAR   exp        0.00      100.00   -6
+ 102  m06DUST   exp        0.00      100.00   -6
+ 103  m06OCAR   exp        0.00      100.00   -6
+ 104  m06PPM    exp        0.00      100.00   -6
+ 105  m06SALT   exp        0.00      100.00   -6
+ 106  m06AnA1D  exp        0.00      100.00   -6
+ 107  m06AnBmP  exp        0.00      100.00   -6
+ 108  m06BiA1D  exp        0.00      100.00   -6
+ 109  m06BiBmP  exp        0.00      100.00   -6
+ 110  m06H2SO4  exp        0.00      100.00   -6
+ 111  m06HNO3   exp        0.00      100.00   -6
+ 112  m06NH3    exp        0.00      100.00   -6
+ 113  m06WATER  exp        0.00      100.00   -6
+ 114  m06ISOPA1 exp        0.00      100.00   -6
+ 115  m06AnA0D  exp        0.00      100.00   -6
+ 116  m06AnA2D  exp        0.00      100.00   -6
+ 117  m06AnBIP  exp        0.00      100.00   -6
+ 118  m06BiA0D  exp        0.00      100.00   -6
+ 119  m06BiA2D  exp        0.00      100.00   -6
+ 120  m06ISOP2  exp        0.00      100.00   -6
+
+ 121  m07BCAR   exp        0.00      100.00   -6
+ 122  m07DUST   exp        0.00      100.00   -6
+ 123  m07OCAR   exp        0.00      100.00   -6
+ 124  m07PPM    exp        0.00      100.00   -6
+ 125  m07SALT   exp        0.00      100.00   -6
+ 126  m07AnA1D  exp        0.00      100.00   -6
+ 127  m07AnBmP  exp        0.00      100.00   -6
+ 128  m07BiA1D  exp        0.00      100.00   -6
+ 129  m07BiBmP  exp        0.00      100.00   -6
+ 130  m07H2SO4  exp        0.00      100.00   -6
+ 131  m07HNO3   exp        0.00      100.00   -6
+ 132  m07NH3    exp        0.00      100.00   -6
+ 133  m07WATER  exp        0.00      100.00   -6
+ 134  m07ISOPA1 exp        0.00      100.00   -6
+ 135  m07AnA0D  exp        0.00      100.00   -6
+ 136  m07AnA2D  exp        0.00      100.00   -6
+ 137  m07AnBIP  exp        0.00      100.00   -6
+ 138  m07BiA0D  exp        0.00      100.00   -6
+ 139  m07BiA2D  exp        0.00      100.00   -6
+ 140  m07ISOP2  exp        0.00      100.00   -6
+
+ 141  m08BCAR   exp        0.00      100.00   -6
+ 142  m08DUST   exp        0.00      100.00   -6
+ 143  m08OCAR   exp        0.00      100.00   -6
+ 144  m08PPM    exp        0.00      100.00   -6
+ 145  m08SALT   exp        0.00      100.00   -6
+ 146  m08AnA1D  exp        0.00      100.00   -6
+ 147  m08AnBmP  exp        0.00      100.00   -6
+ 148  m08BiA1D  exp        0.00      100.00   -6
+ 149  m08BiBmP  exp        0.00      100.00   -6
+ 150  m08H2SO4  exp        0.00      100.00   -6
+ 151  m08HNO3   exp        0.00      100.00   -6
+ 152  m08NH3    exp        0.00      100.00   -6
+ 153  m08WATER  exp        0.00      100.00   -6
+ 154  m08ISOPA1 exp        0.00      100.00   -6
+ 155  m08AnA0D  exp        0.00      100.00   -6
+ 156  m08AnA2D  exp        0.00      100.00   -6
+ 157  m08AnBIP  exp        0.00      100.00   -6
+ 158  m08BiA0D  exp        0.00      100.00   -6
+ 159  m08BiA2D  exp        0.00      100.00   -6
+ 160  m08ISOP2  exp        0.00      100.00   -6
+
+ 161  m09BCAR   exp        0.00      100.00   -6
+ 162  m09DUST   exp        0.00      100.00   -6
+ 163  m09OCAR   exp        0.00      100.00   -6
+ 164  m09PPM    exp        0.00      100.00   -6
+ 165  m09SALT   exp        0.00      100.00   -6
+ 166  m09AnA1D  exp        0.00      100.00   -6
+ 167  m09AnBmP  exp        0.00      100.00   -6
+ 168  m09BiA1D  exp        0.00      100.00   -6
+ 169  m09BiBmP  exp        0.00      100.00   -6
+ 170  m09H2SO4  exp        0.00      100.00   -6
+ 171  m09HNO3   exp        0.00      100.00   -6
+ 172  m09NH3    exp        0.00      100.00   -6
+ 173  m09WATER  exp        0.00      100.00   -6
+ 174  m09ISOPA1 exp        0.00      100.00   -6
+ 175  m09AnA0D  exp        0.00      100.00   -6
+ 176  m09AnA2D  exp        0.00      100.00   -6
+ 177  m09AnBIP  exp        0.00      100.00   -6
+ 178  m09BiA0D  exp        0.00      100.00   -6
+ 179  m09BiA2D  exp        0.00      100.00   -6
+ 180  m09ISOP2  exp        0.00      100.00   -6
+
+ 181  mxxBCAR   exp        0.00      100.00   -6
+ 182  mxxDUST   exp        0.00      100.00   -6
+ 183  mxxOCAR   exp        0.00      100.00   -6
+ 184  mxxPPM    exp        0.00      100.00   -6
+ 185  mxxSALT   exp        0.00      100.00   -6
+ 186  mxxAnA1D  exp        0.00      100.00   -6
+ 187  mxxAnBmP  exp        0.00      100.00   -6
+ 188  mxxBiA1D  exp        0.00      100.00   -6
+ 189  mxxBiBmP  exp        0.00      100.00   -6
+ 190  mxxH2SO4  exp        0.00      100.00   -6
+ 191  mxxHNO3   exp        0.00      100.00   -6
+ 192  mxxNH3    exp        0.00      100.00   -6
+ 193  mxxWATER  exp        0.00      100.00   -6
+ 194  mxxISOPA1 exp        0.00      100.00   -6
+ 195  mxxAnA0D  exp        0.00      100.00   -6
+ 196  mxxAnA2D  exp        0.00      100.00   -6
+ 197  mxxAnBIP  exp        0.00      100.00   -6
+ 198  mxxBiA0D  exp        0.00      100.00   -6
+ 199  mxxBiA2D  exp        0.00      100.00   -6
+ 200  mxxISOP2  exp        0.00      100.00   -6
+
+ 201  BCARAQ    exp        0.00      100.00   -6
+ 202  DUSTAQ    exp        0.00      100.00   -6
+ 203  OCARAQ    exp        0.00      100.00   -6
+ 204  PPMAQ     exp        0.00      100.00   -6
+ 205  SALTAQ    exp        0.00      100.00   -6
+ 206  AnA1DAQ   exp        0.00      100.00   -6
+ 207  AnBmPAQ   exp        0.00      100.00   -6
+ 208  BiA1DAQ   exp        0.00      100.00   -6
+ 209  BiBmPAQ   exp        0.00      100.00   -6
+ 210  H2SO4AQ   exp        0.00      100.00   -6
+ 211  HNO3AQ    exp        0.00      100.00   -6
+ 212  NH3AQ     exp        0.00      100.00   -6
+ 214  ISOPA1AQ  exp        0.00      100.00   -6
+ 215  AnA0DAQ   exp        0.00      100.00   -6
+ 216  AnA2DAQ   exp        0.00      100.00   -6
+ 217  AnBIPAQ   exp        0.00      100.00   -6
+ 218  BiA0DAQ   exp        0.00      100.00   -6
+ 219  BiA2DAQ   exp        0.00      100.00   -6
+ 220  ISOP2AQ   exp        0.00      100.00   -6
+!123--12345678--123--1234567890--1234567890--123

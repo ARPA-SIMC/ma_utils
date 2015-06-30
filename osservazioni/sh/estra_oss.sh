@@ -25,7 +25,7 @@
 # - miglioare gestione errori quando non trova nessun dato
 # - gestire dataset lmruc_* (per dati in tempo reale)
 #
-#                                              Versione 2.2.1, Enrico 17/06/2015
+#                                              Versione 2.2.2, Enrico 30/06/2015
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -54,7 +54,8 @@ function write_help
   echo "            Hxxxxx; vedi file anag_arkioss.csv)"
   echo "          - con reti synop e temp usare il codice WMO (formato xxxxx, oppure"
   echo "            Sxxxxx o Txxxxx; vedi file anag_synop.csv)"
-  echo "FILESTA:  file con la lista degli id delle stazioni da estrarre"
+  echo "FILESTA:  file con la lista degli id delle stazioni da estrarre; puo' essere un"
+  echo "          file .csv con id_stazione come primo campo."
   echo ""
   echo "IDPAR:    id dei parametri da estrarre (se piu' di uno, separare con virgole)"
   echo "          - per reti non-GTS, indicare i codici Oracle (param_shortnames.csv o"
@@ -310,7 +311,7 @@ for id in $sta_list ; do
       exit 3
     fi
     str_anag=`grep ^${id_staz}, $anag_arkioss`
-    dataset=`echo $str_anag | cut -d , -f 2`
+    dataset=`echo $str_anag | cut -d , -f 5`
     nome_sta=`echo $str_anag | cut -d , -f 6`
 
   elif [ $id_arc = "syn" ] ; then
@@ -357,7 +358,7 @@ for id in $sta_list ; do
 
 # Stazione e parametri
   if [ $id_arc = "hfr" ] ; then
-    id_staz_acr=$(echo $id_staz | awk '{print substr($1,2,5)}' | sed 's/^0*//')
+    id_staz_arc=$(echo $id_staz | awk '{print substr($1,2,5)}' | sed 's/^0*//')
     str_sta="area: VM2,${id_staz_arc}"
     str_dum="product:"
     for par in $par_list ; do

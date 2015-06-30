@@ -35,6 +35,8 @@ pkgdataroot_DATA = \
 	$(top_srcdir)/data/tabella_002.txt \
 	$(top_srcdir)/data/tabella_128_ser.txt \
 	$(top_srcdir)/data/tabella_128.txt \
+	$(top_srcdir)/data/tabella_194_ser.txt \
+	$(top_srcdir)/data/tabella_194.txt \
 	$(top_srcdir)/data/tabella_195_ser.txt \
 	$(top_srcdir)/data/tabella_195.txt \
 	$(top_srcdir)/data/tabella_196_ser.txt \

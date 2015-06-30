@@ -1,8 +1,6 @@
 !--------------------------------------------------------------------------
-! Sigla identificativa e altri parametri richiesti da trasp_seriet relativi
-! alla tab. 199 (variabili prognostiche aerosol di Chimere V2008)
-! I parametri aerosol di Chimere 2005 sono nella tab. 199
-! I parametri Chimere gas sono nella tabella 200
+! Parametri richiesti da gacsv2seriet relativi alla tabella 196: 
+! "Variabili prognostiche aerosol, Chimere versioni 2008-2014, ppb"
 !
 ! Contenuto dei campi
 ! Cod:     condice GRIB del parametro

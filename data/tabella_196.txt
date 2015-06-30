@@ -1,8 +1,12 @@
 !--------------------------------------------------------------------------
-! Sigla GRADS e descrizione dei parametri della tabella 199  (variabili 
-! prognostiche aerosol di Chimere V2008)
-! I parametri aerosol di Chimere 2005 sono nella tab. 199
-! I parametri Chimere gas sono nella tabella 200
+! Sigla GRADS e descrizione dei parametri della tabella 196:
+!   "Variabili prognostiche aerosol, Chimere versioni 2008-2014, ppb"
+!
+! Codifica variabili Chimere:
+! Le specie gassose sono nella tabella 200
+! Le famiglie aerosol sono nelle tabelle 200 (V2005) e 195 (V2008-2014)
+! Le variabili prognostiche aerosol sono nelle tabelle: 199 (V2005), 
+!   196 (V2014, ppb) e 194 (V2014, ug/m3)
 !
 !                                          Ultimo aggiornamento: 10/06/2015
 !--------------------------------------------------------------------------
@@ -220,23 +224,23 @@
  199  pxxBiA2D  pxxBiA2D (ppb; classe 20-40 um)
  200  pxxISOP2  pxxISOP2 (ppb; classe 20-40 um)
 
- 201  BCARAQ    BCARAQ  
- 202  DUSTAQ    DUSTAQ  
- 203  OCARAQ    OCARAQ    
- 204  PPMAQ     PPMAQ     
- 205  SALTAQ    SALTAQ    
- 206  AnA1DAQ   AnA1DAQ   
- 207  AnBmPAQ   AnBmPAQ   
- 208  BiA1DAQ   BiA1DAQ   
- 209  BiBmPAQ   BiBmPAQ   
- 210  H2SO4AQ   H2SO4AQ   
- 211  HNO3AQ    HNO3AQ    
- 212  NH3AQ     NH3AQ     
- 214  ISOPA1AQ  ISOPA1AQ
- 215  AnA0DAQ   AnA0DAQ   
- 216  AnA2DAQ   AnA2DAQ
- 217  AnBIPAQ   AnBIPAQ
- 218  BiA0DAQ   BiA0DAQ
- 219  BiA2DAQ   BiA2DAQ
- 220  ISOP2AQ   ISOP2AQ
+ 201  BCARAQ    BCARAQ   (ug/m3)
+ 202  DUSTAQ    DUSTAQ   (ug/m3)
+ 203  OCARAQ    OCARAQ   (ug/m3)
+ 204  PPMAQ     PPMAQ    (ug/m3)    
+ 205  SALTAQ    SALTAQ   (ug/m3)
+ 206  AnA1DAQ   AnA1DAQ  (ug/m3) 
+ 207  AnBmPAQ   AnBmPAQ  (ug/m3)
+ 208  BiA1DAQ   BiA1DAQ  (ug/m3)
+ 209  BiBmPAQ   BiBmPAQ  (ug/m3)
+ 210  H2SO4AQ   H2SO4AQ  (ug/m3)
+ 211  HNO3AQ    HNO3AQ   (ug/m3)
+ 212  NH3AQ     NH3AQ    (ug/m3)
+ 214  ISOPA1AQ  ISOPA1AQ (ug/m3)
+ 215  AnA0DAQ   AnA0DAQ  (ug/m3)
+ 216  AnA2DAQ   AnA2DAQ  (ug/m3)
+ 217  AnBIPAQ   AnBIPAQ  (ug/m3)
+ 218  BiA0DAQ   BiA0DAQ  (ug/m3)
+ 219  BiA2DAQ   BiA2DAQ  (ug/m3)
+ 220  ISOP2AQ   ISOP2AQ  (ug/m3)
 !123--12345678--1234567890123456789012345678901234567890

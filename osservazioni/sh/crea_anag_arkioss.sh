@@ -1,6 +1,6 @@
 #/bin/ksh
 #-------------------------------------------------------------------------------
-# Estre da arkioss le infomrazioni relative alle stazioni e ai prarametri 
+# Estre da arkioss le informazioni relative alle stazioni e ai prarametri 
 # presenti in ciascuna rete, e le scrive in due files .csv
 #
 # NOTE:
@@ -9,6 +9,7 @@
 #   evitare conflitti con i codici WMO delle stazioni GTS.
 # - Causa bug arkimet, le query con intervallo di date ritornano meno dati di 
 #   quelle sull'intero dataset (non e' chiaro quale sia quella giusta...)
+# - Estremi zoom: per BPA "6 43.5 14 47", per EmR "9.2 43.8 13 45.2"
 #
 #                                              Versione 2.2.0, Enrico 15/06/2015
 #-------------------------------------------------------------------------------

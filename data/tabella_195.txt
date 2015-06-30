@@ -1,12 +1,16 @@
 !--------------------------------------------------------------------------
-! Sigla GRADS e descrizione dei parametri della tabella 195 (usata da 
-! Chimere V2008 e successive). 
-! I parametri gas Chimere sono nella tabella 200, le variabili prognostiche
-! aerosol nella tabella 196
+! Sigla GRADS e descrizione dei parametri della tabella 195: 
+!   "Famiglie aersol, Chimere versioni 2008-2014"
+!
+! Codifica variabili Chimere:
+! Le specie gassose sono nella tabella 200
+! Le famiglie aerosol sono nelle tabelle 200 (V2005) e 195 (V2008-2014)
+! Le variabili prognostiche aerosol sono nelle tabelle: 199 (V2005), 
+!   196 (V2014, ppb) e 194 (V2014, ug/m3)
 !
 ! I suffissi "spl", "med" e "cpx" si riferiscono agli schemi aerosol
 ! di Chimere
-!                                          Ultimo aggiornamento: 06/12/2013
+!                                          Ultimo aggiornamento: 25/06/2015
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890--12345
 !Cod  Sigla     Descrizione e unita'                      B-Tab 
@@ -46,33 +50,39 @@
   32  p10tsec   Total secondary part. in PM10 (ug/m3)     15223
   33  p10ant    Total antr. part. in PM10, med (ug/m3)    15237
   34  p10bio    Total biog. part. in PM10, med (ug/m3)    15238
+  35  p10dusb   Dust from boundary cond. in PM10 (ug/m3)
+  36  p10duse   Dust from erosion in PM10 (ug/m3)
+  37  p10dusr   Dust from resuspsension in PM10 (ug/m3)
 
-!Speciazione PM25, V2008 (specie: 39-59; aggregati: 60-68)
-  39  p25ppm    Primary part. matter in PM25 (ug/m3)
-  40  p25h2so4  Sulfate in PM25 (ug/m3)
-  41  p25hno3   Nitrate in PM25 (ug/m3)
-  42  p25nh3    Ammonium in PM25 (ug/m3)
-  43  p25bcar   Black carbon in PM25 (ug/m3)
-  44  p25ocar   Organic carbon in PM25 (ug/m3)
-  45  p25dust   Dust in PM25 (ug/m3)
-  46  p25AnA1D  Anthropogenic A1D in PM25 (ug/m3)
-  47  p25AnBmP  Anthropogenic BmP in PM25 (ug/m3)
-  48  p25BiA1D  Biogenic A1D in PM25 (ug/m3)
-  49  p25BiBmP  Biogenic BmP in PM25 (ug/m3)
-  50  p25WATER  Water in PM25 (ug/m3)
-  51  p25salt   Sea salt in PM25 (ug/m3)
-  52  p25ISOP1  ISOPA1 in PM25 (ug/m3)
-  53  p25AnA0D  Anthropogenic A0D in PM25 (ug/m3)
-  54  p25AnA2D  Anthropogenic A2D in PM25 (ug/m3)
-  55  p25AnBIP  Anthropogenic BIP in PM25 (ug/m3)
-  56  p25BiA0D  Biogenic A0D in PM25 (ug/m3)
-  57  p25BiA2D  Biogenic A2D in PM25 (ug/m3)
-  58  p25ISOP2  ISOPA2 in PM25 (ug/m3)
-  60  p25tsoa   Total secondary organic in PM25 (ug/m3)
-  61  p25tpri   Total primary part. in PM25 (ug/m3)
-  62  p25tsec   Total secondary part. in PM25 (ug/m3)
-  63  p25ant    Total antr. part. in PM25, med (ug/m3)    15237
-  64  p25bio    Total biog. part. in PM25, med (ug/m3)    15238
+!Speciazione PM2.5, V2008 (specie: 39-59; aggregati: 60-68)
+  39  p25ppm    Primary part. matter in PM2.5 (ug/m3)
+  40  p25h2so4  Sulfate in PM2.5 (ug/m3)
+  41  p25hno3   Nitrate in PM2.5 (ug/m3)
+  42  p25nh3    Ammonium in PM2.5 (ug/m3)
+  43  p25bcar   Black carbon in PM2.5 (ug/m3)
+  44  p25ocar   Organic carbon in PM2.5 (ug/m3)
+  45  p25dust   Dust in PM2.5 (ug/m3)
+  46  p25AnA1D  Anthropogenic A1D in PM2.5 (ug/m3)
+  47  p25AnBmP  Anthropogenic BmP in PM2.5 (ug/m3)
+  48  p25BiA1D  Biogenic A1D in PM2.5 (ug/m3)
+  49  p25BiBmP  Biogenic BmP in PM2.5 (ug/m3)
+  50  p25WATER  Water in PM2.5 (ug/m3)
+  51  p25salt   Sea salt in PM2.5 (ug/m3)
+  52  p25ISOP1  ISOPA1 in PM2.5 (ug/m3)
+  53  p25AnA0D  Anthropogenic A0D in PM2.5 (ug/m3)
+  54  p25AnA2D  Anthropogenic A2D in PM2.5 (ug/m3)
+  55  p25AnBIP  Anthropogenic BIP in PM2.5 (ug/m3)
+  56  p25BiA0D  Biogenic A0D in PM2.5 (ug/m3)
+  57  p25BiA2D  Biogenic A2D in PM2.5 (ug/m3)
+  58  p25ISOP2  ISOPA2 in PM2.5 (ug/m3)
+  60  p25tsoa   Total secondary organic in PM2.5 (ug/m3)
+  61  p25tpri   Total primary part. in PM2.5 (ug/m3)
+  62  p25tsec   Total secondary part. in PM2.5 (ug/m3)
+  63  p25ant    Total antr. part. in PM2.5, med (ug/m3)    15237
+  64  p25bio    Total biog. part. in PM2.5, med (ug/m3)    15238
+  65  p25dusb   Dust from boundary cond. in PM2.5 (ug/m3)
+  66  p25duse   Dust from erosion in PM2.5 (ug/m3)
+  67  p25dusr   Dust from resuspsension in PM2.5 (ug/m3)
 
 !Speciazione PM1, V2008 (specie: 69-89; aggregati: 90-98)
   69  p1ppm     Primary part. matter in PM1 (ug/m3)
@@ -100,6 +110,9 @@
   92  p1tsec    Total secondary part. in PM1 (ug/m3)
   93  p1ant     Antr. part. in PM1, level 2 (ug/m3)
   94  p1bio     Biog. part. in PM1, level 2 (ug/m3)
+  95  p1dusb    Dust from boundary cond. in PM1 (ug/m3)
+  96  p1duse    Dust from erosion in PM1 (ug/m3)
+  97  p1dusr    Dust from resuspsension in PM1 (ug/m3)
 
 !AOD
  200  aod550    Aerosol Optical Depth at 550nm (number)   15241

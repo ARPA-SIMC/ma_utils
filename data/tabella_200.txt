@@ -1,9 +1,17 @@
 !--------------------------------------------------------------------------
-! Sigla GRADS e descrizione dei parametri della tabella 200 (usata da 
-! Calmet e modelli fotochimici)
-! I parametri aerosol Chimere sono nelle tabelle 196 e 199.
+! Parametri richiesti da gacsv2seriet relativi alla tabella 200: 
+! "Calmet e modelli fotochimici"
 !
-!                                          Ultimo aggiornamento: 15/12/2014
+! Codifica variabili Chimere:
+! Le specie gassose sono nella tabella 200
+! Le famiglie aerosol sono nelle tabelle 200 (V2005) e 195 (V2008-2014)
+! Le variabili prognostiche aerosol sono nelle tabelle: 199 (V2005), 
+!   196 (V2014, ppb) e 194 (V2014, ug/m3)
+!
+! Per implementare lo schema "full" di Chimere V2014, occorre aggiungere 
+! 7 specie gas (AnA0D, BiA0D, AnA2D, BiA2D, ISOPA1, ISOPA2, AnBIP) e 
+!
+!                                          Ultimo aggiornamento: 25/06/2015
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890--12345
 !Cod  Sigla     Descrizione e unita'                      B-Tab 
@@ -84,7 +92,16 @@
  158  ho2       HO2 (ppb)
  159  pan       PAN (ppb)
 
-!Chimere GAS species
+!Chimere "V2014 full" gas species
+ 160  AnA0D     AnA0D (ppb) 
+ 161  BiA0D 	BiA0D (ppb)
+ 162  AnA2D 	AnA2D (ppb)
+ 163  BiA2D 	BiA2D (ppb)
+ 164  ISOPA1	ISOPA1 (ppb)
+ 165  ISOPA2	ISOPA2 (ppb)
+ 166  AnBIP 	AnBIP (ppb)
+
+!Chimere gas species
  170  hcho      HCHO (ppb)
  175  mglyox    MGLYOX (ppb)
  180  bpinen    BPINEN (chimere: ppb)

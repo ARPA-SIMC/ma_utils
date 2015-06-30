@@ -1,7 +1,6 @@
 !--------------------------------------------------------------------------
-! Sigla identificativa e altri parametri richiesti da trasp_seriet relativi
-! alla tab. 200 (usata da Calmet e modelli fotochimici) 
-! I parametri aerosol Chimere sono nelle tabelle 196 e 199.
+! Parametri richiesti da gacsv2seriet relativi alla tabella 200: 
+! "Calmet e modelli fotochimici"
 !
 ! Contenuto dei campi
 ! Cod:     condice GRIB del parametro
@@ -15,7 +14,7 @@
 !          -4 (se cloud cover); -5 (se flussi di calore); 
 !          -6 (se specie chimiche); 0 (altri casi)
 !
-!                                          Ultimo aggiornamento: 22/11/2013
+!                                          Ultimo aggiornamento: 25/06/2015
 !--------------------------------------------------------------------------
 !123--12345678--123--1234567890--1234567890--123
 !Cod  Sigla     dec     val.min     val.max  cp2
@@ -97,7 +96,16 @@
  158  ho2         4        0.00    99999.99   -6
  159  pan         4        0.00    99999.99   -6
 
-!Chimere GAS species
+!Chimere "V2014 full" gas species
+ 160  AnA0D       4        0.00    99999.99   -6
+ 161  BiA0D       4        0.00    99999.99   -6
+ 162  AnA2D       4        0.00    99999.99   -6
+ 163  BiA2D       4        0.00    99999.99   -6
+ 164  ISOPA1      4        0.00    99999.99   -6
+ 165  ISOPA2      4        0.00    99999.99   -6
+ 166  AnBIP       4        0.00    99999.99   -6
+
+!Chimere gas species
  170  hcho        4        0.00    99999.99   -6
  175  mglyox      4        0.00    99999.99   -6
  180  bpinen      4        0.00    99999.99   -6

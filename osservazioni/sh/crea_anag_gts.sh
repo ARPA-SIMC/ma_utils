@@ -19,12 +19,7 @@
 #               se non specificato, usa: /usr/bin)
 #
 # TODO:
-# - Estrarre un dato qualsiasi da ciascuna stazione, e ricavare lat,lon,quota,nome
-#   Al momento non e' chiaro come fare: non c'e' modo fi estrarre da arkimet 
-#   solo il primo dato valido (la query rischierebbe di rimanere appesa); le 
-#   altrenative sembrerebbero estrarre una data a caso (ma si perdono dati), 
-#   estrarre tutti i dati (ma diventa lentissimo), fare un ciclo di estrazioni
-#   su date successive a caso (peggio che peggio...)
+# - Anagrficia completa anche per la rete TEMP: richiede 
 #
 # Note:
 # - Nei files di output, id_staz e' composto come: Xbbsss, con X="S" o "T", bb=
@@ -33,8 +28,9 @@
 # - A differenza di quanto avviene per le stazioni ad alta frequenza (archiviate
 #   in formato VM2), i dati gts sono archiviati in formato BUFR: ciascun 
 #   messaggio contiene quindi tutte le informazioni di anagrafica.
+# - Estremi zoom: per BPA "6 43.5 14 47", per EmR "9.2 43.8 13 45.2"
 #
-#                                              Versione 2.1.1, Enrico 15/06/2015
+#                                              Versione 2.2.0, Enrico 29/06/2015
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -45,10 +41,11 @@ function write_help
   echo "Estre da arkimet le informazioni relative alle stazioni europee della rete"
   echo "GTS (synop e temp)"
   echo "Uso: crea_anag_gts [-z xmin ymin xmax ymax] [-d data_ini data_fin]"
-  echo "     [-h] [-ope] "
+  echo "     [-h] [-ope] [-coo]"
   echo "xmin ymin xmax ymax: estremi dell'aera geografica di ricerca (def: ovunque)"
   echo "data_ini, data_fin: intervallo di date in cui cercare (def: qualsiasi data)"
   echo "-ope: aggiorna l'anagrafica in /home/eminguzzi/svn/ma_utils/data"
+  echo "-full: scrive anche coordinate, quota e nome stazione (lento; def: solo codice) "
 }
 
 #===============================================================================
@@ -116,13 +113,64 @@ else
 fi
 
 }
+
+#===============================================================================
+function build_anag
+{
+#----------------------------------------------------------------------
+# Cerca di estrarre qualche dato della stazione corrente, per salvare 
+# l'anagrafica campleta
+#----------------------------------------------------------------------
+
+# Assegnazioni valide per tutti i tentativi
+  rm -f ba.query ba_param.csv ba.bufr ba.csv "S"${blo2}${sta2}".ana"
+  data_ba1=$(date -d "$data2 - 5day" +%Y%m%d)
+  echo ",B12101,,,,,,,,T ist,," > ba_param.csv
+
+# Primo tentativo: estraggo gli ultimi 5 giorni
+  echo "reftime: >="$(date -d $data_ba1 +%Y-%m-%d)", >="$(date -d $data1 +%Y-%m-%d)", <="$(date -d $data2 +%Y-%m-%d) > ba.query
+  echo "proddef: GRIB: blo="$blo", sta="$sta >> ba.query
+  arki-query --data --file=ba.query ${akurl}/dataset/${dataset} > ba.bufr
+  dbamsg dump --type=bufr --csv ba.bufr > ba.csv
+  $bufr_csv2orari -syn ba.csv $data_ba1 $data2 ba_param.csv "S"${blo2}${sta2} \
+    > /dev/null 2>&1
+  iret=$?
+
+# Secondo tentativo: estraggo l'intero periodo
+  if [ $iret -ne 0 -a $iret -ne 102 ] ; then
+    rm -f ba.query ba.bufr ba.csv "S"${blo2}${sta2}".ana" 
+    echo "reftime: >="$(date -d $data1 +%Y-%m-%d)", <="$(date -d $data2 +%Y-%m-%d) > ba.query
+    echo "proddef: GRIB: blo="$blo", sta="$sta >> ba.query
+    arki-query --data --file=ba.query ${akurl}/dataset/${dataset} > ba.bufr
+    dbamsg dump --type=bufr --csv ba.bufr > ba.csv
+    $bufr_csv2orari -syn ba.csv $data1 $data2 ba_param.csv "S"${blo2}${sta2} \
+      > /dev/null 2>&1
+    iret=$?
+  fi
+
+}
+
 #===============================================================================
 # 1) Preliminari
+
+# URL  dell'archivio arkimet
+akurl=http://arkimet.metarpa:8090/
+
+# Assegno l'ambiente ma_utils
+if [ -z $MA_UTILS_SVN ] ; then
+  bufr_csv2orari=/usr/libexec/ma_utils/bufr_csv2orari.exe
+  bufr_csv2temp=/usr/libexec/ma_utils/bufr_csv2temp.exe
+else 
+  echo "(estra_oss.ksh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
+  bufr_csv2orari=${MA_UTILS_SVN}/osservazioni/src/bufr_csv2orari.exe
+  bufr_csv2temp=${MA_UTILS_SVN}/osservazioni/src/bufr_csv2temp.exe
+fi
 
 # Parametri da riga comando
 data_restrict="N"
 area_restrict="N"
 ope="N"
+full="N"
 
 idp=0
 while [ $# -ge 1 ] ; do
@@ -150,6 +198,9 @@ while [ $# -ge 1 ] ; do
   elif [ $1 = "-ope" ] ; then
     ope="Y"
     shift
+  elif [ $1 = "-full" ] ; then
+    full="Y"
+    shift
   else
     if [ $idp -eq 0 ] ; then
       data1=$1
@@ -160,9 +211,6 @@ while [ $# -ge 1 ] ; do
     shift
   fi
 done
-
-# URL  dell'archivio arkimet
-akurl=http://arkimet.metarpa:8090/
 
 # Dir di lavoro e nome files di output
 if [ $ope = "Y" ] ; then
@@ -240,11 +288,28 @@ for net in temp syn ; do
     parse_proddef
     if [ \( $blo -ge 1 -a $blo -le 20 \) -o $blo = 22 -o $blo = 26 -o $blo = 27 -o \
       $blo = 33 -o $blo = 34 -o $blo = 37 -o $blo = 40 ] ; then
-      echo ${ch1}${blo2}${sta2} >> ${net}.anag
+
+# Se richiesto, estraggo i dati e salvo l'anagrafica completa, altrimenti salvo
+# solo il codice stazione.
+      if [ $net = "syn" -a $full = "Y" ] ; then
+        echo "Cerco anagrafica completa, stazione "${ch1}${blo2}${sta2}
+        build_anag
+        if [ -s eo_${ch1}${blo2}${sta2}.ana ] ; then
+          cat eo_${ch1}${blo2}${sta2}.ana >> ${net}.anag
+        else
+          echo ${ch1}${blo2}${sta2}",,,,," >> ${net}.anag
+        fi
+      else
+        echo ${ch1}${blo2}${sta2} >> ${net}.anag
+      fi
     fi
   done < ${net}.yml.short
 
-  sort -u ${net}.anag >> $fileout
-  ns2=`tail -n +2 $fileout | wc -l`
+  if [ -s ${net}.anag ] ; then
+    sort -u ${net}.anag >> $fileout
+    ns2=`tail -n +2 $fileout | wc -l`
+  else
+    ns2=0
+  fi
   echo "Selezionate ${ns2} stazioni su ${ns1}"
 done

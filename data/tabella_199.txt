@@ -1,10 +1,14 @@
 !--------------------------------------------------------------------------
-! Sigla GRADS e descrizione dei parametri della tabella 199 (variabili 
-! prognostiche aerosol di Chimere, V2005)
-! I parametri aerosol di Chimere 2008 sono nella tab. 196
-! I parametri Chimere gas sono nella tabella 200
+! Sigla GRADS e descrizione dei parametri della tabella 199:
+!   "Variabili prognostiche aerosol, Chimere versione 2005"
 !
-!                                                    Versione 4, 25/05/2006
+! Codifica variabili Chimere:
+! Le specie gassose sono nella tabella 200
+! Le famiglie aerosol sono nelle tabelle 200 (V2005) e 195 (V2008-2014)
+! Le variabili prognostiche aerosol sono nelle tabelle: 199 (V2005), 
+!   196 (V2014, ppb) e 194 (V2014, ug/m3)
+!
+!                                          Ultimo aggiornamento: 25/05/2006
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890
 !Cod  Sigla     Descrizione e unita'
@@ -70,11 +74,11 @@
   67  p6WATER   p6WATER (ppb; classe 10-40 um)  
   68  p6DUST    p6DUST  (ppb; classe 10-40 um)  
   69  p6SOA     p6SOA   (ppb; classe 10-40 um)  
- 101  PPMAQ     PPMAQ   (???)  
- 102  ASOAAQ    ASOAAQ  (???)  
- 103  BSOAAQ    BSOAAQ  (???)  
- 104  H2SO4AQ   H2SO4AQ (???)  
- 105  HNO3AQ    HNO3AQ  (???)  
- 106  NH3AQ     NH3AQ   (???)  
- 108  DUSTAQ    DUSTAQ  (???)  
+ 101  PPMAQ     PPMAQ   (ug/m3)  
+ 102  ASOAAQ    ASOAAQ  (ug/m3)  
+ 103  BSOAAQ    BSOAAQ  (ug/m3)  
+ 104  H2SO4AQ   H2SO4AQ (ug/m3)  
+ 105  HNO3AQ    HNO3AQ  (ug/m3)  
+ 106  NH3AQ     NH3AQ   (ug/m3)  
+ 108  DUSTAQ    DUSTAQ  (ug/m3)  
 !123--12345678--1234567890123456789012345678901234567890

@@ -1,8 +1,6 @@
 !--------------------------------------------------------------------------
-! Sigla identificativa e altri parametri richiesti da gacsv2seriet relativi
-! alla tab. 195 (usata da Chimere V2008 e successive). 
-! I parametri gas Chimere sono nella tabella 200, le variabili prognostiche
-! aerosol nella tabella 196
+! Parametri richiesti da gacsv2seriet relativi alla tabella 195:
+! alla tab. 195: "Famiglie aersol, Chimere versioni 2008-2014"
 !
 ! Contenuto dei campi
 ! Cod:     condice GRIB del parametro
@@ -16,7 +14,7 @@
 !          -4 (se cloud cover); -5 (se flussi di calore); 
 !          -6 (se specie chimiche); 0 (altri casi)
 !
-!                                          Ultimo aggiornamento: 29/11/2013
+!                                          Ultimo aggiornamento: 25/06/2015
 !--------------------------------------------------------------------------
 !123--12345678--123--1234567890--1234567890--123
 !Cod  Sigla     dec     val.min     val.max  cp2
@@ -56,6 +54,9 @@
   32  p10tsec     2       0.00       250.00   -6
   33  p10ant      2       0.00       250.00   -6
   34  p10bio      2       0.00       250.00   -6
+  35  p10dusb     2       0.00       250.00   -6
+  36  p10duse     2       0.00       250.00   -6
+  37  p10dusr     2       0.00       250.00   -6
  
 !Speciazione PM25, V2008
   39  p25ppm      2       0.00       250.00   -6
@@ -83,6 +84,9 @@
   62  p25tsec     2       0.00       250.00   -6
   63  p25ant      2       0.00       250.00   -6
   64  p25bio      2       0.00       250.00   -6
+  35  p25dusb     2       0.00       250.00   -6
+  36  p25duse     2       0.00       250.00   -6
+  37  p25dusr     2       0.00       250.00   -6
  
 !Speciazione PM1, V2008
   69  p1ppm       2       0.00       250.00   -6
@@ -110,6 +114,9 @@
   92  p1tsec      2       0.00       250.00   -6
   93  p1ant       2       0.00       250.00   -6
   94  p1bio       2       0.00       250.00   -6
+  95  p1dusb      2       0.00       250.00   -6
+  96  p1duse      2       0.00       250.00   -6
+  97  p1dusr      2       0.00       250.00   -6
  
 !AOD
  200  aod550      4       0.00         1.00    0

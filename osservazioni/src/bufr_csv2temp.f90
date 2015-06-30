@@ -7,6 +7,13 @@ PROGRAM bufr_csv2temp
 ! Uso: bufr_csv2temp.exe filein [-int] [-geo] [-rdate] [-zsta Z] 
 !    [-phpa] [-rh] [-uv] [-tc] [-h]
 !
+! TODO:
+! - Studiare opzione per sfoltire i livelli: in tempi recenti, alcune 
+!   stazioni (es: Milano) trasmettono i dati ad alta risoluzione, con 
+!   migliaia di livelli anche nella stratosfera.
+! - Aggiungere scrittura di un file con l'anagrafica della stazione, in 
+!   analogia a quello che fa bufr_csv2orari.f90
+!
 ! Note:
 ! Programma chiamato da estra_oss.ksh
 !
@@ -36,14 +43,14 @@ PROGRAM bufr_csv2temp
 !   B11001 WIND DIRECTION
 !   B11002 WIND SPEED 
 !
-!                                         Versione 1.0.0, Enrico 18/09/2014
+!                                         Versione 1.0.1, Enrico 29/06/2015
 !--------------------------------------------------------------------------
 
 USE missing_values
 
 IMPLICIT NONE
 
-INTEGER, PARAMETER :: maxlev = 500    ! Max numero di livell in un rsd
+INTEGER, PARAMETER :: maxlev = 10000  ! Max numero di livell in un rsd
 INTEGER, PARAMETER :: iu = 20         ! Unita' per lettura filein
 
 REAL :: pp(maxlev),zz(maxlev),tt(maxlev),td(maxlev),ff(maxlev),dd(maxlev)
