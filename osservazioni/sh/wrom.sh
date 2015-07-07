@@ -128,11 +128,12 @@ EOF
 fi
 set -x
 grads -clb $wrom_gs' '"$opts2"
+set +x
 
 # elimina le windrose "di lavoro"
-# rm legend.png
-# j=0
-# while [ $j -lt $nwr ] ; do
-#   j=`expr $j + 1`
-#   rm $j.png   
-# done
+rm legend.png
+j=0
+while [ $j -lt $nwr ] ; do
+  j=`expr $j + 1`
+#  rm $j.png   
+done
