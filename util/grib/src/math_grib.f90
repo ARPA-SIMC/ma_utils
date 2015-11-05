@@ -5,7 +5,7 @@ PROGRAM math_grib
 ! Gestisce GRIB1 e GRIB"
 ! Sostituisce ed integra somma_grib.f90 e moltiplica_grib.f90
 !
-!                                         Versione 1.2.0, Enrico 02/12/2014
+!                                         Versione 1.3.0, Enrico 05/10/2015
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -23,7 +23,7 @@ CHARACTER (LEN=250) :: filea,fileb,fileout,chdum,check_list
 CHARACTER(LEN=40) :: gta
 CHARACTER (LEN=5) :: oper
 CHARACTER (LEN=3) :: next_arg,lsgn
-LOGICAL :: cl_grid,cl_time,cl_vtime,cl_lev,cl_var,lbconst,lforce,lverbose
+LOGICAL :: cl_grid,cl_time,cl_vtime,cl_lev,cl_var,lbconst,luseb,lforce,lverbose
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
@@ -37,6 +37,7 @@ cl_vtime = .FALSE.
 cl_lev   = .TRUE.
 cl_var   = .FALSE.
 lbconst = .FALSE.
+luseb = .TRUE.
 lforce = .FALSE.
 lverbose = .FALSE.
 bpv = imiss
@@ -98,19 +99,26 @@ IF (check_list /= "") CALL parse_check_list(check_list,cl_grid,cl_time, &
   cl_vtime,cl_lev,cl_var,ier)
 
 IF (ANY(ios(:) /= 0) .OR. ier /= 0 .OR. idp /= 6 .OR. &
-    (oper/="sum" .AND. oper/="mul" .AND. oper/="div" .AND. oper/="div2") .OR. &
+    (oper/="sum" .AND. oper/="mul" .AND. oper/="div" .AND. &
+     oper/="div2" .AND. oper/="lin") .OR. &
     (lsgn/="nil" .AND. lsgn/="c" .AND. lsgn/="p" .AND. &
      lsgn/="m" .AND. lsgn/="zp" .AND. lsgn/="zm") ) &
     THEN
   CALL write_help
   STOP 1
+
+ELSE IF (oper == "lin") THEN
+  luseb = .FALSE.
+
 ENDIF
 
 ! 1.4 Inizializzazioni
 CALL grib_open_file(ifa,filea,"r",iret)
 IF (iret /= GRIB_SUCCESS) GOTO 9999
-CALL grib_open_file(ifb,fileb,"r",iret)
-IF (iret /= GRIB_SUCCESS) GOTO 9998
+IF (luseb) THEN
+  CALL grib_open_file(ifb,fileb,"r",iret)
+  IF (iret /= GRIB_SUCCESS) GOTO 9998
+ENDIF
 CALL grib_open_file(ifout,fileout,"w",iret)
 
 IF (lforce) THEN
@@ -128,22 +136,24 @@ DO kga = 1,HUGE(0)
   IF (iret == GRIB_END_OF_FILE) EXIT
   IF (iret /= GRIB_SUCCESS) GOTO 9997
 
-  IF (kga == 1 .OR. .NOT. lbconst) THEN
+  IF (luseb .AND. (kga == 1 .OR. .NOT. lbconst)) THEN
     CALL grib_new_from_file(ifb,igb,iret)
     IF (iret == GRIB_END_OF_FILE) EXIT
     IF (iret /= GRIB_SUCCESS) GOTO 9996
   ENDIF
 
 ! 2.2) Controlli di consistenza  
-  CALL check_consistency(iga,igb,cl_grid,cl_time,cl_vtime,cl_lev,cl_var, &
-    lverbose,clret,ier)
-  IF (.NOT. lforce .AND. ier /= 0) THEN
-    GOTO 9995
-  ELSE IF (lforce .AND. ier /= 0) THEN
-    nmiss = nmiss + 1
-    WHERE (clret(:) /= 0)
-      cllog(:) = cllog(:) + 1
-    ENDWHERE
+  IF (luseb) THEN
+    CALL check_consistency(iga,igb,cl_grid,cl_time,cl_vtime,cl_lev,cl_var, &
+      lverbose,clret,ier)
+    IF (.NOT. lforce .AND. ier /= 0) THEN
+      GOTO 9995
+    ELSE IF (lforce .AND. ier /= 0) THEN
+      nmiss = nmiss + 1
+      WHERE (clret(:) /= 0)
+        cllog(:) = cllog(:) + 1
+      ENDWHERE
+    ENDIF
   ENDIF
 
 ! 2.3) Calcoli
@@ -177,7 +187,7 @@ DO kga = 1,HUGE(0)
   IF (nom + nocv /= gnov .OR. &
     (nocv /= 0 .AND. nocv /= COUNT(valuesa(:) /= rmiss))) GOTO 9994
 
-  IF (kga == 1 .OR. .NOT. lbconst) THEN
+  IF (luseb .AND. (kga == 1 .OR. .NOT. lbconst)) THEN
     CALL grib_get(igb,"getNumberOfValues",gnov)    ! totale di punti nel grib
     CALL grib_get(igb,"numberOfMissing",nom)       ! n.ro dati mancanti
     CALL grib_get(igb,"numberOfCodedValues",nocv)  ! n.ro dati validi
@@ -200,6 +210,10 @@ DO kga = 1,HUGE(0)
     CASE("sum")  
       WHERE (valuesa(:) /= rmiss .AND. valuesb(:) /= rmiss)
         valuesout(:) = (coeffa * valuesa(:)) + (coeffb * valuesb(:))
+      ENDWHERE
+    CASE("lin")  
+      WHERE (valuesa(:) /= rmiss)
+        valuesout(:) = (coeffa * valuesa(:)) + coeffb
       ENDWHERE
     CASE("mul")  
       WHERE (valuesa(:) /= rmiss .AND. valuesb(:) /= rmiss)
@@ -267,7 +281,7 @@ DO kga = 1,HUGE(0)
 
 ! 2.5) Libero memoria
   CALL grib_release(iga)
-  IF (.NOT. lbconst) CALL grib_release(igb)
+  IF (luseb .AND. .NOT. lbconst) CALL grib_release(igb)
   CALL grib_release(igout)
   
 ENDDO
@@ -419,6 +433,8 @@ WRITE (*,*) "    sum       : fileout = (a * fileA) + (b * fileB)"
 WRITE (*,*) "    mul       : fileout = (a + fileA) * (b + fileB)"
 WRITE (*,*) "    div       : fileout = (a + fileA) / (b + fileB)"
 WRITE (*,*) "    div2      : fileout = (b + fileB) / (a + fileA)"
+WRITE (*,*) "    lin       : fileout = (a + fileB) + b "
+WRITE (*,*) "  Con l'operazione ""lin"" fileB non viene usato (mettere una stringa qualsiasi)"
 WRITE (*,*) ""
 WRITE (*,*) "check_list  : definisce gli elementi che devono essere uguali in due grib"
 WRITE (*,*) "              corrispondenti di fileA e fileB. Possono essere specificate"

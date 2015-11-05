@@ -101,8 +101,9 @@ if [ -z $HOME_MINGUZZI ] ; then
 fi
 
 # 1.1) Path
-work_root=/autofs/scratch2/eminguzzi/arkimet/tmp_point # root dir lavoro
-# work_root=/scratch/eminguzzi/tmp_point
+if [ -z $work_root ] ; then
+  work_root=/autofs/scratch2/eminguzzi/arkimet/tmp_point # root dir lavoro
+fi
 template_dir=${HOME_MINGUZZI}/arkimet/templates    # templates .akq
 fisiog_dir=${HOME_MINGUZZI}/util/grib/lm_ope       # dati fisiografici
 arc_root=${HOME_MINGUZZI}/arkimet/progetti_point   # root arc. estrazioni

@@ -726,7 +726,7 @@ SUBROUTINE write_help
 ! Scrive a scehmo l'help del programma
 !
 !            12345678901234567890123456789012345678901234567890123456789012345678901234567890
-WRITE (*,*) "Uso: grib2chimere.exe filein fileout aero coord vcoord DOMAIN "
+WRITE (*,*) "Uso: grib2chimerencdf.exe filein fileout aero coord vcoord DOMAIN "
 WRITE (*,*) "     [-ro OROG]/[-roz OROG]"
 WRITE (*,*) "filein:   in formato grib"
 WRITE (*,*) "fileout:  in formato NetCDF - Chimere"

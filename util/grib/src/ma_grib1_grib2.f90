@@ -10,12 +10,13 @@ PROGRAM ma_grib1_grib2
 ! - opzione -ana (per scrivere i dati previsti come analisi con lo stesso 
 !   verification time)
 !
-!                                         Versione 2.4.1, Enrico 03/03/2014
+!                                         Versione 2.5.0, Enrico 13/10/2015
 !--------------------------------------------------------------------------
 
 USE grib_api
 USE datetime_class
 USE missing_values
+USE grib2_utilities
 IMPLICIT NONE
 
 ! Variabili locali
@@ -25,8 +26,8 @@ REAL :: xi_out,yi_out,xf_out,yf_out,dx_out,dy_out,xrot_out,yrot_out
 INTEGER :: cnt_par,kg,kpar,iret,cnt_utm,cnt_geo,cnt_rot,cnt_skp,cnt_gr2
 INTEGER :: ifin,ifout,igin=0,igout=0,igtemp_utm=0,igtemp_geo=0,igtemp_rot=0
 INTEGER :: datah_in(4),datah_ref(4),datah_end(4)
-INTEGER :: scad(4),lev(3),ni,nj
-INTEGER :: cem,sc,par,tab,sortx,togp,igen,gd,topd,dig,uvrtg,sm,pdtn,dd, &
+INTEGER :: scad(4),lev(3),ni,nj,ier
+INTEGER :: cem,sc,par,tab,sortt,togp,igen,gd,topd,dig,uvrtg,sm,pdtn,dd, &
   dt,ft,toffs,sfoffs,svoffs,tosfs,sfosfs,svosfs,toti,lotr,bp,bpv,bmi, &
   nv,tosp,ct,en,gnov,nocv,nom
 CHARACTER(LEN=200) :: chpar,filein,fileout
@@ -198,9 +199,7 @@ DO kg = 1,HUGE(0)
       MOD(dt,100)/=0  .OR. &                ! minutes /= 0
       gd /= 255 .OR. &                      ! section 2 not included
       sm /= 64 .OR. &                       ! scanning mode anomalo
-      (scad(4)/=0 .AND. scad(4)/=3 .AND. scad(4) /= 4 .AND. &
-       scad(4)/=10 .AND. scad(4)/=14 .AND. scad(4)/=15 .AND. scad(4)/=16).OR. &
-       (scad(4)/=0 .AND. scad(4)/=10 .AND. scad(2)>scad(3)) .OR. &
+      (scad(4)/=0 .AND. scad(4)/=10 .AND. scad(2)>scad(3)) .OR. &
       (lev(1)/=1 .AND. lev(1)/=105 .AND. lev(1)/=109 .AND. lev(1)/=110) &
       ) GOTO 9996
 
@@ -208,95 +207,8 @@ DO kg = 1,HUGE(0)
 ! 3) Calcolo le chiavi GRIB2 non contenute nel GRIB1
 
 ! 3.1) Timerange
-  IF ((scad(4)==0 .OR. scad(4)==10).AND. scad(2)==0) THEN  ! analisi istant.
-    pdtn = 0               ! productDefinitionTemplateNumber (t4.0)
-    ft = 0                 ! forecastTime (INT >= 0)
-    IF (.NOT. lforc) THEN
-      topd = 0             ! typeOfProcessedData (t1.4)
-      sortx = 0            ! significanceOfReferenceTime (t1.2)
-      togp = 0             ! typeOfGeneratingProcess (t4.3)
-    ELSE
-      topd = 1
-      sortx = 1
-      togp = 2
-    ENDIF
-
-  ELSE IF (scad(4) == 14) THEN  ! analisi mediata (Pesco)
-    pdtn = 8
-    ft = 0 
-    tosp = 0               ! typeOfStatisticalProcessing (t4.10)
-    toti = 1               ! typeOtTimeIncrement (t4.11)
-    lotr = scad(3)-scad(2) ! lenghtOfTimeRange (INT >= 0)
-    IF (.NOT. lforc) THEN
-      topd = 0
-      sortx = 0
-      togp = 0
-    ELSE
-      topd = 1
-      sortx = 1
-      togp = 2
-    ENDIF
-
-  ELSE IF (scad(4) == 15) THEN  ! analisi cumulata (depos. d-1 Ninfa)
-    pdtn = 8
-    ft = 0 
-    tosp = 1               ! typeOfStatisticalProcessing (t4.10)
-    toti = 1               ! typeOtTimeIncrement (t4.11)
-    lotr = scad(3)-scad(2) ! lenghtOfTimeRange (INT >= 0)
-    IF (.NOT. lforc) THEN
-      topd = 0
-      sortx = 0
-      togp = 0
-    ELSE
-      topd = 1
-      sortx = 1
-      togp = 2
-    ENDIF
-
-  ELSE IF (scad(4) == 16) THEN  ! analisi massima (NinfaUB O3/NO2)
-    pdtn = 8
-    ft = 0 
-    tosp = 2               ! typeOfStatisticalProcessing (t4.10)
-    toti = 1               ! typeOtTimeIncrement (t4.11)
-    lotr = scad(3)-scad(2) ! lenghtOfTimeRange (INT >= 0)
-    IF (.NOT. lforc) THEN
-      topd = 0
-      sortx = 0
-      togp = 0
-    ELSE
-      topd = 1
-      sortx = 1
-      togp = 2
-    ENDIF
-
-  ELSE IF (scad(4) == 0 .AND. scad(2) /= 0)  THEN ! previsione istantanea
-    sortx = 1
-    topd = 1
-    pdtn = 0
-    togp = 2
-    ft = scad(2) 
-
-  ELSE IF (scad(4) == 3) THEN                     ! previsione mediata
-    sortx = 1
-    topd = 1
-    pdtn = 8
-    togp = 2
-    ft = scad(2) 
-    tosp = 0
-    toti = 2 
-    lotr = scad(3)-scad(2) ! lenghtOfTimeRange
-
-   ELSE IF (scad(4) == 4) THEN                    ! previsione cumulata
-    sortx = 1
-    topd = 1
-    pdtn = 8
-    togp = 2
-    ft = scad(2) 
-    tosp = 1
-    toti = 2 
-    lotr = scad(3)-scad(2)
-
-  ENDIF
+  CALL calc_grib2_trange(scad,lforc,sortt,topd,pdtn,togp,ft,tosp,toti,lotr,ier)
+  IF (ier /= 0) GOTO 9994
 
 ! 3.2) Reference time; end of overall time interval
   datah_in(1) = dd/10000
@@ -423,7 +335,7 @@ DO kg = 1,HUGE(0)
 ! 4.1 Section 1 (Identificator)                         
   CALL grib_set(igout,"centre",cem)
   CALL grib_set(igout,"subCentre",sc)
-  CALL grib_set(igout,"significanceOfReferenceTime",sortx)
+  CALL grib_set(igout,"significanceOfReferenceTime",sortt)
   CALL grib_set(igout,"year",datah_ref(1))
   CALL grib_set(igout,"month",datah_ref(2))                             
   CALL grib_set(igout,"day",datah_ref(3))                               
@@ -597,6 +509,10 @@ WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
 WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom
 WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(values(1:ni*nj) /= rmiss)
 STOP 6
+
+9994 CONTINUE
+WRITE (*,*) "Timernage non gestito ",scad(4)
+STOP 7
 
 END PROGRAM ma_grib1_grib2
 

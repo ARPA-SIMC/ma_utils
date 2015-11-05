@@ -21,6 +21,9 @@ function write_help
   echo "  -l  crea estra_qaria.inp di esempio con la lista di tutte le stazioni"
   echo "  -b  lancia l'estrazione usando le opzioni di estra_qaria.inp"
   echo "  -nograds: costruisce solo gli output .asc"
+  echo ""
+  echo "NB: gli orari in ouptut sono LST; i dati orari sono concentrazioni medie"
+  echo "    nell'ora precedetne"
 }
 
 #--------------------------------------------------------------------------
@@ -163,6 +166,10 @@ NOTE:
   1 esclude i dati invalidati
   2 tiene solo i dati validati
   3 tiene solo i dati validati da operatore
+
+- i files prodotti hanno orari LST; i valori orari si riferiscono alle
+  concentrazioni medie nell'ora precedente (per ogni giornata sono quindi
+  estratti i valori dalle 01 alle 24)
 EOF3
 fi
 
@@ -228,11 +235,12 @@ if [ $estra = "YES" ] ; then
     rm -f _nomectl.tmp
     cat dati.tmp | sed s/\,/\./g > dati.tmp.tmp
     mv dati.tmp.tmp dati.tmp
-    $ordina_dati_tmp
 
     if [ $lgrads = "YES" ] ; then
+      $ordina_dati_tmp
       $stnmap -q -i `cat _nomectl.tmp`
       rm _nomectl.tmp
+    else
+      $ordina_dati_tmp -nograds
     fi
 fi
-

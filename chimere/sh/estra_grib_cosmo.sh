@@ -50,7 +50,7 @@
 #   richiederebbe l'introduzione di nuovi alias per le scadenze previste 
 #   (c0124 -> c0124ph, ...); per le analisi dovrebbe bastare Timedef,0,x,1h
 #
-#                                    Versione 7.7.0 (Arkimet), Enrico 14/01/2015
+#                                    Versione 7.7.1 (Arkimet), Enrico 21/09/2015
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -469,7 +469,7 @@ for param in $plist_2d ; do
     var="bflqds" ;;
   SOIM_2D)
     tipo_sca="ist"
-    expr_levsup="lug000010 or ug0001 or ug0002 or ug0006"
+    expr_levsup="lug000010 or ug0001 or ug0002 or ug0006 or ug0018"
     var="ssw or qsoil" ;;
   LOWC_2D)
     tipo_sca="ist"
@@ -611,21 +611,26 @@ EOF2
 
 done
 
-# 2.3.5 Post-processing umidita' del terreno prodotta con multilayer soil model:
-#       calcolo il contenuto medio nei primi 10 cm, scrivo il grib come nelle 
-#       analisi lamaz (2/86 invece di 201/198)
+# 2.3.5 Calcolo il contenuto d'acqua nello strato superificale del terreno.
+# I calcoli e codifica grib  (2/86 invece di 201/198) sono gli stessi usati per 
+# produrre le analisi LAMA: Per maggiori dettagli vedi
+# /home/eminguzzi/svn/feed_lama/proc_cosmo_ana.sh, sez. 3.5
 
 if [ `echo $plist_2d | grep SOIM_2D | wc -l` -eq 1 -a \
      \( $dataset = "lm7tmpc" -o $dataset = "COSMO_I7" \) ] ; then
-  rm -f sg*.grb tmp.grb
+  rm -f sg*.grb tmp*.grb
   mv SOIM_2D.grb SOIM_2D.grb.org
-  $split_grib_par -lev SOIM_2D.grb.org || ier=50
-  $math_grib -check=grid,time,var \
-    0.15 sg_200_201_198_111_001_000.grb 0.25 sg_200_201_198_111_002_000.grb \
-    tmp.grb sum || ier=51
-  $math_grib -check=grid,time,var \
-    1. tmp.grb 0.6 sg_200_201_198_111_006_000.grb \
-    SOIM_2D.grb sum || ier=52
+
+  $split_grib_par -lev soil_q.grib || ier=50
+  $math_grib -check=grid,time,var 1. sg_200_201_198_111_001_000.grib \
+    1. sg_200_201_198_111_002_000.grib tmp1.grib sum || ier=51
+  $math_grib -check=grid,time,var 1. sg_200_201_198_111_006_000.grib \
+    1. tmp1.grib tmp2.grib sum || ier=52
+  $math_grib -check=grid,time,var 0.0555 sg_200_201_198_111_018_000.grib \
+    1. tmp2.grib tmp3.grib sum || ier=53
+
+  grib_set -s table2Version=2,indicatorOfParameter=86,indicatorOfTypeOfLevel=112,topLevel=0,bottomLevel=10 \
+    tmp3.grib SOIM_2D.grb
 fi
 
 #-------------------------------------------------------------------------------

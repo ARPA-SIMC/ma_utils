@@ -142,7 +142,7 @@ DO kp = 1,HUGE(kp)
    CALL getarg(kp,chdum)
    IF (TRIM(chdum) == "-h") THEN
      CALL write_help
-     STOP
+     STOP 1
    ELSE IF (TRIM(chdum) == "") THEN  
      EXIT
    ELSE IF (TRIM(chdum) == "-grd") THEN
@@ -179,7 +179,7 @@ DO kp = 1,HUGE(kp)
      inp_fmt = 8  
    ELSE IF (idp >= 4) THEN
      CALL write_help
-     STOP
+     STOP 1
    ELSE   
       idp = idp + 1
       arg(idp) = chdum
@@ -194,7 +194,7 @@ READ (arg(4),*,IOSTAT=ios) igen
 IF (filein == "" .OR. fileout == "" .OR. fileinfo == "" .OR. &
      ios /= 0 .OR. TRIM(filein) == "-h") THEN
    CALL write_help
-   STOP
+   STOP 1
 ENDIF
 
 !--------------------------------------------------------------------------
@@ -542,8 +542,7 @@ ELSE IF (proj == "ROT") THEN
    ksec2(14) = NINT(xrot * 1000.)
 
 ELSE
-   WRITE (*,*) "Errore, proiezione non gestita ",proj
-   STOP
+   GOTO 9987
 
 ENDIF
 
@@ -1158,7 +1157,7 @@ ENDIF
 
 CALL PBCLOSE (iu,kret)
 
-STOP
+STOP 0
 
 !==========================================================================
 ! 3) Gestione errori
@@ -1212,6 +1211,10 @@ STOP 6
 9988 CONTINUE
 WRITE (*,*) "Area ",TRIM(domain)," non trovata in ",TRIM(tab_file)
 STOP 7
+
+9987 CONTINUE
+WRITE (*,*) "Errore, proiezione non gestita ",proj
+STOP 8
 
 END PROGRAM chimerencdf2grib
 

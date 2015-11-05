@@ -7,7 +7,7 @@
 !
 ! 19/10/2006: risolto bug per estrazione dati non invalidati
 !
-!                                          V1.5, Johnny&Enrico 05/09/2013
+!                                        V1.6.0, Johnny&Enrico 31/08/2015
 !________________________________________________________________________
 !
 PROGRAM ordina
@@ -43,14 +43,14 @@ PROGRAM ordina
        nstep, &
        hstart
   REAL :: opt_percval,buono
-  LOGICAL :: new, unknown
+  LOGICAL :: new, unknown, lgrads
   CHARACTER (LEN=4) :: ch4,codparam_gds(nparam_lst),codstat(nstats),intv_gds(nstats)
   CHARACTER (LEN=5) :: ch5,codparam_lst(nparam_lst)
   CHARACTER (LEN=8) :: ch8
   CHARACTER (LEN=10) :: strdate2,strdate1,nomeunmis(nunmis)
   CHARACTER (LEN=20) :: nomestat(nstats),tab
   CHARACTER (LEN=30) :: form,fileout,nomeoptval(0:noptval-1)
-  CHARACTER (LEN=100) :: line
+  CHARACTER (LEN=100) :: line,chdum
        
   INTEGER, ALLOCATABLE :: staz_req(:),prov_req(:), &
        idconfsens(:),staz(:),param(:),intv_db(:),alt(:), &
@@ -78,6 +78,13 @@ PROGRAM ordina
   ! 1) Lettura files d'appoggio
 
   ! 1.1) Lettura file opzioni
+
+  CALL getarg(1,chdum)
+  IF (TRIM(chdum) == "-nograds") THEN
+    lgrads = .FALSE.
+  ELSE
+    lgrads = .TRUE.
+  ENDIF
 
   OPEN(11,file="estra_qaria.inp",err=901)
   READ(11,'(i4,2i2)',err=902)date_start%yy,date_start%mm,date_start%dd
@@ -430,6 +437,8 @@ PROGRAM ordina
 
   ! 4.3) File GrADS su punto: binario
 
+  IF (lgrads) THEN         ! inizio elaborazioni output GRADS
+
   DO kstaz=1,nstaz_anag
      ksens=sensstaz(kstaz)
      IF((opt_stat==1 .AND. COUNT(hmed_out(kstaz,:,:)/=missdata(1))>0) .OR.  &
@@ -577,7 +586,8 @@ PROGRAM ordina
   OPEN(15,file="_nomectl.tmp")
   WRITE(15,'(a)')TRIM(fileout)//".ctl"
   CLOSE(15)
-
+ 
+  ENDIF               ! fine elaborazioni output GRADS
   !--------------------------------------------------------------------------
   ! 5) Scrittura logs
 

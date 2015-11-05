@@ -23,7 +23,7 @@ PROGRAM grib_daily_stat
 ! - Per rendere piu' leggibile il codice, il programma fa comunque tutti i
 !   calcoli, ma scrive solo gli output richiesti
 !
-!                                         Versione 5.1.0, Enrico 08/04/2014
+!                                         Versione 5.1.1, Enrico 28/10/2015
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -102,7 +102,7 @@ DO kpar = 1,HUGE(0)
     EXIT
   ELSE IF (TRIM(chpar) == "-h") THEN
     CALL scrive_help
-    STOP
+    STOP 1
   ELSE IF (TRIM(chpar) == "-pts") THEN
     deb = .TRUE.
     next_arg = "pts"
@@ -168,11 +168,14 @@ DO kpar = 1,HUGE(0)
   ELSE IF (cnt_par == 0) THEN
     cnt_par = 1
     filein = chpar
+  ELSE
+    CALL scrive_help
+    STOP 1
   ENDIF
 
   IF (ios /= 0) THEN
     CALL scrive_help
-    STOP
+    STOP 1
   ENDIF
     
 ENDDO
@@ -183,9 +186,9 @@ IF ((ldty.AND.ldtylc) .OR. &
     (nval<0 .OR. nval>24) .OR. & 
     (laot.AND.thr_aot==rmis) .OR. (lmxrm1.AND.thr_mxrm1==rmis) .OR. &
     (lexc.AND.thr_exc==rmis) .OR. (lmxrm2.AND.thr_mxrm2==rmis) .OR. &
-    (nbit<1 .OR. nbit>24) .OR. pdb<0) THEN
+    (nbit<1 .OR. nbit>24) .OR. pdb<0 .OR. cnt_par/=1) THEN
   CALL scrive_help
-  STOP
+  STOP 1
 ENDIF  
 
 ! 1.2 Disabilito i controlli sui parametri GRIBEX
@@ -242,7 +245,7 @@ grib: DO kg = 1,HUGE(0)
     EXIT grib
   ELSE IF (kret < -1) THEN
     WRITE(*,*) "Error pbgrib: kret ",kret
-    STOP
+    STOP 2
   ENDIF
 
   psec3(2) = rmis                                    ! dati mancanti = rmis
@@ -1066,7 +1069,7 @@ STOP
 
 9999 CONTINUE
 WRITE (*,*) "Errore aprendo ",TRIM(filein)," kret ",kret
-STOP
+STOP 2
 
 9998 CONTINUE
 WRITE (*,*) "Parametro/livello diverso in ",TRIM(filein)," grib ",kg
@@ -1074,21 +1077,22 @@ WRITE (*,'(a,2i4,a,3i4)') "Atteso:  par ",ksec1_first(1),ksec1_first(6), &
   "   liv ",ksec1_first(7:9)
 WRITE (*,'(a,2i4,a,3i4)') "Trovato: par ",ksec1(1),ksec1(6), &
   "   liv ",ksec1(7:9)
-STOP
+STOP 3
 
 9997 CONTINUE
 WRITE (*,*) "Griglia diversa in ",TRIM(filein)," grib ",kg
 WRITE (*,'(a,10i8)') "Atteso:  ",ksec2((/1,2,3,4,5,7,8,11,13,14/))
 WRITE (*,'(a,10i8)') "Trovato: ",ksec2((/1,2,3,4,5,7,8,11,13,14/))
-STOP
+STOP 4
 
 9996 CONTINUE
 WRITE (*,*) "Numero punti diverso in ",TRIM(filein)," grib ",kg
 WRITE (*,*) "Attesi ",np," trovati ",ksec4(1)
+STOP 5
 
 9995 CONTINUE
 WRITE (*,*) "Errore calcolo data validita, ",TRIM(filein)," grib ",kg
-STOP
+STOP 6
 
 9994 CONTINUE
 WRITE (*,*) "Istanti di validita' non sequenziali in ",TRIM(filein), &
@@ -1097,7 +1101,7 @@ WRITE (*,'(a,i4.4,3(1x,i2.2))') "Attuale:    ", &
   datav%yy,datav%mm,datav%dd,hhv
 WRITE (*,'(a,i4.4,3(1x,i2.2))') "Precedente: ", &
   datav_sav%yy,datav_sav%mm,datav_sav%dd,hhv_sav
-STOP
+STOP 7
 
 END PROGRAM grib_daily_stat
 

@@ -2,7 +2,7 @@ MODULE grib2_utilities
 !--------------------------------------------------------------------------
 ! Utilita' per la getione dei GRIB2 in logica GRIB1
 !
-!                                         Versione 1.3.1, Enrico 04/08/2014
+!                                         Versione 1.4.0, Enrico 13/10/2015
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -248,42 +248,56 @@ IF (PRESENT(scad)) THEN
       WRITE (*,*) "Unit of timerange is not hour"
       ier = 3
     ENDIF
+
+!   4.1 Scadenze istantanee
     IF (sortt==0 .AND. topd==0 .AND. (pdtn==0 .OR. pdtn==40) .AND. &
-        togp==0 .AND. ft==0) THEN               ! Analisi istantanea
+        togp==0 .AND. ft==0) THEN                  ! Analisi
       scad(1) = iouotr
       scad(2) = 0  
       scad(3) = 0
       scad(4) = 0
     ELSE IF (sortt==1 .AND. topd==1 .AND. (pdtn==0 .OR. pdtn==40) .AND. &
-        togp==2 .AND. ft/=0) THEN               ! Previsione istantanea
+        togp==2 .AND. ft/=0) THEN                  ! Previsione
       scad(1) = iouotr
       scad(2) = ft  
       scad(3) = 0
       scad(4) = 0
+
+!   4.2 Analisi non istantanee
     ELSE IF (sortt==0 .AND. topd==0 .AND. pdtn==8 .AND. togp==0 .AND. &
-        ft==0 .AND. tosp==0 .AND. toti==1) THEN ! Analisi mediata (Pesco)
+             ft==0 .AND. toti==1) THEN
       scad(1) = iouotr
       scad(2) = 0
       scad(3) = lotr
-      scad(4) = 14
-    ELSE IF (sortt==0 .AND. topd==0 .AND. pdtn==8 .AND. togp==0 .AND. &
-        ft==0 .AND. tosp==1 .OR. toti==1) THEN  ! Analisi cum (dep.Chimere)
-      scad(1) = iouotr
-      scad(2) = 0
-      scad(3) = lotr
-      scad(4) = 15
-    ELSE IF (sortt==0 .AND. topd==0 .AND. pdtn==8 .AND. togp==0 .AND. &
-        ft==0 .AND. tosp==2 .OR. toti==1) THEN  ! Analisi max (NinfaUB, O3/NO2)
-      scad(1) = iouotr
-      scad(2) = 0
-      scad(3) = lotr
-      scad(4) = 16
+
+      IF (tosp==0) THEN                ! Media (Pesco, NinfaUB: PM)
+        scad(4) = 14      
+      ELSE IF (tosp==1) THEN           ! Cumulata (dep.Chimere)
+        scad(4) = 15
+      ELSE IF (tosp==2) THEN           ! Massimo (NinfaUB: NO2)
+        scad(4) = 16
+      ELSE IF (tosp==206) THEN         ! Max MM 8h (NinfaUB: O3)
+        scad(4) = 17
+      ENDIF
+
+!   4.3 Prevsioni non istantanee
     ELSE IF (sortt==1 .AND. topd==1 .AND. pdtn==8 .AND. togp==2 .AND. &
-        toti==2) THEN                ! Previsione mediata
+             toti==2) THEN
       scad(1) = iouotr
       scad(2) = ft 
       scad(3) = ft + lotr
-      scad(4) = 3
+
+      IF (tosp==0) THEN                ! Media (Pesco, NinfaUB: PM)
+        scad(4) = 3      
+      ELSE IF (tosp==1) THEN           ! Cumulata (dep.Chimere)
+        scad(4) = 4
+      ELSE IF (tosp==2) THEN           ! Massimo (NinfaUB: NO2)
+        scad(4) = 6
+      ELSE IF (tosp==206) THEN         ! Max MM 8h (NinfaUB: O3)
+        scad(4) = 7
+      ENDIF
+
+!   4.4 Altri casi
     ELSE IF (sortt==1 .AND. topd==2 .AND. pdtn==40 .AND. togp==2) THEN
       scad(1) = iouotr               ! Analisi o previ ist. MACC
       scad(2) = ft 
@@ -302,6 +316,121 @@ IF (PRESENT(iret)) iret = ier
 
 RETURN
 END SUBROUTINE get_grib1_header 
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+SUBROUTINE calc_grib2_trange(scad,lforc,sortt,topd,pdtn,togp,ft,tosp, &
+  toti,lotr,ier)
+
+!--------------------------------------------------------------------------
+! Dato un timerange GRIB1, calcola le chiavi GRIB2  corrispondenti
+! Se lforc=.T., scrive i campi relativi ad analisi (istantanee o elaborate) 
+!   come forecast +0
+!
+! Parametri in Output:
+! sortt: significanceOfReferenceTime (t1.2)
+! topd:  typeOfProcessedData (t1.4)
+! pdtn:  productDefinitionTemplateNumber (t4.0)
+! ft     forecastTime (INT >= 0)
+! togp:  typeOfGeneratingProcess (t4.3)
+! tosp:  typeOfStatisticalProcessing (t4.10)
+! toti:  typeOtTimeIncrement (t4.11)
+! lotr:  lenghtOfTimeRange (INT >= 0)
+!--------------------------------------------------------------------------
+
+USE missing_values
+IMPLICIT NONE
+INTEGER, INTENT(IN) :: scad(4)
+LOGICAL, INTENT(IN) :: lforc
+INTEGER, INTENT(OUT) :: sortt,topd,pdtn,togp,ft,tosp,toti,lotr,ier
+
+tosp  = imiss
+sortt = imiss
+topd  = imiss 
+pdtn  = imiss
+togp  = imiss
+ft    = imiss
+tosp  = imiss
+toti  = imiss
+lotr  = imiss
+ier = 0
+
+! 1) Scadenze istantanee
+IF ((scad(4)==0 .OR. scad(4)==10) .AND. scad(2)==0) THEN  ! Analisi
+  pdtn = 0
+  ft = 0
+  IF (.NOT. lforc) THEN
+    topd = 0
+    sortt = 0
+    togp = 0
+  ELSE
+    topd = 1
+    sortt = 1
+    togp = 2
+  ENDIF
+
+ELSE IF (scad(4) == 0 .AND. scad(2) /= 0)  THEN           ! Previsione
+  sortt = 1
+  topd = 1
+  pdtn = 0
+  togp = 2
+  ft = scad(2) 
+
+! 2) Analisi non istantanee
+ELSE IF (scad(4) >= 14 .AND. scad(4) <= 17) THEN
+
+  IF (scad(4) == 14) THEN          ! Media (Pesco, NinfaUB: PM)
+    tosp = 0
+  ELSE IF (scad(4) == 15) THEN     ! Cumulata (dep.Chimere)
+    tosp = 1
+  ELSE IF (scad(4) == 16) THEN     ! Massimo (NinfaUB: NO2)
+    tosp = 2
+  ELSE IF (scad(4) == 17) THEN     ! Max MM 8h (NinfaUB: O3)
+    tosp = 206
+  ENDIF
+  
+  pdtn = 8
+  ft = 0 
+  toti = 1
+  lotr = scad(3)-scad(2)
+  IF (.NOT. lforc) THEN
+    topd = 0
+    sortt = 0
+    togp = 0
+  ELSE
+    topd = 1
+    sortt = 1
+    togp = 2
+  ENDIF
+
+! 2) Previsioni non istantanee
+ELSE IF (scad(4) >= 3 .AND. scad(4) <= 7) THEN
+
+  IF (scad(4) == 3) THEN           ! Media (Pesco, NinfaUB: PM)
+    tosp = 0
+  ELSE IF (scad(4) == 4) THEN      ! Cumulata (dep.Chimere)
+    tosp = 1
+  ELSE IF (scad(4) == 6) THEN      ! Massimo (NinfaUB: NO2)
+    tosp = 2
+  ELSE IF (scad(4) == 7) THEN      ! Max MM 8h (NinfaUB: O3)
+    tosp = 206
+  ENDIF
+
+  sortt = 1
+  topd = 1
+  pdtn = 8
+  togp = 2
+  toti = 2 
+  ft = scad(2) 
+  lotr = scad(3)-scad(2) ! lenghtOfTimeRange
+
+ELSE
+  ier = 1
+
+ENDIF
+
+RETURN
+END SUBROUTINE calc_grib2_trange
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
