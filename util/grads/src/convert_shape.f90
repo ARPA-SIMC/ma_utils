@@ -43,7 +43,7 @@ DO kp = 1,HUGE(kp)
     CASE(2)
       fileout = chdum
     CASE(3)
-      ch7 = chdum
+      ch7 = chdum(1:7)
     END SELECT
   ENDIF
 ENDDO

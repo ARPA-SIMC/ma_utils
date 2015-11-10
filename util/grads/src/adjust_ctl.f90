@@ -8,29 +8,32 @@ PROGRAM adjust_ctl
 ! NB: in tutti i casi, grads non funziona se richiedo p.es. 
 !   T@ 10 e 40 e U @ 10 e 90
 !   
-!                                          Versione 6.2   Enrico 14/12/2009
+!                                        Versione 7.0.0   Enrico 10/11/2015
 !--------------------------------------------------------------------------
+USE char_utilities
 IMPLICIT NONE
 
 INTEGER, PARAMETER :: mxlevs = 60    ! max. n.ro livelli nei GRIB
 INTEGER, PARAMETER :: mxvars = 256   ! max. n.ro varibili (tabella e ctl)
 REAL, PARAMETER :: rmis = -999.
 
-CHARACTER (LEN=40) :: var_desc(mxvars)
-CHARACTER (LEN=8) :: var_id(mxvars)
+! CHARACTER (LEN=40) :: var_desc(mxvars)
+! CHARACTER (LEN=8) :: var_id(mxvars)
+
+INTEGER, DIMENSION(:), POINTER :: ws,we
 
 REAL :: idlevs(mxlevs),xynorm,x1,y1,xstep,ystep
 INTEGER :: tab_code(mxvars),var_nlevs(mxvars),var_grb(3,mxvars)
-INTEGER :: nlevs,nlevs_g,nvars,nvars_g,nv_tab,tsize
-INTEGER :: ios,p1,p2,k,k2,kp,idp,pt,krepl,loper
-CHARACTER (LEN=200) :: filein,fileout,filetab,chpar
+INTEGER :: nlevs,nlevs_g,nvars,nvars_g,nv_tab,tsize,nw
+INTEGER :: ios,p1,p2,k,k2,kp,kf,idp,pt,loper
+CHARACTER (LEN=200) :: filein,fileout,filetab
 CHARACTER (LEN=400) :: rec,rec_lev(2),rec_var(mxvars+2),chfmt
 CHARACTER (LEN=80) :: chdum,arg(3),ch80
-CHARACTER (LEN=40) :: tab_desc(mxvars)
+CHARACTER (LEN=40) :: tab_desc(mxvars),tfields(5),tstep
 CHARACTER (LEN=32) :: body(mxvars)
 CHARACTER (LEN=8) :: tab_id(mxvars),ch8,ch8b
 CHARACTER (LEN=3) :: next_arg
-LOGICAL :: lsort,adjvar,tforce,xyforce
+LOGICAL :: lsort,adjvar,tforce,stforce,xyforce
 
 !==========================================================================
 ! 1) Preliminari
@@ -41,6 +44,7 @@ loper = 0
 lsort=.FALSE.
 adjvar=.FALSE.
 tforce=.FALSE.
+stforce=.FALSE.
 xyforce=.FALSE.
 arg(:) = ""
 idp = 0
@@ -52,11 +56,14 @@ DO kp = 1,HUGE(kp)
 
   IF (TRIM(chdum) == "-h") THEN
     CALL write_help
-    STOP
+    STOP 1
   ELSE IF (TRIM(chdum) == "") THEN  
     EXIT
   ELSE IF (next_arg == "tsz") THEN
     READ (chdum,*) tsize
+    next_arg = ""
+  ELSE IF (next_arg == "tst") THEN
+    READ (chdum,*) tstep
     next_arg = ""
   ELSE IF (next_arg == "xys") THEN
     READ (chdum,*) xynorm
@@ -70,11 +77,18 @@ DO kp = 1,HUGE(kp)
   ELSE IF (TRIM(chdum) == "-tsz") THEN
     tforce = .TRUE.
     next_arg = "tsz"
+  ELSE IF (TRIM(chdum) == "-tst") THEN
+    stforce = .TRUE.
+    next_arg = "tst"
   ELSE IF (TRIM(chdum) == "-xyscale") THEN
     xyforce = .TRUE.
     next_arg = "xys"
   ELSE   
     idp = idp + 1
+    IF (idp > 3) THEN
+      CALL write_help
+      STOP 1
+    ENDIF
     arg(idp) = chdum
   ENDIF
 
@@ -87,15 +101,12 @@ IF (TRIM(filetab) /= "") adjvar = .TRUE.
 
 IF (filein == '' .OR. fileout == '') THEN
   CALL write_help
-  STOP
+  STOP 1
 ENDIF   
 
 ! 1.2) Apro files .ctl
 OPEN (UNIT=20,FILE=filein, STATUS="OLD", ACTION="READ", IOSTAT=ios)
-IF (ios /= 0) THEN
-  CALL write_help
-  STOP
-ENDIF
+IF (ios /= 0) GOTO 9999
 
 OPEN (UNIT=21,FILE=fileout, STATUS="REPLACE", ACTION="WRITE")
 
@@ -107,11 +118,7 @@ IF (adjvar) THEN
 ! Apro file
   OPEN (UNIT=22,FILE=filetab, STATUS="OLD", ACTION="READ", & 
     FORM="FORMATTED", IOSTAT=ios)
-  IF (ios /= 0) THEN
-    CALL write_help
-    STOP
-  ENDIF
-
+  IF (ios /= 0) GOTO 9998
 
 ! Leggo tabella GRIB
   nv_tab = 0
@@ -121,18 +128,11 @@ IF (adjvar) THEN
     IF (TRIM(ch80) == "" .OR. ch80(1:1) == "!") CYCLE
 
     nv_tab = nv_tab + 1
-    IF (nv_tab > mxvars) THEN
-      WRITE (*,*) "errore, troppe variabili in tabella",TRIM(filetab)
-      STOP
-    ENDIF
+    IF (nv_tab > mxvars) GOTO 9991
 
     READ (ch80,'(1x,i3,2x,a8,2x,a40)',IOSTAT=ios) tab_code(nv_tab), &
       tab_id(nv_tab),tab_desc(nv_tab)
-    IF (ios /= 0) THEN
-      WRITE (*,*) "Errore leggendo la tabella ",TRIM(filetab)
-      STOP
-    ENDIF
- 
+    IF (ios /= 0) GOTO 9997
   ENDDO
 
 ENDIF
@@ -142,10 +142,7 @@ ENDIF
 
 DO
   READ (20,'(a)', IOSTAT=ios) rec
-  IF (ios /= 0) THEN
-    WRITE (*,*) "Errore, manca la sezione livelli!"
-    STOP
-  ENDIF
+  IF (ios /= 0) GOTO 9996
 
   IF (INDEX(rec,'zdef') /= 0) EXIT   ! sono arrivato alla sez. livelli
 
@@ -153,12 +150,17 @@ DO
   IF (INDEX(rec,'undef') /= 0 .OR. INDEX(rec,'UNDEF') /= 0 ) THEN
     WRITE (21,'(a,1x,e10.3)') 'undef',rmis   
   
-! Se richiesto, forzo tsize
-  ELSE IF (tforce .AND. &
+! Se richiesto, forzo tsize e tstep
+  ELSE IF ((tforce .OR. stforce) .AND. &
            (INDEX(rec,'tdef') /= 0 .OR. INDEX(rec,'TDEF') /= 0) ) THEN
-    p1 = INDEX(rec,' ')
-    p2 = p1 + INDEX(rec(p1+1:),' ')
-    WRITE (21,'(a,1x,i6,1x,a)') 'tdef',tsize,TRIM(rec(p2:))
+    nw = word_split(rec, word_start=ws, word_end=we)
+    IF (nw /= 5) GOTO 9990
+    DO kf = 1,5
+      tfields(kf) = rec(ws(kf):we(kf))
+    ENDDO
+    IF (tforce) WRITE (tfields(2),'(i10)') tsize
+    IF (stforce) tfields(5) = tstep
+    WRITE (21,'(10a)') (TRIM(tfields(kf))," ",kf=1,5)
 
 ! Se richiesto, modifico xdef e ydef
   ELSE IF (xyforce .AND. &
@@ -201,12 +203,9 @@ ENDIF
 
 ! primo record sezione variabili
 READ (20,'(a)') rec_var(1)
-IF (INDEX(rec_var(1),'vars') == 0) STOP "Errore 1 elaborando liv/var"
+IF (INDEX(rec_var(1),'vars') == 0) GOTO 9995
 READ ( rec_var(1)(INDEX(rec_var(1),'vars')+4:), *) nvars
-IF (nvars > mxvars) THEN
-  WRITE (*,*) "Errore, troppe varibiali nel file ctl: ",TRIM(filein)
-  STOP
-ENDIF
+IF (nvars > mxvars) GOTO 9994
 
 ! record variabili
 DO k = 1, nvars
@@ -222,17 +221,12 @@ DO k = 1,nvars
 !  var_desc(k) = rec(p2+1:)
 
   READ (body(k),*,IOSTAT=ios) var_nlevs(k),var_grb(1:3,k)
-  IF (ios /= 0) THEN
-    WRITE (*,*) "Errore interpretando record variabili :"
-    WRITE (*,*) rec
-    STOP
-  ENDIF
+  IF (ios /= 0) GOTO 9993
 ENDDO
 
 ! ultimo record sezione variabili
 READ (20,'(a)') rec_var(nvars+2)
-IF (INDEX(rec_var(nvars+2),'ENDVARS') == 0) &
-  STOP "Errore 2 elaborando liv/var"
+IF (INDEX(rec_var(nvars+2),'ENDVARS') == 0) GOTO 9992
 
 !--------------------------------------------------------------------------
 ! 4.2) Modifico i records
@@ -322,7 +316,55 @@ ENDDO
 CLOSE(20)
 CLOSE(21)
 
-STOP
+STOP 0
+
+!==========================================================================
+! 6) Gestione errori
+
+9999 CONTINUE
+WRITE (*,*) "Errore aprnedo ",TRIM(filein)
+STOP 2
+
+9998 CONTINUE
+WRITE (*,*) "Errore aprendo ",TRIM(filetab)
+STOP 2
+
+9997 CONTINUE
+WRITE (*,*) "Errore leggendo ",TRIM(filetab)
+STOP 2
+
+9996 CONTINUE
+WRITE (*,*) "Errore, manca la sezione livelli in ",TRIM(filein)
+STOP 2
+
+9995 CONTINUE
+WRITE (*,*) "Errore 1 elaborando liv/var"
+STOP 3
+
+9992 CONTINUE
+WRITE (*,*) "Errore 2 elaborando liv/var"
+STOP 3
+
+9994 CONTINUE
+WRITE (*,*) "Errore, troppe varibiali in ",TRIM(filein)
+WRITE (*,*) "Massimo gestito: ",mxvars
+STOP 4
+
+9991 CONTINUE
+WRITE (*,*) "errore, troppe variabili ",TRIM(filetab)
+WRITE (*,*) "Massimo gestito: ",mxvars
+STOP 4
+
+9993 CONTINUE
+WRITE (*,*) "Errore interpretando record variabili :"
+WRITE (*,'(a)') TRIM(rec)
+STOP 4
+
+9990 CONTINUE
+WRITE (*,*) "Errore record ""tdef"" non ha 5 campi :"
+WRITE (*,'(a)') TRIM(rec)
+STOP 4
+
 END PROGRAM adjust_ctl
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -531,7 +573,7 @@ SUBROUTINE write_help
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 WRITE (*,*) ""
 WRITE (*,*) "USO: adjust_ctl.exe filein fileout "
-WRITE (*,*) "     [filetab] [-lsort] [-lgrp/-lsup] [-tsz N] [-xyscale S]"
+WRITE (*,*) "     [filetab] [-lsort] [-lgrp/-lsup] [-tsz N] [-tst S] [-xyscale S]"
 WRITE (*,*) ""
 WRITE (*,*) "Modifica i nomi di livelli e varibili in un file .ctl"
 WRITE (*,*) ""
@@ -546,6 +588,7 @@ WRITE (*,*) "-lsup:   non raggruppa i parametri a 2 e 10 metri, ma li scrive con
 WRITE (*,*) "         diverso dalle variabili in quota [LM]"
 WRITE (*,*) "-tsz N:  mette a N il numero di istanti nel record tdef, senza fare nessun"
 WRITE (*,*) "         controllo (utile per serie storiche con dati mancanti)"
+WRITE (*,*) "-tst S:  mette a S il passo temporale nel record tdef"
 WRITE (*,*) "-xysceale S: moltiplica per il fattore S le scale X e Y (puo risolvere"
 WRITE (*,*) "         problemi di griglie incompatibili con dati UTM)"
 

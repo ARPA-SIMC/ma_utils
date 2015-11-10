@@ -28,7 +28,7 @@ REAL, PARAMETER :: eps = 0.001           ! tolleranza per uguaglianza Real
 
 ! Dichiarazioni per GRIBEX.
 INTEGER :: ksec0(2),ksec1(1024),ksec2(1024),ksec3(2),ksec4(512)
-INTEGER :: kbuffer(maxdim),kbuffer2(maxdim),klen,kret
+INTEGER :: kbuffer(maxdim),klen,kret
 REAL    :: psec2(512),psec3(2)
 REAL    :: field(maxdim)
 
@@ -37,7 +37,7 @@ REAL :: fnorm,offset
 INTEGER :: iuin,iuout,cnt_in,cnt_utm,ksec2_sav(1024)
 INTEGER :: new_dx,new_dy,ios1,ios2
 CHARACTER (LEN=200) :: filein,fileout,chpar1,chpar2
-LOGICAL :: utm_uniq,wrn(3)
+LOGICAL :: wrn(3)
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
