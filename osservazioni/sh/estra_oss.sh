@@ -1,4 +1,4 @@
-#/bin/ksh
+#/bin/bash
 #-------------------------------------------------------------------------------
 # Estrae i dati di una o piu' stazioni meteo, e li converte nei vecchi formati
 # estra_orari / estra_tmp
@@ -51,15 +51,15 @@ function write_help
   echo ""
   echo "IDSTA:    id delle stazioni da estrarre (se piu' di una, separare con virgole)"
   echo "          - con reti non-GTS usare il codice Oracle (intero < 100000, oppure"
-  echo "            Hxxxxx; vedi file anag_arkioss.csv)"
+  echo "            Hxxxxx; vedi file /usr/share/ma_utils/anag_arkioss.csv)"
   echo "          - con reti synop e temp usare il codice WMO (formato xxxxx, oppure"
-  echo "            Sxxxxx o Txxxxx; vedi file anag_synop.csv)"
+  echo "            Sxxxxx o Txxxxx; vedi file /usr/share/ma_utils/anag_synop.csv)"
   echo "FILESTA:  file con la lista degli id delle stazioni da estrarre; puo' essere un"
   echo "          file .csv con id_stazione come primo campo."
   echo ""
   echo "IDPAR:    id dei parametri da estrarre (se piu' di uno, separare con virgole)"
   echo "          - per reti non-GTS, indicare i codici Oracle (param_shortnames.csv o"
-  echo "            param_arkioss.csv)"
+  echo "            param_arkioss.csv in /usr/share/ma_utils)"
   echo "          - per rete synop, indicare i codici B-table (Bxxxxx: param_shortnames.csv)"
   echo "          - per i radiosondaggi, mettere 'temp'"
   echo "FILEPAR:  file con la lista degli id dei parametri da estrarre"

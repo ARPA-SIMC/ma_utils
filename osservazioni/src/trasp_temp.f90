@@ -33,7 +33,7 @@ PROGRAM trasp_temp
 !   Se i dati in input usano l'altro riferimento, vengono convertiti al
 !   momento della lettura (tlev_in)
 !
-!                                                 V6.0.1, Enrico 17/10/2013
+!                                                 V6.1.0, Enrico 11/11/2015
 !--------------------------------------------------------------------------
 
 USE datetime_class
@@ -41,7 +41,7 @@ IMPLICIT NONE
 
 ! Parametri relativi ai files di I/O
 REAL, PARAMETER :: rmis = -9999.       ! dato mancante in output
-INTEGER, PARAMETER :: mxlev_in = 1000  ! max n.ro di livelli in un temp
+INTEGER, PARAMETER :: mxlev_in = 20000 ! max n.ro di livelli in un temp
 INTEGER, PARAMETER :: mxlev_out = 100  ! max n.ro di livelli in output
 INTEGER, PARAMETER :: mxtemp = 5000    ! max n.ro di sondaggi
 INTEGER, PARAMETER :: fw = 10          ! ampiezza campi file di output
@@ -262,7 +262,7 @@ temp: DO kt_in = 1,ntemp_in
 
 ! 2.2.1 Apro file e leggo header
   OPEN (UNIT=31, FILE=filein, STATUS="OLD", ACTION="READ",IOSTAT=ios)
-  READ (31,'(1x,i5,1x,a24,1x,i4.4,2(i2),1x,i2,3x,i3,1x,i4,2(1x,f10.5))', &
+  READ (31,'(1x,i5,1x,a24,1x,i4.4,2(i2),1x,i2,3x,i5,1x,i4,2(1x,f10.5))', &
     IOSTAT=ios1) idstazh,nome_stazh,yyh,mmh,ddh,hhh,nlev_in,ihstazh,lonh,lath
   READ (31,'(11x,5(1x,a10))',IOSTAT=ios2) idparh(1:4),labzh
   CALL init(datah, YEAR=yyh, MONTH=mmh, DAY=ddh, HOUR=hhh)
@@ -859,7 +859,11 @@ WRITE (filectl,'(a,i5.5,a)') "temp_",idstaz,".ctl"
 OPEN (UNIT=33, FILE=filectl, STATUS="REPLACE", FORM="FORMATTED")
 
 WRITE (33,'(3a)')          "DSET   ","^",TRIM(filedat)
-WRITE (33,'(3a)')          "TITLE  ","temp ",TRIM(nome_staz)
+IF (TRIM(nome_staz) /= "") THEN
+  WRITE (33,'(3a)')        "TITLE  ","temp ",TRIM(nome_staz)
+ELSE
+  WRITE (33,'(2a,i5.5)')   "TITLE  ","temp ",idstaz
+ENDIF
 WRITE (33,'(a,f10.3)')     "UNDEF  ",rmis   
 WRITE (33,'(2a)')          "XDEF   ","1 linear 1 1"
 WRITE (33,'(2a)')          "YDEF   ","1 linear 1 1"

@@ -181,12 +181,13 @@ PROGRAM bufr_csv2orari
 !   ottavi (adesso esce in %; assicurarsi che alameno sia consistente nella
 !   serie storica dei synop)
 ! 
-!                                         Versione 2.1.0, Enrico 29/06/2015
+!                                         Versione 2.2.0, Enrico 11/11/2015
 !--------------------------------------------------------------------------
 
 USE file_utilities
 USE datetime_class
 USE missing_values
+USE char_utilities
 USE local
 
 IMPLICIT NONE
@@ -211,7 +212,7 @@ INTEGER :: idp,yy,mm,dd,hh,mn,nf,pp,npar,ndays,ndec,ndiff
 INTEGER :: cnt_date_in,cnt_date_miss,cnt_date_skip,cnt_valok_out
 INTEGER :: cnt_istok_out,cnt_msg_skip,cnt_diff,cnt_ist_diff
 CHARACTER (LEN=200) :: filein,fileout,filepar,filelog,fileana
-CHARACTER (LEN=200) :: chdum,chrec,chfmt1,chfmt2
+CHARACTER (LEN=200) :: chdum,chrec,chfmt1,chfmt2,key
 CHARACTER (LEN=20) :: idsta
 CHARACTER (LEN=12) :: ch12a,ch12b
 CHARACTER (LEN=10) :: ch10a,ch10b
@@ -381,32 +382,33 @@ DO k = 1,HUGE(0)
   IF (ios /= 0) GOTO 9993
   pp = INDEX(chrec,",")
   IF (pp == 0) CYCLE
+  key = wash_char(chrec(1:pp-1), badchar=CHAR(34)) !tolgo "" (dballe > 5.7)
   ios = 0
   IF (pp == LEN(TRIM(chrec))) THEN
     CYCLE
 
 ! Chiavi relative alla data
-  ELSE IF (chrec(1:pp-1) == "B04001") THEN
+  ELSE IF (key == "B04001") THEN
     READ (chrec(pp+1:),*,IOSTAT=ios) yy
-  ELSE IF (chrec(1:pp-1) == "B04002") THEN
+  ELSE IF (key == "B04002") THEN
     READ (chrec(pp+1:),*,IOSTAT=ios) mm
-  ELSE IF (chrec(1:pp-1) == "B04003") THEN
+  ELSE IF (key == "B04003") THEN
     READ (chrec(pp+1:),*,IOSTAT=ios) dd
-  ELSE IF (chrec(1:pp-1) == "B04004") THEN
+  ELSE IF (key == "B04004") THEN
     READ (chrec(pp+1:),*,IOSTAT=ios) hh
-  ELSE IF (chrec(1:pp-1) == "B04005") THEN
+  ELSE IF (key == "B04005") THEN
     READ (chrec(pp+1:),*,IOSTAT=ios) mn
 
 ! Eventuali chiavi relative all'anagrafica
-  ELSE IF (chrec(1:pp-1) == "B05001") THEN
+  ELSE IF (key == "B05001") THEN
     READ (chrec(pp+1:),*,IOSTAT=ios) anag_out%lat
-  ELSE IF (chrec(1:pp-1) == "B06001") THEN
+  ELSE IF (key == "B06001") THEN
     READ (chrec(pp+1:),*,IOSTAT=ios) anag_out%lon
-  ELSE IF (chrec(1:pp-1) == "B07030") THEN
+  ELSE IF (key == "B07030") THEN
     READ (chrec(pp+1:),*,IOSTAT=ios) anag_out%quo
-  ELSE IF (chrec(1:pp-1) == "B01019" .OR. chrec(1:pp-1) == "B01015") THEN
+  ELSE IF (key == "B01019" .OR. key == "B01015") THEN
     READ (chrec(pp+1:),'(a)',IOSTAT=ios) anag_out%nome
-  ELSE IF (chrec(1:pp-1) == "B01194") THEN
+  ELSE IF (key == "B01194") THEN
     READ (chrec(pp+1:),'(a)',IOSTAT=ios) anag_out%rete
   ENDIF
 
@@ -699,6 +701,7 @@ SUBROUTINE get_msg(iu,iu_log,ldeb,eof,datah_req,npar,req_par,inp_type, &
 
 USE datetime_class
 USE missing_values
+USE char_utilities
 USE local
 
 IMPLICIT NONE
@@ -804,7 +807,7 @@ DO k = 1,HUGE(0)
 
   pp = INDEX(chrec,",")
   IF (pp == 0) CYCLE
-  key = chrec(1:pp-1)
+  key = wash_char(chrec(1:pp-1), badchar=CHAR(34)) !tolgo "" (dballe > 5.7)
   kty = "othe"
   ios = 0
 
@@ -813,7 +816,7 @@ DO k = 1,HUGE(0)
     kty = "null"
 
 ! 2.1 Inizio di un nuovo messaggio
-  ELSE IF (key == "edition") THEN
+  ELSE IF (key == "edition" .OR. key == "edition_number") THEN
     kty = "head"
 
 ! 2.2 "key" fa parte della codifica della data

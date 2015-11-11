@@ -43,18 +43,19 @@ PROGRAM bufr_csv2temp
 !   B11001 WIND DIRECTION
 !   B11002 WIND SPEED 
 !
-!                                         Versione 1.0.1, Enrico 29/06/2015
+!                                         Versione 1.1.0, Enrico 11/11/2015
 !--------------------------------------------------------------------------
 
 USE missing_values
+USE char_utilities
 
 IMPLICIT NONE
 
-INTEGER, PARAMETER :: maxlev = 10000  ! Max numero di livell in un rsd
+INTEGER, PARAMETER :: maxlev = 20000  ! Max numero di livell in un rsd
 INTEGER, PARAMETER :: iu = 20         ! Unita' per lettura filein
 
 REAL :: pp(maxlev),zz(maxlev),tt(maxlev),td(maxlev),ff(maxlev),dd(maxlev)
-REAL :: z_sta
+REAL :: z_sta,lat_sta,lon_sta
 INTEGER :: idp,eof,eor,ios,ier,k,kp,p1,cnt_rsd
 INTEGER :: id_block,id_sta,yy,mm,dy,hh,mn,nlev
 CHARACTER (LEN=200) :: filein,chdum,next_arg,chrec,key
@@ -146,16 +147,16 @@ DO k = 1,HUGE(0)
   p1 = INDEX(chrec,",")
 ! record senza separatore o chiave senza valore
   IF (p1 == 0 .OR. LEN(TRIM(chrec)) == p1) CYCLE 
-  key = chrec(1:p1-1)
+  key = wash_char(chrec(1:p1-1), badchar=CHAR(34)) !tolgo "" (dballe > 5.7))
 
 ! "edition": inizio un nuovo messaggio
-  IF (key == "edition") THEN
+  IF (key == "edition" .OR. key == "edition_number") THEN
   
 !   Elaboro e scrivo il messaggio appena concluso
     IF (.NOT. first) THEN
       CALL proc_rsd(nlev,pp,zz,tt,td,ff,dd, &
         lint,lgeo,lrdate,lphpa,lrh,luv,ltc, &
-        id_block,id_sta,z_sta,yy,mm,dy,hh,mn,ier)
+        id_block,id_sta,lat_sta,lon_sta,z_sta,yy,mm,dy,hh,mn,ier)
       cnt_rsd = cnt_rsd + 1
     ENDIF
     first = .FALSE.
@@ -183,6 +184,10 @@ DO k = 1,HUGE(0)
     READ (chrec(p1+1:),*,IOSTAT=ios) id_block
   ELSE IF (key == "B01002") THEN
     READ (chrec(p1+1:),*,IOSTAT=ios) id_sta
+  ELSE IF (key == "B05001") THEN
+    READ (chrec(p1+1:),*,IOSTAT=ios) lat_sta
+  ELSE IF (key == "B06001") THEN
+    READ (chrec(p1+1:),*,IOSTAT=ios) lon_sta
   ELSE IF (key == "B07030" .AND. .NOT. force_zsta) THEN
     READ (chrec(p1+1:),*,IOSTAT=ios) z_sta
   ELSE IF (key == "B04001") THEN
@@ -240,7 +245,7 @@ ENDDO
 IF (.NOT. first) THEN
   CALL proc_rsd(nlev,pp,zz,tt,td,ff,dd, &
     lint,lgeo,lrdate,lphpa,lrh,luv,ltc, &
-    id_block,id_sta,z_sta,yy,mm,dy,hh,mn,ier)
+    id_block,id_sta,lat_sta,lon_sta,z_sta,yy,mm,dy,hh,mn,ier)
   cnt_rsd = cnt_rsd + 1
 ENDIF
 
@@ -269,7 +274,7 @@ END PROGRAM bufr_csv2temp
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 SUBROUTINE proc_rsd(nlev,pp,zz,tt,td,ff,dd, lint,lgeo,lrdate,lphpa,lrh,luv,ltc, &
-  id_block,id_sta,z_sta,yy,mm,dy,hh,mn, ier)
+  id_block,id_sta,lat_sta,lon_sta,z_sta,yy,mm,dy,hh,mn, ier)
 
 !
 ! Elabora e scrive un radiosondaggio
@@ -283,7 +288,8 @@ IMPLICIT NONE
 REAL, PARAMETER :: rmiss_out = -9999. ! Valore per dati mancanti in output
 
 ! Parametri della subroutine
-REAL, INTENT(IN) :: pp(nlev),zz(nlev),tt(nlev),td(nlev),ff(nlev),dd(nlev),z_sta
+REAL, INTENT(IN) :: pp(nlev),zz(nlev),tt(nlev),td(nlev),ff(nlev),dd(nlev)
+REAL, INTENT(IN) :: lat_sta,lon_sta,z_sta
 INTEGER, INTENT(IN) :: id_block,id_sta,yy,mm,dy,hh,mn,nlev
 LOGICAL, INTENT(IN) :: lint,lgeo,lrdate,lphpa,lrh,luv,ltc
 INTEGER, INTENT(OUT) :: ier
@@ -495,8 +501,9 @@ ELSE
 ENDIF
 
 OPEN (UNIT=30, FILE=fileout, STATUS="REPLACE", FORM="FORMATTED")
-WRITE (30,'(1x,i2.2,i3.3,1x,a24,1x,a8,1x,a2,i2.2,1x,i3.3,1x,i4)') &
-  id_block,id_sta,nome_sta,ch10(1:8),ch10(9:10),00,nlev,out_z_sta
+WRITE (30,'(1x,i2.2,i3.3,1x,a24,1x,a8,1x,a2,i2.2,1x,i5,1x,i4,2(1x,f10.5))') &
+  id_block,id_sta,nome_sta,ch10(1:8),ch10(9:10),00,nlev, &
+  out_z_sta,lon_sta,lat_sta
 WRITE (30,'(6(1x,a10))') label(1:6)
 DO kl = 1,nlev
   WRITE (30,'(6(1x,f10.1))') out_val(kl,1:6)
