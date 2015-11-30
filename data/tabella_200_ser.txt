@@ -14,12 +14,13 @@
 !          -4 (se cloud cover); -5 (se flussi di calore); 
 !          -6 (se specie chimiche); 0 (altri casi)
 !
-!                                          Ultimo aggiornamento: 25/06/2015
+!                                          Ultimo aggiornamento: 16/11/2015
 !--------------------------------------------------------------------------
 !123--12345678--123--1234567890--1234567890--123
 !Cod  Sigla     dec     val.min     val.max  cp2
 
 !Meteorological parameters
+   1  pr          0       10.00   105000.00    0
    8  z           1        0.00    99999.99    0
   11  Temp        1      193.16      323.16   -1
   33  U-wind      1      -50.00       50.00   34
@@ -28,7 +29,14 @@
   36  Mod-wind    1        0.00       70.00    0
   40  W-wind      4       -1.00        1.00    0
   41  W-wind-c    4       -1.00        1.00    0
+  51  q         exp        0.00        0.10    0
   52  relhum      4        0.00      100.00    0
+  53  cliq      exp        0.00        0.10    0
+  61  tp          2        0.00     1000.00    0
+  73  clcl        0        0.00      100.00   -4
+  74  clcm        0        0.00      100.00   -4
+  75  clch        0        0.00      100.00   -4
+  86  wg          4        0.00    99999.99    0
   89  ro          5        0.00        1.50    0
   90  xxx       exp      -1.e22       1.e22    0
   92  phatt       4    -9999.99    99999.99    0

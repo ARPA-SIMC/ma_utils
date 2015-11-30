@@ -11,11 +11,12 @@
 ! Per implementare lo schema "full" di Chimere V2014, occorre aggiungere 
 ! 7 specie gas (AnA0D, BiA0D, AnA2D, BiA2D, ISOPA1, ISOPA2, AnBIP) e 
 !
-!                                          Ultimo aggiornamento: 25/06/2015
+!                                          Ultimo aggiornamento: 16/11/2015
 !--------------------------------------------------------------------------
 !123--12345678--1234567890123456789012345678901234567890--12345
 !Cod  Sigla     Descrizione e unita'                      B-Tab 
 !Meteorological parameters
+   1  pr        pressure [Pa]                             10004
    8  z         Geometric height [m]                      10007
   11  t         Temperature [K]                           12101
   33  u         X (zonal) wind component [m/s]            11003
@@ -24,7 +25,14 @@
   36  ff        Wind speed [m/s]                          11002
   40  w         Vertical Velocity (ter.foll.) [m/s]       11192
   41  wc        Vertical Velocity (cartesian) [m/s]       11006
+  51  q         specific water vapor content [kg/kg]      13001
   52  relhum    relative humidity [%]                     13003
+  53  cliq      Cl.Water mix.r. (Chimere input) [Kg/Kg]
+  61  tp        total precipitation [kg/m2]               13011
+  73  clcl      low cloud fraction [%]                    20051
+  74  clcm      medium cloud fraction [%]                 20052
+  75  clch      high cloud fraction [%]                   20053
+  86  wg        soil water content [mm H2O]               13206
   89  ro        Air density [mle/cm3]                     12194
   90  xxx       Reserved for temporary use
   92  phat      Cloud Photolysis Attenuation [0-1]

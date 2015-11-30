@@ -15,7 +15,7 @@
 !          -4 (se cloud cover); -5 (se flussi di calore); 
 !          -6 (se specie chimiche); 0 (altri casi)
 !
-!                                          Ultimo aggiornamento: 22/11/2013
+!                                          Ultimo aggiornamento: 16/11/2015
 !--------------------------------------------------------------------------
 !123--12345678--123--1234567890--1234567890--123
 !Cod  Sigla     dec     val.min     val.max  cp2
@@ -23,11 +23,11 @@
   22  radir       1        0.00     1300.00    0
   23  radiff      1        0.00     1300.00    0
   29  clc         4    -9999.99    99999.99    0   
-  31  qw        exp        0.00        1.00    0   
-  33  qi        exp        0.00        1.00    0   
-  35  qr        exp        0.00        1.00    0   
-  36  qs        exp        0.00        1.00    0   
-  39  qrs       exp        0.00        1.00    0   
+  31  qw        exp        0.00        0.10    0   
+  33  qi        exp        0.00        0.10    0   
+  35  qr        exp        0.00        0.10    0   
+  36  qs        exp        0.00        0.10    0   
+  39  qrs       exp        0.00        0.10    0   
   41  iwater      4    -9999.99    99999.99    0   
   42  idivhum     4    -9999.99    99999.99    0   
   68  hbascon     4    -9999.99    99999.99    0   

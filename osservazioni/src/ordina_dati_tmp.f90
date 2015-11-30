@@ -54,7 +54,8 @@ PROGRAM ordina
        
   INTEGER, ALLOCATABLE :: staz_req(:),prov_req(:), &
        idconfsens(:),staz(:),param(:),intv_db(:),alt(:), &
-       flag(:,:,:,:),valid(:,:,:),stazsens(:),sensstaz(:)
+       flag(:,:,:,:),valid(:,:,:),stazsens(:),sensstaz(:), &
+       qfh_db(:,:,:,;),qfh_out(:,:,:,;),qfd_db(:,:,:),qfd_out(:,:,:)
   REAL, ALLOCATABLE :: lon(:),lat(:), &
        hmed_db(:,:,:),hmed_out(:,:,:),dmed_db(:,:),dmed_out(:,:),dmax_out(:,:)
 
@@ -198,7 +199,10 @@ PROGRAM ordina
   ALLOCATE(hmed_db(nsens,ndays,0:23),dmed_db(nsens,ndays), &
        flag(nsens,ndays,0:23,nflags), &
        hmed_out(nstaz_anag,ndays,0:23), &
-       dmed_out(nstaz_anag,ndays),dmax_out(nstaz_anag,ndays))
+       dmed_out(nstaz_anag,ndays),dmax_out(nstaz_anag,ndays),& 
+       qfh_out(nstaz_anag,ndays,0:23,3),qfd_out(nstaz_anag,ndays,3), &
+       qfh_db(nsens,ndays,0:23,3),qfd_db(nsens,ndays,3))
+
   hmed_db =missdata(1)
   dmed_db =missdata(1)
   flag    =missflag
@@ -327,6 +331,25 @@ PROGRAM ordina
      END IF
   END DO
 
+  ! salva le flag di qualita' significative (per ciascun gruppo, la prima /=0)
+  ! array flag_sig(sensore, giorno, ora, man/auto/all)
+  flag_sig(:,:,:,:) = 0
+  DO kflag=nflags_man,1,-1
+     WHERE(flag(:,:,:,kflag) /= 0)
+        flag_sig(:,:,:,1) = flag(:,:,:,kflag)
+     END WHERE
+  END DO
+  DO kflag=nflags,nflags_man+1,-1
+     WHERE(flag(:,:,:,kflag) /= 0)
+        flag_sig(:,:,:,2) = flag(:,:,:,kflag)
+     END WHERE
+  END DO
+  DO kflag=nflags,1,-1
+     WHERE(flag(:,:,:,kflag) /= 0)
+        flag_sig(:,:,:,3) = flag(:,:,:,kflag)
+     END WHERE
+  END DO
+
   ! 3.2)  Costruzione della matrice dei dati di output,
   !       pescando dal sensore attivo e corrispondente
   !       alla stazione in ciascun istante
@@ -341,6 +364,9 @@ PROGRAM ordina
      WHERE(valid(ksens,:,0)==1)
         dmed_out(kstaz,:)=dmed_db(ksens,:)
      END WHERE
+
+     qfh_out(kstaz,:,:,:) = flag_sig(ksens,:,:,:)
+     qfd_out(kstaz,:,:) = flag_sig(ksens,:,0,:)
   END DO
 
   ! 3.3) Calcolo medie e massimi giornalieri
@@ -354,6 +380,9 @@ PROGRAM ordina
            dmed_out(kstaz,:)= &
                 SUM(valid(ksens,:,:)*hmed_db(ksens,:,:)*intv_db(ksens), DIM=2) /&
                 SUM(valid(ksens,:,:)*intv_db(ksens), DIM=2)
+        ENDWHERE
+        WHERE(dmed_out(kstaz,:) == missdata(1))
+           
         ENDWHERE
      END DO
 
@@ -433,6 +462,57 @@ PROGRAM ordina
 
         CLOSE(14)
      END IF
+  END DO
+
+  ! 4.2) File con flag di validazione (formato .csv)
+  DO kstaz=1,nstaz_anag
+     ksens=sensstaz(kstaz)
+
+     WRITE(fileout,'(a,"_",i9.9,"_qflags.csv")') &
+       TRIM(codparam_lst(kparam)),staz(ksens)
+     WRITE(*,*)"Scrivo il file ",fileout
+     OPEN(14,file=fileout)
+
+     ! intestazione
+     IF(opt_stat==1)THEN
+        WRITE(14,'(a)')"aaaa,mm,gg,hh,man,auto,all"
+     ELSEIF(opt_stat==2 .OR. opt_stat==3)THEN
+        WRITE(14,'(a)')"aaaa,mm,gg,man,auto,all"
+     END IF
+
+     ! dati.
+     ! Con dati orari (opt_stat=1), devo passare da ora di inizio a ora di fine
+     ! misura; la misura iniziata alle 23 finisce alle 00 del giorno seguente.
+     DO kday=1,ndays
+        date_out=date_start+kday-1
+        IF(opt_stat==1)THEN
+           DO i=0,22
+              WRITE(14,'(i4.4,a1,6(i2.2,a1))')          &
+                 date_out%yy,",",date_out%mm,",",date_out%dd,",",i+1, &
+                 (",",qfh_out(kstaz,kday,i,kq),kq=1,3)
+
+           END DO
+           date_out=date_out+1
+
+           WRITE(14,'(i4.4,a1,6(i2.2,a1))')          &
+              date_out%yy,",",date_out%mm,",",date_out%dd,",",0,",", &
+              (",",qfh_out(kstaz,kday,23,kq),kq=1,3)
+
+        ELSE IF(opt_stat==2)THEN
+           WRITE(14,'(i4.4,a1,5(i2.2,a1))')          &
+              date_out%yy,",",date_out%mm,",",date_out%dd,",", &
+              (",",qfd_out(kstaz,kday,kq),kq=1,3)
+
+        ELSE IF(opt_stat==3)THEN
+           WRITE(14,'(i4.4,a1,5(i2.2,a1))')          &
+              date_out%yy,",",date_out%mm,",",date_out%dd,",", &
+              (",",qfd_out(kstaz,kday,kq),kq=1,3)
+
+        END IF
+     END DO
+
+     CLOSE(14)
+
   END DO
 
   ! 4.3) File GrADS su punto: binario

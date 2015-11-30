@@ -2,7 +2,7 @@ PROGRAM chimerencdf2grib
 !--------------------------------------------------------------------------
 ! Legge un file di netcdf di Chimere e lo scrive in formato GRIB
 ! Uso: chimerencdf2grib.exe filein fileout fileinfo igen
-!                       [-out/-met/-bio/-ini/-bc/-emibio/-eminv/-aodem]
+!                      [-out/-met/-bio/-ini/-bc/-emibio/-eminv/-aodem]
 !
 ! NOTE:
 ! Stato delle opzioni: (label crev)
@@ -18,7 +18,7 @@ PROGRAM chimerencdf2grib
 ! - tutti i dati sono scritti in ug/m3, anche se la codifica grib-SIMC dei gas 
 !   richiederebbe ppb.
 !
-!                               Versione 3.2.2, Michele & Enrico 10/04/2015
+!                               Versione 3.3.0, Michele & Enrico 16/11/2015
 !--------------------------------------------------------------------------
 use calendar 
 use netcdf
@@ -41,7 +41,7 @@ END INTERFACE
 ! Parametri costanti
 INTEGER, PARAMETER :: maxdim = 1000000 ! dimensione massima dei GRIB
 INTEGER, PARAMETER :: maxvar = 200     ! n.ro max var. in output Chimere
-INTEGER, PARAMETER :: maxlev = 16      ! n.ro max livelli in output Chimere
+INTEGER, PARAMETER :: maxlev = 100     ! n.ro max livelli nel file di input .nc
 REAL, PARAMETER :: eps = 0.0001        ! tolleranza per uguaglianza estemi griglia
 
 CHARACTER (LEN=120) :: tab_path_def = PKGDATAROOTDIR
@@ -685,7 +685,7 @@ IF (inp_fmt == 1) THEN
   WRITE (*,*) "Scadenze elaborate ",kscad-1," grib scritti ",cnt_grb
 
 !--------------------------------------------------------------------------
-! 2.2) Formato METEO
+! 2.2) Formato METEO / Exdom
 
 ELSE IF (inp_fmt == 2) THEN
 
@@ -747,6 +747,8 @@ ELSE IF (inp_fmt == 2) THEN
         ksec1(6) = code_var(ivar)
         DO klev = 1,nl
           IF (lev_out(klev) == 0) CYCLE
+
+!         Codifica livelli
           IF (varids1(ivarid)%ndims==4) then
             ksec1(7) = 109
             ksec1(8) = klev
@@ -755,7 +757,8 @@ ELSE IF (inp_fmt == 2) THEN
             ksec1(7) = 105
             ksec1(8) = 2
             ksec1(9) = 0
-          ELSE IF (namevar(ivar) == "w10m" .OR. namevar(ivar) == "w10s" ) THEN
+          ELSE IF (namevar(ivar) == "w10m" .OR. namevar(ivar) == "w10s" .OR. &
+                   namevar(ivar) == "u10m" .OR. namevar(ivar) == "v10m") THEN
             ksec1(7) = 105
             ksec1(8) = 10
             ksec1(9) = 0
@@ -767,6 +770,11 @@ ELSE IF (inp_fmt == 2) THEN
             ksec1(7) = 1
             ksec1(8) = 0
             ksec1(9) = 0
+          ENDIF
+
+!         Correggo unita' di misura (da Chimere a GRIB). Verificate Tp!!
+          IF (namevar(ivar) == "alb") THEN
+            conc_out(:,1,ivar) = conc_out(:,1,ivar)/100.
           ENDIF
 
           CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
@@ -1318,7 +1326,7 @@ WRITE (*,*) "fileinfo: namelsit (formato CHIMERE_INFO.DAT o CHIMERE_NCINFO.DAT)"
 WRITE (*,*) "igen:     processo generatore dei grib in output"
 WRITE (*,*)
 WRITE (*,*) "  -out:   analizza l'output di Chimere (concentrazioni) [DEFAULT]"
-WRITE (*,*) "  -met:   analizza un file METEO"
+WRITE (*,*) "  -met:   analizza un file METEO o exdom"
 WRITE (*,*) "  -bio:   analizza un file BIOFACS (??? calcola potenziale totale)"
 WRITE (*,*) "  -ini:   analizza un file ini.sim o end.sim"
 WRITE (*,*) "  -bc:    analizza un file LAT_CONCS o TOP_CONCS"

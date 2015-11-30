@@ -297,9 +297,12 @@ unset http_proxy
 rm -f ${dataset}.conf
 arki-mergeconf ${akurl}/dataset/${dataset} > ${dataset}.conf || exit 3
 
-# Scarico gli alias dal server, per poterli usare nelle query su file locali
-arki-dump --aliases ${akurl} > ./match_alias.conf || exit 3
-export ARKI_ALIASES=`pwd`/match_alias.conf
+# Se gli alias non sono gia' stati assegnati, li scarico dal server (servono per
+# le query arkimet sui files di lavoro)
+if [ -z "${ARKI_ALIASES:-}" ] ; then
+  arki-dump --aliases ${akurl} > ./match_alias.conf || exit 3
+  export ARKI_ALIASES=`pwd`/match_alias.conf
+fi
 
 #-------------------------------------------------------------------------------
 # 2.2) Parametri 3D
