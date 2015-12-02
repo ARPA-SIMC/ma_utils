@@ -222,8 +222,8 @@ DO kg = 1,HUGE(0)
   CALL getval(datet_ref, YEAR=datah_ref(1), MONTH=datah_ref(2), &
     DAY=datah_ref(3), HOUR=datah_ref(4))
   
-  IF (scad(4) == 3 .OR. scad(4) == 4 .OR. &
-      scad(4) == 14 .OR. scad(4) == 15) THEN
+  IF (scad(4)==3  .OR. scad(4)==4  .OR. scad(4)==6  .OR. scad(4)==7 .OR. &
+      scad(4)==14 .OR. scad(4)==15 .OR. scad(4)==16 .OR. scad(4)==17) THEN
     datet_end = datet_in + timedelta_new(HOUR=scad(3))
     CALL getval(datet_end, YEAR=datah_end(1), MONTH=datah_end(2), &
       DAY=datah_end(3), HOUR=datah_end(4))
