@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 ###########################################################################
 # run_calmet.ksh
 #
@@ -28,10 +28,14 @@
 # L'opzione -lmtest agisce tra l'estrazione dati e la scrittura dei files
 #   up* e surf* -> funziona se 
 #
-#                                                 V8.0.0, Enrico 02/08/2012
+# TODO:
+# 2.2.1
+# 2.3.1
+#
+#                                                 V9.0.0, Enrico 31/12/2015
 ###########################################################################
 #set -x
-set +e
+set -u
 
 #-------------------------------------------------------------------------
 # Scrive a schermo l'help della procedura
@@ -125,38 +129,62 @@ done
 
 #--------------------------------------------------------------------------
 # 1.2) Path e altri parametri costanti
-calmet_root=${HOME_MINGUZZI}/calmet/         # root programmi calmet
-run_root=${SCRATCH_MINGUZZI}/calmet/${proj}  # root esecuzione progetto
-proj_dir=${calmet_root}/progetti/${proj}     # files statici del progetto
-exe_dir=${calmet_root}/bin/                  # dir. eseguibili calmet
-dat_dir=${calmet_root}/dat/                  # dir. files costanti calmet
 
-out_dir=${run_root}/out/                     # dir. dei prodotti finali
-log_dir=${run_root}/log/                     # dir. dei files di log
-run_dir=${run_root}/run/                     # dir. in cui eseguo calmet
-oss_dir=${run_root}/oss/                     # archivio dati osservati
+proj_dir=/home/eminguzzi/calmet/progetti/${proj} # files statici del progett
+dat_dir=/home/eminguzzi/calmet/dat/              # files costanti calmet
+run_root=/scratch/eminguzzi/calmet/${proj}       # root esecuzione
 
-days=${HOME_MINGUZZI}/bin/days.exe
-delta_days=${HOME_MINGUZZI}/bin/delta_days.exe
-ak_seriet=${HOME_MINGUZZI}/arkimet/bin/ak_seriet.ksh
-ak_getgrib=${HOME_MINGUZZI}/arkimet/bin/ak_getgrib.ksh
-cong=/usr/bin/cong
-zoom_grib=${HOME_MINGUZZI}/util/grib/bin/zoom_grib.exe
-grib2up_dat=${HOME_MINGUZZI}/calmet/bin/grib2up_dat.exe
-rw_dat_calmet=${HOME_MINGUZZI}/calmet/bin/rw_dat_calmet.exe
-rw_xout_calmet=${HOME_MINGUZZI}/calmet/bin/rw_xout_calmet.exe
-grib23ddat=${HOME_MINGUZZI}/calmet/bin/grib23ddat.exe
-zlay_lamaz_35=${HOME_MINGUZZI}/util/grib/lm_ope/LAMAZ_layers_35.grb
-zlay_lamaz_40=${HOME_MINGUZZI}/util/grib/lm_ope/LAMAZ_layers_40.grb
+out_dir=${run_root}/out/                         # prodotti finali
+log_dir=${run_root}/log/                         # log
+run_dir=${run_root}/run/                         # esecuzione calmet
+oss_dir=${run_root}/oss/                         # archivio dati osservati
+
+# Assegno l'ambiente ma_utils
+if [ -z $MA_UTILS_SVN ] ; then
+  ak_seriet=/usr/libexec/ma_utils/ak_seriet.sh
+  ak_getgrib=/usr/libexec/ma_utils/ak_getgrib.sh
+  grib2up_dat=/usr/libexec/ma_utils/grib2up_dat.exe
+  rw_dat_calmet=/usr/libexec/ma_utils/rw_dat_calmet.exe
+  rw_xout_calmet=/usr/libexec/ma_utils/rw_xout_calmet.exe
+  grib23ddat=/usr/libexec/ma_utils/grib23ddat.exe
+else 
+  echo "(run_calmet.sh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
+  ak_seriet=${MA_UTILS_SVN}/arkimet/sh/ak_seriet.ksh
+  ak_getgrib=${MA_UTILS_SVN}/arkimet/sh/ak_getgrib.ksh
+  grib2up_dat=${MA_UTILS_SVN}/calmet/src/grib2up_dat.exe
+  rw_dat_calmet=${MA_UTILS_SVN}/calmet/src/rw_dat_calmet.exe
+  rw_xout_calmet=${MA_UTILS_SVN}/calmet/src/rw_xout_calmet.exe
+  grib23ddat=${MA_UTILS_SVN}/calmet/src/grib23ddat.exe
+fi
+
+# Assegno l'ambiente LibSim
+if [ -z $LIBSIM_SVN ] ; then
+  getpoint=vg6d_getpoint
+  subarea=vg6d_subarea  
+  transform=vg6d_transform
+else
+  echo "(ak_seriet.ksh) Eseguibili libsim: copia di lavoro in "$LIBSIM_SVN
+  getpoint=${LIBSIM_SVN}/bin/vg6d_getpoint
+  subarea=${LIBSIM_SVN}/bin/vg6d_subarea
+  transform=${LIBSIM_SVN}/bin/vg6d_transform
+fi
 
 # Livelli LAMAZ da usare per pseudo-osservazioni
-lay_lm_40="GRIB1,110,040,041 or GRIB1,110,039,040 or GRIB1,110,038,039 or GRIB1,110,037,038 or GRIB1,110,036,037 or GRIB1,110,035,036 or GRIB1,110,034,035 or GRIB1,110,033,034 or GRIB1,110,032,033 or GRIB1,110,031,032 or GRIB1,110,030,031 or GRIB1,110,029,030 or GRIB1,110,028,029 or GRIB1,110,027,028 or GRIB1,110,026,027 or GRIB1,110,025,026 or GRIB1,110,024,025 or GRIB1,110,023,024 or GRIB1,110,022,023 or GRIB1,110,021,022 or GRIB1,110,020,021 or GRIB1,110,019,020 or GRIB1,110,018,019 or GRIB1,110,017,018"
-nlayb_40="40"
-nlayt_40="17"
+zlay_lamaz_2003=/home/eminguzzi/util/grib/lm_ope/LAMAZ_layers_20030402.grb
+zlay_lamaz_2006=/home/eminguzzi/util/grib/lm_ope/LAMAZ_layers_20060126.grb
+zlay_lamaz_2012=/home/eminguzzi/util/grib/lm_ope/LAMAZ_layers_20120606.grb
 
-lay_lm_35="GRIB1,110,035,036 or GRIB1,110,034,035 or GRIB1,110,033,034 or GRIB1,110,032,033 or GRIB1,110,031,032 or GRIB1,110,030,031 or GRIB1,110,029,030 or GRIB1,110,028,029 or GRIB1,110,027,028 or GRIB1,110,026,027 or GRIB1,110,025,026 or GRIB1,110,024,025 or GRIB1,110,023,024 or GRIB1,110,022,023 or GRIB1,110,021,022 or GRIB1,110,020,021 or GRIB1,110,019,020 or GRIB1,110,018,019 or GRIB1,110,017,018 or GRIB1,110,016,017 or GRIB1,110,015,016"
-nlayb_35="35"
-nlayt_35="15"
+lay_lm_2003="GRIB1,110,035,036 or GRIB1,110,034,035 or GRIB1,110,033,034 or GRIB1,110,032,033 or GRIB1,110,031,032 or GRIB1,110,030,031 or GRIB1,110,029,030 or GRIB1,110,028,029 or GRIB1,110,027,028 or GRIB1,110,026,027 or GRIB1,110,025,026 or GRIB1,110,024,025 or GRIB1,110,023,024 or GRIB1,110,022,023 or GRIB1,110,021,022 or GRIB1,110,020,021 or GRIB1,110,019,020 or GRIB1,110,018,019 or GRIB1,110,017,018 or GRIB1,110,016,017 or GRIB1,110,015,016"
+nlayb_2003="35"
+nlayt_2003="15"
+
+lay_lm_2006="GRIB1,110,040,041 or GRIB1,110,039,040 or GRIB1,110,038,039 or GRIB1,110,037,038 or GRIB1,110,036,037 or GRIB1,110,035,036 or GRIB1,110,034,035 or GRIB1,110,033,034 or GRIB1,110,032,033 or GRIB1,110,031,032 or GRIB1,110,030,031 or GRIB1,110,029,030 or GRIB1,110,028,029 or GRIB1,110,027,028 or GRIB1,110,026,027 or GRIB1,110,025,026 or GRIB1,110,024,025 or GRIB1,110,023,024 or GRIB1,110,022,023 or GRIB1,110,021,022 or GRIB1,110,020,021 or GRIB1,110,019,020 or GRIB1,110,018,019 or GRIB1,110,017,018"
+nlayb_2006="40"
+nlayt_2012="17"
+
+lay_lm_2012=$lay_lm_2006
+nlayb_2012=$nlayb_2006
+nlayt_2012=$nlayt_2006
 
 #--------------------------------------------------------------------------
 # 1.3) Lettura pre_calmet.inp 
@@ -197,8 +225,7 @@ force_sup=`tail -n +35 pre_calmet.inp | head -n +1 | cut -d \  -f 1`
 
 data_ini=`echo $datah_ini | awk '{print substr($1,1,8)}'`
 data_fin=`echo $datah_fin | awk '{print substr($1,1,8)}'`
-ndays=`$delta_days $data_fin $data_ini 2>/dev/null`
-ndays=`expr $ndays + 1`
+ndays=$[($(date -d $data_fin +%s)-$(date -d $data_ini +%s))/86400+1]
 
 #--------------------------------------------------------------------------
 # 1.4) Elaborazioni e controlli sul contenuto di pre_calmet.inp
@@ -465,7 +492,7 @@ cday=0
 while [ $cday -lt $ndays ] ; do
   cday=`expr $cday + 1`
   incr=`expr $cday - 1`
-  data=`$days $data_ini $incr 2>/dev/null`
+  data=$(date -d "$data_ini + ${incr}day" +%Y%m%d)
 
   echo "### Inizio elaborazione run del "$data"      "`date -u +"%d-%b-%Y %T"`
 
@@ -487,24 +514,33 @@ while [ $cday -lt $ndays ] ; do
 # 2.0.1 Assegnazioni dipendenti dalla data richiesta (per model layers LAMA)
   if [ $data -lt 20060126 ] ; then
     nlay_lm=35
-    nlayb=$nlayb_35
-    nlayt=$nlayt_35
-    lay_lm=$lay_lm_35
+    nlayb=$nlayb_2003
+    nlayt=$nlayt_2003
+    lay_lm=$lay_lm_2003
     zlay_lamaz=$zlay_lamaz_35
+  elif [ $data -lt 20120606 ] ; then
+    nlay_lm=40
+    nlayb=$nlayb_2006
+    nlayt=$nlayt_2006
+    lay_lm=$lay_lm_2006
+    zlay_lamaz=$zlay_lamaz_2006
   else
     nlay_lm=40
-    nlayb=$nlayb_40
-    nlayt=$nlayt_40
-    lay_lm=$lay_lm_40
-    zlay_lamaz=$zlay_lamaz_40
+    nlayb=$nlayb_2012
+    nlayt=$nlayt_2012
+    lay_lm=$lay_lm_2012
+    zlay_lamaz=$zlay_lamaz_2012
   fi
   
   if [ $use_bckgr -eq 1 -a $data -lt 20060126 ] ; then
-    grib23ddat_inp=grib23ddat_${proj}.inp.35lay
-    grb_static=static_${proj}.grb.35lay
-  elif [ $use_bckgr -eq 1 -a $data -ge 20060126 ] ; then
-    grib23ddat_inp=grib23ddat_${proj}.inp.40lay
-    grb_static=static_${proj}.grb.40lay
+    grib23ddat_inp=grib23ddat_${proj}.inp.2003
+    grb_static=static_${proj}.grb.2003
+  elif [ $use_bckgr -eq 1 -a $data -lt 20120606 ] ; then
+    grib23ddat_inp=grib23ddat_${proj}.inp.2006
+    grb_static=static_${proj}.grb.2006
+  elif [ $use_bckgr -eq 1 -a $data -ge 20120606 ] ; then
+    grib23ddat_inp=grib23ddat_${proj}.inp.2012
+    grb_static=static_${proj}.grb.2012
   elif [ $use_bckgr -eq 2 ] ; then
     grib23ddat_inp=grib23ddat_${proj}.inp.ecmwf
     grb_static=static_${proj}.grb.ecmwf
@@ -554,10 +590,15 @@ EOF1
       $ak_getgrib lamaz lamaz >> getgrib_lamaz.log 2>&1
 
 #     Destag, zoom, sort
-      $cong lamaz.grb tmp1.grb -uv2h >> getgrib_lamaz.log 2>&1
       zoom_str=`head -n 2 ${proj}.zoom | tail -n 1`
-      $zoom_grib tmp1.grb tmp2.grib -pts $zoom_str >> getgrib_lamaz.log
-      arki_scan tmp2.grib --sort=day:reftime --data -o bckgr.grb
+      ix=$(echo $zoom_str | awk '{print $1}')
+      iy=$(echo $zoom_str | awk '{print $2}')
+      fx=$(echo $zoom_str | awk '{print $3}')
+      fy=$(echo $zoom_str | awk '{print $4}')
+      $transform --a-grid  lamaz.grb tmp1.grb >> getgrib_lamaz.log 2>&1
+      $subarea --trans-type=zoom --sub-type=index \
+         --ix=$ix --iy=$iy --fx=$fx --fy=$fy tmp1.grb tmp2.grb
+      arki_scan grib:tmp2.grb --sort=day:reftime --data -o bckgr.grb
 
 #   Copio i grib ECMWF nella dir. di lavoro
     elif [ $use_bckgr -eq 2 ] ; then 
@@ -830,7 +871,7 @@ EOF4
         incr=`expr $cnt - 1`
 
 #       Costruisco il calmet.dat
-        data_repl=`$days $data_ini $incr 2>/dev/null`
+        data_repl=$(date -d "$data_ini + ${incr}day" +%Y%m%d)
         $rw_dat_calmet calmet.dat calmet_repl.dat ${data_repl}01
         $rw_xout_calmet calmet_xout.dat calmet_xout_repl.dat ${data_repl}01
         echo ${data_repl}";"${data} >> $log_dir/replaced_run.log

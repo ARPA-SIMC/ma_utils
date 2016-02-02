@@ -269,6 +269,9 @@ temp: DO kt_in = 1,ntemp_in
 
 ! 2.2.2 Controlli sugli header
   IF (ios /= 0 .OR. ios1 /= 0 .OR. ios2 /= 0) THEN
+    WRITE (*,*) "* ",TRIM(filein)," errore aprendo il file, metto mancante"
+    CYCLE temp
+  ELSE IF (ios1 /= 0 .OR. ios2 /= 0) THEN
     WRITE (*,*) "* ",TRIM(filein)," errore lettura header, metto mancante"
     CYCLE temp
   ELSE IF (idstazh/=idstazn .OR. datah/=datan) THEN
@@ -313,7 +316,7 @@ temp: DO kt_in = 1,ntemp_in
   ENDIF
   
 ! 2.2.3 Leggo i dati e salvo i valori nei rispettivi array:
-!   p_in, z_in:     Pressione (mb), quota (m SLM)
+!   p_in, z_in:     Pressione (Pa o hPa), quota (m SLM)
 !   field_in(1:4):  T(C), Td(C), DD(gradi), FF (m/s)
 
   lok = 1
@@ -1252,7 +1255,7 @@ OPEN (UNIT=20, FILE="trasp_temp.inp", STATUS="REPLACE", FORM="FORMATTED")
 WRITE (20,'(2a)')           "0             ! step temporale in output", &
                             "(0: lo stesso dei dati in input)"
 WRITE (20,'(2a)')           "3             ! tipo livelli su cui inte", &
-                            "rpolare (1: hPa; 2: m SLM; 3: m da sup.)"
+                            "rpolare (1: Pa/hPa; 2: m SLM; 3: m da sup.)"
 WRITE (20,'(2a)')           "2             ! n.ro livelli su cui inte", &
                             "polare"
 WRITE (20,'(2a)')           "500           ! lista livelli su cui int", &
@@ -1270,6 +1273,12 @@ WRITE (20,'(2a)')           "1500.         ! altezza top per calcolo ", &
                             "velocita' media vento BPL (m, come tipo liv.)"
 WRITE (20,'(2a)')           "1500.         ! altezza top per calcolo ", &
                             "inversione integrale (m, come tipo liv)"
+
+WRITE (20,*) 
+WRITE (20,*) "NB (20160101): l'interpolalzione sui livelli z funziona solo se i files"
+WRITE (20,*) "    di input contengono la quota (a SPC dal 2013)"
+WRITE (20,*) "    Se si interpola sui livelli P, l'unita' di misura della lista livelli"
+WRITE (20,*) "    (Pa o hPa) deve essere la stessa contenuta nei files di input."
 
 RETURN
 END SUBROUTINE scrive_esempio

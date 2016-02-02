@@ -25,7 +25,7 @@
 # - miglioare gestione errori quando non trova nessun dato
 # - gestire dataset lmruc_* (per dati in tempo reale)
 #
-#                                              Versione 2.2.2, Enrico 30/06/2015
+#                                              Versione 2.3.1, Enrico 02/02/2016
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -35,7 +35,7 @@ function write_help
 {
 #       12345678901234567890123456789012345678901234567890123456789012345678901234567890
   echo "Uso: estra_oss.ksh [-syn/-temp/-oracle]  data_ini data_end   IDSTA / -sl FILESTA"
-  echo "     IDPAR / -pl FILEPAR   [-ndec N] [-tc] [-phpa]  [-deb] [-h]"
+  echo "     IDPAR / -pl FILEPAR   [-zsta ZLIST] [-ndec N] [-tc] [-phpa]  [-deb] [-h]"
   echo ""
   echo "Estrae da arkioss/arkimet/oracle i dati osservati relativi a una o piu' giornate, "
   echo "stazioni e parametri, e li scrive nei vecchi formati estra_orari/estra_temp."
@@ -64,6 +64,9 @@ function write_help
   echo "          - per i radiosondaggi, mettere 'temp'"
   echo "FILEPAR:  file con la lista degli id dei parametri da estrarre"
   echo ""
+  echo "-zsta ZLIST solo temp; specifica la quota (in m) delle stazioni richieste;"
+  echo "          lista di interi, separati da virgole, nello stesso ordine di IDSTA;"
+  echo "          spesso necessaria per elaborare dati vecchi (<2010)"
   echo "-tc       scrive le temperature in gradi centigradi"
   echo "-phpa     scrive la pressione in hPa (invece che in Pa)"
 # echo "-uv       scrive le componenti del vento (invece di dierzione e modulo)"
@@ -145,6 +148,8 @@ id_arc="hfr"
 url=$akourl
 deb="N"
 opt=""
+optt="-int -geo"
+temp_zsta="N"
 
 mand_par=0
 req_par=4
@@ -168,6 +173,11 @@ while [ $# -ge 1 ] ; do
     file_par=$1
     shift
     req_par=`expr $req_par - 1`
+  elif [ `echo $1 | awk '{print $1}'` = '-zsta' ] ; then
+    shift
+    temp_zsta="Y"
+    zsta_list_str=$1
+    shift
   elif [ `echo $1 | awk '{print $1}'` = '-syn' ] ; then
     id_arc="syn"
     url=$akmurl
@@ -190,6 +200,7 @@ while [ $# -ge 1 ] ; do
   elif [ `echo $1 | awk '{print $1}'` = '-phpa' ] ; then
     shift
     opt=${opt}" -phpa"
+    optt=${optt}" -phpa"
   elif [ `echo $1 | awk '{print $1}'` = '-deb' ] ; then
     shift
     opt=${opt}" -deb"
@@ -231,6 +242,7 @@ if [ $input_sta = "lst" ] ; then
 else
   sta_list=`echo $sta_list_str | sed 's/,/ /g'`
 fi
+nsta=`echo $sta_list | wc -w`
 
 if [ $input_par = "lst" ] ; then
   if [ ! -s $file_par ] ; then
@@ -241,6 +253,16 @@ if [ $input_par = "lst" ] ; then
   fi
 else
   par_list=`echo $par_list_str | sed 's/,/ /g'`
+fi
+npar=`echo $par_list | wc -w`
+
+if [ $temp_zsta = "Y" ] ; then
+  zsta_list=`echo $zsta_list_str | sed 's/,/ /g'`
+  nzsta=`echo $zsta_list | wc -w`
+  if [ $nzsta -ne $nsta ] ; then
+    echo "Numero diverso di stazioni e quote"
+    exit 1
+  fi
 fi
 
 #-------------------------------------------------------------------------------
@@ -281,11 +303,10 @@ fi
 #===============================================================================
 # 2) Elaborazioni (ciclo sulle stazioni)
 
-nsta=`echo $sta_list | wc -w`
-npar=`echo $par_list | wc -w`
 echo "Estraggo ${npar} parametri da ${nsta} stazioni"
-
+cnt_sta=0
 for id in $sta_list ; do
+  cnt_sta=$[$cnt_sta+1]
 
 # 2.0 Costuisco id_staz (Xsssss)
   ch1=$(echo $id | awk '{print substr($1,1,1)}')
@@ -308,7 +329,7 @@ for id in $sta_list ; do
     grep ^${id_staz}, $anag_arkioss > /dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "Stazione "$id_staz" non trovata in "$anag_arkioss
-      exit 3
+      continue
     fi
     str_anag=`grep ^${id_staz}, $anag_arkioss`
     dataset=`echo $str_anag | cut -d , -f 5`
@@ -318,7 +339,7 @@ for id in $sta_list ; do
     grep ^${id_staz} $anag_synop > /dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "Stazione "$id_staz" non trovata in "$anag_synop
-      exit 3
+      continue
     fi
     dataset="gts_synop"
     nome_sta=$id_staz
@@ -328,7 +349,7 @@ for id in $sta_list ; do
     grep ^${id_staz} $anag_temp > /dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "Stazione "$id_staz" non trovata in "$anag_temp
-      exit 3
+      continue
     fi
     dataset="gts_temp"
     nome_sta=$id_staz
@@ -419,7 +440,12 @@ EOF
     elif [ $id_arc = "syn" ] ; then
       $bufr_csv2orari $opt -syn eo.csv $data1 $data2 eo_param.csv $id_staz
     elif [ $id_arc = "temp" ] ; then
-      $bufr_csv2temp eo.csv
+      if [ $temp_zsta = "Y" ] ; then
+        zsta=$(echo $zsta_list | awk '{print $'$cnt_sta'}')
+        $bufr_csv2temp $optt -zsta $zsta eo.csv
+      else
+        $bufr_csv2temp $optt eo.csv
+      fi
     fi
   
     if [ $deb = "Y" ] ; then

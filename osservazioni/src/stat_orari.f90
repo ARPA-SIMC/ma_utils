@@ -2,8 +2,8 @@ PROGRAM stat_orari
 !--------------------------------------------------------------------------
 ! Programma per calcolare una serie di statistiche a partire da una serie
 ! storica su un punto (stazione o modello).
-! Scrive 3 coppie di files dat/ctl per grads (ggtyp, daily e month) e una 
-! serie di files in formato testo, ciascuno relativo a una statistica:
+! Scrive 4 coppie di files dat/ctl per grads (ggtyp, daily, month, hours) 
+! e una serie di files in formato testo, ciascuno relativo a una statistica:
 ! - statistiche base  (stats): ndati,ave,max,min,std
 ! - distr.di frequenza(dfreq): n.ro dati con valori raggruppati in interv.
 ! - giorno tipo       (ggtyp): per ogni ora del giorno: ave, max, min, nok
@@ -35,7 +35,7 @@ PROGRAM stat_orari
 !   in cui iniziano.
 ! - Usa il modulo per la gestione date date_hander.f90 (obsoleto)
 !
-!                                       V10.2.3, Enrico & Johnny 31/03/2014
+!                                                V10.3.0, Enrico 27/01/2016
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -98,8 +98,8 @@ CHARACTER (LEN=3), PARAMETER :: labsea(9) = (/ &
   "mam","jja","son","djf","sum","win","yea","wi2","jfd"/)
 
 ! 0.2.3 Stringhe descrittive dei prodotti
-CHARACTER (LEN=5), PARAMETER :: labprod(8) = (/ &
-  "stats","dfreq","ggtyp","yrtyp","daily","month","seaso","wrose"/)
+CHARACTER (LEN=5), PARAMETER :: labprod(9) = (/ &
+  "stats","dfreq","ggtyp","yrtyp","daily","month","seaso","wrose","hours"/)
 
 ! 0.2.4 Ordine delle statistiche nei files .sta (relative agli array dei
 !       contatori statistici)
@@ -116,6 +116,7 @@ REAL,ALLOCATABLE :: month(:,:,:) ! nok/med/max/min/(ext) mensili (5,npar,nmonths
 REAL,ALLOCATABLE :: season(:,:,:,:)!nok/med/max/min/(ext) stagionali (5,9,npar,nyears)
                                  ! Stagioni: MAM,JJA,SON,DJF,SUM,WIN,YEA,WI2,JFD
 REAL,ALLOCATABLE :: yeatv(:,:,:) ! valori piu' alti nell'anno (req_rank,npar,nyears)
+REAL,ALLOCATABLE :: hours(:,:)   ! valori orari (npar,nrep)
 REAL :: wrose(mxbin,mxbin)       ! intervallo (<=); settore (N,NE,E...)
 
 !--------------------------------------------------------------------------
@@ -133,7 +134,7 @@ REAL :: rval(mxpar),rmis,ff_calm
 INTEGER :: npar,nrep,ndays,nmonths,nyears,id_par(mxpar),ival(mxpar)
 INTEGER :: kp,kpr,kpar_dd,kpar_ff,fint,dsect,ncalm,nsect,ndec_out,req_rank
 INTEGER :: cnt_miss,cnt_nodd,cnt_noff,cnt_ok
-INTEGER :: k,kk,k2,kv,kr,kpar,kbin,khr,kmm
+INTEGER :: k,kk,k2,kv,kr,kpar,khour,kbin,khr,kmm
 INTEGER :: kyear3,kyear6,kyear12,kyear,nsea,ksea3,ksea6,kmonth,kday,year1
 INTEGER :: eof,eor,ios,idum,hrdum,p1,p2,irec,month_tot,lline,out_grp
 CHARACTER (LEN=mxpar*(fw+1)+20) :: chdum,chdum2,head_par,head_liv
@@ -148,7 +149,7 @@ CHARACTER (LEN=10) :: ch10
 CHARACTER (LEN=8) :: ch_id_staz
 CHARACTER (LEN=4) :: ch4
 CHARACTER (LEN=3) :: inp_data,out_fmt,next_arg
-LOGICAL :: fmt_ser_xls,out_liv,lrank,lstd,miss0,req_prod(8)
+LOGICAL :: fmt_ser_xls,out_liv,lrank,lstd,miss0,req_prod(9)
 
 !--------------------------------------------------------------------------
 ! 1) Parametri da riga comandi
@@ -193,7 +194,7 @@ DO kp = 1,HUGE(0)
     miss0 = .TRUE.
   ELSE IF (chdum(1:5) == "-prod") THEN
     req_prod(:) = .FALSE.
-    DO kpr = 1,8
+    DO kpr = 1,9
       IF (INDEX(chdum,labprod(kpr)) /= 0) req_prod(kpr) = .TRUE.
     ENDDO
   ELSE IF (TRIM(chdum) == "-liv") THEN
@@ -427,6 +428,7 @@ ALLOCATE (yrtyp(5,npar,1:12))
 ALLOCATE (daily(5,npar,ndays))
 ALLOCATE (month(5,npar,nmonths))
 ALLOCATE (season(5,9,npar,nyears))
+ALLOCATE(hours(npar,nrep))
 IF (lrank) ALLOCATE(yeatv(req_rank,npar,nyears))
 
 !--------------------------------------------------------------------------
@@ -767,7 +769,10 @@ DO k = 1,nrep
 
   ENDDO
 
-! 3.6 Aggiorno wrose (questo deve rimanere l'ultimo blocco!!)
+! 3.6 Salvo la serie dei dati orari
+  hours(k,1:kpar) = rval(1:npar)
+
+! 3.7 Aggiorno wrose (questo deve rimanere l'ultimo blocco!!)
   IF (kpar_dd == -99 .OR. kpar_ff == -99) CYCLE
 
   write (44,*) data_dum,rval(kpar_dd),rval(kpar_ff),rmis
@@ -801,6 +806,8 @@ DO k = 1,nrep
     ENDIF  
  
   ENDIF
+
+
 
 ENDDO
 CLOSE(20)
@@ -1935,6 +1942,53 @@ ENDIF
 
 ENDIF
 
+!--------------------------------------------------------------------------
+! 5.9 file hour (GRADS)
+
+IF (req_prod(9)) THEN
+
+! File dat
+WRITE (file_out,'(2a)') TRIM(file_root),"_hours.dat"
+OPEN (32, FILE=file_out, FORM='UNFORMATTED', STATUS="REPLACE", &
+  ACCESS='DIRECT', RECL=4)
+
+irec = 1
+DO khour = 1,nrep
+DO kpar = 1,npar
+  WRITE (32, REC=irec) hours(kpar,khour)          ! valori orari
+  irec = irec + 1
+ENDDO
+ENDDO
+
+CLOSE(32)
+
+! File ctl
+WRITE (file_out2,'(2a)') TRIM(file_root),"_hours.ctl"
+OPEN (UNIT=33, FILE=file_out2, STATUS="REPLACE", FORM="FORMATTED")
+
+WRITE (33,'(3a)')                "DSET   ","^",TRIM(file_out)
+WRITE (33,'(a,2(a,2i2.2,i4.4))') "TITLE  ","time series from ",data1,"to",data2
+IF (ABS(rmis) < 1.E5) THEN
+  WRITE (33,'(a,f10.3)')         "UNDEF  ",rmis   
+ELSE
+  WRITE (33,'(a,e10.3)')         "UNDEF  ",rmis   
+ENDIF
+WRITE (33,'(2a)')                "XDEF   ","1 linear 1 1"
+WRITE (33,'(2a)')                "YDEF   ","1 linear 1 1"
+WRITE (33,'(2a)')                "ZDEF   ","1 linear 1 1"
+WRITE (33,'(a,i4,3a)')           "TDEF   ",nrep, &
+  " linear 00Z",grads_date(data1)," 1dy"
+WRITE (33,'(a,i3)')              "VARS   ",npar
+DO kpar = 1,npar
+  WRITE (33,'(a,1x,2i4,1x,2a)') ADJUSTL(str_par2(kpar)), &
+    0,99,ADJUSTL(str_par(kpar))
+ENDDO
+WRITE (33,'(a)')                 "ENDVARS"
+
+CLOSE(33)
+
+ENDIF
+
 WRITE (*,*) "Scritte statistiche"
 
 STOP
@@ -2083,7 +2137,7 @@ WRITE (*,*) "           standard dei valori"
 WRITE (*,*) ""
 WRITE (*,*) " -prod   : scrive solo i files relativi alle elaborazioni specificate;"
 WRITE (*,*) "           LIST e' un elenco di campi (stats,dfreq,ggtyp,yrtyp,daily,"
-WRITE (*,*) "           month,seaso,wrose) separati da virgole e senza spazi."
+WRITE (*,*) "           month,seaso,wrose,hours) separati da virgole e senza spazi."
 WRITE (*,*) "           Default: li scrive tutti"
 WRITE (*,*) " -csv    : scrive i files ASCII in formato csv (def: sep. da spazi)"
 WRITE (*,*) " -liv    : aggiunge header con le quote dei livelli (solo fmt seriet)"

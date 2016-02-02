@@ -396,7 +396,7 @@ PROGRAM ordina
         OPEN(14,file=fileout)
 
         ! intestazione
-        WRITE(14,'(a,1x,a," [",a,"] staz.",i2,1x,a)') &
+        WRITE(14,'(a,1x,a," [",a,"] staz.",i10,1x,a)') &
              TRIM(nomestat(opt_stat)),             &
              TRIM(codparam_lst(kparam)),           &
              TRIM(nomeunmis(opt_unmis)),           &

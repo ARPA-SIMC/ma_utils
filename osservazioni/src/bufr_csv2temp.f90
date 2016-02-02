@@ -75,6 +75,7 @@ lphpa = .FALSE.
 lrh = .FALSE.
 luv = .FALSE.
 ltc = .FALSE.
+z_sta = rmiss
 force_zsta = .FALSE.
 next_arg = ""
 idp = 0
@@ -305,9 +306,10 @@ TYPE(datetime) :: datat_rsd,datat_out,data_syn
 REAL :: u,v
 REAL :: out_val(1:nlev,6),dum_val(1:nlev,6),plast,slope,tvmed
 REAL :: lnp(nlev),esattd(nlev),esatt(nlev),w(nlev),tv(nlev),rh(nlev)
-INTEGER :: yy_syn,mm_syn,dy_syn,hh_syn,kl2,kp,klint,kl1,kl,l1,out_z_sta
+INTEGER :: yy_syn,mm_syn,dy_syn,hh_syn,kl2,kp,klint,kl1,kl,l1,out_z_sta,lfirst
 CHARACTER (LEN=200) :: fileout
 CHARACTER (LEN=10) :: ch10
+LOGICAL :: geop_ok
 
 !==========================================================================
  
@@ -413,48 +415,74 @@ ENDIF
 !--------------------------------------------------------------------------
 ! 4) Se richiesto, calcolo il geopotenziale sui livelli in cui e'mancante
 !    Note:
-!    - Se il primo livello e' 1000 hPa, sottoterra e con geop mancante, 
-!      suppongo che il secondo livello sia la superifice, e inizio il 
-!      calcolo da li'.
+!    - Se il primo livello e' 1000 hPa e con geop mancante, suppongo che
+!      si tratti di un livello sottoterra: lo ignoro, e considero che il
+!      secondo livello corrisponda alla superficie
+!    - Se il geopotenziale e' gia' presente su tutti i livelli con un dato
+!      valido di pressione, non lo ricalcolo
 !    - Rispetto ai valori riportati nei rsd, questo calcolo produce 
 !      differenze dell'ordine di 10m
 
 IF (lgeo) THEN
 
-  IF (.NOT. c_e(out_val(1,6)) .AND. .NOT. c_e(z_sta)) THEN
+! Verifico se il primo livello e' sottoterra
+  IF (.NOT. c_e(out_val(1,6))) THEN
+    IF (ABS(out_val(1,1)-100000.) < 1.e-4) THEN
+      lfirst = 2
+      out_val(1,6) = rmiss
+    ELSE
+      lfirst = 1
+    ENDIF
+  ENDIF
+
+! Verifico se il geopotenziale e' gia' presente in tutti i livelli in cui
+! c'e' un dato di pressione valido
+  geop_ok = .TRUE.
+  DO kl = lfirst, nlev
+    IF (.NOT. c_e(out_val(kl,6)) .AND. c_e(out_val(kl,1))) THEN
+      geop_ok = .FALSE.
+      EXIT
+    ENDIF
+  ENDDO
+
+! Se necessario, calcolo il geopotenziale su tutti i livelli
+! - se Z e' gia' presente, non lo ricalcolo
+! - se mancano T o P al livello richiesto o a quello precedente, oppure se manca
+!   Z al livello precedente, il calcolo e' impossibile
+! - se manca Td e sono sopra 500 hPa, uso la semplice T
+
+  IF (.NOT. c_e(out_val(lfirst,6)) .AND. .NOT. c_e(z_sta)) THEN
     WRITE (*,*) ch10, &
       ": calcolo geop impossibile: specificare quota stazione (parametro -zsta)"
 
-  ELSE IF (ALL(c_e(out_val(1:nlev,6)))) THEN
+  ELSE IF (geop_ok) THEN
     WRITE (*,*) ch10,": geop gia' presente, non lo calcolo"
 
   ELSE
-    l1 = 2
-    IF (.NOT. c_e(out_val(1,6))) THEN
-      IF (ABS(out_val(1,1)-100000.) < 1.e-4 .AND. c_e(out_val(2,6))) THEN
-        WRITE (*,*) ch10, &
-          ": primo livello 1000hPa sottoterra, calcolo geop dal 2o livello"
-        l1 = 3
-      ELSE
-        out_val(1,6) = z_sta
-      ENDIF
-    ENDIF
-    
+
 !deb write (90,*) "lev,P,estattd,w,t,tv,tvmed,delta_geo"
+    out_val(lfirst,6) = z_sta
+    l1 = lfirst + 1
     DO kl = l1,nlev
       IF (c_e(out_val(kl,6))) CYCLE
-      IF (.NOT. c_e(out_val(kl-1,6)) .OR. ANY(.NOT. c_e(out_val(kl-1:kl,2:3))) .OR. &
-          .NOT. c_e(tv(kl-1)) .OR. .NOT. c_e(tv(kl))) CYCLE
-      tvmed = (tv(kl-1) + tv(kl)) / 2.
+      IF (.NOT. c_e(out_val(kl-1,6)) .OR. ANY(.NOT. c_e(out_val(kl-1:kl,1:2)))) CYCLE
+
+      IF (c_e(out_val(kl-1,3)) .AND. c_e(out_val(kl,3)) .AND. &
+          c_e(tv(kl-1)) .AND. c_e(tv(kl))) THEN
+        tvmed = (tv(kl-1) + tv(kl)) / 2.
+      ELSE IF (out_val(kl,1) < 50000.) THEN
+        tvmed = (out_val(kl-1,2) + out_val(kl,2)) / 2.
+      ELSE
+        CYCLE
+      ENDIF
+
       out_val(kl,6) = out_val(kl-1,6) + 14.64285*tvmed*2.* &
         ALOG(out_val(kl-1,1)/out_val(kl,1))
 !deb write (90,'(i3,f10.1,6f10.5)') &
 !deb   kl,out_val(kl,1),esattd(kl),w(kl),out_val(kl,2),tv(kl),tvmed, &
 !deb   14.64285*tvmed*2.*ALOG(out_val(kl-1,1)/out_val(kl,1))
     ENDDO
-
   ENDIF
-
 ENDIF
 
 !--------------------------------------------------------------------------
@@ -480,7 +508,9 @@ IF (luv) THEN
 ENDIF
 
 IF (lphpa) THEN
-  out_val(1:nlev,1) = out_val(1:nlev,1) / 100.
+  WHERE (c_e(out_val(1:nlev,1)))
+    out_val(1:nlev,1) = out_val(1:nlev,1) / 100.
+  ENDWHERE
 ENDIF
 
 IF (ltc) THEN

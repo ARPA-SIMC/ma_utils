@@ -181,7 +181,7 @@ PROGRAM bufr_csv2orari
 !   ottavi (adesso esce in %; assicurarsi che alameno sia consistente nella
 !   serie storica dei synop)
 ! 
-!                                         Versione 2.2.0, Enrico 11/11/2015
+!                                         Versione 2.2.1, Enrico 02/02/2016
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -212,7 +212,7 @@ INTEGER :: idp,yy,mm,dd,hh,mn,nf,pp,npar,ndays,ndec,ndiff
 INTEGER :: cnt_date_in,cnt_date_miss,cnt_date_skip,cnt_valok_out
 INTEGER :: cnt_istok_out,cnt_msg_skip,cnt_diff,cnt_ist_diff
 CHARACTER (LEN=200) :: filein,fileout,filepar,filelog,fileana
-CHARACTER (LEN=200) :: chdum,chrec,chfmt1,chfmt2,key
+CHARACTER (LEN=200) :: chdum,chrec,chrecw,chfmt1,chfmt2,key
 CHARACTER (LEN=20) :: idsta
 CHARACTER (LEN=12) :: ch12a,ch12b
 CHARACTER (LEN=10) :: ch10a,ch10b
@@ -380,36 +380,39 @@ DO k = 1,HUGE(0)
   READ (iu_in,'(a)',IOSTAT=ios) chrec
   IF (ios == eof) GOTO 9994
   IF (ios /= 0) GOTO 9993
-  pp = INDEX(chrec,",")
+  chrecw = wash_char(chrec, badchar=CHAR(34))      !tolgo "" (dballe > 5.7)
+
+  pp = INDEX(chrecw,",")
   IF (pp == 0) CYCLE
-  key = wash_char(chrec(1:pp-1), badchar=CHAR(34)) !tolgo "" (dballe > 5.7)
+  key = chrecw(1:pp-1)
+
   ios = 0
-  IF (pp == LEN(TRIM(chrec))) THEN
+  IF (pp == LEN(TRIM(chrecw))) THEN
     CYCLE
 
 ! Chiavi relative alla data
   ELSE IF (key == "B04001") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) yy
+    READ (chrecw(pp+1:),*,IOSTAT=ios) yy
   ELSE IF (key == "B04002") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) mm
+    READ (chrecw(pp+1:),*,IOSTAT=ios) mm
   ELSE IF (key == "B04003") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) dd
+    READ (chrecw(pp+1:),*,IOSTAT=ios) dd
   ELSE IF (key == "B04004") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) hh
+    READ (chrecw(pp+1:),*,IOSTAT=ios) hh
   ELSE IF (key == "B04005") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) mn
+    READ (chrecw(pp+1:),*,IOSTAT=ios) mn
 
 ! Eventuali chiavi relative all'anagrafica
   ELSE IF (key == "B05001") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) anag_out%lat
+    READ (chrecw(pp+1:),*,IOSTAT=ios) anag_out%lat
   ELSE IF (key == "B06001") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) anag_out%lon
+    READ (chrecw(pp+1:),*,IOSTAT=ios) anag_out%lon
   ELSE IF (key == "B07030") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) anag_out%quo
+    READ (chrecw(pp+1:),*,IOSTAT=ios) anag_out%quo
   ELSE IF (key == "B01019" .OR. key == "B01015") THEN
-    READ (chrec(pp+1:),'(a)',IOSTAT=ios) anag_out%nome
+    READ (chrecw(pp+1:),'(a)',IOSTAT=ios) anag_out%nome
   ELSE IF (key == "B01194") THEN
-    READ (chrec(pp+1:),'(a)',IOSTAT=ios) anag_out%rete
+    READ (chrecw(pp+1:),'(a)',IOSTAT=ios) anag_out%rete
   ENDIF
 
   IF (ios /= 0) GOTO 9993
@@ -418,6 +421,7 @@ DO k = 1,HUGE(0)
     cnt_date_in = cnt_date_in + 1
     EXIT
   ENDIF
+
 ENDDO
 datah_in1 = datah_next
 
@@ -724,7 +728,7 @@ TYPE (metpar) :: par_dum
 REAL :: val_dum
 INTEGER :: ios,iosr,k,kp,yy,mm,dd,hh,mn,pp,kp_qc_pending
 INTEGER :: cnt_null,nok,ndble,nqcmiss,nmsg,qcf
-CHARACTER (LEN=200) :: chrec,key
+CHARACTER (LEN=200) :: chrec,chrecw,key
 CHARACTER (LEN=12) :: ch12
 CHARACTER (LEN=4) :: kty
 
@@ -805,14 +809,16 @@ DO k = 1,HUGE(0)
 !--------------------------------------------------------------------------
 ! 2) Interpreto la key appena letta
 
-  pp = INDEX(chrec,",")
+  chrecw = wash_char(chrec, badchar=CHAR(34))      !tolgo "" (dballe > 5.7)
+  pp = INDEX(chrecw,",")
   IF (pp == 0) CYCLE
-  key = wash_char(chrec(1:pp-1), badchar=CHAR(34)) !tolgo "" (dballe > 5.7)
+  key = chrecw(1:pp-1)
+
   kty = "othe"
   ios = 0
 
 ! 2.0 "key" a cui non e' associato alcun valore
-  IF (pp == LEN(TRIM(chrec))) THEN
+  IF (pp == LEN(TRIM(chrecw))) THEN
     kty = "null"
 
 ! 2.1 Inizio di un nuovo messaggio
@@ -821,66 +827,66 @@ DO k = 1,HUGE(0)
 
 ! 2.2 "key" fa parte della codifica della data
   ELSE IF (key == "B04001") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) yy
+    READ (chrecw(pp+1:),*,IOSTAT=ios) yy
     kty = "date"
   ELSE IF (key == "B04002") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) mm
+    READ (chrecw(pp+1:),*,IOSTAT=ios) mm
     kty = "date"
   ELSE IF (key == "B04003") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) dd
+    READ (chrecw(pp+1:),*,IOSTAT=ios) dd
     kty = "date"
   ELSE IF (key == "B04004") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) hh
+    READ (chrecw(pp+1:),*,IOSTAT=ios) hh
     kty = "date"
   ELSE IF (key == "B04005") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) mn
+    READ (chrecw(pp+1:),*,IOSTAT=ios) mn
     kty = "date"
 
 ! 2.3 "key" contiene informazioni di anagrafica
   ELSE IF (key == "B05001") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) anag_dum%lat
+    READ (chrecw(pp+1:),*,IOSTAT=ios) anag_dum%lat
     kty = "anag"
   ELSE IF (key == "B06001") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) anag_dum%lon
+    READ (chrecw(pp+1:),*,IOSTAT=ios) anag_dum%lon
     kty = "anag"
   ELSE IF (key == "B07030") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) anag_dum%quo
+    READ (chrecw(pp+1:),*,IOSTAT=ios) anag_dum%quo
     kty = "anag"
   ELSE IF (key == "B01019" .OR. key == "B01015") THEN
-    READ (chrec(pp+1:),'(a)',IOSTAT=ios) anag_dum%nome
+    READ (chrecw(pp+1:),'(a)',IOSTAT=ios) anag_dum%nome
     kty = "anag"
   ELSE IF (key == "B01194") THEN
-    READ (chrec(pp+1:),'(a)',IOSTAT=ios) anag_dum%rete
+    READ (chrecw(pp+1:),'(a)',IOSTAT=ios) anag_dum%rete
     kty = "anag"
 
 ! 2.4 "key" fa parte della codifica di par/liv
   ELSE IF (key == "B07192") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%lt1
+    READ (chrecw(pp+1:),*,IOSTAT=ios) par_dum%lt1
     kty = "varl"
   ELSE IF (key == "B07193") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%l1
+    READ (chrecw(pp+1:),*,IOSTAT=ios) par_dum%l1
     kty = "varl"
   ELSE IF (key == "B04192") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%tr
+    READ (chrecw(pp+1:),*,IOSTAT=ios) par_dum%tr
     kty = "varl"
   ELSE IF (key == "B04193") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%p1
+    READ (chrecw(pp+1:),*,IOSTAT=ios) par_dum%p1
     kty = "varl"
   ELSE IF (key == "B04194") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) par_dum%p2
+    READ (chrecw(pp+1:),*,IOSTAT=ios) par_dum%p2
     kty = "varl"
 
 ! 2.5 "key" contiene informazioni sul controllo di qualita'
 !     NB chiavi di futura implementazione: 33192, 33193, 33194, 33197
   ELSE IF (key == "B33196") THEN
-    READ (chrec(pp+1:),*,IOSTAT=ios) qcf
+    READ (chrecw(pp+1:),*,IOSTAT=ios) qcf
     kty = "qflg"
 
 ! 2.6 "key" corrisponde a una delle variabili fisiche richieste in output
   ELSE
     DO kp = 1, npar
       IF (key == req_par(kp)%bcode) THEN
-        READ (chrec(pp+1:),*,IOSTAT=ios) val_dum
+        READ (chrecw(pp+1:),*,IOSTAT=ios) val_dum
         par_dum%bcode = key(1:6)
         kty = "valu"
         EXIT
@@ -1027,11 +1033,13 @@ WRITE (*,*) "Non dovrei mai passare di qui!!!"
 STOP 10
 
 9999 CONTINUE
+WRITE (*,*) "Errore leggendo il valore della chiave ",TRIM(key)
 WRITE (*,*) TRIM(chrec)
 ier = 2
 RETURN
 
 9998 CONTINUE
+WRITE (*,*) "Trovata chiave relativa ai dati mentre la data e' indefinita: "
 WRITE (*,*) TRIM(chrec)
 ier = 4
 RETURN
@@ -1060,6 +1068,7 @@ SUBROUTINE skip_input_time(iu,eof,datah_in,datah_out,ier)
 
 USE datetime_class
 USE missing_values
+USE char_utilities
 
 IMPLICIT NONE
 
@@ -1072,7 +1081,7 @@ INTEGER, INTENT(OUT) :: ier
 
 ! Variabili locali
 INTEGER :: k,pp,yy,mm,dd,hh,mn,ios
-CHARACTER (LEN=200) :: chrec
+CHARACTER (LEN=200) :: chrec,chrecw,key
 
 !-------------------------------------------------------------------------
 
@@ -1095,20 +1104,22 @@ DO k = 1,HUGE(0)
     GOTO 9999
 
   ELSE
-    pp = INDEX(chrec,",")
+    chrecw = wash_char(chrec, badchar=CHAR(34))      !tolgo "" (dballe > 5.7)
+    pp = INDEX(chrecw,",")
     IF (pp == 0) CYCLE
-    ios = 0
+    key =  chrecw(1:pp-1)
 
-    IF (chrec(1:pp-1) == "B04001") THEN
-      READ (chrec(pp+1:),*,IOSTAT=ios) yy
-    ELSE IF (chrec(1:pp-1) == "B04002") THEN
-      READ (chrec(pp+1:),*,IOSTAT=ios) mm
-    ELSE IF (chrec(1:pp-1) == "B04003") THEN
-      READ (chrec(pp+1:),*,IOSTAT=ios) dd
-    ELSE IF (chrec(1:pp-1) == "B04004") THEN
-      READ (chrec(pp+1:),*,IOSTAT=ios) hh
-    ELSE IF (chrec(1:pp-1) == "B04005") THEN
-      READ (chrec(pp+1:),*,IOSTAT=ios) mn
+    ios = 0
+    IF (key == "B04001") THEN
+      READ (chrecw(pp+1:),*,IOSTAT=ios) yy
+    ELSE IF (key == "B04002") THEN
+      READ (chrecw(pp+1:),*,IOSTAT=ios) mm
+    ELSE IF (key == "B04003") THEN
+      READ (chrecw(pp+1:),*,IOSTAT=ios) dd
+    ELSE IF (key == "B04004") THEN
+      READ (chrecw(pp+1:),*,IOSTAT=ios) hh
+    ELSE IF (key == "B04005") THEN
+      READ (chrecw(pp+1:),*,IOSTAT=ios) mn
     ENDIF
 
     IF (ios /= 0) GOTO 9999
