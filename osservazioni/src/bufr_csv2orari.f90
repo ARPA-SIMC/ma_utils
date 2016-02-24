@@ -605,9 +605,9 @@ STOP 2
 9997 CONTINUE
 WRITE (*,*) "Errore leggendo ",TRIM(filepar)," record ",kp
 IF (ios /= 0) THEN
-  IF (ios /= 0) WRITE (*,*) "ios ",ios
+  WRITE (*,*) "ios ",ios
 ELSE
-  WRITE (*,*) chrec
+  WRITE (*,*) TRIM(chrec)
   IF (nf <10) THEN
     WRITE (*,*) "nf ",nf
   ELSE

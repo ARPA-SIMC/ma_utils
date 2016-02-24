@@ -666,6 +666,8 @@ if [ $inpdata = "arkimet" ] ; then
     echo "ak_seriet: inizio estrazione query "$cnt"    "`date "+%Y%m%d %H:%M:%S"`
   
 #   Per ciscuna delle query rettangolari, estraggo i dati in formato gacsv
+#    echo "arki-query --config=${ds}.conf --file=query.${cnt} --inline | arki-xargs ${split_opt} ./xargs.ksh ${prog}.gacsv.${cnt}"
+
     arki-query --config=${ds}.conf --file=query.${cnt} --inline  | \
       arki-xargs ${split_opt} ./xargs.ksh ${prog}.gacsv.${cnt} > \
       arki.log.${cnt} 2>&1

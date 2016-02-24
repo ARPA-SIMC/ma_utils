@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 #==========================================================================
 # crea_progetto_point.ksh
 #
@@ -18,7 +18,7 @@
 # LIBSIM_SVN:   esegubili (ad esempio: /home/eminguzzi/svn/libsim; se non 
 #               specificato, usa gli eseguibili in path)
 #
-#                                                 V7.9.1, Enrico 13/06/2014
+#                                                 V7.9.3, Enrico 23/02/2016
 #==========================================================================
 
 #==========================================================================
@@ -110,8 +110,6 @@ arc_root=${HOME_MINGUZZI}/arkimet/progetti_point   # root arc. estrazioni
 
 # 1.2) Utility e files di appoggio non in PATH
 doc_file=${arc_root}/_doc/progetti_estra.doc       
-ak_seriet=${HOME_MINGUZZI}/arkimet/bin/ak_seriet.ksh
-windrose=${HOME_BONAFE}/osservazioni/bin/windrose.ksh
 plot_local_orog=${HOME_MINGUZZI}/arkimet/bin/plot_local_orog.gs
 
 if [ -z $MA_UTILS_DAT ] ; then
@@ -122,14 +120,18 @@ fi
 arkimet_aree=${MA_UTILS_DAT}/arkimet_aree.dat
 
 if [ -z $MA_UTILS_SVN ] ; then
+  ak_seriet=/usr/libexec/ma_utils/ak_seriet.ksh
   sel_punti=/usr/libexec/ma_utils/sel_punti.exe
   gacsv2seriet=/usr/libexec/ma_utils/gacsv2seriet.exe
   stat_orari=/usr/libexec/ma_utils/stat_orari.exe
+  windrose=/usr/libexec/ma_utils/windrose.sh
 else 
   echo "(crea_progetto_point.ksh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
+  ak_seriet=${MA_UTILS_SVN}/arkimet/sh/ak_seriet.ksh
   sel_punti=${MA_UTILS_SVN}/arkimet/src/sel_punti.exe
   gacsv2seriet=${MA_UTILS_SVN}/arkimet/src/gacsv2seriet.exe
   stat_orari=${MA_UTILS_SVN}/osservazioni/src/stat_orari.exe
+  windrose=${MA_UTILS_SVN}/osservazioni/sh/windrose.ksh
 fi
 
 if [ ! $EDITOR ] ; then
@@ -191,7 +193,7 @@ if [ $batch = "N" ] ; then
   nfields=`echo $proj | awk '{print gsub("_","###",$1)}'`
   if [ $nfields -eq 0 ] ; then
     line=`grep $proj $doc_file | grep -i progetto | tail -n 1`
-    if [ ! -z $line ] ; then
+    if [ ! -z "$line" ] ; then
       last_id=`echo ${line##*_}`
       new_id=`expr $last_id + 1`
       intfill $new_id 2
