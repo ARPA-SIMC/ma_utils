@@ -131,7 +131,7 @@ else
   sel_punti=${MA_UTILS_SVN}/arkimet/src/sel_punti.exe
   gacsv2seriet=${MA_UTILS_SVN}/arkimet/src/gacsv2seriet.exe
   stat_orari=${MA_UTILS_SVN}/osservazioni/src/stat_orari.exe
-  windrose=${MA_UTILS_SVN}/osservazioni/sh/windrose.ksh
+  windrose=${MA_UTILS_SVN}/osservazioni/sh/windrose.sh
 fi
 
 if [ ! $EDITOR ] ; then

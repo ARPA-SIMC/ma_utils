@@ -23,25 +23,19 @@ PROGRAM bufr_csv_int2orari
 !      [-dy] [-offset H] [-ndec N] [-tc] [-phpa] [-deb] [-h]"
 !
 ! Note:
+! - Programma chiamato da estra_oss_int.sh
+! - Programma derivato da bufr_csv2orari.f90 (elabora i files prodotti da
+!   "dbamsg dump --csv"); rispetto a questo, la semplificazione principale
+!   e' che elabora un parametro alla volta, cosa possbile perche' con l'
+!   opzione --interpeted la data finisce nella stessa riga del valore.
+!
 ! - Nel file di input gli istanti devono essere in ordine cronologico
 ! - Per i dati non istantanei, il programm considera sempre la fine 
 !   dell'intervallo di elaborazione (convenzione Dballe/BUFR)
 ! - Il programma elabora solo i record relativi al par/liv/scad richiesto,
 !   ma il file di input ne puo' contenere altri.
 !
-! Questo programma potrebbe essere usato come base per realizzare una
-! versione molto piu' semplice di bufr_csv2orari.f90.
-! 1) convertire i bufr in csv con l'opzione --interpreted
-! 2) spezzare il file da shell, costruendo un file per ogni par/liv/scad +
-!    un file per l'anagrafica (sort|uniq)
-! 3) usare questo programma per convertire ciascun file in formato 
-!    estra_orari
-! 4) unire i files risultanti (potrebbe bastare cut/paste da shell)
-!
-! Todo:
-! - Implementare gestione lt2/l2
-!
-!                                         Versione 0.0.0, Enrico 24/02/2016
+!                                         Versione 1.0.0, Enrico 25/02/2016
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -56,6 +50,7 @@ REAL, PARAMETER :: rmiss_out = -9999. ! Valore per dati mancanti in output
 INTEGER, PARAMETER :: iu_in = 20      ! Unita' per lettura filein
 INTEGER, PARAMETER :: iu_par = 21     ! Unita' per lettura filepar
 INTEGER, PARAMETER :: iu_out = 22     ! Unita' per scrittura fileout
+INTEGER, PARAMETER :: iu_log = 23     ! Unita' per scrittura filelog
 
 ! Altre variabili locali
 TYPE (csv_record) :: csvline
@@ -69,7 +64,7 @@ INTEGER :: idp,ndec,hoff,nh_day,ndays,nrec_out,nerr,nnrq
 INTEGER :: yy,mm,dd,hh,mn
 INTEGER :: cnt_err,cnt_didp,cnt_nrq,cnt_dble,cnt_rq,cnt_ok
 INTEGER :: eof,eor,ios,ier(10),iret,k,kp,kd,kh,idum,nf
-CHARACTER (LEN=200) :: filein,fileout,filepar,chfmt1,chfmt2,chrec,chdum
+CHARACTER (LEN=200) :: filein,fileout,filelog,filepar,chfmt1,chfmt2,chrec,chdum
 CHARACTER (LEN=12) :: ch12a,ch12b
 CHARACTER (LEN=3) :: next_arg
 CHARACTER (LEN=2) :: out_fmt
@@ -78,6 +73,8 @@ LOGICAL :: ldeb,ltc,lphpa,end_inp
 
 !==========================================================================
 ! 1) Preliminari
+
+filelog = "bufr_csv_int2orari.log"
 
 !--------------------------------------------------------------------------
 ! 1.1 Parametri da riga comando
@@ -208,8 +205,11 @@ ELSE IF (out_fmt == "dy") THEN
 
 ENDIF
 
+IF (ldeb) &
+  OPEN (UNIT=iu_log, FILE=filelog, STATUS="REPLACE", FORM="FORMATTED")
+
 !--------------------------------------------------------------------------
-! 1.3 Apro filein e leggo il primo dato utile
+! 1.4 Apro filein e leggo il primo dato utile
 
 OPEN (UNIT=iu_in, FILE=filein, STATUS="OLD", FORM="FORMATTED", ERR=9996)
 cnt_err = 0
@@ -220,7 +220,7 @@ cnt_rq = 0
 cnt_ok = 0
 
 CALL read_next_req(iu_in,vls_req,hoff, &
-  idp_read,vtime_read,val_read,iret,nerr,nnrq)
+  idp_read,vtime_read,val_read,iret,nerr,nnrq,ldeb,iu_log)
 cnt_err = cnt_err + nerr
 cnt_nrq = cnt_nrq + nnrq
 idp_first = idp_read
@@ -237,7 +237,7 @@ ELSE
 ENDIF
 
 !--------------------------------------------------------------------------
-! 1.4 Apro fileout e scrivo gli headers
+! 1.5 Apro fileout e scrivo gli headers
 
 OPEN (UNIT=iu_out, FILE=fileout, STATUS="REPLACE", FORM="FORMATTED")
 WRITE (iu_out,'(2(f10.5,1x),a)') REAL(idp_read%lon5)/100000, &
@@ -264,7 +264,7 @@ DO kh = 0,nh_day-1
 
       vtime_last = vtime_read
       CALL read_next_req(iu_in,vls_req,hoff, &
-        idp_read,vtime_read,val_read,iret,nerr,nnrq)
+        idp_read,vtime_read,val_read,iret,nerr,nnrq,ldeb,iu_log)
       cnt_err = cnt_err + nerr
       cnt_nrq = cnt_nrq + nnrq
       IF (iret /= 0) THEN
@@ -407,7 +407,7 @@ END PROGRAM bufr_csv_int2orari
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 SUBROUTINE read_next_req(iu,vls_req,hoff,idp_read,vtime_read,val_read, &
-  iret,nerr,nnrq)
+  iret,nerr,nnrq,ldeb,iu_log)
 !
 ! Legge dall'unita' iu gia' aperta il prossimo record corrisopndente al 
 ! parametro richiesto.
@@ -425,8 +425,9 @@ USE local
 IMPLICIT NONE
 
 ! Parametri della subroutine
-INTEGER, INTENT(IN) :: iu,hoff
+INTEGER, INTENT(IN) :: iu,iu_log,hoff
 TYPE(varlivsca), INTENT(IN) :: vls_req
+LOGICAL, INTENT(IN) :: ldeb
 TYPE(point_id), INTENT(OUT) :: idp_read
 TYPE(datetime), INTENT(OUT) :: vtime_read
 REAL, INTENT(OUT) :: val_read
@@ -479,13 +480,13 @@ DO
   CALL csv_record_getfield(csvline,FIELD=bcode,IER=ier(12))
   CALL csv_record_getfield(csvline,FIELD=chdum,IER=ier(13))
   IF (ANY(ier(:) /= 0)) THEN
-    WRITE (90,'(a,13i5)') "Errore parsing csv ",ier(:)
+    IF (ldeb) WRITE (iu_log,'(a,13i5)') "Errore parsing csv ",ier(:)
     nerr = nerr + 1
     CYCLE
   ENDIF
   READ(chdum,*,IOSTAT=ios) val
   IF (ios /= 0) THEN
-    WRITE (90,'(2a)') "Chiave non numerica: ",TRIM(chdum)
+    IF (ldeb) WRITE (iu_log,'(2a)') "Chiave non numerica: ",TRIM(chdum)
     nerr = nerr + 1
     CYCLE
   ENDIF
@@ -503,11 +504,11 @@ DO
   ss = imiss
   READ (str_date,'(i4,5(1x,i2))',IOSTAT=ios) yy,mm,dd,hh,min,ss
   IF (ios /= 0) THEN
-    WRITE (90,'(a,6i5)') "Errore lettura data ",yy,mm,dd,hh,min,ss
+    IF (ldeb) WRITE (iu_log,'(a,6i5)') "Errore lettura data ",yy,mm,dd,hh,min,ss
     nerr = nerr + 1
     CYCLE
   ELSE IF (min /= 0 .OR. ss /= 0) THEN
-    WRITE (90,'(a,6i5)') "Data non e' ora esatta ",yy,mm,dd,hh,min,ss
+    IF (ldeb) WRITE (iu_log,'(a,6i5)') "Data non e' ora esatta ",yy,mm,dd,hh,min,ss
     nnrq = nnrq + 1
     CYCLE
   ENDIF
@@ -515,14 +516,19 @@ DO
 
 ! Controllo se si riferisce al var/liv/scad richiesto
   IF (l1 /= vls_req%l1 .OR. lt1 /= vls_req%lt1 .OR. tr /= vls_req%tr .OR. &
-      p1 /= vls_req%p1 .OR. p2 /= vls_req%p2) THEN
+      p1 /= vls_req%p1 .OR. p2 /= vls_req%p2 .OR. bcode /= vls_req%bcode) THEN
 
-    WRITE (90,'(a,i5,3i3)') "Var/liv/sca non richiesto; data:",yy,mm,dd,hh
-!   IF (l1 /= vls_req%l1)  WRITE (90,'(2x,2(a,i4))') "l1: val ",l1," expect ",vls_req%l1
-!   IF (lt1 /= vls_req%lt1)  WRITE (90,'(2x,2(a,i4))') "lt1: val ",lt1," expect ",vls_req%lt1
-!   IF (tr /= vls_req%tr)  WRITE (90,'(2x,2(a,i4))') "tr: val ",tr," expect ",vls_req%tr
-!   IF (p1 /= vls_req%p1)  WRITE (90,'(2x,2(a,i4))') "p1: val ",p1," expect ",vls_req%p1
-!   IF (p2 /= vls_req%p2)  WRITE (90,'(2x,2(a,i4))') "p2: val ",p2," expect ",vls_req%p2
+    IF (ldeb) THEN
+      chdum = ""
+      IF (l1 /= vls_req%l1)  chdum = TRIM(chdum) // " l1"
+      IF (lt1 /= vls_req%lt1) chdum = TRIM(chdum) // " lt1"
+      IF (tr /= vls_req%tr) chdum = TRIM(chdum) // " tr"
+      IF (p1 /= vls_req%p1) chdum = TRIM(chdum) // " p1"
+      IF (p2 /= vls_req%p2) chdum = TRIM(chdum) // " p2"
+      IF (bcode /= vls_req%bcode) chdum = TRIM(chdum) // " bcode"
+      WRITE (iu_log,'(a,i5,3i3,2a)') "Var/liv/sca non richiesto; data:", &
+        yy,mm,dd,hh," differenze: ",TRIM(chdum)
+    ENDIF
 
     nnrq = nnrq + 1
     CYCLE
@@ -534,7 +540,7 @@ DO
   idp_read%report = rep
   val_read = val
   iret =0
-  WRITE (90,'(a,4i5)') "Record ok ",yy,mm,dd,hh
+  IF (ldeb) WRITE (iu_log,'(a,4i5)') "Record ok ",yy,mm,dd,hh
   RETURN
 
 ENDDO
@@ -619,6 +625,8 @@ WRITE (*,*) "fileout:  file di ouput (formato estra_orari senza header)"
 WRITE (*,*)
 WRITE (*,*) "-dy       per ogni giorno scrive il dato alle ore 00, in formato estra_qa day"
 WRITE (*,*) "-offset H aggiunge H ore all'istante di tutti i dati (puo' essere negativo)"
+WRITE (*,*) "-deb:     scrive sul file bufr_csv_int2orari.log un report di tutti i record"
+WRITE (*,*) "          letti dal file di input (una riga per ogni record)"
 WRITE (*,*) "-h:       visualizza questo help"
 WRITE (*,*)
 WRITE (*,*) "Codici d'errore:"

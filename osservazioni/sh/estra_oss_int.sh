@@ -1,10 +1,14 @@
 #/bin/bash
 #-------------------------------------------------------------------------------
 # Estrae i dati di una o piu' stazioni meteo, e li converte nei vecchi formati
-# estra_orari / estra_tmp. Sfrutta l'opzione --interpreted di dbamsg dump
+# estra_orari / estra_tmp. 
+# Sfrutta l'opzione --interpreted di dbamsg dump
 # Gestisce anche i dati di PM10 Ita NRT della condivisione MapPo
 #
 # Note:
+# - Script derivato da estra_oss.sh, che e' sostanzialmente uguale ma elabora
+#   i Bufr-Simc col comando dbamsg dump --csv.
+#
 # - Non e' possibile estrarre simultaneamente stazioni Synop e HFR (ie. non GTS),
 #   in quanto l'id-oracle di una stazione ad alta frequenza potrebbe coincidere
 #   col codice di una stazione GTS.
@@ -23,10 +27,13 @@
 #   vecchi.
 #
 # TODO:
-# - miglioare gestione errori quando non trova nessun dato
+# - Procedura incompleta: attualmente gestisce solo i dati MapPo e TEMP (per i
+#   TEMP e' identica a estra_oss.sh)
+#
+# - migliorare gestione errori quando non trova nessun dato
 # - gestire dataset lmruc_* (per dati in tempo reale)
 #
-#                                              Versione 3.0.0, Enrico 24/02/2016
+#                                              Versione 0.0.0, Enrico 25/02/2016
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -35,7 +42,7 @@
 function write_help
 {
 #       12345678901234567890123456789012345678901234567890123456789012345678901234567890
-  echo "Uso: estra_oss.ksh [-syn/-temp/-oracle/-mappo] "
+  echo "Uso: estra_oss_int.ksh [-syn/-temp/-oracle/-mappo] "
   echo "     data_ini data_end   IDSTA / -sl FILESTA   IDPAR / -pl FILEPAR"
   echo "     [-zsta ZLIST] [-ndec N] [-tc] [-phpa]  [-deb] [-h]"
   echo ""
@@ -471,9 +478,19 @@ EOF
     fi
     dbamsg dump --type=bufr --csv --interpreted eo.bufr > eo.csv
   
-# Ciclo sui paramteri - da implementare
+################################################################################
+# Gestione dataset ad alta frequenza ancora da implementare:
+# - suddividere il file eo.csv in un file per ciascuno dei var/liv/scad 
+#   richiesti (per isolare i bcode bastra un grep, selezione liv/sca e' piu'
+#   complesso) + un file con tutti i dati di anagrafica (sort|uniq; costruire
+#   il file .ana gestendo la presenza di valori di anagrafica diversi)
+# - elaborare separatamente ciascuno dei files realtivi a un parametro
+# - unire gli ouput in un unico file estra_orari (forse basta cut/paste)
+################################################################################
+
 #   if [ $id_arc = "hfr" -o $id_arc = "oracle" -o $id_arc = "syn" ] ; then
 #     $bufr_csv_int2orari $opt eo.csv $data1 $data2 eo_param.csv $id_staz
+
     if [ $id_arc = "mappo" ] ; then
       $bufr_csv_int2orari $opt eo.csv eo_param.csv $data1 $data2 \
         eo_${id_staz}.dat -dy -offset \-25
