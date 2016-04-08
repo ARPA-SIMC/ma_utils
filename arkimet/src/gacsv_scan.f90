@@ -21,7 +21,7 @@ PROGRAM gacsv_scan
 !      programma  da' un warning, e non sara' possibile convertire i dati
 !      in formato seriet.
 !
-!                                         Versione 1.3.2, Enrico 17/10/2013
+!                                         Versione 1.4.1, Enrico 24/03/2016
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -157,7 +157,7 @@ DO k = 1,HUGE(0)
     CALL gacsv_rep_read(chrec,report,iret)
     IF (iret /= 0) GOTO 9996
     cnt_dat_ok = cnt_dat_ok + 1
-    tr(1:3) = (/report%datascad%p1,report%p2,report%timerange/)
+    tr(1:3) = (/report%datascad%p1,report%datascad%p2,report%datascad%timerange/)
     vl(1:6) = report%varliv(1:6)
 
 !   Controllo se ho trovato un nuovo punto

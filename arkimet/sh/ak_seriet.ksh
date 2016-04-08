@@ -1,4 +1,4 @@
-#/bin/bash
+#/bin/ksh
 #-------------------------------------------------------------------------------
 # Procedura per estrarre da un dataset Arkimet o da un file i dati su uno o piu'
 # punti in formato seriet (tabella ASCII con una riga per ogni ora, una colonna

@@ -33,7 +33,7 @@ PROGRAM gacsv2seriet
 !   sarebbero comunque ordinati per reftime e trange, ie. non e' garantito
 !   che i verification times siano consecutivi)
 !
-!                                         Versione 1.6.10 Enrico 25/03/2014
+!                                          Versione 1.7.2 Enrico 31/03/2016
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -60,9 +60,10 @@ LOGICAL :: mo_rec = .FALSE.
 LOGICAL :: sw_down = .FALSE.
 LOGICAL :: flx_rev = .FALSE.
 LOGICAL :: cc_fract = .FALSE.
+LOGICAL :: sca_ini = .FALSE.
 LOGICAL :: dos = .FALSE.
 NAMELIST /param/out_form,out_ndec,qcont,libsim,step_yy_mm,lab3d,lab3ddec, &
-  xls_dec_sep,add_albedo,dir_int,tem_cel,mo_rec,sw_down,flx_rev,cc_fract,dos
+  xls_dec_sep,add_albedo,dir_int,tem_cel,mo_rec,sw_down,flx_rev,cc_fract,sca_ini,dos
 
 ! File di log
 INTEGER, PARAMETER :: iu_qcnt = 10
@@ -86,8 +87,8 @@ REAL :: vmin(maxvl),vmax(maxvl)
 REAL :: pct_ok
 INTEGER :: varliv_req(6,maxvl),cp2(maxvl),ndec(maxvl)
 INTEGER :: tdh(maxqry),p1_min(maxqry),p1_max(maxqry),p1_step(maxqry)
-INTEGER :: id_vl_alb,id_vl_z0
-INTEGER :: k,k2,krt,ksc,kp,kpt,kf,kvl,kuv,nht,nargs,nfilein
+INTEGER :: id_vl_alb,id_vl_z0,p2_sav
+INTEGER :: k,k2,k3,krt,ksc,kp,kpt,kf,kvl,kuv,nht,nargs,nfilein
 INTEGER :: ios,iret,ier(12),iu,nvl_out
 INTEGER :: cnt_read,cnt_xyz_ok,cnt_ok,nok,cnt_qc(5),cnt_head
 INTEGER :: nf,npt,nvl,nrrow,nrt,nsc,nuv
@@ -203,6 +204,8 @@ IF (dos) THEN
 ELSE
   cheor = ""
 ENDIF
+
+p2_sav = imiss
 
 !--------------------------------------------------------------------------
 ! 1.3 Leggo da filepts l'elenco dei punti richiesti
@@ -424,15 +427,20 @@ ENDIF
 ! 1.7.2 Se necessario, cerco tra i parametri richiesti albedo e roughness 
 tvar_alb = .FALSE.
 IF (sw_down .OR. add_albedo) THEN
-  DO k = 1,nvl
-  DO k2 = 1,nvl_alb
-    IF (ALL(varliv_req(1:4,k) == varliv_alb(1:4,k2))) THEN
+  var: DO k = 1,nvl
+    alb: DO k2 = 1,nvl_alb
+
+      key: DO k3 = 1,4 ! -999 = wildcard
+        IF (varliv_req(k3,k) /= -999 .AND. &
+            varliv_alb(k3,k2) /= -999 .AND. &
+            varliv_req(k3,k) /= varliv_alb(k3,k2)) CYCLE alb
+      ENDDO key
       tvar_alb = .TRUE.
       id_vl_alb = k2
-      EXIT
-    ENDIF
-  ENDDO
-  ENDDO
+      EXIT var
+
+    ENDDO alb
+  ENDDO var
 ENDIF
 
 tvar_z0 = .FALSE.
@@ -651,7 +659,7 @@ DO ksc = 1, nsc
   ENDIF
 
   p1_req = gp1_min + (ksc-1) * gp1_step
-  datascad_req = datascad_new(reftime_req,p1_req)
+  datascad_req = datascad_new(reftime_req,p1_req,imiss,imiss)
   val_in(:,:) = rmiss
 
 !--------------------------------------------------------------------------
@@ -693,6 +701,17 @@ DO ksc = 1, nsc
         CALL gacsv_rep_read(chrec,record_in(kf),iret)
         IF (iret /= 0) GOTO 9982
         IF (record_in(kf)%datascad < datascad_sav) GOTO 9983
+
+!       Se i dati elaborati devono essere riferiti all'inizio dell'intervallo
+!       di elaborazione, controllo che la sua lunghezza non cambi
+        IF (sca_ini) THEN
+          IF (c_e(p2_sav)) THEN
+            IF (record_in(kf)%datascad%p2 /= p2_sav) GOTO 9978
+          ELSE
+            p2_sav = record_in(kf)%datascad%p2 
+          ENDIF
+        ENDIF
+
         IF (record_in(kf)%datascad == datascad_req) EXIT
         IF (record_in(kf)%datascad > datascad_req) CYCLE files_in
       ENDDO
@@ -852,7 +871,7 @@ DO ksc = 1, nsc
   DO k = 1,npt
     iu = 10+maxqry+k
     CALL write_out_rec(nvl,val_in(k,1:nvl),datascad_req,iu,out_form, &
-      chfmt_seriet,ndec(1:nvl),xls_dec_sep,cheor,nok)
+      chfmt_seriet,ndec(1:nvl),xls_dec_sep,sca_ini,p2_sav,cheor,nok)
     cnt_ok = cnt_ok + nok
   ENDDO
 
@@ -1023,6 +1042,11 @@ STOP 20
 WRITE (*,*) "Impossibile calcolare lo step dei reference time in ouput:"
 WRITE (*,*) "i segmenti di dati richiesti si riferiscono a istanti sparsi"
 STOP 21
+
+9978 CONTINUE
+WRITE (*,*) "L'opzione sca_ini richiede che tutti i dati abbiano la stesso periodo"
+WRITE (*,*) "di elaborazione. Trovati: ",p2_sav,record_in(kf)%datascad%p2
+STOP 22
 
 END PROGRAM gacsv2seriet
 
@@ -1411,7 +1435,7 @@ END SUBROUTINE build_out_fmt
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 SUBROUTINE write_out_rec(nvl,values,ds,iu,out_form,chfmt,ndec, &
-  xls_dec_sep,cheor,nok)
+  xls_dec_sep,sca_ini,p2_sav,cheor,nok)
 !
 ! Scrive su uno dei files di output un record (ie. dati relativi a una 
 ! coppia reference time - timerange)
@@ -1426,12 +1450,15 @@ INTEGER, INTENT(IN) :: nvl,iu,out_form
 REAL, INTENT(IN) :: values(nvl)
 TYPE (datascad), INTENT(IN) :: ds
 CHARACTER (LEN=50+maxvl*9), INTENT(IN) :: chfmt
-INTEGER, INTENT(IN) :: ndec(nvl)
+INTEGER, INTENT(IN) :: ndec(nvl),p2_sav
 CHARACTER (LEN=1), INTENT(IN) :: xls_dec_sep,cheor
+LOGICAL, INTENT(IN) :: sca_ini
 INTEGER, INTENT(OUT) :: nok
 
 ! Variabili locali
 TYPE(csv_record) :: csvline
+TYPE (datascad) :: ds_out
+TYPE (timedelta) :: td
 REAL :: values_out(nvl)
 INTEGER :: yy,mm,dd,hh,p1,p2,k
 CHARACTER (LEN=14+maxvl*11) :: out_rec
@@ -1450,10 +1477,22 @@ ELSEWHERE
   ENDWHERE
 ENDWHERE
 
+ds_out = ds
+IF (sca_ini) THEN
+! Analisi non istantanee
+  IF (c_e(p2_sav) .AND. ds_out%p1 == 0 .AND. p2_sav > 0) THEN
+    td = timedelta_new(HOUR=p2_sav)
+    ds_out%reftime = ds_out%reftime - td
+! Previsioni non istantanee
+  ELSE IF (c_e(p2_sav) .AND. ds_out%p1 > 0 .AND. p2_sav <= ds_out%p1) THEN
+    ds_out%p1 = ds_out%p1 - p2_sav
+  ENDIF
+ENDIF
+
 ! 1) Formato Seriet
 IF (out_form == 1) THEN
-  CALL getval(ds%reftime, YEAR=yy, MONTH=mm, DAY=dd, HOUR=hh)
-  WRITE (out_rec,chfmt) dd,"/",mm,"/",yy," ",hh," ",ds%p1, &
+  CALL getval(ds_out%reftime, YEAR=yy, MONTH=mm, DAY=dd, HOUR=hh)
+  WRITE (out_rec,chfmt) dd,"/",mm,"/",yy," ",hh," ",ds_out%p1, &
     values_out(1:nvl),TRIM(cheor)
 
 ! Se richesto, sostiuisco il separatore decimale
@@ -1472,11 +1511,11 @@ IF (out_form == 1) THEN
 ! 2) Formtato CSV
 
 ELSE IF (out_form == 2) THEN
-  CALL getval(ds%reftime, SIMPLEDATE=ch10)
+  CALL getval(ds_out%reftime, SIMPLEDATE=ch10)
   CALL init(csvline)
   CALL csv_record_addfield(csvline,ch10(1:8))
   CALL csv_record_addfield(csvline,ch10(9:10))
-  CALL csv_record_addfield(csvline,ds%p1)
+  CALL csv_record_addfield(csvline,ds_out%p1)
   DO k = 1,nvl
     CALL csv_record_addfield(csvline,values_out(k))
   ENDDO
@@ -1742,6 +1781,7 @@ WRITE (20,9) "mo_rec       = F,"
 WRITE (20,9) "sw_down      = F,"
 WRITE (20,9) "flx_rev      = F,"
 WRITE (20,9) "cc_fract     = F,"
+WRITE (20,9) "sca_ini      = F,"
 WRITE (20,9) "dos          = F"
 WRITE (20,9) "/"
 WRITE (20,9) ""
@@ -1801,6 +1841,12 @@ WRITE (20,9) &
   "flx_rev     : se T cambio segno ai flussi di calore (>0 se sup.si raffredda)"
 WRITE (20,9) &
   "cc_fract    : se T esprimo la copertura nuvolosa in frazione (default: %)"
+WRITE (20,9) &
+  "sca_ini     : se T scrivo data e scad dei parametri non istantei relative all'"
+WRITE (20,9) &
+  "                inizio del periodo di elaborazione (default: alla fine)."
+WRITE (20,9) &
+  "                Tutti i parametri devono avere lo stesso periodo di elaborazione!"
 WRITE (20,9) &
   "dos         : se T scrivo con record DOS (i.e. aggiungo CR a ogni riga)"
 WRITE (20,9) ""

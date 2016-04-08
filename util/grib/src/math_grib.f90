@@ -5,7 +5,7 @@ PROGRAM math_grib
 ! Gestisce GRIB1 e GRIB"
 ! Sostituisce ed integra somma_grib.f90 e moltiplica_grib.f90
 !
-!                                         Versione 1.3.0, Enrico 05/10/2015
+!                                         Versione 1.3.1, Enrico 22/03/2016
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -433,7 +433,7 @@ WRITE (*,*) "    sum       : fileout = (a * fileA) + (b * fileB)"
 WRITE (*,*) "    mul       : fileout = (a + fileA) * (b + fileB)"
 WRITE (*,*) "    div       : fileout = (a + fileA) / (b + fileB)"
 WRITE (*,*) "    div2      : fileout = (b + fileB) / (a + fileA)"
-WRITE (*,*) "    lin       : fileout = (a + fileA) + b "
+WRITE (*,*) "    lin       : fileout = (a * fileA) + b "
 WRITE (*,*) "  Con l'operazione ""lin"" fileB non viene usato (mettere una stringa qualsiasi)"
 WRITE (*,*) ""
 WRITE (*,*) "check_list  : definisce gli elementi che devono essere uguali in due grib"

@@ -11,19 +11,21 @@
 #   piu' standard (ma piu' lento) cercando il codice stazione in tutti i dataset
 #   disponibili.
 # 
-#                                              Versione 2.2.1, Enrico 17/06/2015
+#                                              Versione 2.3.0, Enrico 26/02/2016
 #-------------------------------------------------------------------------------
 #set -x
 
 function write_help
 {
 #       123456789012345678901234567890123456789012345678901234567890123456789012345678
-  echo "Interroga arkioss e ritorna la lista dei parametri disponibli per una specifica"
-  echo "stazione"
-  echo "Uso: get_var_staz.sh id_staz [-d data_ini data_fin]"
+  echo "Interroga arkioss e ritorna la lista dei parametri disponibli per una "
+  echo "  specifica stazione"
+  echo "Uso: get_var_staz.sh id_staz [-d data_ini data_fin] [-url URL]"
+  echo ""
   echo "id_staz: id oracle della stazione (vedi file anag_arkioss.csv in"
   echo "  /usr/share/ma_utils)"
-  echo "data_ini, data_fin: intervallo di date in cui cercare (default: qualsiasi data)"
+  echo "data_ini, data_fin: intervallo di date in cui cercare (def: qualsiasi data)"
+  echo "URL: indirizzo del server arkioss (def: http://arkioss4.metarpa:8090)"
 }
 
 #===============================================================================
@@ -114,6 +116,7 @@ str_product_csv=${id_var}","${bcode}","${long_name}${ltru}","${short_name}
 # 1) Preliminari
 
 # Parametri da riga comando
+akurl="http://arkioss4.metarpa:8090"
 id_staz=0
 data_restrict="N"
 
@@ -134,6 +137,10 @@ while [ $# -ge 1 ] ; do
     shift
     data2=$1
     shift
+  elif [ $1 = "-url" ] ; then
+    shift
+    akurl=$1
+    shift
   else
     if [ $mand_par -eq 0 ] ; then
       id=$1
@@ -147,9 +154,6 @@ if [ $mand_par != $req_par ] ; then
   write_help
   exit 1
 fi
-
-# URL dell'archivio arkioss
-akurl="http://arkioss.metarpa:8090"
 
 # Assegno l'ambiente ma_utils
 if [ -z $MA_UTILS_DAT ] ; then

@@ -11,7 +11,7 @@
 # - Causa bug arkimet, le query con intervallo di date ritornano meno dati di 
 #   quelle sull'intero dataset (non e' chiaro quale sia quella giusta...)
 #
-#                                              Versione 2.2.1, Enrico 17/06/2015
+#                                              Versione 3.0.0, Enrico 08/04/2016
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -22,11 +22,13 @@ function write_help
   echo "Interroga arkioss e ritorna la lista delle stazioni che misurano uno specifico"
   echo "parametro"
   echo "Uso: get_var_staz.sh id_var [-z xmin ymin xmax ymax] [-d data_ini data_fin]"
+  echo "     [-url URL]"
   echo ""
   echo "id_var: id oracle del parametro (vedi files param_arkioss.csv e "
   echo "        param_shortnames.csv, in /usr/share/ma_utils)"
   echo "xmin ymin xmax ymax: estremi dell'aera geografica di ricerca (def: ovunque)"
-  echo "data_ini, data_fin: intervallo di date in cui cercare (default: qualsiasi data)"
+  echo "data_ini, data_fin: intervallo di date in cui cercare (def: qualsiasi data)"
+  echo "URL: indirizzo del server arkioss (def: http://arkioss4.metarpa:8090)"
 }
 
 #===============================================================================
@@ -36,9 +38,8 @@ function parse_area
 # a una stazione.
 #
 # Note:
+# - Funzione usata anche da get_staz_var.sh
 # - Se il record di anagrafica e' incompleto, i campi mancanti sono messi a ""
-# - La funzione parse_area e' usata da crea_anag_arkioss.sh e get_staz_var.sh
-# - La funzione parse_product e' usata da crea_anag_arkioss.sh e get_var_staz.sh
 
 {
 line2=$(echo $line | sed 's/"//g')
@@ -51,40 +52,67 @@ nome=""
 # id_staz (Oracle)
 pp=$(echo "" | awk '{print index("'"${line2}"'","(")}')
 if [ $pp -gt 0 ] ; then
-  dummy=$(echo $line2 | cut -c $[pp+1]- | cut -d , -f 1 | cut -d \) -f 1)
-  intfill $dummy 5
+  id_staz_row=$(echo $line2 | cut -c $[pp+1]- | cut -d , -f 1 | cut -d \) -f 1)
+  intfill $id_staz_row 5
   id_staz="H"${str_out}
 fi
 
 # Coordinate (in archvio in gradi*10^5)
 pp=$(echo "" | awk '{print index("'"${line2}"'","lon=")}')
 if [ $pp -gt 0 ] ; then
-  dummy=$(echo $line2 | cut -c $[pp+4]- | cut -d , -f 1 | cut -d \) -f 1)
-  intfill $dummy 7
+  lon_raw=$(echo $line2 | cut -c $[pp+4]- | cut -d , -f 1 | cut -d \) -f 1)
+  intfill $lon_raw 7
   lon=$(echo $str_out | awk '{print substr($1,1,2) "." substr($1,3,5)}')
 fi
 
 pp=$(echo "" | awk '{print index("'"${line2}"'","lat=")}')
 if [ $pp -gt 0 ] ; then
-  dummy=$(echo $line2 | cut -c $[pp+4]- | cut -d , -f 1 | cut -d \) -f 1)
-  intfill $dummy 7
+  lat_raw=$(echo $line2 | cut -c $[pp+4]- | cut -d , -f 1 | cut -d \) -f 1)
+  intfill $lat_raw 7
   lat=$(echo $str_out | awk '{print substr($1,1,2) "." substr($1,3,5)}')
 fi
 
-# Quota (in archvio in dm)
-pp=$(echo "" | awk '{print index("'"${line2}"'","B07030=")}')
-if [ $pp -gt 0 ] ; then
-  dummy=$(echo $line2 | cut -c $[pp+7]- | cut -d , -f 1 | cut -d \) -f 1)
-  quo=$[$dummy/10]
-fi
+# Cerco la stazione in anag_meteozen.dat; verifico che le coordinate 
+# corrispondano; leggo quota e nome stazione.
 
-# Nome 
-pp=$(echo "" | awk '{print index("'"${line2}"'","B01019=")}')
-if [ $pp -gt 0 ] ; then
-  nome=$(echo $line2 | cut -c $[pp+7]- | cut -d , -f 1 | cut -d \) -f 1)
+line3=$(grep ^:${id_staz_row}, anag_meteozen.dat)
+if [ $? -eq 0 ] ; then
+  line4=$(echo $line3 | sed 's/"//g')
+
+# Verifico coordinate
+  pp=$(echo "" | awk '{print index("'"${line4}"'","lon:")}')
+  if [ $pp -gt 0 ] ; then
+    lon_mz=$(echo $line4 | cut -c $[pp+4]- | cut -d , -f 1 | cut -d \) -f 1)
+  fi
+
+  pp=$(echo "" | awk '{print index("'"${line4}"'","lat:")}')
+  if [ $pp -gt 0 ] ; then
+    lat_mz=$(echo $line4 | cut -c $[pp+4]- | cut -d , -f 1 | cut -d \) -f 1)
+  fi
+  
+# Cerco nome e quota
+  if [ $lon_mz = $lon_raw -a $lat_mz = $lat_raw ] ; then
+    pp=$(echo "" | awk '{print index("'"${line4}"'","name:")}')
+    if [ $pp -gt 0 ] ; then
+      nome=$(echo $line4 | cut -c $[pp+5]- | cut -d , -f 1 | cut -d \) -f 1)
+    fi
+  
+    pp=$(echo "" | awk '{print index("'"${line4}"'","height:")}')
+    if [ $pp -gt 0 ] ; then
+      quo=$(echo $line4 | cut -c $[pp+7]- | cut -d , -f 1 | cut -d \) -f 1)
+    fi
+
+  else
+    echo "Stazione $id_staz $net: coordinate inconsistenti in anag_meteozen.dat"
+    echo "  attese "$lon_raw $lat_row" trovate "$lon_mz $lat_mz
+  fi
+
+else
+  echo "Stazione $id_staz $net non trovata in anag_meteozen.dat"
 fi
 
 str_area_csv=${id_staz},${lat},${lon},${quo},${net},${nome}
+
 }
 
 #===============================================================================
@@ -116,6 +144,7 @@ function intfill
 # 1) Preliminari
 
 # Parametri da riga comando
+akurl="http://arkioss4.metarpa:8090"
 id_var=0
 data_restrict="N"
 area_restrict="N"
@@ -148,6 +177,10 @@ while [ $# -ge 1 ] ; do
     shift
     data2=$1
     shift
+  elif [ $1 = "-url" ] ; then
+    shift
+    akurl=$1
+    shift
   else
     if [ $mand_par -eq 0 ] ; then
       id_var=$1
@@ -163,9 +196,6 @@ if [ $mand_par != $req_par ] ; then
 fi
 
 fileout=anag_var${id_var}.csv
-
-# URL dell'archivio arkioss
-akurl="http://arkioss.metarpa:8090"
 
 # Costruisco la query arkioss
 rm -f gsv.query
@@ -189,6 +219,15 @@ fi
 
 #===============================================================================
 # 2) Elaborazioni
+
+#-------------------------------------------------------------------------------
+# 2.0 Scarico da meteozen l'anagrafica completa
+
+rm -f tmp.dat anag_meteozen.dat
+curl -u "ugo:Ul1ss&" "http://meteozen.metarpa/simcstations/api/stations" > tmp.dat
+cat tmp.dat | sed 's/{"id"/\n/g' | cut -d , -f 1,3,4,5,6,7 > anag_meteozen.dat
+ns=$(wc -l anag_meteozen.dat |awk '{print $1}')
+echo "Scaricata anagrafica meteozen, stazioni trovate "$ns
 
 #-------------------------------------------------------------------------------
 # 2.1 Trovo l'elenco dei dataset presenti su arkioss

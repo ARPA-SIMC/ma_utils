@@ -30,7 +30,7 @@ MODULE seriet_utilities
 ! Una soluzione migliore sarebbe modificare vg6d_getpoint in modo da 
 ! elaborare ogni punto separatamente, e poi appendere i risultati.
 !
-!                                         Versione 1.1.5, Enrico 17/10/2013
+!                                         Versione 1.2.0, Enrico 24/03/2016
 !--------------------------------------------------------------------------
 
 USE datetime_class
@@ -52,7 +52,6 @@ INTEGER, PARAMETER :: coo_ndec = 5
 DOUBLE PRECISION, PARAMETER :: coo_eps = 0.000015
 DOUBLE PRECISION, PARAMETER :: coo_eps_shift = 1.e-10
 
-
 ! Dimensionamenti massimi relativi a un'estrazione Arkimet
 INTEGER, PARAMETER :: maxvl = 1000    ! coppie var-liv
 INTEGER, PARAMETER :: maxtr = 500     ! timerange
@@ -65,9 +64,21 @@ INTEGER, PARAMETER :: maxaklay = 45  ! model layers
 INTEGER, PARAMETER :: maxaklev = 46  ! model levels
 
 ! Tipo derivato "data e scadenza"
+! I parametri del timerange sono quelli del tipo derivato "vol7d_timerange"
+! in LibSIM/DBalle: 
+! - p1: termine del periodo di validità del dato (LibSIM in secondi, qui in ore)
+! - p2: durata del periodo di validità del dato (LibSIM in secondi, qui in ore)
+! - timerange: tipo di elaborazione statistica (254=istantaneo, 0=media, ...)
+! Nella catena seriet, la maggior parte delle elaborazioni (date e scadenze 
+! richieste, file datasca.csv, controlli) considerano solo p1, in modo da 
+! poter mescolare dati istantanei e non; l'unica eccezione e' la flag sca_ini
+! in gacsv2seriet.nml
+
 TYPE datascad
   TYPE(datetime) :: reftime
   INTEGER :: p1
+  INTEGER :: p2
+  INTEGER :: timerange
 END TYPE datascad
 
 ! Tipo derivato "report gacsv per seriet"
@@ -75,7 +86,7 @@ END TYPE datascad
 ! varliv contiene: cem,tab,var,level1,l1,l2
 TYPE gacsv_report
   TYPE(datascad) :: datascad
-  INTEGER :: p2,timerange,varliv(6),np,edition
+  INTEGER :: varliv(6),np,edition
   DOUBLE PRECISION :: lon,lat
   REAL :: value
 ENDTYPE gacsv_report
@@ -356,15 +367,15 @@ INTEGER, INTENT(OUT) :: iret
 
 TYPE(csv_record) :: csvline
 TYPE(datetime) :: reftime
-INTEGER :: yy,mm,dd,hh,minute,p1,ier(nf_gacsv),ier2
+INTEGER :: yy,mm,dd,hh,minute,p1,p2,timerange,ier(nf_gacsv),ier2
 CHARACTER(LEN=12) :: ch12
 !
 CALL init(csvline, RECORD=chrecord)
 
 CALL csv_record_getfield(csvline,FIELD=ch12,             IER=ier(1))
 CALL csv_record_getfield(csvline,FIELD=p1,               IER=ier(2))
-CALL csv_record_getfield(csvline,FIELD=report%p2,        IER=ier(3))
-CALL csv_record_getfield(csvline,FIELD=report%timerange, IER=ier(4))
+CALL csv_record_getfield(csvline,FIELD=p2,               IER=ier(3))
+CALL csv_record_getfield(csvline,FIELD=timerange,        IER=ier(4))
 CALL csv_record_getfield(csvline,FIELD=report%varliv(4), IER=ier(7))
 CALL csv_record_getfield(csvline,FIELD=report%varliv(5), IER=ier(5))
 CALL csv_record_getfield(csvline,FIELD=report%varliv(6), IER=ier(6))
@@ -381,7 +392,7 @@ CALL delete(csvline)
 
 READ(ch12,'(i4,4i2)',IOSTAT=ier2) yy,mm,dd,hh,minute
 reftime = datetime_new(YEAR=yy,MONTH=mm,DAY=dd,HOUR=hh,MINUTE=minute)
-report%datascad = datascad_new(reftime,p1)
+report%datascad = datascad_new(reftime,p1,p2,timerange)
 
 IF (ANY(ier(:) /= 0) .OR. ier2 /= 0) THEN
   CALL gacsv_rep_setmiss(report)
@@ -400,8 +411,9 @@ SUBROUTINE gacsv_rep_setmiss(report,reft)
 !
 ! Assegna valori di default a una variabile di tipo "gacsv_report".
 ! Se reft = "max", reftime viene messo a "data massima", altrimenti a 
-! "data minima". Le altre componenti sono messe al "missing value" LibSim
-!
+! "data minima". 
+! P1 e' masso a 0, le altre componenti al "missing value" LibSim
+
 USE datetime_class
 USE missing_values
 
@@ -411,16 +423,14 @@ CHARACTER(LEN=3), INTENT(IN), OPTIONAL :: reft
 !
 IF (PRESENT(reft)) THEN
   IF (reft == "min") THEN
-    report%datascad = datascad_new(datetime_min,0)
+    report%datascad = datascad_new(datetime_min,0,imiss,imiss)
   ELSE IF (reft == "max") THEN
-    report%datascad = datascad_new(datetime_max,0)
+    report%datascad = datascad_new(datetime_max,0,imiss,imiss)
   ENDIF
 ELSE 
-  report%datascad = datascad_new(datetime_min,0)
+  report%datascad = datascad_new(datetime_min,0,imiss,imiss)
 ENDIF
 
-report%p2 = imiss
-report%timerange = imiss
 report%varliv(1:3) = imiss
 report%varliv(4:6) = imiss
 report%np = imiss
@@ -592,18 +602,20 @@ END SUBROUTINE read_fisiog_gacsv
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-FUNCTION datascad_new(reftime,p1) RESULT (this)
+FUNCTION datascad_new(reftime,p1,p2,timerange) RESULT (this)
 !
 ! Costruttore del tipo derivato datascad
 !
 IMPLICIT NONE
 
 TYPE(datetime), INTENT(IN) :: reftime
-INTEGER, INTENT(IN) :: p1
+INTEGER, INTENT(IN) :: p1,p2,timerange
 TYPE(datascad) :: this
 !
 this%reftime = reftime
 this%p1 = p1
+this%p2 = p2
+this%timerange = timerange
 
 RETURN
 END FUNCTION datascad_new

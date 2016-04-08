@@ -25,7 +25,7 @@
 # - miglioare gestione errori quando non trova nessun dato
 # - gestire dataset lmruc_* (per dati in tempo reale)
 #
-#                                              Versione 2.3.1, Enrico 02/02/2016
+#                                              Versione 2.4.1, Enrico 31/03/2016
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -35,7 +35,8 @@ function write_help
 {
 #       12345678901234567890123456789012345678901234567890123456789012345678901234567890
   echo "Uso: estra_oss.ksh [-syn/-temp/-oracle]  data_ini data_end   IDSTA / -sl FILESTA"
-  echo "     IDPAR / -pl FILEPAR   [-zsta ZLIST] [-ndec N] [-tc] [-phpa]  [-deb] [-h]"
+  echo "     IDPAR / -pl FILEPAR   [-zsta ZLIST] [-ndec N] [-tc] [-phpa]"
+  echo "     [-url URL] [-deb] [-h]"
   echo ""
   echo "Estrae da arkioss/arkimet/oracle i dati osservati relativi a una o piu' giornate, "
   echo "stazioni e parametri, e li scrive nei vecchi formati estra_orari/estra_temp."
@@ -62,7 +63,7 @@ function write_help
   echo "            param_arkioss.csv in /usr/share/ma_utils)"
   echo "          - per rete synop, indicare i codici B-table (Bxxxxx: param_shortnames.csv)"
   echo "          - per i radiosondaggi, mettere 'temp'"
-  echo "FILEPAR:  file con la lista degli id dei parametri da estrarre"
+  echo "FILEPAR:  file con la lista degli id dei parametri da estrarre (un parametro per ogni riga)"
   echo ""
   echo "-zsta ZLIST solo temp; specifica la quota (in m) delle stazioni richieste;"
   echo "          lista di interi, separati da virgole, nello stesso ordine di IDSTA;"
@@ -70,6 +71,9 @@ function write_help
   echo "-tc       scrive le temperature in gradi centigradi"
   echo "-phpa     scrive la pressione in hPa (invece che in Pa)"
 # echo "-uv       scrive le componenti del vento (invece di dierzione e modulo)"
+  echo ""
+  echo "-url URL  indirizzo del server arkimet/arkioss da cui estrarre. Default: "
+  echo "          http://arkimet.metarpa:8090 (GTS), http://arkioss4.metarpa:8090 (non GTS)"
   echo "-deb      salva i file intermedi, costruisce files di log"
   echo "-h        visualizza questo help"
 #       12345678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -106,9 +110,7 @@ function intfill
 #-------------------------------------------------------------------------------
 # 1.1) Path e utility
 
-# URL degli archivi
-akmurl="http://arkimet.metarpa:8090"
-akourl="http://arkioss.metarpa:8090"
+# Nomi dataset GTS su arkimet
 ds_temp="gts_temp"
 ds_syn="gts_synop"
 
@@ -142,10 +144,13 @@ fi
 # Siccome i parametri sta_list e par_list possono essere formati da piu' 
 # parole, tutti i test devono essere compiuti sulla prima parola del parametro
 
+akourl="http://arkioss4.metarpa:8090"
+akmurl="http://arkimet.metarpa:8090"
+def_url=$akourl
+force_url="N"
 input_sta=id
 input_par=id
 id_arc="hfr"
-url=$akourl
 deb="N"
 opt=""
 optt="-int -geo"
@@ -180,11 +185,11 @@ while [ $# -ge 1 ] ; do
     shift
   elif [ `echo $1 | awk '{print $1}'` = '-syn' ] ; then
     id_arc="syn"
-    url=$akmurl
+    def_url=$akmurl
     shift
   elif [ `echo $1 | awk '{print $1}'` = '-temp' ] ; then
     id_arc="temp"
-    url=$akmurl
+    def_url=$akmurl
     shift
   elif [ `echo $1 | awk '{print $1}'` = '-oracle' ] ; then
     id_arc="oracle"
@@ -205,6 +210,11 @@ while [ $# -ge 1 ] ; do
     shift
     opt=${opt}" -deb"
     deb="Y"
+  elif [ $1 = "-url" ] ; then
+    force_url="Y"
+    shift
+    url=$1
+    shift
   else
     if [ $mand_par -eq 0 ] ; then
       data1=$1
@@ -223,6 +233,10 @@ while [ $# -ge 1 ] ; do
     shift
   fi
 done
+
+if [ $force_url = "N" ] ; then
+  url=$def_url
+fi
 
 #-------------------------------------------------------------------------------
 # 1.3 Controlli ed eleborazioni dipendenti dai parametri
@@ -271,7 +285,7 @@ fi
 rm -f eo_param.csv
 if [ $id_arc = "hfr" -o $id_arc = "oracle" ] ; then
   for par in $par_list ; do
-    grep ^$par $param_arkioss >> eo_param.csv
+    grep ^${par}, $param_arkioss >> eo_param.csv
     if [ $? -ne 0 ] ; then
       echo "Warning: parametro "$par" non trovato in "$param_arkioss
     fi
@@ -336,7 +350,7 @@ for id in $sta_list ; do
     nome_sta=`echo $str_anag | cut -d , -f 6`
 
   elif [ $id_arc = "syn" ] ; then
-    grep ^${id_staz} $anag_synop > /dev/null 2>&1
+    grep ^${id_staz}, $anag_synop > /dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "Stazione "$id_staz" non trovata in "$anag_synop
       continue
@@ -346,7 +360,7 @@ for id in $sta_list ; do
 
   elif [ $id_arc = "temp" ] ; then
     sta2=`echo $sta | sed 's/^0*//'`
-    grep ^${id_staz} $anag_temp > /dev/null 2>&1
+    grep ^${id_staz}, $anag_temp > /dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "Stazione "$id_staz" non trovata in "$anag_temp
       continue

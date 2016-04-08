@@ -1,155 +1,361 @@
 id_var,bcode,long_name,l1,lt1,p1,p2,tr,unit,short_name,net_number,net_list
-82,B04195,[SIM] Temperature event - time of occurrence,2000,103,0,3600,2,mn,var82,2,libere simc
-81,B04195,[SIM] Temperature event - time of occurrence,2000,103,0,3600,3,mn,var81,2,libere simc
-88,B04195,[SIM] Temperature event - time of occurrence,500,103,0,3600,2,mn,var88,3,libere simc umsuol
-87,B04195,[SIM] Temperature event - time of occurrence,500,103,0,3600,3,mn,var87,3,libere simc umsuol
-100,B04196,[SIM] Relative humidity event - time of occurrence,2000,103,0,3600,2,mn,var100,2,libere simc
-99,B04196,[SIM] Relative humidity event - time of occurrence,2000,103,0,3600,3,mn,var99,2,libere simc
-275,B08192,[SIM] Number of wind velocity mean values present,10000,103,86400,86400,1,numero,var275,2,libere simc
-276,B08193,[SIM] Number of wind velocity minimum values present,10000,103,86400,86400,1,numero,var276,2,libere simc
-277,B08194,[SIM] Number of wind velocity maximum values present,10000,103,86400,86400,1,numero,var277,2,libere simc
-299,B08196,[SIM] Number of mean temperature values present,150,106,86400,86400,1,numero,var299,2,libere simc
-279,B08196,[SIM] Number of mean temperature values present,2000,103,86400,86400,1,numero,var279,2,libere simc
-282,B08196,[SIM] Number of mean temperature values present,500,103,86400,86400,1,numero,var282,1,simc
-300,B08197,[SIM] Number of minimum temperature values present,150,106,86400,86400,1,numero,var300,2,libere simc
-280,B08197,[SIM] Number of minimum temperature values present,2000,103,86400,86400,1,numero,var280,2,libere simc
-283,B08197,[SIM] Number of minimum temperature values present,500,103,86400,86400,1,numero,var283,1,simc
-301,B08198,[SIM] Number of maximum temperature values present,150,106,86400,86400,1,numero,var301,2,libere simc
-281,B08198,[SIM] Number of maximum temperature values present,2000,103,86400,86400,1,numero,var281,2,libere simc
-284,B08198,[SIM] Number of maximum temperature values present,500,103,86400,86400,1,numero,var284,1,simc
-288,B08199,[SIM] Number of mean relative humidity values present,2000,103,86400,86400,1,numero,var288,2,libere simc
-289,B08200,[SIM] Number of minimum relative humidity values present,2000,103,86400,86400,1,numero,var289,2,libere simc
-290,B08201,[SIM] Number of maximum relative humidity values present,2000,103,86400,86400,1,numero,var290,2,libere simc
-291,B08202,[SIM] Number of mean pressure values present,2000,103,86400,86400,1,numero,var291,2,libere simc
-292,B08203,[SIM] Number of minimum pressure values present,2000,103,86400,86400,1,numero,var292,1,simc
-293,B08204,[SIM] Number of maximum pressure values present,2000,103,86400,86400,1,numero,var293,1,simc
-298,B08205,[SIM] Number of precipitation values present,,1,86400,86400,1,numero,var298,4,cer cro libere simc
-305,B08206,[SIM] Number of leaf wetness values present,2000,103,86400,86400,1,numero,var305,2,libere simc
-315,B08207,[SIM] Number of scalar wind velocity mean values present,10000,103,86400,86400,1,numero,var315,1,libere
-167,B10004,PRESSURE,,1,0,0,254,hPa,Prs ist,11,cer cro fiduli fiduma fidupo fiduto fiduve piattaforme rer romacq simc
-444,B10004,PRESSURE,,1,0,3600,0,hPa,var444,2,libere simc
-447,B10004,PRESSURE,,1,0,3600,2,hPa,var447,1,simc
-446,B10004,PRESSURE,,1,0,3600,3,hPa,var446,1,simc
-445,B10004,PRESSURE,,1,0,3600,6,hPa,var445,1,simc
-243,B10004,PRESSURE,,1,86400,86400,0,hPa,var243,3,libere rer simc
-245,B10004,PRESSURE,,1,86400,86400,2,hPa,var245,2,rer simc
-244,B10004,PRESSURE,,1,86400,86400,3,hPa,var244,2,rer simc
-165,B11001,WIND DIRECTION,10000,103,0,0,254,gsess,DD ist,11,fidufv fiduli fiduma fidupo fiduto fiduve libere piattaforme renana rer simc
-440,B11001,WIND DIRECTION,10000,103,0,3600,200,gsess,var440,2,libere simc
-441,B11001,WIND DIRECTION,10000,103,0,3600,202,gsess,var441,2,libere simc
-230,B11001,WIND DIRECTION,10000,103,86400,86400,201,ottavi,var230,4,libere renana rer simc
-166,B11002,WIND SPEED,10000,103,0,0,254,M/S,FF ist,11,fidufv fiduli fiduma fidupo fiduto fiduve libere piattaforme renana rer simc
-69,B11002,WIND SPEED,10000,103,0,3600,0,M/S,var69,7,cer fidufv libere rer romacq simc umsuol
-73,B11002,WIND SPEED,10000,103,0,3600,2,M/S,var73,11,cer coremo cro fiduli fiduto icirfe libere renana rer romacq simc
-431,B11002,WIND SPEED,10000,103,0,3600,200,M/S,var431,2,libere simc
-432,B11002,WIND SPEED,10000,103,0,3600,202,M/S,var432,2,libere simc
-433,B11002,WIND SPEED,10000,103,0,3600,203,M/S,var433,2,libere simc
-434,B11002,WIND SPEED,10000,103,0,3600,204,M/S,var434,2,libere simc
-72,B11002,WIND SPEED,10000,103,0,3600,3,M/S,var72,8,coremo cro fidupo icirfe libere renana rer simc
-436,B11002,WIND SPEED,10000,103,0,3600,6,M/S,var436,2,libere simc
-227,B11002,WIND SPEED,10000,103,86400,86400,0,M/S,var227,4,libere renana rer simc
-324,B11002,WIND SPEED,10000,103,86400,86400,1,M/S,var324,4,libere renana rer simc
-229,B11002,WIND SPEED,10000,103,86400,86400,2,M/S,var229,4,libere renana rer simc
-228,B11002,WIND SPEED,10000,103,86400,86400,3,M/S,var228,4,libere renana rer simc
-258,B11002,WIND SPEED,2000,103,86400,86400,0,M/S,var258,1,libere
-351,B11041,MAXIMUM WIND GUST SPEED,10000,103,0,600,205,M/S,var351,7,fidupo fiduto fiduve libere piattaforme renana rer
-353,B11043,MAXIMUM WIND GUST DIRECTION,10000,103,0,600,205,gsess,var353,6,fidupo fiduto fiduve libere piattaforme rer
-326,B11208,[SIM] Distance covered by the hourly mean wind,10000,103,86400,86400,1,Km,var326,4,libere renana rer simc
-522,B12030,SOIL TEMPERATURE,100,106,0,0,254,C,var522,2,libere umsuol
-251,B12030,SOIL TEMPERATURE,100,106,86400,86400,0,C,var251,2,libere simc
-253,B12030,SOIL TEMPERATURE,100,106,86400,86400,2,C,var253,2,libere simc
-252,B12030,SOIL TEMPERATURE,100,106,86400,86400,3,C,var252,2,libere simc
-526,B12030,SOIL TEMPERATURE,1000,106,0,0,254,C,var526,1,umsuol
-527,B12030,SOIL TEMPERATURE,1350,106,0,0,254,C,var527,1,umsuol
-115,B12030,SOIL TEMPERATURE,150,106,0,0,254,C,var115,2,libere simc
-116,B12030,SOIL TEMPERATURE,150,106,0,3600,0,C,var116,2,libere simc
-118,B12030,SOIL TEMPERATURE,150,106,0,3600,2,C,var118,2,libere simc
-117,B12030,SOIL TEMPERATURE,150,106,0,3600,3,C,var117,2,libere simc
-562,B12030,SOIL TEMPERATURE,150,106,0,3600,6,C,var562,2,libere simc
-528,B12030,SOIL TEMPERATURE,1800,106,0,0,254,C,var528,1,umsuol
-523,B12030,SOIL TEMPERATURE,250,106,0,0,254,C,var523,1,umsuol
-524,B12030,SOIL TEMPERATURE,450,106,0,0,254,C,var524,2,libere umsuol
-525,B12030,SOIL TEMPERATURE,700,106,0,0,254,C,var525,1,umsuol
-158,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,0,254,C,T ist,15,cer cro fidufv fiduli fiduma fidupo fiduto fiduve icirfe libere piattaforme renana rer romacq simc
-78,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,0,C,var78,2,libere simc
-80,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,2,C,var80,2,libere simc
-79,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,3,C,var79,2,libere simc
-403,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,6,C,var403,2,libere simc
-231,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,86400,86400,0,C,var231,7,cro icirfe libere renana rer romacq simc
-233,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,86400,86400,2,C,var233,7,cro icirfe libere renana rer romacq simc
-232,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,86400,86400,3,C,var232,7,cro icirfe libere renana rer romacq simc
-83,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,0,254,C,var83,2,piattaforme simc
-84,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,0,C,var84,2,piattaforme simc
-86,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,2,C,var86,3,libere simc umsuol
-85,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,3,C,var85,2,simc umsuol
-563,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,6,C,var563,1,simc
-234,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,86400,86400,0,C,var234,1,simc
-236,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,86400,86400,2,C,var236,1,simc
-235,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,86400,86400,3,C,var235,1,simc
-240,B13003,RELATIVE HUMIDITY,1800,103,86400,86400,0,%,var240,4,libere renana rer simc
-242,B13003,RELATIVE HUMIDITY,1800,103,86400,86400,2,%,var242,4,libere renana rer simc
-241,B13003,RELATIVE HUMIDITY,1800,103,86400,86400,3,%,var241,4,libere renana rer simc
-139,B13003,RELATIVE HUMIDITY,2000,103,0,0,254,%,RH ist,12,fidufv fiduli fiduma fidupo fiduto fiduve libere piattaforme renana rer romacq simc
-140,B13003,RELATIVE HUMIDITY,2000,103,0,3600,0,%,var140,2,libere simc
-142,B13003,RELATIVE HUMIDITY,2000,103,0,3600,2,%,var142,2,libere simc
-141,B13003,RELATIVE HUMIDITY,2000,103,0,3600,3,%,var141,2,libere simc
-406,B13003,RELATIVE HUMIDITY,2000,103,0,3600,6,%,var406,2,libere simc
-159,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,1800,1,mm,var159,9,cer coremo cro fidupo fiduto icirfe libere renana rer
-160,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,3600,1,mm,Prc 1hr,15,cer coremo cro fidufv fiduli fiduma fidupo fiduto fiduve icirfe libere renana rer romacq simc
-172,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,900,1,mm,var172,8,coremo cro fidupo icirfe libere renana rer simc
-473,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,32400,86400,1,mm,var473,11,cer coremo cro fiduli fiduto icirfe libere renana rer romacq simc
-250,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,86400,86400,1,mm,var250,9,cer coremo cro icirfe libere renana rer romacq simc
-162,B13013,TOTAL SNOW DEPTH,,1,0,0,254,cm,var162,6,fiduma fidupo fiduve libere rer simc
-518,B13013,TOTAL SNOW DEPTH,,1,0,3600,0,cm,var518,1,simc
-521,B13013,TOTAL SNOW DEPTH,,1,0,3600,2,cm,var521,1,simc
-520,B13013,TOTAL SNOW DEPTH,,1,0,3600,3,cm,var520,1,simc
-519,B13013,TOTAL SNOW DEPTH,,1,0,3600,6,cm,var519,1,simc
+238,-9999,,,,,,,,var238,1,syrep
+255,-9999,,,,,,,,var255,2,ita_pollution locali
+333,-9999,,,,,,,,var333,2,agrmet locali
+343,-9999,,,,,,,,var343,1,locali
+344,-9999,,,,,,,,var344,1,locali
+345,-9999,,,,,,,,var345,1,locali
+347,-9999,,,,,,,,var347,2,agrmet locali
+555,B04195,[SIM] Temperature event - time of occurrence,1000,103,0,3600,2,mn,var555,1,locali
+554,B04195,[SIM] Temperature event - time of occurrence,1000,103,0,3600,3,mn,var554,1,locali
+120,B04195,[SIM] Temperature event - time of occurrence,150,106,0,3600,2,mn,var120,1,locali
+119,B04195,[SIM] Temperature event - time of occurrence,150,106,0,3600,3,mn,var119,1,locali
+82,B04195,[SIM] Temperature event - time of occurrence,2000,103,0,3600,2,mn,var82,5,agrmet freati locali pollini urbane
+81,B04195,[SIM] Temperature event - time of occurrence,2000,103,0,3600,3,mn,var81,7,agrmet etg freati locali pollini profe urbane
+638,B04195,[SIM] Temperature event - time of occurrence,2000,103,0,43200,2,mn,var638,1,syrep
+640,B04195,[SIM] Temperature event - time of occurrence,2000,103,0,43200,3,mn,var640,1,syrep
+88,B04195,[SIM] Temperature event - time of occurrence,500,103,0,3600,2,mn,var88,6,agrmet locali pollini profe umsuol urbane
+87,B04195,[SIM] Temperature event - time of occurrence,500,103,0,3600,3,mn,var87,4,agrmet locali pollini umsuol
+126,B04195,[SIM] Temperature event - time of occurrence,500,106,0,3600,2,mn,var126,1,locali
+125,B04195,[SIM] Temperature event - time of occurrence,500,106,0,3600,3,mn,var125,1,locali
+100,B04196,[SIM] Relative humidity event - time of occurrence,2000,103,0,3600,2,mn,var100,3,agrmet locali urbane
+99,B04196,[SIM] Relative humidity event - time of occurrence,2000,103,0,3600,3,mn,var99,4,agrmet locali pollini urbane
+75,B04197,[SIM] Wind velocity event - time of occurrence,10000,103,0,3600,2,mn,var75,5,agrmet cofor locali pollini urbane
+74,B04197,[SIM] Wind velocity event - time of occurrence,10000,103,0,3600,3,mn,var74,3,cofor locali pollini
+636,B04197,[SIM] Wind velocity event - time of occurrence,10000,103,0,86400,2,mn,var636,1,syrep
+106,B04198,[SIM] Pressure event - time of occurrence,2000,103,0,3600,2,mn,var106,1,locali
+105,B04198,[SIM] Pressure event - time of occurrence,2000,103,0,3600,3,mn,var105,1,locali
+275,B08192,[SIM] Number of wind velocity mean values present,10000,103,0,86400,1,numero,var275,3,agrmet locali urbane
+276,B08193,[SIM] Number of wind velocity minimum values present,10000,103,0,86400,1,numero,var276,3,agrmet locali urbane
+277,B08194,[SIM] Number of wind velocity maximum values present,10000,103,0,86400,1,numero,var277,3,agrmet locali urbane
+278,B08195,[SIM] Number of wind prevalent direction values present,10000,103,0,86400,1,numero,var278,2,agrmet locali
+559,B08196,[SIM] Number of mean temperature values present,1000,103,0,86400,0,numero,var559,1,locali
+299,B08196,[SIM] Number of mean temperature values present,150,106,0,86400,1,numero,var299,2,agrmet locali
+279,B08196,[SIM] Number of mean temperature values present,2000,103,0,86400,1,numero,var279,5,agrmet etg locali profe urbane
+282,B08196,[SIM] Number of mean temperature values present,500,103,0,86400,1,numero,var282,1,locali
+302,B08196,[SIM] Number of mean temperature values present,500,106,0,86400,1,numero,var302,1,locali
+560,B08197,[SIM] Number of minimum temperature values present,1000,103,0,86400,3,numero,var560,1,locali
+300,B08197,[SIM] Number of minimum temperature values present,150,106,0,86400,1,numero,var300,2,agrmet locali
+280,B08197,[SIM] Number of minimum temperature values present,2000,103,0,86400,1,numero,var280,5,agrmet etg locali profe urbane
+283,B08197,[SIM] Number of minimum temperature values present,500,103,0,86400,1,numero,var283,1,locali
+303,B08197,[SIM] Number of minimum temperature values present,500,106,0,86400,1,numero,var303,1,locali
+561,B08198,[SIM] Number of maximum temperature values present,1000,103,0,86400,2,numero,var561,1,locali
+301,B08198,[SIM] Number of maximum temperature values present,150,106,0,86400,1,numero,var301,2,agrmet locali
+281,B08198,[SIM] Number of maximum temperature values present,2000,103,0,86400,1,numero,var281,5,agrmet etg locali profe urbane
+284,B08198,[SIM] Number of maximum temperature values present,500,103,0,86400,1,numero,var284,1,locali
+304,B08198,[SIM] Number of maximum temperature values present,500,106,0,86400,1,numero,var304,1,locali
+288,B08199,[SIM] Number of mean relative humidity values present,2000,103,0,86400,1,numero,var288,4,agrmet locali profe urbane
+289,B08200,[SIM] Number of minimum relative humidity values present,2000,103,0,86400,1,numero,var289,4,agrmet locali profe urbane
+290,B08201,[SIM] Number of maximum relative humidity values present,2000,103,0,86400,1,numero,var290,4,agrmet locali profe urbane
+291,B08202,[SIM] Number of mean pressure values present,2000,103,0,86400,1,numero,var291,3,locali profe urbane
+292,B08203,[SIM] Number of minimum pressure values present,2000,103,0,86400,1,numero,var292,2,locali urbane
+293,B08204,[SIM] Number of maximum pressure values present,2000,103,0,86400,1,numero,var293,1,locali
+298,B08205,[SIM] Number of precipitation values present,,1,0,86400,1,numero,var298,7,agrmet cer cro etg locali profe urbane
+305,B08206,[SIM] Number of leaf wetness values present,2000,103,0,86400,1,numero,var305,3,agrmet locali profe
+315,B08207,[SIM] Number of scalar wind velocity mean values present,10000,103,0,86400,1,numero,var315,2,agrmet locali
+167,B10004,PRESSURE,,1,0,0,254,hPa,Prs ist,13,boa cer cro fiduli fiduma fidupo fiduto fiduve locali simnbo simnpr spdsra urbane
+444,B10004,PRESSURE,,1,0,3600,0,hPa,var444,3,locali profe urbane
+447,B10004,PRESSURE,,1,0,3600,2,hPa,var447,2,locali urbane
+446,B10004,PRESSURE,,1,0,3600,3,hPa,var446,2,locali urbane
+445,B10004,PRESSURE,,1,0,3600,6,hPa,var445,2,locali urbane
+243,B10004,PRESSURE,,1,0,86400,0,hPa,var243,13,boa cer cro fiduli fiduma fidupo fiduve locali profe simnbo simnpr spdsra urbane
+245,B10004,PRESSURE,,1,0,86400,2,hPa,var245,12,boa cer cro fiduli fiduma fidupo fiduve locali simnbo simnpr spdsra urbane
+244,B10004,PRESSURE,,1,0,86400,3,hPa,var244,12,boa cer cro fiduli fiduma fidupo fiduve locali simnbo simnpr spdsra urbane
+165,B11001,WIND DIRECTION,10000,103,0,0,254,gsess,DD ist,13,agrmet boa fidufv fiduli fiduma fidupo fiduto fiduve locali simnbo simnpr spdsra urbane
+440,B11001,WIND DIRECTION,10000,103,0,3600,200,gsess,var440,3,agrmet locali urbane
+76,B11001,WIND DIRECTION,10000,103,0,3600,201,octants,var76,5,agrmet cofor locali pollini urbane
+441,B11001,WIND DIRECTION,10000,103,0,3600,202,gsess,var441,3,agrmet locali urbane
+230,B11001,WIND DIRECTION,10000,103,0,86400,201,octants,var230,13,agrmet boa fidufv fiduli fiduma fidupo fiduto fiduve locali simnbo simnpr spdsra urbane
+166,B11002,WIND SPEED,10000,103,0,0,254,M/S,FF ist,14,agrmet boa fidufv fiduli fiduma fidupo fidutn fiduto fiduve locali simnbo simnpr spdsra urbane
+69,B11002,WIND SPEED,10000,103,0,3600,0,M/S,var69,10,agrmet cer fidufv locali pollini simnbo simnpr spdsra umsuol urbane
+73,B11002,WIND SPEED,10000,103,0,3600,2,M/S,var73,5,agrmet cofor locali pollini urbane
+431,B11002,WIND SPEED,10000,103,0,3600,200,M/S,var431,3,agrmet locali urbane
+432,B11002,WIND SPEED,10000,103,0,3600,202,M/S,var432,3,agrmet locali urbane
+433,B11002,WIND SPEED,10000,103,0,3600,203,M/S,var433,3,agrmet locali urbane
+434,B11002,WIND SPEED,10000,103,0,3600,204,M/S,var434,3,agrmet locali urbane
+72,B11002,WIND SPEED,10000,103,0,3600,3,M/S,var72,13,agrmet cer coremo cro etg icirfe idrost locali pollini simnbo simnpr spdsra urbane
+436,B11002,WIND SPEED,10000,103,0,3600,6,M/S,var436,3,agrmet locali urbane
+227,B11002,WIND SPEED,10000,103,0,86400,0,M/S,var227,15,agrmet boa climat fidufv fiduli fiduma fidupo fidutn fiduto fiduve locali simnbo simnpr spdsra urbane
+324,B11002,WIND SPEED,10000,103,0,86400,1,M/S,var324,6,agrmet locali simnbo simnpr spdsra urbane
+229,B11002,WIND SPEED,10000,103,0,86400,2,M/S,var229,14,agrmet boa fidufv fiduli fiduma fidupo fidutn fiduto fiduve locali simnbo simnpr spdsra urbane
+228,B11002,WIND SPEED,10000,103,0,86400,3,M/S,var228,14,agrmet boa fidufv fiduli fiduma fidupo fidutn fiduto fiduve locali simnbo simnpr spdsra urbane
+258,B11002,WIND SPEED,2000,103,0,86400,0,M/S,var258,2,agrmet locali
+351,B11041,MAXIMUM WIND GUST SPEED,10000,103,0,600,205,M/S,var351,6,boa fidupo fiduto fiduve simnbo simnpr
+635,B11041,MAXIMUM WIND GUST SPEED,10000,103,0,86400,2,nodi,var635,1,syrep
+353,B11043,MAXIMUM WIND GUST DIRECTION,10000,103,0,600,205,gsess,var353,6,boa fidupo fiduto fiduve simnbo simnpr
+634,B11043,MAXIMUM WIND GUST DIRECTION,10000,103,0,86400,2,gsess,var634,1,syrep
+326,B11208,[SIM] Distance covered by the hourly mean wind,10000,103,0,86400,1,KM,var326,7,agrmet climat locali simnbo simnpr spdsra urbane
+522,B12030,SOIL TEMPERATURE,100,106,0,0,254,C,T gr1,2,locali umsuol
+251,B12030,SOIL TEMPERATURE,100,106,0,86400,0,C,var251,2,agrmet locali
+253,B12030,SOIL TEMPERATURE,100,106,0,86400,2,C,var253,2,agrmet locali
+252,B12030,SOIL TEMPERATURE,100,106,0,86400,3,C,var252,2,agrmet locali
+526,B12030,SOIL TEMPERATURE,1000,106,0,0,254,C,T gr5,1,umsuol
+527,B12030,SOIL TEMPERATURE,1350,106,0,0,254,C,T gr6,1,umsuol
+115,B12030,SOIL TEMPERATURE,150,106,0,0,254,C,var115,2,agrmet locali
+116,B12030,SOIL TEMPERATURE,150,106,0,3600,0,C,var116,2,agrmet locali
+118,B12030,SOIL TEMPERATURE,150,106,0,3600,2,C,var118,2,agrmet locali
+117,B12030,SOIL TEMPERATURE,150,106,0,3600,3,C,var117,2,agrmet locali
+562,B12030,SOIL TEMPERATURE,150,106,0,3600,6,C,var562,2,agrmet locali
+528,B12030,SOIL TEMPERATURE,1800,106,0,0,254,C,T gr7,1,umsuol
+523,B12030,SOIL TEMPERATURE,250,106,0,0,254,C,T gr2,1,umsuol
+524,B12030,SOIL TEMPERATURE,450,106,0,0,254,C,T gr3,2,agrmet umsuol
+122,B12030,SOIL TEMPERATURE,500,106,0,3600,0,C,var122,1,locali
+124,B12030,SOIL TEMPERATURE,500,106,0,3600,2,C,var124,1,locali
+121,B12030,SOIL TEMPERATURE,500,106,0,3600,254,C,var121,1,locali
+123,B12030,SOIL TEMPERATURE,500,106,0,3600,3,C,var123,1,locali
+254,B12030,SOIL TEMPERATURE,500,106,0,86400,0,C,var254,1,locali
+256,B12030,SOIL TEMPERATURE,500,106,0,86400,2,C,var256,1,locali
+255,B12030,SOIL TEMPERATURE,500,106,0,86400,3,C,var255,2,ita_pollution locali
+525,B12030,SOIL TEMPERATURE,700,106,0,0,254,C,T gr4,1,umsuol
+550,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,1000,103,0,0,254,C,var550,1,locali
+551,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,1000,103,0,3600,0,C,var551,1,locali
+553,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,1000,103,0,3600,2,C,var553,1,locali
+552,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,1000,103,0,3600,3,C,var552,1,locali
+557,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,1000,103,0,86400,0,C,var557,1,locali
+556,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,1000,103,0,86400,2,C,var556,1,locali
+558,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,1000,103,0,86400,3,C,var558,1,locali
+158,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,0,254,C,T ist,18,agrmet boa cer cofor cro fidufv fiduli fiduma fidupo fidutn fiduto fiduve icirfe locali simnbo simnpr spdsra urbane
+78,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,0,C,var78,7,agrmet etg freati locali pollini profe urbane
+80,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,2,C,var80,7,agrmet etg freati locali pollini profe urbane
+79,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,3,C,var79,7,agrmet etg freati locali pollini profe urbane
+403,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,3600,6,C,var403,3,agrmet locali urbane
+231,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,86400,0,C,var231,20,agrmet boa cer climat cro etg fidufv fiduli fiduma fidupo fidutn fiduto fiduve icirfe locali profe simnbo simnpr spdsra urbane
+233,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,86400,2,C,var233,23,agrmet boa cer climat cofor cro etg fidufv fiduli fiduma fidupo fidutn fiduto fiduve icirfe idrost locali profe simnbo simnpr spdsra syrep urbane
+232,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,2000,103,0,86400,3,C,var232,23,agrmet boa cer climat cofor cro etg fidufv fiduli fiduma fidupo fidutn fiduto fiduve icirfe idrost locali profe simnbo simnpr spdsra syrep urbane
+83,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,0,254,C,var83,3,boa locali pollini
+84,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,0,C,var84,3,boa locali pollini
+86,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,2,C,var86,4,agrmet locali pollini umsuol
+85,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,3,C,var85,3,locali pollini umsuol
+563,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,3600,6,C,var563,1,locali
+234,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,86400,0,C,var234,1,locali
+236,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,86400,2,C,var236,1,locali
+235,B12101,TEMPERATURE/DRY-BULB TEMPERATURE,500,103,0,86400,3,C,var235,1,locali
+674,B12131,SNOW TEMPERATURE,100,106,0,0,254,C,var674,1,cofor
+675,B12131,SNOW TEMPERATURE,300,106,0,0,254,C,var675,1,cofor
+139,B13003,RELATIVE HUMIDITY,2000,103,0,0,254,%,RH ist,14,agrmet boa fidufv fiduli fiduma fidupo fiduto fiduve locali pollini simnbo simnpr spdsra urbane
+140,B13003,RELATIVE HUMIDITY,2000,103,0,3600,0,%,var140,5,agrmet locali pollini profe urbane
+142,B13003,RELATIVE HUMIDITY,2000,103,0,3600,2,%,var142,4,agrmet locali profe urbane
+141,B13003,RELATIVE HUMIDITY,2000,103,0,3600,3,%,var141,4,agrmet locali profe urbane
+406,B13003,RELATIVE HUMIDITY,2000,103,0,3600,6,%,var406,3,agrmet locali urbane
+240,B13003,RELATIVE HUMIDITY,2000,103,0,86400,0,%,var240,15,agrmet boa climat fidufv fiduli fiduma fidupo fiduto fiduve locali profe simnbo simnpr spdsra urbane
+242,B13003,RELATIVE HUMIDITY,2000,103,0,86400,2,%,var242,16,agrmet boa climat fidufv fiduli fiduma fidupo fiduto fiduve locali profe simnbo simnpr spdsra syrep urbane
+241,B13003,RELATIVE HUMIDITY,2000,103,0,86400,3,%,var241,16,agrmet boa climat fidufv fiduli fiduma fidupo fiduto fiduve locali profe simnbo simnpr spdsra syrep urbane
+159,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,1800,1,mm,var159,9,cer coremo cro icirfe idrost simnbo simnpr spdsra urbane
+160,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,3600,1,mm,Prc 1hr,20,agrmet cer coremo cro etg fidufv fiduli fiduma fidupo fidutn fiduto fiduve icirfe idrost locali profe simnbo simnpr spdsra urbane
+15,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,43200,1,mm,T ist,23,agrmet boa cer cofor coremo cro fidufv fiduli fiduma fidupo fidutn fiduto fiduve icirfe idrost locali pollini profe simnbo simnpr spdsra syrep urbane
+250,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,86400,1,mm,var250,21,agrmet cer climat coremo cro etg fidufv fiduli fiduma fidupo fidutn fiduto fiduve icirfe idrost locali profe simnbo simnpr spdsra urbane
+172,B13011,TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT,,1,0,900,1,mm,var172,12,agrmet cer coremo cro etg icirfe idrost locali simnbo simnpr spdsra urbane
+671,B13012,DEPTH OF FRESH SNOW,,1,0,86400,1,cm,var671,1,cofor
+162,B13013,TOTAL SNOW DEPTH,,1,0,0,254,cm,var162,10,cofor fiduma fidupo fiduve idrost locali simnbo simnpr syrep urbane
+518,B13013,TOTAL SNOW DEPTH,,1,0,3600,0,cm,var518,2,locali urbane
+521,B13013,TOTAL SNOW DEPTH,,1,0,3600,2,cm,var521,2,locali urbane
+520,B13013,TOTAL SNOW DEPTH,,1,0,3600,3,cm,var520,2,locali urbane
+519,B13013,TOTAL SNOW DEPTH,,1,0,3600,6,cm,var519,2,locali urbane
+323,B13031,EVAPOTRANSPIRATION,2000,103,0,86400,1,mm,var323,2,agrmet locali
 662,B13081,WATER CONDUCTIVITY,,192,0,0,254,mS/cm,var662,1,freati
-169,B13082,WATER TEMPERATURE,,1,0,0,254,C,var169,2,cer rer
+682,B13081,WATER CONDUCTIVITY,,192,0,2592000,0,mS/cm,var682,1,freati
+681,B13081,WATER CONDUCTIVITY,,192,0,86400,0,mS/cm,var681,1,freati
+169,B13082,WATER TEMPERATURE,,1,0,0,254,C,var169,3,cer simnbo simnpr
 661,B13082,WATER TEMPERATURE,,192,0,0,254,C,var661,1,freati
-670,B13194,[SIM] Water table depth,,1,0,0,254,m,var670,1,freati
-692,B13211,,,1,0,0,254,mc,var692,1,romacq
-144,B13212,[SIM] Leaf wetness duration,2000,103,0,3600,1,minuti,var144,3,fiduli libere simc
-257,B13212,[SIM] Leaf wetness duration,2000,103,86400,86400,0,minuti,var257,2,libere simc
-161,B13215,[SIM] River level,,1,0,0,254,m,var161,12,burana cer fiduli fiduma fidupo fiduto fiduve icirfe libere renana rer romacq
-512,B13226,[SIM] River discharge,,1,0,0,254,mc/s,var512,4,fidupo libere rer romacq
-529,B13227,[SIM] Soil volumetric water content,100,106,0,0,254,numero,var529,2,libere umsuol
-685,B13227,[SIM] Soil volumetric water content,100,106,86400,86400,0,numero,var685,1,umsuol
-533,B13227,[SIM] Soil volumetric water content,1000,106,0,0,254,numero,var533,1,umsuol
-689,B13227,[SIM] Soil volumetric water content,1000,106,86400,86400,0,numero,var689,1,umsuol
-534,B13227,[SIM] Soil volumetric water content,1350,106,0,0,254,numero,var534,1,umsuol
-690,B13227,[SIM] Soil volumetric water content,1350,106,86400,86400,0,numero,var690,1,umsuol
-535,B13227,[SIM] Soil volumetric water content,1800,106,0,0,254,numero,var535,1,umsuol
-691,B13227,[SIM] Soil volumetric water content,1800,106,86400,86400,0,numero,var691,1,umsuol
-530,B13227,[SIM] Soil volumetric water content,250,106,0,0,254,numero,var530,3,libere simc umsuol
-686,B13227,[SIM] Soil volumetric water content,250,106,86400,86400,0,numero,var686,3,libere simc umsuol
-531,B13227,[SIM] Soil volumetric water content,450,106,0,0,254,numero,var531,3,libere simc umsuol
-687,B13227,[SIM] Soil volumetric water content,450,106,86400,86400,0,numero,var687,3,libere simc umsuol
-532,B13227,[SIM] Soil volumetric water content,700,106,0,0,254,numero,var532,3,libere simc umsuol
-688,B13227,[SIM] Soil volumetric water content,700,106,86400,86400,0,numero,var688,3,libere simc umsuol
-248,B14018,INSTANTANEOUS SHORT-WAVE RADIATION (incoming),,1,86400,86400,2,W/m**2,var248,3,libere rer simc
-246,B14021,GLOBAL SOLAR RADIATION- INTEGRATED OVER PERIOD SPECIFIED,,1,86400,86400,1,Mj/m**2,var246,3,libere rer simc
-357,B14193,[SIM] Instantenous latent heat flux,,1,0,600,254,W/m**2,var357,4,fidupo fiduto fiduve libere
-164,B14198,[SIM] Visible radiation (downward),,1,0,0,254,W/m**2,Rad ist,8,fiduli fiduma fidupo fiduto fiduve libere piattaforme rer
-409,B14198,[SIM] Visible radiation (downward),,1,0,3600,0,W/m**2,Rad 1hr,2,libere simc
-411,B14198,[SIM] Visible radiation (downward),,1,0,3600,2,W/m**2,var411,2,libere simc
-410,B14198,[SIM] Visible radiation (downward),,1,0,3600,3,W/m**2,var410,2,libere simc
-414,B14199,[SIM] Visible radiation (upward),,1,0,3600,0,W/m**2,var414,1,simc
-416,B14199,[SIM] Visible radiation (upward),,1,0,3600,2,W/m**2,var416,1,simc
-415,B14199,[SIM] Visible radiation (upward),,1,0,3600,3,W/m**2,var415,1,simc
-419,B14200,[SIM] Infrared radiation (downward),,1,0,3600,0,W/m**2,var419,1,simc
-421,B14200,[SIM] Infrared radiation (downward),,1,0,3600,2,W/m**2,var421,1,simc
-420,B14200,[SIM] Infrared radiation (downward),,1,0,3600,3,W/m**2,var420,1,simc
-423,B14201,[SIM] Infrared radiation (upward),,1,0,3600,0,W/m**2,var423,1,simc
-425,B14201,[SIM] Infrared radiation (upward),,1,0,3600,2,W/m**2,var425,1,simc
-424,B14201,[SIM] Infrared radiation (upward),,1,0,3600,3,W/m**2,var424,1,simc
+680,B13082,WATER TEMPERATURE,,192,0,2592000,0,C,var680,1,freati
+679,B13082,WATER TEMPERATURE,,192,0,86400,0,C,var679,1,freati
+670,B13194,[SIM] Water table depth,,1,0,0,254,M,var670,1,freati
+678,B13194,[SIM] Water table depth,,1,0,2592000,0,M,var678,1,freati
+677,B13194,[SIM] Water table depth,,1,0,86400,0,M,var677,1,freati
+676,B13210,[SIM] Penetration of the probe in the snow,,1,0,0,254,cm,var676,1,cofor
+692,B13211,,,1,0,0,254,M**3,var692,1,spdsra
+144,B13212,[SIM] Leaf wetness duration,2000,103,0,3600,1,MINUTE,var144,5,agrmet fiduli locali profe urbane
+257,B13212,[SIM] Leaf wetness duration,2000,103,0,86400,1,MINUTE,var257,6,agrmet climat fiduli locali profe urbane
+161,B13215,[SIM] River level,,1,0,0,254,M,var161,11,cer fiduli fiduma fidupo fiduto fiduve icirfe provpc simnbo simnpr spdsra
+346,B13216,[SIM] Hourly precipitation,,1,0,86400,2,mm,var346,3,agrmet climat locali
+512,B13226,[SIM] River discharge,,1,0,0,254,M**3/S,var512,5,fidupo provpc simnbo simnpr spdsra
+663,B13226,[SIM] River discharge,,1,0,86400,0,M**3/S,var663,1,idrtl9
+529,B13227,[SIM] Soil volumetric water content,100,106,0,0,254,RATIO,Q gr1,2,locali umsuol
+685,B13227,[SIM] Soil volumetric water content,100,106,0,86400,0,RATIO,var685,1,umsuol
+533,B13227,[SIM] Soil volumetric water content,1000,106,0,0,254,RATIO,Q gr5,1,umsuol
+689,B13227,[SIM] Soil volumetric water content,1000,106,0,86400,0,RATIO,var689,1,umsuol
+534,B13227,[SIM] Soil volumetric water content,1350,106,0,0,254,RATIO,Q gr6,1,umsuol
+690,B13227,[SIM] Soil volumetric water content,1350,106,0,86400,0,RATIO,var690,1,umsuol
+535,B13227,[SIM] Soil volumetric water content,1800,106,0,0,254,RATIO,Q gr7,1,umsuol
+691,B13227,[SIM] Soil volumetric water content,1800,106,0,86400,0,RATIO,var691,1,umsuol
+530,B13227,[SIM] Soil volumetric water content,250,106,0,0,254,RATIO,Q gr2,2,agrmet umsuol
+686,B13227,[SIM] Soil volumetric water content,250,106,0,86400,0,RATIO,var686,2,agrmet umsuol
+531,B13227,[SIM] Soil volumetric water content,450,106,0,0,254,RATIO,Q gr3,2,agrmet umsuol
+687,B13227,[SIM] Soil volumetric water content,450,106,0,86400,0,RATIO,var687,2,agrmet umsuol
+532,B13227,[SIM] Soil volumetric water content,700,106,0,0,254,RATIO,Q gr4,2,agrmet umsuol
+688,B13227,[SIM] Soil volumetric water content,700,106,0,86400,0,RATIO,var688,2,agrmet umsuol
+660,B13228,[SIM] Piezometric level,,192,0,0,254,M,var660,1,freati
+673,B13229,[SIM] Density of snow,,1,0,0,254,KG/M**3,var673,1,cofor
+248,B14018,INSTANTANEOUS SHORT-WAVE RADIATION (incoming),,1,0,86400,2,W/m**2,var248,5,agrmet locali simnbo simnpr urbane
+246,B14021,GLOBAL SOLAR RADIATION- INTEGRATED OVER PERIOD SPECIFIED,,1,0,86400,1,Mj/m**2,var246,8,agrmet climat locali profe simnbo simnpr syrep urbane
+249,B14031,TOTAL SUNSHINE,,1,0,86400,1,MINUTE,var249,3,climat locali syrep
+357,B14193,[SIM] Instantenous latent heat flux,,1,0,600,254,W/m**2,var357,4,fidupo fiduto fiduve simnpr
+164,B14198,[SIM] Visible radiation (downward),,1,0,0,254,W/m**2,Rad ist,10,agrmet boa fiduli fiduma fidupo fidutn fiduto fiduve simnbo simnpr
+409,B14198,[SIM] Visible radiation (downward),,1,0,3600,0,W/m**2,RadVsUmd,4,agrmet locali profe urbane
+411,B14198,[SIM] Visible radiation (downward),,1,0,3600,2,W/m**2,var411,3,agrmet locali urbane
+410,B14198,[SIM] Visible radiation (downward),,1,0,3600,3,W/m**2,var410,3,agrmet locali urbane
+414,B14199,[SIM] Visible radiation (upward),,1,0,3600,0,W/m**2,RadVsDmd,2,locali urbane
+416,B14199,[SIM] Visible radiation (upward),,1,0,3600,2,W/m**2,var416,2,locali urbane
+415,B14199,[SIM] Visible radiation (upward),,1,0,3600,3,W/m**2,var415,2,locali urbane
+419,B14200,[SIM] Infrared radiation (downward),,1,0,3600,0,W/m**2,RadIrUmd,2,locali urbane
+421,B14200,[SIM] Infrared radiation (downward),,1,0,3600,2,W/m**2,var421,2,locali urbane
+420,B14200,[SIM] Infrared radiation (downward),,1,0,3600,3,W/m**2,var420,2,locali urbane
+423,B14201,[SIM] Infrared radiation (upward),,1,0,3600,0,W/m**2,RadIrDmd,2,locali urbane
+425,B14201,[SIM] Infrared radiation (upward),,1,0,3600,2,W/m**2,var425,2,locali urbane
+424,B14201,[SIM] Infrared radiation (upward),,1,0,3600,3,W/m**2,var424,2,locali urbane
+646,B20062,STATE OF THE GROUND (WITH OR WITHOUT SNOW),,1,0,86400,205,code table,var646,1,syrep
+650,B20192,[SIM] Presence of rain > 1mm,,1,0,86400,205,code table,var650,1,syrep
+651,B20194,[SIM] Presence of shower,,1,0,86400,205,code table,var651,1,syrep
+652,B20195,[SIM] Presence of hail,,1,0,86400,205,code table,var652,1,syrep
+653,B20196,[SIM] Presence of thunderstorm,,1,0,86400,205,code table,var653,1,syrep
+654,B20197,[SIM] Presence of snow,,1,0,86400,205,code table,var654,1,syrep
+655,B20198,[SIM] Presence of frost,,1,0,86400,205,code table,var655,1,syrep
+656,B20199,[SIM] Presence of dew,,1,0,86400,205,code table,var656,1,syrep
+657,B20200,[SIM] Presence of fog,,1,0,86400,205,code table,var657,1,syrep
+658,B20201,[SIM] Presence of water-spout,,1,0,86400,205,code table,var658,1,syrep
 630,B22001,DIRECTION OF WAVES,,1,0,1800,0,gsess,var630,1,boa
-489,B22031,SPEED OF CURRENT,5000,106,0,0,254,M/S,var489,1,piattaforme
-683,B22038,Tidal elevation with respect to local chart datum,,101,0,0,254,m,var683,1,piattaforme
+489,B22031,SPEED OF CURRENT,5000,106,0,0,254,M/S,var489,1,boa
+683,B22038,Tidal elevation with respect to local chart datum,,101,0,0,254,M,var683,1,boa
 633,B22049,SEA-SURFACE TEMPERATURE,,1,0,1800,0,C,var633,1,boa
-629,B22070,SIGNIFICANT WAVE HEIGHT,,1,0,1800,0,M,var629,2,boa piattaforme
-632,B22071,SPECTRAL PEAK WAVE PERIOD,,1,0,1800,205,S,var632,2,boa piattaforme
-684,B22073,,,1,0,1800,2,m,var684,1,piattaforme
-631,B22074,AVERAGE WAVE PERIOD,,1,0,1800,0,S,var631,2,boa piattaforme
-493,B22192,[SIM] Current X component,5000,106,0,0,254,numero,var493,1,piattaforme
-494,B22193,[SIM] Current Y component,5000,106,0,0,254,numero,var494,1,piattaforme
+629,B22070,SIGNIFICANT WAVE HEIGHT,,1,0,1800,0,M,var629,1,boa
+632,B22071,SPECTRAL PEAK WAVE PERIOD,,1,0,1800,205,S,var632,1,boa
+684,B22073,,,1,0,1800,2,M,var684,1,boa
+631,B22074,AVERAGE WAVE PERIOD,,1,0,1800,0,S,var631,1,boa
+493,B22192,[SIM] Current X component,5000,106,0,0,254,numero,var493,1,boa
+494,B22193,[SIM] Current Y component,5000,106,0,0,254,numero,var494,1,boa
+667,B23198,[SIM] Solid transport by river,,1,0,86400,1,KG/S,var667,1,idrtl9
+360,B48001,[SIM] Graminacee_Graminacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var360,1,pollini
+1360,B48001,[SIM] Graminacee_Graminacee indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1360,1,pollini
+361,B48002,[SIM] Betulacee_Ontano nero,15000,103,0,86400,0,POLLEN/M**3,var361,1,pollini
+362,B48003,[SIM] Betulacee_Betulla,15000,103,0,86400,0,POLLEN/M**3,var362,1,pollini
+363,B48004,[SIM] Betulacee_Betulacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var363,1,pollini
+1363,B48004,[SIM] Betulacee_Betulacee indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1363,1,pollini
+364,B48005,[SIM] Composite_Ambrosia,15000,103,0,86400,0,POLLEN/M**3,var364,1,pollini
+365,B48006,[SIM] Composite_Artemisia,15000,103,0,86400,0,POLLEN/M**3,var365,1,pollini
+366,B48007,[SIM] Composite_Composite indistinte,15000,103,0,86400,0,POLLEN/M**3,var366,1,pollini
+1366,B48007,[SIM] Composite_Composite indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1366,1,pollini
+367,B48008,[SIM] Corilacee_Nocciolo,15000,103,0,86400,0,POLLEN/M**3,var367,1,pollini
+368,B48009,[SIM] Corilacee_Carpino bianco -Carpino nero,15000,103,0,86400,0,POLLEN/M**3,var368,1,pollini
+369,B48010,[SIM] Corilacee_Corilacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var369,1,pollini
+1369,B48010,[SIM] Corilacee_Corilacee indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1369,1,pollini
+370,B48011,[SIM] Fagacee_Castagno,15000,103,0,86400,0,POLLEN/M**3,var370,1,pollini
+371,B48012,[SIM] Fagacee_Faggio,15000,103,0,86400,0,POLLEN/M**3,var371,1,pollini
+372,B48013,[SIM] Fagacee_Quercia,15000,103,0,86400,0,POLLEN/M**3,var372,1,pollini
+373,B48014,[SIM] Fagacee_Fagacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var373,1,pollini
+1373,B48014,[SIM] Fagacee_Fagacee indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1373,1,pollini
+374,B48015,[SIM] Oleacee_Olivo,15000,103,0,86400,0,POLLEN/M**3,var374,1,pollini
+375,B48016,[SIM] Oleacee_Frassino,15000,103,0,86400,0,POLLEN/M**3,var375,1,pollini
+376,B48017,[SIM] Oleacee_Oleacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var376,1,pollini
+1376,B48017,[SIM] Oleacee_Oleacee indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1376,1,pollini
+377,B48018,[SIM] Plantaginacee_Plantaginacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var377,1,pollini
+1377,B48018,[SIM] Plantaginacee_Plantaginacee indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1377,1,pollini
+378,B48019,[SIM] Urticacee_Urticacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var378,1,pollini
+1378,B48019,[SIM] Urticacee_Urticacee indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1378,1,pollini
+379,B48020,[SIM] Cupressacee - Taxacee indistinte_Cipresso comune,15000,103,0,86400,0,POLLEN/M**3,var379,1,pollini
+380,B48021,[SIM] Cupressacee - Taxacee indistinte_Cupressacee - Taxacee ind,15000,103,0,86400,0,POLLEN/M**3,var380,1,pollini
+1380,B48021,[SIM] Cupressacee - Taxacee indistinte_Cupressacee - Taxacee ind,15000,103,604800,86400,0,POLLEN/M**3,var1380,1,pollini
+381,B48022,[SIM] Chenopodiacee - Amarantacee Indistinte_Amaranto,15000,103,0,86400,0,POLLEN/M**3,var381,1,pollini
+382,B48023,[SIM] Chenopodiacee - Amarantacee Indistinte_Chenopodiacee - Ama,15000,103,0,86400,0,POLLEN/M**3,var382,1,pollini
+1382,B48023,[SIM] Chenopodiacee - Amarantacee Indistinte_Chenopodiacee - Ama,15000,103,604800,86400,0,POLLEN/M**3,var1382,1,pollini
+383,B48024,[SIM] Poligonacee_Poligonacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var383,1,pollini
+384,B48025,[SIM] Euphorbiacee_Euforbiacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var384,1,pollini
+385,B48026,[SIM] Mirtacee_Mirtacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var385,1,pollini
+386,B48027,[SIM] Ulmacee_Bagolaro comune,15000,103,0,86400,0,POLLEN/M**3,var386,1,pollini
+387,B48028,[SIM] Ulmacee_Olmo campestre,15000,103,0,86400,0,POLLEN/M**3,var387,1,pollini
+388,B48029,[SIM] Ulmacee_Ulmacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var388,1,pollini
+1388,B48029,[SIM] Ulmacee_Ulmacee indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1388,1,pollini
+389,B48030,[SIM] Platanacee_Platanacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var389,1,pollini
+1389,B48030,[SIM] Platanacee_Platanacee indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1389,1,pollini
+390,B48031,[SIM] Aceraceae_Aceracee indistinte,15000,103,0,86400,0,POLLEN/M**3,var390,1,pollini
+1390,B48031,[SIM] Aceraceae_Aceracee indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1390,1,pollini
+391,B48032,[SIM] Pinacee_Pinacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var391,1,pollini
+1391,B48032,[SIM] Pinacee_Pinacee indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1391,1,pollini
+392,B48033,[SIM] Salicacee_Salice comune,15000,103,0,86400,0,POLLEN/M**3,var392,1,pollini
+393,B48034,[SIM] Salicacee_Pioppo,15000,103,0,86400,0,POLLEN/M**3,var393,1,pollini
+394,B48035,[SIM] Salicacee_Salicacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var394,1,pollini
+1394,B48035,[SIM] Salicacee_Salicacee indistinte,15000,103,604800,86400,0,POLLEN/M**3,var1394,1,pollini
+395,B48036,[SIM] Ciperacee_Ciperacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var395,1,pollini
+396,B48037,[SIM] Juglandacee_Juglandacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var396,1,pollini
+397,B48038,[SIM] Ippocastanacee_Ippocastanacee indistinte,15000,103,0,86400,0,POLLEN/M**3,var397,1,pollini
+398,B48039,[SIM] Spore fungine_Alternaria,15000,103,0,86400,0,POLLEN/M**3,var398,1,pollini
+1398,B48039,[SIM] Spore fungine_Alternaria,15000,103,604800,86400,0,POLLEN/M**3,var1398,1,pollini
+399,B48040,[SIM] Spore fungine_Botrytis,15000,103,0,86400,0,POLLEN/M**3,var399,1,pollini
+400,B48041,[SIM] Spore fungine_Stemphylium,15000,103,0,86400,0,POLLEN/M**3,var400,1,pollini
+1400,B48041,[SIM] Spore fungine_Stemphylium,15000,103,604800,86400,0,POLLEN/M**3,var1400,1,pollini
+401,B48042,[SIM] Spore fungine_Cladosporium,15000,103,0,86400,0,POLLEN/M**3,var401,1,pollini
+402,B48043,[SIM] Spore fungine_Epicoccum,15000,103,0,86400,0,POLLEN/M**3,var402,1,pollini
+513,B48044,[SIM] Altri Pollini / Non Identificati_Altri pollini identificat,15000,103,0,86400,0,POLLEN/M**3,var513,1,pollini
+514,B48045,[SIM] Altri Pollini / Non Identificati_Pollini non identificati,15000,103,0,86400,0,POLLEN/M**3,var514,1,pollini
+515,B48046,[SIM] Altre Spore / Non identificati_Altre spore fungine,15000,103,0,86400,0,POLLEN/M**3,var515,1,pollini
+516,B48047,[SIM] Altre Spore / Non identificati_Spore fungine non identific,15000,103,0,86400,0,POLLEN/M**3,var516,1,pollini
+538,B48048,[SIM] Graminacee_Graminacee indistinte 1,15000,103,0,86400,0,POLLEN/M**3,var538,1,pollini
+539,B48049,[SIM] Plantaginacee_Plantaginacee indistinte 1,15000,103,0,86400,0,POLLEN/M**3,var539,1,pollini
+540,B48050,[SIM] Urticacee_Urticacee indistinte 1,15000,103,0,86400,0,POLLEN/M**3,var540,1,pollini
+541,B48051,[SIM] Poligonacee_Poligonacee indistinte 1,15000,103,0,86400,0,POLLEN/M**3,var541,1,pollini
+542,B48052,[SIM] Euphorbiacee_Euforbiacee indistinte 1,15000,103,0,86400,0,POLLEN/M**3,var542,1,pollini
+543,B48053,[SIM] Mirtacee_Mirtacee indistinte 1,15000,103,0,86400,0,POLLEN/M**3,var543,1,pollini
+544,B48054,[SIM] Platanacee_Platanacee indistinte 1,15000,103,0,86400,0,POLLEN/M**3,var544,1,pollini
+545,B48055,[SIM] Aceraceae_Aceracee indistinte 1,15000,103,0,86400,0,POLLEN/M**3,var545,1,pollini
+546,B48056,[SIM] Pinacee_Pinacee indistinte 1,15000,103,0,86400,0,POLLEN/M**3,var546,1,pollini
+547,B48057,[SIM] Ciperacee_Ciperacee indistinte 1,15000,103,0,86400,0,POLLEN/M**3,var547,1,pollini
+548,B48058,[SIM] Juglandacee_Juglandacee indistinte 1,15000,103,0,86400,0,POLLEN/M**3,var548,1,pollini
+549,B48059,[SIM] Ippocastanacee_Ippocastanacee indistinte 1,15000,103,0,86400,0,POLLEN/M**3,var549,1,pollini
+569,B48128,[SIM] Conta Graminacee_Graminacee indistinte,15000,103,0,86400,1,NUMERIC,var569,1,pollini
+570,B48129,[SIM] Conta Betulacee_Ontano nero,15000,103,0,86400,1,NUMERIC,var570,1,pollini
+571,B48130,[SIM] Conta Betulacee_Betulla,15000,103,0,86400,1,NUMERIC,var571,1,pollini
+572,B48131,[SIM] Conta Betulacee_Betulacee indistinte,15000,103,0,86400,1,NUMERIC,var572,1,pollini
+573,B48132,[SIM] Conta Composite_Ambrosia,15000,103,0,86400,1,NUMERIC,var573,1,pollini
+574,B48133,[SIM] Conta Composite_Artemisia,15000,103,0,86400,1,NUMERIC,var574,1,pollini
+575,B48134,[SIM] Conta Composite_Composite indistinte,15000,103,0,86400,1,NUMERIC,var575,1,pollini
+576,B48135,[SIM] Conta Corilacee_Nocciolo,15000,103,0,86400,1,NUMERIC,var576,1,pollini
+577,B48136,[SIM] Conta Corilacee_Carpino bianco -Carpino nero,15000,103,0,86400,1,NUMERIC,var577,1,pollini
+578,B48137,[SIM] Conta Corilacee_Corilacee indistinte,15000,103,0,86400,1,NUMERIC,var578,1,pollini
+579,B48138,[SIM] Conta Fagacee_Castagno,15000,103,0,86400,1,NUMERIC,var579,1,pollini
+580,B48139,[SIM] Conta Fagacee_Faggio,15000,103,0,86400,1,NUMERIC,var580,1,pollini
+581,B48140,[SIM] Conta Fagacee_Quercia,15000,103,0,86400,1,NUMERIC,var581,1,pollini
+582,B48141,[SIM] Conta Fagacee_Fagacee indistinte,15000,103,0,86400,1,NUMERIC,var582,1,pollini
+583,B48142,[SIM] Conta Oleacee_Olivo,15000,103,0,86400,1,NUMERIC,var583,1,pollini
+584,B48143,[SIM] Conta Oleacee_Frassino,15000,103,0,86400,1,NUMERIC,var584,1,pollini
+585,B48144,[SIM] Conta Oleacee_Oleacee indistinte,15000,103,0,86400,1,NUMERIC,var585,1,pollini
+586,B48145,[SIM] Conta Plantaginacee_Plantaginacee indistinte,15000,103,0,86400,1,NUMERIC,var586,1,pollini
+587,B48146,[SIM] Conta Urticacee_Urticacee indistinte,15000,103,0,86400,1,NUMERIC,var587,1,pollini
+588,B48147,[SIM] Conta Cupressacee - Taxacee indistinte_Cipresso comune,15000,103,0,86400,1,NUMERIC,var588,1,pollini
+589,B48148,[SIM] Conta Cupressacee - Taxacee indistinte_Cupressacee - Taxac,15000,103,0,86400,1,NUMERIC,var589,1,pollini
+590,B48149,[SIM] Conta Chenopodiacee - Amarantacee Indistinte_Amaranto,15000,103,0,86400,1,NUMERIC,var590,1,pollini
+591,B48150,[SIM] Conta Chenopodiacee - Amarantacee Indistinte_Chenopodiacee,15000,103,0,86400,1,NUMERIC,var591,1,pollini
+592,B48151,[SIM] Conta Poligonacee_Poligonacee indistinte,15000,103,0,86400,1,NUMERIC,var592,1,pollini
+593,B48152,[SIM] Conta Euphorbiacee_Euforbiacee indistinte,15000,103,0,86400,1,NUMERIC,var593,1,pollini
+594,B48153,[SIM] Conta Mirtacee_Mirtacee indistinte,15000,103,0,86400,1,NUMERIC,var594,1,pollini
+595,B48154,[SIM] Conta Ulmacee_Bagolaro comune,15000,103,0,86400,1,NUMERIC,var595,1,pollini
+596,B48155,[SIM] Conta Ulmacee_Olmo campestre,15000,103,0,86400,1,NUMERIC,var596,1,pollini
+597,B48156,[SIM] Conta Ulmacee_Ulmacee indistinte,15000,103,0,86400,1,NUMERIC,var597,1,pollini
+598,B48157,[SIM] Conta Platanacee_Platanacee indistinte,15000,103,0,86400,1,NUMERIC,var598,1,pollini
+599,B48158,[SIM] Conta Aceraceae_Aceracee indistinte,15000,103,0,86400,1,NUMERIC,var599,1,pollini
+600,B48159,[SIM] Conta Pinacee_Pinacee indistinte,15000,103,0,86400,1,NUMERIC,var600,1,pollini
+601,B48160,[SIM] Conta Salicacee_Salice comune,15000,103,0,86400,1,NUMERIC,var601,1,pollini
+602,B48161,[SIM] Conta Salicacee_Pioppo,15000,103,0,86400,1,NUMERIC,var602,1,pollini
+603,B48162,[SIM] Conta Salicacee_Salicacee indistinte,15000,103,0,86400,1,NUMERIC,var603,1,pollini
+604,B48163,[SIM] Conta Ciperacee_Ciperacee indistinte,15000,103,0,86400,1,NUMERIC,var604,1,pollini
+605,B48164,[SIM] Conta Juglandacee_Juglandacee indistinte,15000,103,0,86400,1,NUMERIC,var605,1,pollini
+606,B48165,[SIM] Conta Ippocastanacee_Ippocastanacee indistinte,15000,103,0,86400,1,NUMERIC,var606,1,pollini
+607,B48166,[SIM] Conta Spore fungine_Alternaria,15000,103,0,86400,1,NUMERIC,var607,1,pollini
+608,B48167,[SIM] Conta Spore fungine_Botrytis,15000,103,0,86400,1,NUMERIC,var608,1,pollini
+609,B48168,[SIM] Conta Spore fungine_Stemphylium,15000,103,0,86400,1,NUMERIC,var609,1,pollini
+610,B48169,[SIM] Conta Spore fungine_Cladosporium,15000,103,0,86400,1,NUMERIC,var610,1,pollini
+611,B48170,[SIM] Conta Spore fungine_Epicoccum,15000,103,0,86400,1,NUMERIC,var611,1,pollini
+612,B48171,[SIM] Conta Altri Pollini / Non Identificati_Altri pollini ident,15000,103,0,86400,1,NUMERIC,var612,1,pollini
+613,B48172,[SIM] Conta Altri Pollini / Non Identificati_Pollini non identif,15000,103,0,86400,1,NUMERIC,var613,1,pollini
+614,B48173,[SIM] Conta Altre Spore / Non identificati_Altre spore fungine,15000,103,0,86400,1,NUMERIC,var614,1,pollini
+615,B48174,[SIM] Conta Altre Spore / Non identificati_Spore fungine non ide,15000,103,0,86400,1,NUMERIC,var615,1,pollini
+616,B48175,[SIM] Conta Graminacee_Graminacee indistinte 1,15000,103,0,86400,1,NUMERIC,var616,1,pollini
+617,B48176,[SIM] Conta Plantaginacee_Plantaginacee indistinte 1,15000,103,0,86400,1,NUMERIC,var617,1,pollini
+618,B48177,[SIM] Conta Urticacee_Urticacee indistinte 1,15000,103,0,86400,1,NUMERIC,var618,1,pollini
+619,B48178,[SIM] Conta Poligonacee_Poligonacee indistinte 1,15000,103,0,86400,1,NUMERIC,var619,1,pollini
+620,B48179,[SIM] Conta Euphorbiacee_Euforbiacee indistinte 1,15000,103,0,86400,1,NUMERIC,var620,1,pollini
+621,B48180,[SIM] Conta Mirtacee_Mirtacee indistinte 1,15000,103,0,86400,1,NUMERIC,var621,1,pollini
+622,B48181,[SIM] Conta Platanacee_Platanacee indistinte 1,15000,103,0,86400,1,NUMERIC,var622,1,pollini
+623,B48182,[SIM] Conta Aceraceae_Aceracee indistinte 1,15000,103,0,86400,1,NUMERIC,var623,1,pollini
+624,B48183,[SIM] Conta Pinacee_Pinacee indistinte 1,15000,103,0,86400,1,NUMERIC,var624,1,pollini
+625,B48184,[SIM] Conta Ciperacee_Ciperacee indistinte 1,15000,103,0,86400,1,NUMERIC,var625,1,pollini
+626,B48185,[SIM] Conta Juglandacee_Juglandacee indistinte 1,15000,103,0,86400,1,NUMERIC,var626,1,pollini
+627,B48186,[SIM] Conta Ippocastanacee_Ippocastanacee indistinte 1,15000,103,0,86400,1,NUMERIC,var627,1,pollini

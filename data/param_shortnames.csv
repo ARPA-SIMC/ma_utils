@@ -6,7 +6,7 @@
 ! - crea_anag_arkioss.sh (per reti HFR; chiave di ricerca id_var)
 ! - estra_orari.sh (per rete Synop; chiave di ricerca bcode)
 ! 
-! Ultimo aggiornamento: 19/05/2015 
+! Ultimo aggiornamento: 18/03/2016 
 !
 id_hfr,bcode_syn,short_name
 ! Parametri tutte le reti
@@ -18,7 +18,7 @@ id_hfr,bcode_syn,short_name
 160,,Prc 1hr
 167,B10004,Prs ist
 164,,Rad ist
-409,,Rad 1hr
+!
 ! Parametri specifici dei Synop
 ,B10051,SLP
 ,B12103,Td ist
@@ -28,3 +28,25 @@ id_hfr,bcode_syn,short_name
 ,B20001,Visibility
 ,B20003,Pres Weath
 ,B20013,Cloud Base
+!
+! Radiometri a 4 componenti (reti: locali, simc, urbane)
+409,,RadVsUmd
+414,,RadVsDmd
+419,,RadIrUmd
+423,,RadIrDmd
+!
+! Temperatura e umidita' del terreno (rete umsuol)
+529,,Q gr1
+530,,Q gr2
+531,,Q gr3
+532,,Q gr4
+533,,Q gr5
+534,,Q gr6
+535,,Q gr7
+522,,T gr1
+523,,T gr2
+524,,T gr3
+525,,T gr4
+526,,T gr5
+527,,T gr6
+528,,T gr7

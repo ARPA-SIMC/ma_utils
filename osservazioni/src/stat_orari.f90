@@ -148,7 +148,7 @@ CHARACTER (LEN=12) :: title(5)
 CHARACTER (LEN=10) :: ch10
 CHARACTER (LEN=8) :: ch_id_staz
 CHARACTER (LEN=4) :: ch4
-CHARACTER (LEN=3) :: inp_data,out_fmt,next_arg
+CHARACTER (LEN=3) :: inp_data,out_fmt,next_arg,chstep
 LOGICAL :: fmt_ser_xls,out_liv,lrank,lstd,miss0,req_prod(9)
 
 !--------------------------------------------------------------------------
@@ -632,7 +632,7 @@ DO k = 1,nrep
 !   stagione a cui appartiene la data corrente; sono contati a partire da 
 !   year1; kyear12 e' l'anno solare (Jan-Dec), kyear3 e' relativo alle
 !   stagioni di 3 mesi (Mar-Feb), kyear6 e' relativo alle stagioni di 6 
-!   mesi (Apr-Mar); per l'attribuizone dell'anno fa fede il giorno iniziale
+!   mesi (Apr-Mar); per l'attribuzione dell'anno fa fede il giorno iniziale
 !   della stagione (la stagione 1 e' MAM)
 
   kday = data_dum - data1 + 1
@@ -770,7 +770,7 @@ DO k = 1,nrep
   ENDDO
 
 ! 3.6 Salvo la serie dei dati orari
-  hours(k,1:kpar) = rval(1:npar)
+  hours(1:npar,k) = rval(1:npar)
 
 ! 3.7 Aggiorno wrose (questo deve rimanere l'ultimo blocco!!)
   IF (kpar_dd == -99 .OR. kpar_ff == -99) CYCLE
@@ -1963,6 +1963,12 @@ ENDDO
 CLOSE(32)
 
 ! File ctl
+IF (inp_data == "hhr" .OR. inp_data == "ser" .OR. inp_data == "sex") THEN
+  chstep = "1hr"
+ELSE IF (inp_data == "ddy" .OR. inp_data == "tem") THEN
+  chstep = "1dy"
+ENDIF
+
 WRITE (file_out2,'(2a)') TRIM(file_root),"_hours.ctl"
 OPEN (UNIT=33, FILE=file_out2, STATUS="REPLACE", FORM="FORMATTED")
 
@@ -1976,8 +1982,8 @@ ENDIF
 WRITE (33,'(2a)')                "XDEF   ","1 linear 1 1"
 WRITE (33,'(2a)')                "YDEF   ","1 linear 1 1"
 WRITE (33,'(2a)')                "ZDEF   ","1 linear 1 1"
-WRITE (33,'(a,i4,3a)')           "TDEF   ",nrep, &
-  " linear 00Z",grads_date(data1)," 1dy"
+WRITE (33,'(a,i4,2a,1x,a)')      "TDEF   ",nrep, &
+  " linear 00Z",grads_date(data1),chstep
 WRITE (33,'(a,i3)')              "VARS   ",npar
 DO kpar = 1,npar
   WRITE (33,'(a,1x,2i4,1x,2a)') ADJUSTL(str_par2(kpar)), &
