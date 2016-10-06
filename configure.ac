@@ -28,9 +28,18 @@ AM_PROG_LIBTOOL
 
 # Checks for typedefs, structures, and compiler characteristics.
 
+AC_ARG_ENABLE(smnd-build, AC_HELP_STRING([--enable-smnd-build],
+  [enable smnd build]), , [enableval=no])dnl default disable
+if test "x$enableval" = "xyes"; then
+    LIBS="-lgrib_api -lgrib_api_f90 -lsim_base -lsim_volgrid6d -lsim_vol7d"
+else
+    LIBS="-lgrib_api -lgrib_api_f90 -lgrib_util -lemos -lsim_base -lsim_volgrid6d  -lsim_vol7d -lnetcdf -lnetcdff"
+fi
+
+AM_CONDITIONAL(SMND_BUILD, test "x$enableval" = "xyes")
+
 # Checks for library functions.
 #AC_CHECK_LIB([grib_api],[grib_values_check])
-LIBS="-lgrib_api -lgrib_api_f90 -lgrib_util -lemos -lsim_base -lsim_volgrid6d  -lsim_vol7d -lnetcdf -lnetcdff"
 
 # Debug mode for fortran condes
 AC_ARG_ENABLE(debug-mode, AC_HELP_STRING([--enable-debug-mode],

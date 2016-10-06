@@ -1,5 +1,10 @@
 ACLOCAL_AMFLAGS = -I m4
 
+if SMND_BUILD
+SUBDIRS = \
+	modules \
+	util/grib/src
+else
 SUBDIRS = \
 	modules \
 	arkimet/src \
@@ -17,9 +22,12 @@ SUBDIRS = \
 	post_lm/src \
 	util/grads/src \
 	util/grib/src
+endif
 
 pkgdatarootdir = $(datarootdir)/$(PACKAGE)
 
+if SMND_BUILD
+else
 pkgdataroot_DATA = \
 	$(top_srcdir)/data/anag_arkioss.csv \
 	$(top_srcdir)/data/anag_oracle.dat \
@@ -58,5 +66,6 @@ pkgdataroot_DATA = \
 	$(top_srcdir)/data/LMSMR5_layers_20120606.grb \
 	$(top_srcdir)/data/LMSMR5_layersSup_20120606.grb \
 	$(top_srcdir)/data/LMSMR5_orog_20120606.grb
+endif
 
 EXTRA_DIST = $(pkgdataroot_DATA)
