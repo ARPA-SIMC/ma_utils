@@ -8,11 +8,11 @@ URL: http://www.arpa.emr.it/sim
 Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
-BuildRequires: netcdf-devel, grib_api-devel >= 1.10, libdballe-devel, libsim, libsmr
+BuildRequires: netcdf-devel, grib_api-devel >= 1.10, libdballe-devel, libsim-devel, libsmr, udunits2-devel, cnf-devel
 Requires: libsim >= 6.0, libsim < 7.0, libsmr
 
-Vendor:	       Enrico Minguzzi <eminguzzi@arpa.emr.it>
-Packager:      Daniele Branchini <dbranchini@arpa.emr.it>
+Vendor:	       Enrico Minguzzi <eminguzzi@arpae.it>
+Packager:      Daniele Branchini <dbranchini@arpae.it>
 
 Obsoletes: gacsv seriet-utils
 
