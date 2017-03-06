@@ -3,6 +3,9 @@ ACLOCAL_AMFLAGS = -I m4
 if SMND_BUILD
 SUBDIRS = \
 	modules \
+	arkimet/src \
+	arkimet/sh \
+	arkimet/postprocessors/seriet \
 	util/grib/src
 else
 SUBDIRS = \

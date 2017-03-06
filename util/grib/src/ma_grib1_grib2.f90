@@ -530,7 +530,7 @@ WRITE (*,'(a)') "Uso: ma_grib1_grib2 [-h] [-forc] [-macc] filein fileout"
 WRITE (*,'(a)') "Legge un file con molti grib1 e lo riscrive in formato GRIB2"
 WRITE (*,'(a)') "Gestisce proiezioni UTM-SIMC, geo, rot; per ora non gestisce nudging COSMO"
 WRITE (*,*) "-forc: scrive i campi relativi ad analisi (istantanee o elaborate) come forecast +0"
-WRITE (*,*) "-macc: scrive i campi relativi a conc. inquianti secondo le convenzioni MACC;"
+WRITE (*,*) "-macc: scrive i campi relativi a conc. inquinanti secondo le convenzioni MACC;"
 WRITE (*,*) "       agisce sulle sezioni 4, 5 e 7; non modifica livello e scadenza"
 
 RETURN
