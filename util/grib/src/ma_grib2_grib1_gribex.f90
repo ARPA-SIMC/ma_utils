@@ -1,15 +1,15 @@
-PROGRAM ma_grib2_grib1
+PROGRAM ma_grib2_grib1_gribex
 !--------------------------------------------------------------------------
 ! Legge un file con molti grib, convertendo i campi GRIB2 in formato GRIB1
 ! - Deriva da ma_grib1_grib2.f90 V3
-! - Usa grib_api per leggere, e scrivere"
+! - Usa grib_api per leggere, gibex (vecchia libreria EMOS) per scrivere:
 !   utile perche' gribex non riesce a leggere correttamente i grib "degeneri"
 !   (ie. con tutti i valori uguali o mancanti) scritti da grib-api.
 ! - Gestisce proiezioni geo, rot, utm (i campi utm sono riscritti nel vecchio"
 !   formato GRIB1-SIMC)
 !  - Gestisce dati SIMC e AQ-MACC
 !
-! Uso: ma_grib2_grib1.exe [-h] filein fileout
+! Uso: ma_grib2_grib1_gribex.exe [-h] filein fileout
 !
 !                                         Versione 3.0.0, Enrico 08/03/2017
 !--------------------------------------------------------------------------
@@ -19,14 +19,22 @@ USE grib2_utilities
 USE missing_values
 IMPLICIT NONE
 
+! Dichiarazioni per GRIBEX
+INTEGER, PARAMETER :: maxdim = 1000000
+INTEGER :: ksec0(2),ksec1(1024),ksec2(1024),ksec3(2),ksec4(512)
+INTEGER :: kbuffer(maxdim),kword,kret
+REAL    :: psec2(512),psec3(2)
+REAL    :: field(maxdim)
+
 ! Variabili locali
 REAL,ALLOCATABLE :: values(:)
 REAL :: xi_in,yi_in,xf_in,yf_in,dx_in,dy_in,fe,fn,xrot,yrot
-REAL :: xi_out,yi_out,xf_out,yf_out,dx_out,dy_out
+INTEGER :: xi_out_gbex,yi_out_gbex,xf_out_gbex,yf_out_gbex,dx_out_gbex, &
+  dy_out_gbex,xrot_gbex,yrot_gbex
 INTEGER :: cnt_par,kg,kpar,iret,cnt_utm,cnt_geo,cnt_rot,cnt_nok
-INTEGER :: ifin,ifout,igin=0,igout=0,igtemp=0,iu
+INTEGER :: ifin,ifout,igin=0,iu
 INTEGER :: par(3),lev(3),scad(4),datah_ref(4),min,sec,yoc,cortod
-INTEGER :: sc,igen,drt,nv,bp,bmi,bpv,ni,nj,sogd,dig,idig, &
+INTEGER :: sc,igen,drt,nv,bp,bp_gbex,bmi,bpv,bpv_gbex,ni,nj,sogd,dig,idig, &
   jdig,rf,cf,uvrtg,sm,s1f,z,drtn,gnov,nocv,nom
 CHARACTER(LEN=200) ::  chpar,filein,fileout
 CHARACTER(LEN=80) :: grid_type
@@ -62,9 +70,9 @@ ENDIF
 ! 1.2) Apro i files
 CALL grib_open_file(ifin,filein,"r",iret)
 IF (iret /= GRIB_SUCCESS) GOTO 9999
-CALL grib_open_file(ifout,fileout,"w",iret)
-CALL grib_new_from_template(igtemp,"GRIB1",iret)
-IF (iret /= GRIB_SUCCESS) GOTO 9998
+
+CALL grsvck(0)
+CALL PBOPEN (iu,fileout,'W',kret)
 
 !==========================================================================
 ! Elaborazioni (ciclo sui grib in input)
@@ -83,15 +91,14 @@ DO kg = 1,HUGE(0)
   IF (iret == GRIB_END_OF_FILE) EXIT
   IF (iret /= GRIB_SUCCESS) GOTO 9997
 
-! 2.2) Se non e'un GRIB2 in proiezione UTM o geo, lo riscrivo cosi' com'e'
+! 2.2) Se non e'un GRIB2 in proiezione UTM (SIMC-new) o geo, passo oltre
   CALL grib_get(igin,"gridType",grid_type)
   IF (grid_type == "UTM") THEN
     CALL grib_get(igin,"falseEasting",fe)
     CALL grib_get(igin,"falseNorthing",fn)
     CALL grib_get(igin,"zone",z)
     IF (z /= 32 .OR. NINT(fe) /= 500000 .OR. NINT(fn) /= 0) THEN
-      WRITE (*,*) "Warning: trovato grib UTM non SIMC, scrivo immutato"
-      CALL grib_write (igin,ifout)
+      WRITE (*,*) "Warning: trovato grib UTM non SIMC, skip"
       cnt_nok = cnt_nok + 1
       CYCLE
     ELSE
@@ -102,8 +109,7 @@ DO kg = 1,HUGE(0)
   ELSE IF (grid_type == "rotated_ll") THEN
     cnt_rot = cnt_rot + 1
   ELSE
-    WRITE (*,*) "Warning: trovato in proiezione non gestita, scrivo immutato"
-    CALL grib_write (igin,ifout)
+    WRITE (*,*) "Warning: trovato in proiezione non gestita, skip"
     cnt_nok = cnt_nok + 1
     CYCLE
   ENDIF
@@ -179,36 +185,42 @@ DO kg = 1,HUGE(0)
 
   IF (grid_type == "rotated_ll") THEN
     drt = 10
+    xrot_gbex = NINT(xrot * 1000.)
+    yrot_gbex = NINT(yrot * 1000.)
   ELSE
     drt = 0
+    xrot_gbex = 0
+    yrot_gbex = 0
   ENDIF
 
   IF (grid_type == "UTM") THEN
-    xi_out = xi_in / 1000.
-    xf_out = xf_in / 1000.
-    yi_out = yi_in / 1000.
-    yf_out = yf_in / 1000.
+    xi_out_gbex = NINT(xi_in)
+    xf_out_gbex = NINT(xf_in)
+    yi_out_gbex = NINT(yi_in)
+    yf_out_gbex = NINT(yf_in)
   ELSE IF (grid_type == "regular_ll" .OR. grid_type == "rotated_ll") THEN
-    xi_out = xi_in
-    xf_out = xf_in
-    yi_out = yi_in
-    yf_out = yf_in
+    xi_out_gbex = NINT(xi_in * 1000.)
+    xf_out_gbex = NINT(xf_in * 1000.)
+    yi_out_gbex = NINT(yi_in * 1000.)
+    yf_out_gbex = NINT(yf_in * 1000.)
   ENDIF
   
   IF (idig == 1 .AND. jdig ==1) THEN
     dig = 1
     rf = 128
     IF (grid_type == "UTM") THEN
-      dx_out = dx_in / 1000.
-      dy_out = dy_in / 1000.
+      dx_out_gbex = NINT(dx_in)
+      dy_out_gbex = NINT(dy_in)
     ELSE IF (grid_type == "regular_ll" .OR. grid_type == "rotated_ll") THEN
-      dx_out = dx_in
-      dy_out = dy_in
+      dx_out_gbex = NINT(dx_in * 1000.)
+      dy_out_gbex = NINT(dy_in * 1000.)
     ENDIF
 
   ELSE
     dig = 0
     rf = 0
+    dx_out_gbex = 0
+    dy_out_gbex = 0
 
   ENDIF   
 
@@ -239,92 +251,58 @@ DO kg = 1,HUGE(0)
   IF (bmi == 255) THEN              ! Bitmap not present
     bp = 0
     s1f = 128
+    bp_gbex = 1
   ELSE IF (bmi == 0) THEN           ! Bitmap present
     bp = 1
     s1f = 192
+    bp_gbex = 0
   ENDIF
-  IF (drtn == 4 .AND. bpv == 0) bpv = 24
-
-!--------------------------------------------------------------------------
-! 4) Scrivo in formato GRIB1 usando la liberria Grib-API. Assegno solo le 
-!    chiavi GRIB1 che possono avere valori diversi rispetto al template
-
-  CALL grib_clone(igtemp,igout)
- 
-! 4.1 Section 1 (Product)
-  CALL grib_set(igout,"table2Version",par(2))
-  CALL grib_set(igout,"centre",par(1))
-  CALL grib_set(igout,"subCentre",sc)
-  CALL grib_set(igout,"generatingProcessIdentifier",igen)
-  CALL grib_set(igout,"gridDefinition",255) 
-  CALL grib_set(igout,"bitmapPresent",bp)
-  CALL grib_set(igout,"indicatorOfParameter",par(3))
- 
-! Level
-  CALL grib_set(igout,"indicatorOfTypeOfLevel",lev(1))
-  IF (lev(1) == 1 .OR. lev(1) == 105 .OR. lev(1) == 109) THEN
-    CALL grib_set(igout,"level",lev(2))
-  ELSE IF (lev(1) == 110) THEN
-    CALL grib_set(igout,"bottomLevel",lev(2))
-    CALL grib_set(igout,"topLevel",lev(3))
-  ENDIF
- 
-! Reference time
-  CALL grib_set(igout,"yearOfCentury",yoc)
-  CALL grib_set(igout,"month",datah_ref(2))                             
-  CALL grib_set(igout,"day",datah_ref(3))                               
-  CALL grib_set(igout,"hour",datah_ref(4))                              
-  CALL grib_set(igout,"minute",0)                            
-  CALL grib_set(igout,"centuryOfReferenceTimeOfData",cortod)
- 
-! Timerange
-  CALL grib_set(igout,"unitOfTimeRange",scad(1))
-  CALL grib_set(igout,"P1",scad(2))
-  CALL grib_set(igout,"P2",scad(3))
-  CALL grib_set(igout,"timeRangeIndicator",scad(4))
- 
-! 4.2 Section 2 (Grid)
-  CALL grib_set(igout,"dataRepresentationType",drt)
-  CALL grib_set(igout,"numberOfVerticalCoordinateValues",nv)         
-
-  CALL grib_set(igout,"numberOfPointsAlongAParallel",ni)
-  CALL grib_set(igout,"numberOfPointsAlongAMeridian",nj)
-  CALL grib_set(igout,"longitudeOfFirstGridPointInDegrees",xi_out)
-  CALL grib_set(igout,"longitudeOfLastGridPointInDegrees",xf_out)
-  CALL grib_set(igout,"latitudeOfFirstGridPointInDegrees",yi_out)
-  CALL grib_set(igout,"latitudeOfLastGridPointInDegrees",yf_out)
-  IF (grid_type == "rotated_ll") THEN
-    CALL grib_set(igout,"longitudeOfSouthernPoleInDegrees",xrot)
-    CALL grib_set(igout,"latitudeOfSouthernPoleInDegrees",yrot)
-  ENDIF
- 
-  CALL grib_set(igout,"ijDirectionIncrementGiven",dig)
-  IF (dig == 1) THEN
-    CALL grib_set(igout,"iDirectionIncrementInDegrees",dx_out)
-    CALL grib_set(igout,"jDirectionIncrementInDegrees",dy_out)
+  IF (drtn == 4 .AND. bpv == 0) THEN
+    bpv_gbex = 24
+    bpv = 24
+  ELSE IF (bpv == 0) THEN
+    bpv_gbex = 8
   ELSE
-    CALL grib_set_missing(igout,"iDirectionIncrement")
-    CALL grib_set_missing(igout,"jDirectionIncrement")
+    bpv_gbex = bpv
   ENDIF
-  CALL grib_set(igout,"uvRelativeToGrid",uvrtg)
-  CALL grib_set(igout,"scanningMode",sm)
- 
-! 4.3 Section 3 (Bit Map)
-  IF (bp /= 0) CALL grib_set(igout,"missingValue",rmiss)
- 
-! 4.4 Section 4 (Binary Data)
-  CALL grib_set(igout,"bitsPerValue",bpv)
-  CALL grib_set(igout,"values",values(:))
- 
-! 4.5 Scrivo in formato GRIB1
-  CALL grib_write (igout,ifout)
 
 !--------------------------------------------------------------------------
-! 5) Libero memoria
+! 4) Scrivo in formato GRIB1 usando la libreria Emos (Gribex)
+
+  ksec1(:) = 0
+  ksec2(:) = 0
+  psec2(:) = 0. 
+  ksec3(:) = 0
+  psec3(:) = 0.
+  ksec4(:) = 0
+
+  ksec1(1:24) = &
+  (/par(2),      par(1),      igen,        255,         s1f,          &
+    par(3),      lev(1),      lev(2),      lev(3),      yoc,          &
+    datah_ref(2),datah_ref(3),datah_ref(4),0,           scad(1),      &
+    scad(2),     scad(3),     scad(4),     0,           0,            &
+    cortod,      sc,          0,           0/)
+
+  ksec2(1:19) = &
+  (/drt,         ni,          nj,          yi_out_gbex, xi_out_gbex,  &
+    rf,          yf_out_gbex, xf_out_gbex, dx_out_gbex, dy_out_gbex,  &
+    sm,          nv,          yrot_gbex,   xrot_gbex,   0,            &
+    0,           0,           0,           cf/)
+
+  ksec3(1) = bp_gbex
+  psec3(2) = rmiss
+  ksec4(1) = ni * nj
+  ksec4(2) = bpv_gbex
+  field(1:ni*nj) = values(1:ni*nj)
+  CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
+    field,ni*nj,kbuffer,maxdim,kword,'C',kret)
+  CALL PBWRITE(iu,kbuffer,ksec0(1),kret)
+
+!--------------------------------------------------------------------------
+! 6) Libero memoria
 
   DEALLOCATE (values)
   CALL grib_release(igin)
-  CALL grib_release(igout)
 
 ENDDO
 
@@ -332,7 +310,7 @@ ENDDO
 ! Conclusione
 
 CALL grib_close_file(ifin)
-CALL grib_close_file(ifout)
+CALL PBCLOSE (iu,kret)
 
 WRITE (*,*)"Operazioni completate, grib elaborati ",kg-1
 IF (cnt_utm > 0) WRITE (*,*) "  in proiezione utm ",cnt_utm
@@ -374,7 +352,7 @@ STOP 6
 ! 9994 CONTINUE
 ! WRITE (*,*) "Scanning mode non gestito ",sm
 
-END PROGRAM ma_grib2_grib1
+END PROGRAM ma_grib2_grib1_gribex
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
@@ -386,9 +364,11 @@ IMPLICIT NONE
 
 !                12345678901234567890123456789012345678901234567890123456789012345678901234567890
 WRITE (*,*)
-WRITE (*,'(a)') "Uso: ma_grib2_grib1.exe filein fileout [-h]"
+WRITE (*,'(a)') "Uso: ma_grib2_grib1_gribex.exe filein fileout [-h]"
 WRITE (*,'(a)') "Legge un file con molti grib, convertendo i campi GRIB2 in formato GRIB1"
-WRITE (*,'(a)') "  usa le librerie grib-api"
+WRITE (*,'(a)') "  legge con grib-api, scrive con gribex" 
+WRITE (*,'(a)') "  utile perche gribex non riesce a leggere correttamente i grib degeneri"
+WRITE (*,'(a)') "  (ie. con tutti i valori uguali o mancanti) scritti da grib-api."
 WRITE (*,'(a)') "  Gestisce proiezioni geo, rot, utm (i campi utm sono riscritti nel vecchio"
 WRITE (*,'(a)') "  formato GRIB1-SIMC)"
 WRITE (*,*)

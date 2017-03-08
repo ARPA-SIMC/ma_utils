@@ -25,7 +25,7 @@
 # - miglioare gestione errori quando non trova nessun dato
 # - gestire dataset lmruc_* (per dati in tempo reale)
 #
-#                                              Versione 2.4.1, Enrico 31/03/2016
+#                                              Versione 2.4.2, Enrico 31/01/2017
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -350,7 +350,7 @@ for id in $sta_list ; do
     nome_sta=`echo $str_anag | cut -d , -f 6`
 
   elif [ $id_arc = "syn" ] ; then
-    grep ^${id_staz}, $anag_synop > /dev/null 2>&1
+    grep ^${id_staz} $anag_synop > /dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "Stazione "$id_staz" non trovata in "$anag_synop
       continue
@@ -360,7 +360,7 @@ for id in $sta_list ; do
 
   elif [ $id_arc = "temp" ] ; then
     sta2=`echo $sta | sed 's/^0*//'`
-    grep ^${id_staz}, $anag_temp > /dev/null 2>&1
+    grep ^${id_staz} $anag_temp > /dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "Stazione "$id_staz" non trovata in "$anag_temp
       continue

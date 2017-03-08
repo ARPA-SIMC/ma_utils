@@ -11,9 +11,9 @@
 #   piu' standard (ma piu' lento) cercando il codice stazione in tutti i dataset
 #   disponibili.
 # 
-#                                              Versione 2.3.0, Enrico 26/02/2016
+#                                              Versione 2.3.1, Enrico 02/03/2017
 #-------------------------------------------------------------------------------
-#set -x
+set -x
 
 function write_help
 {
@@ -187,7 +187,7 @@ else                            # id e' il codice stazione
   id_staz="H"${str_out}
 fi
 
-id_staz_acr=$(echo $id_staz | awk '{print substr($1,2,5)}' | sed 's/^0*//')
+id_staz_arc=$(echo $id_staz | awk '{print substr($1,2,5)}' | sed 's/^0*//')
 fileout=param_staz_${id_staz}.csv
 
 # Costruisco la query arkioss
@@ -208,7 +208,7 @@ fi
 rm -f $fileout tmp1.yml tmp2.yml tmp3.yml
 echo "id_var,bcode,long_name,l1,lt1,p1,p2,tr,unit,short_name" > $fileout
 
-net=$(grep ^${id_staz} $anag_arkioss | cut -d , -f 2)
+net=$(grep ^${id_staz} $anag_arkioss | cut -d , -f 5)
 if [ $net = "" ] ; then
   echo "Stazione "$id_staz" non trovata in "$anag_arkioss
   exit 3
