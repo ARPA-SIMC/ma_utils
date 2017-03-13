@@ -1,15 +1,15 @@
 Summary: Utilities area Meteorologia Ambientale SIMC
 Name: ma_utils
-Version: 0.12
-Release: 343%{dist}
+Version: 0.13
+Release: 362%{dist}
 License: GPL
 Group: Applications/Meteo
 URL: http://www.arpa.emr.it/sim
 Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
-BuildRequires: netcdf-devel, grib_api-devel >= 1.10, libdballe-devel, libsim-devel, libsmr, udunits2-devel, cnf-devel
-Requires: libsim >= 6.0, libsim < 7.0, libsmr
+BuildRequires: netcdf-devel grib_api-devel >= 1.10 libdballe-devel libsim-devel %{!?rhel:libsmr} udunits2-devel cnf-devel
+Requires: libsim >= 6.0 libsim < 7.0 %{!?rhel:libsmr}
 
 Vendor:	       Enrico Minguzzi <eminguzzi@arpae.it>
 Packager:      Daniele Branchini <dbranchini@arpae.it>
@@ -26,12 +26,12 @@ area MetAmb SIMC
 
 %build
 
-%configure
+%configure %{?rhel:--enable-smnd-build}
 make
 
 %install
 rm -rf %{buildroot}
-%makeinstall
+make DESTDIR=%{buildroot} install
 
 %clean
 rm -rf %{buildroot}
@@ -42,17 +42,18 @@ rm -rf %{buildroot}
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/*.exe
 %{_libexecdir}/%{name}/*sh
+%if ! 0%{?rhel:1}
 %{_libexecdir}/%{name}/crea_anag_oracle.sql
 %{_libexecdir}/%{name}/wrom.gs
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/*
+%endif
 
 %package -n arkimet-postprocess-seriet
 Summary: GRIB to seriet postprocessor for arkimet
 BuildArch: noarch
 Requires: arkimet, ma_utils
 Obsoletes: arkimet-postprocess-gacsv
-
 
 %description -n arkimet-postprocess-seriet
 GRIB to seriet postprocessor for arkimet
