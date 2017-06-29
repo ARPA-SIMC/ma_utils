@@ -749,7 +749,7 @@ IF (cl_grd) THEN
   CALL grib_get(ig,"jScansPositively",scan(2))
   CALL grib_get(ig,"alternativeRowScanning",scan(3))
 
-! 1.2 Li leggo da aree_utm.dat
+! 1.2 Li leggo da aree_geo.dat
 ELSE 
   tab_path = ""
   CALL GETENV(tab_env,tab_path)

@@ -1,186 +1,320 @@
 PROGRAM convert_shape
 !--------------------------------------------------------------------------
-! Legge un file *shape* (poligonale per plot GRADS) e la riscrive in un 
+! Legge un file shape_*.dat per GRADS (draw_shape.gs) e lo riscrive in un 
 ! sistema di coordinate diverso.
-! Uso: convert_shape.exe filein fileout conv [-rev]
 !
-! NOTE
-! in output scrive sempre YY,XX
-! in input si aspetta YY,XX
-! Per leggere files XX,YY, usare il parametro -rev
+! Note:
 !
-!                                         Versione 1.0.1, Enrico 13/01/2014
+! Todo: gestire proiezioni (incluso errore riga comando)
+!
+!                                         Versione 2.0.0, Enrico 20/06/2017
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
 
-REAL :: xin,xout,yin,yout
-INTEGER :: ios,eof,eor,cnt1,cnt2,kp,idum,idp
-CHARACTER (LEN=200) :: filein,fileout,chrec,chdum
-CHARACTER (LEN=7) :: ch7
+! Variabili locali
+INTEGER :: idp,kp,ios,eof,eor,kin,kout,idum
+REAL :: xin,xgeo,xout,yin,ygeo,yout 
+CHARACTER (LEN=200) :: filein,fileout,chdum,chrec
 LOGICAL :: lrev
+
+! Proiezione geografica in e out: GEO (geografica), U32 (UTM 32),
+! U33 (UTM 33), R43 (ruotate, centro 10,43), R57 (ruotate, centro 10,57.5)
+CHARACTER (LEN=3) :: proj_in, proj_out
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
 
-! Parametri da riga comando
-lrev = .FALSE.
+! 1.1 Parametri da riga comando
 idp = 0
-DO kp = 1,HUGE(kp)
+lrev = .FALSE.
+DO kp = 1,HUGE(0)
   CALL getarg(kp,chdum)
-  IF (TRIM(chdum) == "-h") THEN
+  IF (TRIM(chdum) == "") THEN
+    EXIT
+  ELSE IF (TRIM(chdum) == "-h") THEN
     CALL write_help
     STOP
-  ELSE IF (TRIM(chdum) == "") THEN  
-    EXIT
-  ELSE IF (TRIM(chdum) == "-rev") THEN  
+  ELSE IF (TRIM(chdum) == "-rev") THEN
     lrev = .TRUE.
-  ELSE
+  ELSE 
     idp = idp + 1
     SELECT CASE (idp)
-    CASE(1)
+    CASE (1)
       filein = chdum
-    CASE(2)
+    CASE (2)
+      proj_in = chdum
+    CASE (3)
       fileout = chdum
-    CASE(3)
-      ch7 = chdum(1:7)
+    CASE (4)
+      proj_out = chdum
+    CASE DEFAULT
+      CALL write_help
+      STOP
     END SELECT
   ENDIF
 ENDDO
 
-IF (filein == "" .OR. fileout == "" .OR. ch7 == "") THEN
-  CALL write_help
-  STOP
-ENDIF
 
-! Codici EOF
+! Varie
+OPEN (UNIT=30, FILE=filein, STATUS="OLD", ACTION="READ", ERR=9999)
+OPEN (UNIT=31, FILE=fileout, STATUS="REPLACE", FORM="FORMATTED")
+
 CALL get_eof_eor(eof,eor)
 
-! Apro files
-OPEN (UNIT=20,file=filein,STATUS="OLD",ACTION="READ",ERR=9999)
-OPEN (UNIT=21,file=fileout,STATUS="REPLACE",FORM="FORMATTED")
+proj_in = "R57"
+proj_out = "R43"
 
 !--------------------------------------------------------------------------
-! 2) Leggo/scrivo
+! 1) Leggo e riscrivo convertendo le coordinate
 
-cnt1 = 0
-cnt2 = 0
-DO
-  READ (20,'(a)',IOSTAT=ios) chrec
+kout = 0
+DO kin = 1, HUGE(0)
+  READ (30, '(a)', IOSTAT=ios) chrec
   IF (ios == eof) EXIT
   IF (ios /= 0) GOTO 9998
-
-  IF (.NOT. lrev) THEN
+  IF (lrev) THEN
     READ (chrec,*,IOSTAT=ios) yin,xin
   ELSE
     READ (chrec,*,IOSTAT=ios) xin,yin
   ENDIF
-
-  IF (ios == 0) THEN  ! record ordinario (converto coordinate)
- 
-    SELECT CASE (ch7)
-    CASE ("geo2rot")   
-      CALL tll(xin,yin,10.,57.5,xout,yout)
-    CASE ("rot2geo")   
-      CALL rtll(xin,yin,10.,57.5,xout,yout)
-    CASE ("utm2geo")   
-      CALL utm2ll(xin,yin,32,.FALSE.,yout,xout)
-    CASE ("geo2utm")   
-      CALL ll2utm(yin,xin,32,xout,yout,idum)
-    CASE DEFAULT
-      GOTO 9997
-    END SELECT
-
-    WRITE (21,'(f15.6,3x,f15.6)') yout,xout
-    cnt1 = cnt1 + 1
-
-  ELSE                ! record di controllo (riscrivo uguale)
-    WRITE (21,'(a)') chrec
-    cnt2 = cnt2 + 1
-
+    
+  IF (ios /= 0) THEN
+    WRITE (31,'(a)') TRIM(chrec)
+    CYCLE
+  ENDIF
+    
+! Converto le coordinate in ingresso a geografiche
+  IF (proj_in == "R57") THEN
+    CALL rtll(xin,yin,10.,57.5,xgeo,ygeo)
+  ELSE IF (proj_in == "R43") THEN
+    CALL rtll(xin,yin,10.,43.,xgeo,ygeo)
+  ELSE IF (proj_in == "U32") THEN
+    CALL utm2ll(xin,yin,32,.FALSE.,ygeo,xgeo)
+  ELSE IF (proj_in == "U33") THEN
+    CALL utm2ll(xin,yin,33,.FALSE.,ygeo,xgeo)
+  ELSE IF (proj_in == "GEO") THEN
+    xgeo = xin
+    ygeo = yin
   ENDIF
 
+! Calcolo le coordinate di uscita
+  IF (proj_out == "R57") THEN
+    CALL tll(xgeo,ygeo,10.,57.5,xout,yout)
+  ELSE IF (proj_out == "R43") THEN
+    CALL tll(xgeo,ygeo,10.,43.,xout,yout)
+  ELSE IF (proj_out == "U32") THEN
+    CALL ll2utm(ygeo,xgeo,32,xout,yout,idum)
+   ELSE IF (proj_out == "U33") THEN
+    CALL ll2utm(ygeo,xgeo,33,xout,yout,idum)
+  ELSE IF (proj_out == "GEO") THEN
+    xout = xgeo
+    yout = ygeo
+  ENDIF
+  
+  IF (proj_out == "R57" .OR. proj_out == "R43" .OR. proj_out == "GEO") THEN
+    WRITE (31,'(f9.4,1x,f9.4)') yout,xout
+  ELSE IF (proj_out == "U32" .OR. proj_out == "U33") THEN
+! Todo
+  ENDIF
+  kout = kout + 1
+  
 ENDDO
-WRITE (*,*) "Scritte ",cnt1," coordiante e ",cnt2," record di controllo"
+
+WRITE (*,*) "Programma terminato: righe lette ",kin,", scritte ",kout
 
 STOP
 
 !--------------------------------------------------------------------------
-! Gestione errori
 
 9999 CONTINUE
-WRITE (*,*) "Errore aprendo ",TRIM(filein)
-STOP
+WRITE (*,*)  "Errore aprendo ",TRIM(filein)
+STOP 1
 
 9998 CONTINUE
-WRITE (*,*) "Errore leggendo ",TRIM(filein)
-STOP
-
-9997 CONTINUE
-WRITE (*,*) "Conversione di cocordinate non gestita ",ch7
-STOP
+WRITE (*,*)  "Errore leggendo ",TRIM(filein)
+STOP 1
 
 END PROGRAM convert_shape
 
-!=========================================================================
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
+SUBROUTINE get_eof_eor(eof, eor)
 !-------------------------------------------------------------------------
-      SUBROUTINE TLL(ALMD,APHD,TLM0D,TPH0D,TLMD,TPHD)        
+! Ritorna i codici di errore macchina-dipendenti corrispondenti alle 
+! condizioni di EOF e EOR nella lettura di un file sequenziale formattato
+!
+! Secondo manuale, questi sono gli unici due casi in cui IOSTAT ritorna
+! con un valore negativo. 
+! Si noti che EOR riguarda solo non-advancinag READ
 !-------------------------------------------------------------------------
-! trasforma le coordinate geografiche ordinarie (ALMD,APHD) in
-! coordinte ruotate (TLMD,TPHD). I/O in gradi e decimi.
-! TLM0D, TPH0D: lon e lat del centro di rotazione, in gradi e decimi.
-! 
-      PARAMETER (DTR=3.141592654/180.)
+IMPLICIT NONE
 
-      CTPH0=COS(TPH0D*DTR)
-      STPH0=SIN(TPH0D*DTR)
+INTEGER, INTENT(OUT) :: eof,eor
 
-      RELM=(ALMD-TLM0D)*DTR                                             
-      SRLM=SIN(RELM)                                                    
-      CRLM=COS(RELM)                                                    
+INTEGER :: k, ios, idummy=0, iun=0
+LOGICAL :: l1 = .TRUE.
 
-      APH=APHD*DTR                                                      
-      SPH=SIN(APH)                                                      
-      CPH=COS(APH)                                                      
 
-      CC=CPH*CRLM                                                       
-      ANUM=CPH*SRLM                                                     
-      DENOM=CTPH0*CC+STPH0*SPH                                          
+! Cerco un'unita' libera per aprire il file di prova
+DO k = 10,99
+  INQUIRE (UNIT=k, OPENED=l1, IOSTAT=ios)
+  IF (.NOT. l1 .AND. ios==0) THEN
+    iun = k
+    EXIT
+  ENDIF
+ENDDO
+IF (iun == 0) GOTO 9999   ! non ho torvato nessuna unita' libera
+!WRITE (*,*) "uso unita ",iun
 
-      TLMD=ATAN2(ANUM,DENOM)/DTR
-      TPHD=ASIN(CTPH0*SPH-STPH0*CC)/DTR
+! Cerco codice di errore per EOF
+OPEN (unit=k, STATUS="SCRATCH", FORM="FORMATTED", ACCESS="SEQUENTIAL", &
+  PAD="NO", ERR=9999)
+ENDFILE (k)
+REWIND (k)
+READ (k,*,IOSTAT=eof)
+CLOSE(k)
 
-      RETURN                                                          
-      END   
+! Cerco codice di errore per EOR
+OPEN (unit=k, STATUS="SCRATCH", FORM="FORMATTED", ACCESS="SEQUENTIAL", &
+  PAD="NO", ERR=9999)
+WRITE (k,'(a1)') "1" 
+WRITE (k,'(a1)') "2"
+REWIND (k)
+READ (k,'(i1)',ADVANCE="NO",ERR=9999) idummy
+READ (k,'(i1)',ADVANCE="NO",IOSTAT=eor) idummy
+CLOSE(k)
 
-!-------------------------------------------------------------------------
-      SUBROUTINE RTLL(TLMD,TPHD,TLM0D,TPH0D,ALMD,APHD)        
-!-------------------------------------------------------------------------
-! trasforma le coordinate ruotate (TLMD,TPHD) in coordinate geografiche
-! ordinarie (ALMD,APHD). I/O in gradi e decimi
-! TLM0D, TPH0D: lon e lat del centro di rotazione, in gradi e decimi.
-! 
-      PARAMETER (DTR=3.141592654/180.)
+!write (*,*) "eof,eor ",eof,eor
+RETURN
 
-      CTPH0=COS(TPH0D*DTR)
-      STPH0=SIN(TPH0D*DTR)
+! Gestione errori
+9999 CONTINUE
+WRITE (*,*) "Errore in subroutine get_eof_eor, usero' valori di default"
+eof = -1
+eor = -2
+RETURN
 
-      STPH=SIN(TPHD*DTR)
-      CTPH=COS(TPHD*DTR)
-      CTLM=COS(TLMD*DTR)
-      STLM=SIN(TLMD*DTR)
+END SUBROUTINE get_eof_eor
 
-      APH=ASIN(STPH0*CTPH*CTLM+CTPH0*STPH)                            
-      CPH=COS(APH)                                                    
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-      ALMD=TLM0D+ASIN(STLM*CTPH/CPH)/DTR                               
-      APHD=APH/DTR                                                    
+SUBROUTINE write_help
+! Scrive a schermo l'help del programma
 
-      RETURN                                                          
-      END   
+!            123456789012345678901234567890123456789012345678901234567890123456789012345
+WRITE (*,*) "Uso: convert_shape.exe [-h] filein [-rev] proj_in fileout proj_out" 
+WRITE (*,*) "Legge un file shape_*.dat per GRADS (draw_shape.gs) e lo riscrive in un "
+WRITE (*,*) "sistema di coordinate diverso."
+WRITE (*,*) ""
+WRITE (*,*) "filein: in formato shape GRADS. Di default tracciato XX,YY, con parametro"
+WRITE (*,*) "        -rev legge un tracciato YY,XX"
+WRITE (*,*) "fileout: in formato shape GRADS con tracciato YY,XX"
+WRITE (*,*) "proj_in, proj_out: proiezione geografica in input e output; valori gestiti:"
+WRITE (*,*) "  GEO (lat-lon), U32 (UTM fuso 32), U33 (UTM fuso 33), R57 (ruotate con "
+WRITE (*,*) "  centro 57,10 - vecchio Cosmo), R43 (ruotate con centro 43,10 - nuovo Cosmo)."
+!            123456789012345678901234567890123456789012345678901234567890123456789012345
+
+RETURN
+END SUBROUTINE write_help
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+!----------------------------------------------------------------------
+      subroutine ll2utm(rlat,rlon,iz0,x,y,iz)
+!----------------------------------------------------------------------
+! VERSIONE CON SINTASSI F90 DELLA ROUTINE DI CALMET
+!    
+! --- CALMET   Version: 5.0       Level: 970825                  LL2UTM
+!
+! --- PURPOSE:  Converts latitude/longitude to UTM coordinates
+!
+!           *** Universal Transverse Mercator (UTM) grid system divides
+!           *** the world into 60 north-south zones, covering a 6 deg.
+!           *** strip of longitude. Zone 1 begins between 180 and 174
+!           *** degrees West longitude and progresses eastward to
+!           *** zone 60.
+!           *** This routine works in both No. & So. Hemispheres
+!               Reference --
+!                 "Map Projections--A Working Manual", p61,
+!                  U.S. Geological Survey Professional Paper 1395,
+!                    Note: assumes the Clarke 1866 ellipsoid
+!               Adapted from --
+!                  EPS version 2.0; subr. MAPGTU
+!
+! --- INPUTS:
+!               RLAT - Real        - N Latitude in decimal degrees
+!                                    (use negative for southern hemisphere)
+!               RLON - Real        - E Longitude in decimal degrees
+!                                    (use negative for western hemisphere)
+!                IZ0 - Integer     - UTM zone override (used only if
+!                                    IZ0 .ne. zero).
+!
+! --- OUTPUT:
+!                  X - Real        - UTM easting in km
+!                  Y - Real        - UTM northing in km
+!                 IZ - Integer     - UTM zone
+!
+! --- LL2UTM called by:  READCF
+! --- LL2UTM calls:      none
+!----------------------------------------------------------------------
+
+      real k0
+      real N,M
+
+      parameter (k0=0.9996)
+      parameter (a=6378206.4)
+      parameter (e2=0.00676866)
+      parameter (ep2=0.0068148)
+      parameter (false_e=500000.0)
+      parameter (dtr=3.141592654/180.0)
+
+      if (iz0 .eq. 0) then
+! ---   Locate natural zone
+          iz = int((180.0+rlon)/6.0) + 1
+      else
+! ---   Zone override
+          iz = iz0
+      endif
+
+! --- Compute delta longitude in radians
+      dl = dtr*(rlon - (6.0*iz-183.0))
+
+! --- Convert phi (latitude) to radians
+      p = dtr*rlat
+
+      sinp = sin(p)
+      N = a/sqrt(1.0-e2*sinp*sinp)
+      tanp = tan(p)
+      T = tanp*tanp
+      cosp = cos(p)
+      C = ep2*cosp*cosp
+      A1 = dl*cosp
+      M = 111132.0894*rlat - 16216.94*sin(2.0*p) + 17.21*sin(4.0*p) &
+        - 0.02*sin(6.0*p)
+
+      A2 = A1**2
+      A3 = A2*A1
+      A4 = A2**2
+      A5 = A4*A1
+      A6 = A4*A2
+      T2 = T**2
+
+! --- Compute UTM x and y (km)
+      x = 0.001*(k0*N*(A1+(1.0-T+C)*A3/6.0          &     
+        + (5.0-18.0*T+T2+72.0*C-58.0*ep2)*A5/120.0) &
+        + false_e)
+      y = (M+N*tanp * (A2/2.0 + (5.0-T+9.0*C+4.0*C*C)*A4/24.0 &
+        + (61.0-58.0*T+T2+600.0*C-330.0*ep2)*A6/720.0))
+      false_n = 0.
+      if (rlat .lt. 0.) then
+! --- in km, unlike false_e
+        false_n = 10000.
+      endif
+      y = 0.001*k0*y + false_n
+
+      return
+      end subroutine ll2utm
 
 !----------------------------------------------------------------------
       subroutine utm2ll(x,y,iz,lsohem,rlat,rlon)
@@ -283,170 +417,61 @@ END PROGRAM convert_shape
       return
       end subroutine utm2ll
 
-!----------------------------------------------------------------------
-      subroutine ll2utm(rlat,rlon,iz0,x,y,iz)
-!----------------------------------------------------------------------
-! VERSIONE CON SINTASSI F90 DELLA ROUTINE DI CALMET
-!    
-! --- CALMET   Version: 5.0       Level: 970825                  LL2UTM
-!
-! --- PURPOSE:  Converts latitude/longitude to UTM coordinates
-!
-!           *** Universal Transverse Mercator (UTM) grid system divides
-!           *** the world into 60 north-south zones, covering a 6 deg.
-!           *** strip of longitude. Zone 1 begins between 180 and 174
-!           *** degrees West longitude and progresses eastward to
-!           *** zone 60.
-!           *** This routine works in both No. & So. Hemispheres
-!               Reference --
-!                 "Map Projections--A Working Manual", p61,
-!                  U.S. Geological Survey Professional Paper 1395,
-!                    Note: assumes the Clarke 1866 ellipsoid
-!               Adapted from --
-!                  EPS version 2.0; subr. MAPGTU
-!
-! --- INPUTS:
-!               RLAT - Real        - N Latitude in decimal degrees
-!                                    (use negative for southern hemisphere)
-!               RLON - Real        - E Longitude in decimal degrees
-!                                    (use negative for western hemisphere)
-!                IZ0 - Integer     - UTM zone override (used only if
-!                                    IZ0 .ne. zero).
-!
-! --- OUTPUT:
-!                  X - Real        - UTM easting in km
-!                  Y - Real        - UTM northing in km
-!                 IZ - Integer     - UTM zone
-!
-! --- LL2UTM called by:  READCF
-! --- LL2UTM calls:      none
-!----------------------------------------------------------------------
 
-      real k0
-      real N,M
 
-      parameter (k0=0.9996)
-      parameter (a=6378206.4)
-      parameter (e2=0.00676866)
-      parameter (ep2=0.0068148)
-      parameter (false_e=500000.0)
-      parameter (dtr=3.141592654/180.0)
-
-      if (iz0 .eq. 0) then
-! ---   Locate natural zone
-          iz = int((180.0+rlon)/6.0) + 1
-      else
-! ---   Zone override
-          iz = iz0
-      endif
-
-! --- Compute delta longitude in radians
-      dl = dtr*(rlon - (6.0*iz-183.0))
-
-! --- Convert phi (latitude) to radians
-      p = dtr*rlat
-
-      sinp = sin(p)
-      N = a/sqrt(1.0-e2*sinp*sinp)
-      tanp = tan(p)
-      T = tanp*tanp
-      cosp = cos(p)
-      C = ep2*cosp*cosp
-      A1 = dl*cosp
-      M = 111132.0894*rlat - 16216.94*sin(2.0*p) + 17.21*sin(4.0*p) &
-        - 0.02*sin(6.0*p)
-
-      A2 = A1**2
-      A3 = A2*A1
-      A4 = A2**2
-      A5 = A4*A1
-      A6 = A4*A2
-      T2 = T**2
-
-! --- Compute UTM x and y (km)
-      x = 0.001*(k0*N*(A1+(1.0-T+C)*A3/6.0          &     
-        + (5.0-18.0*T+T2+72.0*C-58.0*ep2)*A5/120.0) &
-        + false_e)
-      y = (M+N*tanp * (A2/2.0 + (5.0-T+9.0*C+4.0*C*C)*A4/24.0 &
-        + (61.0-58.0*T+T2+600.0*C-330.0*ep2)*A6/720.0))
-      false_n = 0.
-      if (rlat .lt. 0.) then
-! --- in km, unlike false_e
-        false_n = 10000.
-      endif
-      y = 0.001*k0*y + false_n
-
-      return
-      end subroutine ll2utm
-
-!=========================================================================
-
-SUBROUTINE get_eof_eor(eof, eor)
 !-------------------------------------------------------------------------
-! Ritorna i codici di errore macchina-dipendenti corrispondenti alle 
-! condizioni di EOF e EOR nella lettura di un file sequenziale formattato
-!
-! Secondo manuale, questi sono gli unici due casi in cui IOSTAT ritorna
-! con un valore negativo. 
-! Si noti che EOR riguarda solo non-advancinag READ
+      SUBROUTINE RTLL(TLMD,TPHD,TLM0D,TPH0D,ALMD,APHD)        
 !-------------------------------------------------------------------------
-IMPLICIT NONE
+! trasforma le coordinate ruotate (TLMD,TPHD) in coordinate geografiche
+! ordinarie (ALMD,APHD). I/O in gradi e decimi
+! TLM0D, TPH0D: lon e lat del centro di rotazione, in gradi e decimi.
+! 
+      PARAMETER (DTR=3.141592654/180.)
 
-INTEGER, INTENT(OUT) :: eof,eor
+      CTPH0=COS(TPH0D*DTR)
+      STPH0=SIN(TPH0D*DTR)
 
-INTEGER :: k, ios, idummy=0, iun=0
-LOGICAL :: l1 = .TRUE.
+      STPH=SIN(TPHD*DTR)
+      CTPH=COS(TPHD*DTR)
+      CTLM=COS(TLMD*DTR)
+      STLM=SIN(TLMD*DTR)
 
+      APH=ASIN(STPH0*CTPH*CTLM+CTPH0*STPH)                            
+      CPH=COS(APH)                                                    
 
-! Cerco un'unita' libera per aprire il file di prova
-DO k = 10,99
-  INQUIRE (UNIT=k, OPENED=l1, IOSTAT=ios)
-  IF (.NOT. l1 .AND. ios==0) THEN
-    iun = k
-    EXIT
-  ENDIF
-ENDDO
-IF (iun == 0) GOTO 9999   ! non ho torvato nessuna unita' libera
-!WRITE (*,*) "uso unita ",iun
+      ALMD=TLM0D+ASIN(STLM*CTPH/CPH)/DTR                               
+      APHD=APH/DTR                                                    
 
-! Cerco codice di errore per EOF
-OPEN (unit=k, STATUS="SCRATCH", FORM="FORMATTED", ACCESS="SEQUENTIAL", &
-  PAD="NO", ERR=9999)
-ENDFILE (k)
-REWIND (k)
-READ (k,*,IOSTAT=eof)
-CLOSE(k)
+      RETURN                                                          
+      END   
 
-! Cerco codice di errore per EOR
-OPEN (unit=k, STATUS="SCRATCH", FORM="FORMATTED", ACCESS="SEQUENTIAL", &
-  PAD="NO", ERR=9999)
-WRITE (k,'(a1)') "1" 
-WRITE (k,'(a1)') "2"
-REWIND (k)
-READ (k,'(i1)',ADVANCE="NO",ERR=9999) idummy
-READ (k,'(i1)',ADVANCE="NO",IOSTAT=eor) idummy
-CLOSE(k)
+!-------------------------------------------------------------------------
+      SUBROUTINE TLL(ALMD,APHD,TLM0D,TPH0D,TLMD,TPHD)        
+!-------------------------------------------------------------------------
+! trasforma le coordinate geografiche ordinarie (ALMD,APHD) in
+! coordinte ruotate (TLMD,TPHD). I/O in gradi e decimi.
+! TLM0D, TPH0D: lon e lat del centro di rotazione, in gradi e decimi.
+! 
+      PARAMETER (DTR=3.141592654/180.)
 
-!write (*,*) "eof,eor ",eof,eor
-RETURN
+      CTPH0=COS(TPH0D*DTR)
+      STPH0=SIN(TPH0D*DTR)
 
-! Gestione errori
-9999 CONTINUE
-WRITE (*,*) "Errore in subroutine get_eof_eor, usero' valori di default"
-eof = -1
-eor = -2
-RETURN
+      RELM=(ALMD-TLM0D)*DTR                                             
+      SRLM=SIN(RELM)                                                    
+      CRLM=COS(RELM)                                                    
 
-END SUBROUTINE get_eof_eor
+      APH=APHD*DTR                                                      
+      SPH=SIN(APH)                                                      
+      CPH=COS(APH)                                                      
 
-!--------------------------------------------------------------------------
+      CC=CPH*CRLM                                                       
+      ANUM=CPH*SRLM                                                     
+      DENOM=CTPH0*CC+STPH0*SPH                                          
 
-SUBROUTINE write_help
-!
-WRITE (*,*) "Uso: convert_shape.exe filein fileout conv [-rev]"
-WRITE (*,*) "  conv: tipo di conversione richiesta (geo2rot,rot2geo,geo2utm,utm2geo)"
-WRITE (*,*) "  -rev: legge un file con tracciato XX,YY"
-WRITE (*,*) "        (default: YY,XX; output sempre YY,XX)"
-RETURN
-!
-END SUBROUTINE write_help
+      TLMD=ATAN2(ANUM,DENOM)/DTR
+      TPHD=ASIN(CTPH0*SPH-STPH0*CC)/DTR
+
+      RETURN                                                          
+      END   
+

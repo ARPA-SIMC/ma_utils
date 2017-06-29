@@ -13,7 +13,7 @@ function write_help
  echo " uso: windrose.ksh [-s] [-less] [-t title] [-l lim]   "
  echo "                   [-c col] [-L layout] [-T type]     "
  echo "                   [-p palette] [-M months] [-H hours]"
- echo "                   [-lev level] filein                "
+ echo "                   [-lev level] [-f fileout] filein   "
  echo ""
  echo "      filein = file ASCII nel formato estra_orari"
  echo "      -s       per usare i dati in formato seriet"
@@ -33,10 +33,20 @@ function write_help
  echo "      hours  = ore da considerare, separate da virgole,"
  echo "               senza spazi (p.es. 0,1,2,3,4,5,22,23)"
  echo "      level  = livello del modello (default 10)"
+ echo "      fileout= nome del fine di output"
  echo ""
  return 
 }
 #-------------------------------------------------------------------------
+
+# 1.1.1 Assegno l'ambiente ma_utils
+if [ -z $MA_UTILS_SVN ] ; then
+  wroseR=/usr/libexec/ma_utils/windrose.r
+  polplotR=/usr/libexec/ma_utils/polarplot.r
+else
+  wroseR=${MA_UTILS_SVN}/osservazioni/sh/windrose.r
+  polplotR=${MA_UTILS_SVN}/osservazioni/sh/polplot.r
+fi
 
 # gestisce l'help
 if [ $# -eq 0 ] ; then
@@ -56,6 +66,7 @@ months="1,2,3,4,5,6,7,8,9,10,11,12"
 hours="0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"
 level="10"
 limit=-9999
+fileout="nil"
 while [ $# -ge 1 ] ; do
     if [ $1 = '-h' ] ; then
 	write_help
@@ -93,6 +104,9 @@ while [ $# -ge 1 ] ; do
     elif [ $1 = '-lev' ] ; then
         shift
         level=$1
+    elif [ $1 = '-f' ] ; then
+        shift
+        fileout=$1
     else
 	filein=$1
     fi
@@ -233,8 +247,9 @@ if [ $check = "ok" ] ; then
  echo $months >> windrose.inp
  echo $hours >> windrose.inp
  echo $level >> windrose.inp
+ echo $fileout >> windrose.inp
 
- R --vanilla --slave < $HOME_BONAFE/util/R/scripts/windrose.r
+ R --vanilla --slave < /home/eminguzzi/svn/ma_utils/osservazioni/sh/windrose.r
 
 else
  echo "ATTENZIONE!"

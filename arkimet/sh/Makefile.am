@@ -1,1 +1,1 @@
-dist_pkglibexec_SCRIPTS = ak_getgrib.ksh ak_seriet.ksh crea_progetto_grid.ksh crea_progetto_point.ksh split_progetto_point.sh
+dist_pkglibexec_SCRIPTS = ak_getgrib.ksh ak_seriet.ksh crea_progetto_grid.ksh crea_progetto_point.ksh seriet2adms.sh seriet2calmet_inp.sh split_progetto_point.sh
