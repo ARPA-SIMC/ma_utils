@@ -147,6 +147,8 @@
  213  voc       VOC totali (Chimere, 31 specie, ppb)
  214  hcnm      HCNM (ppb)                                15200
  215  alde      Aldeidi totali (ppb)                      15201
+ 216  isopa1    ISOPA1 (Chimere 2016)
+ 217  oh        OH (Chimere 2016)
 
 !Chimere Aerosol Families and emissions (V2005)
  220  pm10      Total aerosol < 10 um (ug/m3)             15195

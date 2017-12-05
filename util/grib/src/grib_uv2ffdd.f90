@@ -9,7 +9,7 @@ PROGRAM grib_uv2ffdd
 !   (sez 1)
 ! - Le altre sezioni sono prese dall'utlimo grib del file
 !
-!                                         Versione 1.3.3, Enrico 27/11/2014
+!                                         Versione 1.3.4, Enrico 27/11/2017
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -17,7 +17,7 @@ IMPLICIT NONE
 ! Parametri costanti
 REAL, PARAMETER :: rmis = -9999.           ! valore per dati mancanti
 !REAL, PARAMETER :: rmis = -HUGE(0.)       ! valore per dati mancanti
-INTEGER, PARAMETER :: maxdim = 100000      ! dimensione massima dei GRIB
+INTEGER, PARAMETER :: maxdim = 500000      ! dimensione massima dei GRIB
 
 ! Dichiarazioni per GRIBEX.
 INTEGER :: ksec0u(2),ksec1u(1024),ksec2u(1024),ksec3u(2),ksec4u(512)
@@ -33,7 +33,7 @@ REAL :: field_ff(maxdim),field_dd(maxdim)
 
 ! Altre variabili del programma
 REAL :: fave
-INTEGER :: ngrib,iuin1,iuin2,iuout1,iuout2,nok,np_sav,np
+INTEGER :: ngrib,iuin1,iuin2,iuout1,iuout2,nok,np_sav,np,kk
 CHARACTER (LEN=200) :: filein1,filein2,fileout1,fileout2
 
 !--------------------------------------------------------------------------
@@ -111,17 +111,28 @@ grib: DO
 
 ! 2.3) Controllo che uu e vv siano compatibili: deve essere diverso solo il
 !      codice parametro ksec1(6)
+
   IF (ANY(ksec1v(:5) /= ksec1u(:5)) .OR. (ksec1v(6) == ksec1u(6)) .OR. &
       ANY(ksec1v(7:24) /= ksec1u(7:24))) THEN
     WRITE (*,*) "Dati incompatibili nella sez. 1, grib ",ngrib + 1
-    WRITE (*,'(a,24(1x,i3))') "file U, ksec1(1:24) " ,ksec1u(1:24)
-    WRITE (*,'(a,24(1x,i3))') "file V, ksec1(1:24) " ,ksec1v(1:24)
+    DO kk = 1,24
+      IF (ksec1v(kk) /= ksec1u(kk) .OR. kk == 6) THEN
+        WRITE (*,*) "file U, ksec1(",kk,") " ,ksec1u(kk)
+        WRITE (*,*) "file V, ksec1(",kk,") " ,ksec1v(kk)
+      ENDIF
+    ENDDO
     STOP
-  ELSE IF (ANY(ksec2v(:) /= ksec2u(:))) THEN
+
+  ELSE IF (ANY(ksec2v(1:19) /= ksec2u(1:19))) THEN
     WRITE (*,*) "Dati incompatibili nella sez. 2, grib ",ngrib + 1
-    WRITE (*,'(a,20i3)') "file U, ksec2(1:20) " ,ksec2u(1:20)
-    WRITE (*,'(a,20i3)') "file V, ksec2(1:20) " ,ksec2v(1:20)
+    DO kk = 1,19
+      IF (ksec2v(kk) /= ksec2u(kk)) THEN
+        WRITE (*,*) "file U, ksec2(",kk,") " ,ksec2u(kk)
+        WRITE (*,*) "file V, ksec2(",kk,") " ,ksec2v(kk)
+      ENDIF
+    ENDDO
     STOP
+
   ENDIF
 
   ngrib = ngrib +1

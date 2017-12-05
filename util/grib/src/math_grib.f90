@@ -5,7 +5,7 @@ PROGRAM math_grib
 ! Gestisce GRIB1 e GRIB"
 ! Sostituisce ed integra somma_grib.f90 e moltiplica_grib.f90
 !
-!                                         Versione 1.3.1, Enrico 22/03/2016
+!                                         Versione 1.4.0, Enrico 27/11/2017
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -100,14 +100,15 @@ IF (check_list /= "") CALL parse_check_list(check_list,cl_grid,cl_time, &
 
 IF (ANY(ios(:) /= 0) .OR. ier /= 0 .OR. idp /= 6 .OR. &
     (oper/="sum" .AND. oper/="mul" .AND. oper/="div" .AND. &
-     oper/="div2" .AND. oper/="lin") .OR. &
+     oper/="div2" .AND. oper/="lin" .AND. oper/="mskg" &
+     .AND. oper/="mskl") .OR. &
     (lsgn/="nil" .AND. lsgn/="c" .AND. lsgn/="p" .AND. &
      lsgn/="m" .AND. lsgn/="zp" .AND. lsgn/="zm") ) &
     THEN
   CALL write_help
   STOP 1
 
-ELSE IF (oper == "lin") THEN
+ELSE IF (oper == "lin" .OR. oper == "mskg" .OR. oper == "mskl") THEN
   luseb = .FALSE.
 
 ENDIF
@@ -207,28 +208,50 @@ DO kga = 1,HUGE(0)
   ELSE 
     valuesout(:) = rmiss
     SELECT CASE (oper)
+
     CASE("sum")  
       WHERE (valuesa(:) /= rmiss .AND. valuesb(:) /= rmiss)
         valuesout(:) = (coeffa * valuesa(:)) + (coeffb * valuesb(:))
       ENDWHERE
+
     CASE("lin")  
       WHERE (valuesa(:) /= rmiss)
         valuesout(:) = (coeffa * valuesa(:)) + coeffb
       ENDWHERE
+
+    CASE("mskg")  
+      WHERE (valuesa(:) /= rmiss .AND. valuesa(:) > coeffa)
+        valuesout(:) = 1.
+      ENDWHERE
+      WHERE (valuesa(:) /= rmiss .AND. valuesa(:) <= coeffa)
+        valuesout(:) = 0.
+      ENDWHERE
+
+    CASE("mskl")  
+      WHERE (valuesa(:) /= rmiss .AND. valuesa(:) < coeffa)
+        valuesout(:) = 1.
+      ENDWHERE
+      WHERE (valuesa(:) /= rmiss .AND. valuesa(:) >= coeffa)
+        valuesout(:) = 0.
+      ENDWHERE
+
     CASE("mul")  
       WHERE (valuesa(:) /= rmiss .AND. valuesb(:) /= rmiss)
         valuesout(:) = (coeffa + valuesa(:)) * (coeffb + valuesb(:))
       ENDWHERE
+      
     CASE("div")  
       WHERE (valuesa(:) /= rmiss .AND. valuesb(:) /= rmiss .AND. &
              coeffb + valuesb(:) /= 0)
         valuesout(:) = (coeffa + valuesa(:)) / (coeffb + valuesb(:))
       ENDWHERE
+
     CASE("div2")  
       WHERE (valuesa(:) /= rmiss .AND. valuesb(:) /= rmiss .AND. &
              coeffa + valuesa(:) /= 0)
         valuesout(:) = (coeffb + valuesb(:)) / (coeffa + valuesa(:))
       ENDWHERE
+
     END SELECT
 
 !   Se richiesto, cambio il segno
@@ -434,7 +457,9 @@ WRITE (*,*) "    mul       : fileout = (a + fileA) * (b + fileB)"
 WRITE (*,*) "    div       : fileout = (a + fileA) / (b + fileB)"
 WRITE (*,*) "    div2      : fileout = (b + fileB) / (a + fileA)"
 WRITE (*,*) "    lin       : fileout = (a * fileA) + b "
-WRITE (*,*) "  Con l'operazione ""lin"" fileB non viene usato (mettere una stringa qualsiasi)"
+WRITE (*,*) "    mskg      : fileout = 1 se (fileA > a), 0 altrimenti"
+WRITE (*,*) "    mskl      : fileout = 1 se (fileA < a), 0 altrimenti"
+WRITE (*,*) "  Con le operazioni lin, mskg e mskl, fileB non viene usato (mettere una stringa qualsiasi)"
 WRITE (*,*) ""
 WRITE (*,*) "check_list  : definisce gli elementi che devono essere uguali in due grib"
 WRITE (*,*) "              corrispondenti di fileA e fileB. Possono essere specificate"

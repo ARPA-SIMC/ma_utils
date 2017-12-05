@@ -42,6 +42,7 @@ END INTERFACE
 INTEGER, PARAMETER :: maxdim = 1000000 ! dimensione massima dei GRIB
 INTEGER, PARAMETER :: maxvar = 200     ! n.ro max var. in output Chimere
 INTEGER, PARAMETER :: maxlev = 100     ! n.ro max livelli nel file di input .nc
+INTEGER, PARAMETER :: maxbin = 12      ! n.ro max bin aerosol nel file di input .nc
 REAL, PARAMETER :: eps = 0.0001        ! tolleranza per uguaglianza estemi griglia
 
 CHARACTER (LEN=120) :: tab_path_def = PKGDATAROOTDIR
@@ -57,14 +58,15 @@ REAL, ALLOCATABLE :: conc_out(:,:,:),tot(:),conc_miss(:,:,:)
 REAL :: x1,y1,x2,y2,dx,dy,xrot,yrot,x2r,y2r,rmis
 INTEGER :: version
 INTEGER :: nvarout,nx,ny,np,smf,nl,slen,mm,nxi,nyi,ntrov,ntrovs,nscri,nscris
-INTEGER :: code_var(maxvar),tab_var(maxvar),lev_out(maxlev)
+INTEGER :: code_var(maxvar),tab_var(maxvar),aero_var(maxvar)
+INTEGER :: lev_out(maxlev),bin_out(maxbin)
 INTEGER :: cem,igen,idata,idata_ini,scad_ini
-INTEGER :: iu,k,kp,kvar,kscad,klev,kday,kh,ios,eof,eor,cnt_grb,idp
+INTEGER :: iu,k,kp,kvar,kscad,klev,kbin,kday,kh,ios,eof,eor,cnt_grb,idp
 INTEGER :: inp_fmt,info_fmt,p1,p2,nhead,iproj
 CHARACTER (LEN=120) :: filein,fileout,fileinfo,chrec,chdum,arg(4),tab_file,tab_path
 CHARACTER (LEN=3) :: proj
 CHARACTER (LEN=1) :: next_arg
-LOGICAL :: verbose,dok
+LOGICAL :: verbose,dok,lnbin
 
 CHARACTER(LEN=20):: namevar(maxvar)
 !
@@ -89,7 +91,7 @@ real,allocatable::buf2d1(:,:)
 real,allocatable::emisb(:,:,:),emisb1(:,:)
 real,allocatable::buf3d1(:,:,:)
 real,allocatable::buf4d1(:,:,:,:)
-real,allocatable::conc1(:),conc2(:,:),conc3(:,:,:),conc4(:,:,:,:)
+real,allocatable::conc1(:),conc2(:,:),conc3(:,:,:),,conc3b(:,:,:),conc4(:,:,:,:)
 real,allocatable::conc(:,:,:)
 
 ! return status of all netCDF functions calls
@@ -108,6 +110,7 @@ integer :: dstrlen
 integer :: nzonal
 integer :: nmerid
 integer :: nlev
+integer :: nbin
 integer :: nhori
 ! variable identifiers
 integer :: nvarin
@@ -275,6 +278,16 @@ ELSE
 
 ENDIF
 
+! Nbin
+ncstat1 = nf90_inq_dimid(ncid,'nbins',dimid1)
+IF (ncstat1 == NF90_NOERR) THEN
+  ncstat=nf90_inquire_dimension(ncid,dimid1,len=nbin)
+  lnbin = .TRUE.
+ELSE
+  nbin = 1
+  lnbin = .FALSE.
+ENDIF
+
 ! Nhori (Solo per BC; numero celle di bordo? crev)
 IF (inp_fmt == 5) THEN
   ncstat=nf90_inq_dimid(ncid,'h_boundary',h_dimid) 
@@ -381,6 +394,7 @@ ENDIF
 
 OPEN (UNIT=30, FILE=fileinfo, STATUS="OLD", ERR=9999)
 
+aero_var(:) = 0
 k=0
 DO
   READ (30,'(a)',IOSTAT=ios) chrec
@@ -393,13 +407,17 @@ DO
 
 ! Distinguo tra vecchio e nuovo formato di fileinfo
   IF (k ==1) THEN
+    IF (TRIM(chrec) == "V2016") THEN
+      info_fmt = 3
+      nhead = 5
+      if (.NOT. lnbin) GOTO 9986 
     IF (TRIM(chrec) == "V2013") THEN
       info_fmt = 2
       nhead = 5
     ELSE
       info_fmt = 1
       nbit = 24
-      nhead = 5
+      nhead = 6
     ENDIF
   ENDIF
 
@@ -433,7 +451,7 @@ DO
     ENDIF
     IF (ios /= 0) GOTO 9998
 
-! Interpreto la riga letta: nuovo formato (CHIMERE_NCINFO.DAT)
+! Interpreto la riga letta: formato V2013 (CHIMERE_NCINFO.DAT)
   ELSE IF (info_fmt == 2) THEN
 
     IF (k==1) THEN
@@ -449,6 +467,33 @@ DO
     ELSE IF (k>=nhead+1 .AND. k<=maxvar+nhead) THEN
        READ (chrec,'(i3,1x,i3,1x,a)',IOSTAT=ios) &
          tab_var(k-nhead),code_var(k-nhead),namevar(k-nhead)
+       namevar(k-nhead) = ADJUSTL(TRIM(namevar(k-nhead)))
+    ELSE
+       WRITE (*,*) "Troppe specie, elaboro le prime ",maxvar,&
+            " (aumentare param. maxvar)"
+       k = k-1
+       EXIT
+    ENDIF
+    IF (ios /= 0) GOTO 9998
+
+! Interpreto la riga letta: formato V2016 (CHIMERE_NCINFO.DAT)
+  ELSE IF (info_fmt == 3) THEN
+
+    IF (k==1) THEN
+       CONTINUE
+    ELSE IF (k==2) THEN
+       READ (chrec,*,IOSTAT=ios) cem
+    ELSE IF (k==3) THEN
+       READ (chrec,*,IOSTAT=ios) nbit
+    ELSE IF (k==4) THEN
+       READ (chrec,*,IOSTAT=ios) scad_ini
+    ELSE IF (k==5) THEN
+       READ (chrec,*,IOSTAT=ios) lev_out(1:nlev)
+    ELSE IF (k==6) THEN
+       READ (chrec,*,IOSTAT=ios) bin_out(1:nbin)
+    ELSE IF (k>=nhead+1 .AND. k<=maxvar+nhead) THEN
+       READ (chrec,'(i3,1x,i3,1x,i1,1x,a)',IOSTAT=ios) &
+         tab_var(k-nhead),code_var(k-nhead),aero_var(k-nhead),namevar(k-nhead)
        namevar(k-nhead) = ADJUSTL(TRIM(namevar(k-nhead)))
     ELSE
        WRITE (*,*) "Troppe specie, elaboro le prime ",maxvar,&
@@ -484,6 +529,8 @@ WRITE (*,*) "Numero di parametri:"
 WRITE (*,*) "variabili totali in input:  ",nvarin
 WRITE (*,*) "variabili richieste in out: ",nvarout
 WRITE (*,*) "livelli in outuput:         ",COUNT(lev_out(1:nlev) /= 0)
+IF (info_fmt == 3) &
+  WRITE (*,*) "bin aerosol in output:      ",COUNT(bin_out(1:nlev) /= 0)
 WRITE (*,*) ""
 WRITE (*,*) "Parametri scrittura grib:"
 WRITE (*,*) "scadenza iniziale: ",scad_ini
@@ -568,15 +615,22 @@ ENDDO
 ! Alloco le varaibili
 ALLOCATE (buf2d1(nzonal,nmerid))
 ALLOCATE (buf3d1(nzonal,nmerid,nlev))
-ALLOCATE (buf4d1(nzonal,nmerid,nlev,3))
 ALLOCATE (conc1(nzonal*nmerid))
 ALLOCATE (conc2(nzonal*nmerid,nlev))
 ALLOCATE (conc3(nzonal*nmerid,nlev,3))
+
+IF (inp_fmt == 1) THEN
+  ALLOCATE (buf4d1(nzonal,nmerid,nlev,nbin))
+ELSE IF (inp_fmt == 7) THEN
+  ALLOCATE (buf4d1(nzonal,nmerid,nlev,3))
+ENDIF
 
 SELECT CASE (inp_fmt)
 CASE (1,2)
   ALLOCATE(conc_out(nzonal*nmerid,nlev,nvarout))
   ALLOCATE(varids1(nvarin))
+  ALLOCATE (conc3b(nzonal*nmerid,nlev,nbin))
+  ALLOCATE (conc_outb(nzonal*nmerid,nlev,nbin,nvarout))
 CASE (3)
   ALLOCATE(varids1(nvarin))
   ALLOCATE (conc_out(nzonal*nmerid,nlev,nvarout))
@@ -640,12 +694,14 @@ IF (inp_fmt == 1) THEN
 
         ncstat=nf90_inquire_variable(ncid,ivarid,varids1(ivarid)%varname, &
           vartype1,varids1(ivarid)%ndims)
-        ncstat=nf90_get_var(ncid,ivarid,buf3d1,(/1,1,1,kscad/),  & ! start vector
-          (/nzonal,nmerid,nlev,1/))                                ! count vector
-
-        conc2 = RESHAPE(buf3d1,(/nzonal*nmerid,nlev/))
-        conc_out(:,:,ivar) = conc2(:,:)
-
+        IF (aero_var(ivar) == 1) THEN     ! multi-bin aerosol variable
+          ncstat=nf90_get_var(ncid,ivarid,buf4d1,(/1,1,1,1,kscad/),  & ! start vector
+            (/nbin,nzonal,nmerid,nlev,1/))                             ! count vector
+        ELSE                              ! standard variable
+          ncstat=nf90_get_var(ncid,ivarid,buf3d1,(/1,1,1,kscad/),  & ! start vector
+            (/nzonal,nmerid,nlev,1/))                                ! count vector
+        ENDIF
+          
         IF (code_var(ivar) <= 0) CYCLE
         IF (kscad ==1) THEN
           WRITE (*,'(2a,1x,4i6)') "Trovata la variabile ", &
@@ -653,24 +709,58 @@ IF (inp_fmt == 1) THEN
           nscri = nscri + 1
         ENDIF
 
-        ksec1(1) = tab_var(ivar)
-        ksec1(6) = code_var(ivar)
-        DO klev = 1,nlev
-          IF (lev_out(klev) == 0) CYCLE
-          ksec1(7) = 109
-          ksec1(8) = klev
-          ksec1(9) = 0
-          IF (ANY(conc_out(1:np,klev,ivar) == rmis)) THEN
-            ksec1(5) = 192
-          ELSE
-            ksec1(5) = 128
-          ENDIF
+! Elaboro variable aerosol multi-bin 
+        IF (aero_var(ivar) == 1) THEN     
+          conc3b = RESHAPE(buf3d1,(/nzonal*nmerid,nlev,nbin/))
+          conc_outb(:,:,:,ivar) = conc3b(:,:,:)
 
-          CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
-               conc_out(1:np,klev,ivar),np,kbuffer,maxdim,kword,'C',kret)
-          CALL PBWRITE(iu,kbuffer,ksec0(1),kret)
-          cnt_grb = cnt_grb + 1
-        ENDDO                 ! livelli
+          DO kbin = 1,nbin
+    
+              ksec1(1) = tab_var(ivar)
+            ksec1(6) = code_var(ivar)
+  
+            DO klev = 1,nlev
+              IF (lev_out(klev) == 0) CYCLE
+              ksec1(7) = 109
+              ksec1(8) = klev
+              ksec1(9) = 0
+              IF (ANY(conc_out(1:np,klev,ivar) == rmis)) THEN
+                ksec1(5) = 192
+              ELSE
+                ksec1(5) = 128
+              ENDIF
+    
+              CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
+                   conc_out(1:np,klev,ivar),np,kbuffer,maxdim,kword,'C',kret)
+              CALL PBWRITE(iu,kbuffer,ksec0(1),kret)
+              cnt_grb = cnt_grb + 1
+            ENDDO                 ! livelli
+          ENDDO                 ! bin aerosol
+
+! Elaboro variabilie standard
+        ELSE
+          conc2 = RESHAPE(buf3d1,(/nzonal*nmerid,nlev/))
+          conc_out(:,:,ivar) = conc2(:,:)
+  
+          ksec1(1) = tab_var(ivar)
+          ksec1(6) = code_var(ivar)
+          DO klev = 1,nlev
+            IF (lev_out(klev) == 0) CYCLE
+            ksec1(7) = 109
+            ksec1(8) = klev
+            ksec1(9) = 0
+            IF (ANY(conc_out(1:np,klev,ivar) == rmis)) THEN
+              ksec1(5) = 192
+            ELSE
+              ksec1(5) = 128
+            ENDIF
+  
+            CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
+                 conc_out(1:np,klev,ivar),np,kbuffer,maxdim,kword,'C',kret)
+            CALL PBWRITE(iu,kbuffer,ksec0(1),kret)
+            cnt_grb = cnt_grb + 1
+          ENDDO                 ! livelli
+        ENDIF
 
       ELSE
         IF (kscad ==1) WRITE(*,'(2a,1x,4i6)') "Variabile non trovata ", &
@@ -1223,6 +1313,10 @@ STOP 7
 9987 CONTINUE
 WRITE (*,*) "Errore, proiezione non gestita ",proj
 STOP 8
+
+9986 CONTINUE
+WRITE (*,*) "Numero bin aerosol non trovato nel file NetCDF"
+STOP 9
 
 END PROGRAM chimerencdf2grib
 

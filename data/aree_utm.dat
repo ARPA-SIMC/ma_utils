@@ -58,3 +58,4 @@ pesemr500   594  322  510.250 4843.250  806.750 5003.750   32 ! Area PESCO per a
 savena      100  100  673.100 4890.100  692.900 4909.900   32 ! Calmet per test eolico, Val Savena (0.2 x 0.2 km)
 umbria1     100   80  542.500 4547.500 1037.500 4942.500   32 ! Run diagmet per ARPA Umbria (5 x 5 km) [nel progetto: cita]
 appennino    64   36  500.000 4815.000  815.000 4990.000   32
+passante    120   92  671.325 4921.625  701.075 4944.375   32 ! Simulazioni SPRAY per VIA passante di mezzo (AriaNet)

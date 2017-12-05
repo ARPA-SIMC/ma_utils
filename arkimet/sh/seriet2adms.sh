@@ -2,7 +2,7 @@
 #----------------------------------------------------------------------------------
 # Legge un file seriet e lo riscrive nel formato per ADMS
 #
-#                                                 Versione 2.0.0, Enrico 29/06/2017
+#                                                 Versione 2.1.0, Enrico 21/08/2017
 #----------------------------------------------------------------------------------
 #set -x
 function write_help
@@ -110,6 +110,17 @@ paste -d : yy.txt mm.txt day.txt | sed 's/://g' > yyyymmdd.txt
 while read date ; do
   date -d $date +%j >> jul.txt
 done < yyyymmdd.txt
+
+# Converto la temperatura da K a C
+mv tt.txt tmpt.txt
+while read tk ; do
+  if [ $tk != -9999.0 ] ; then
+    tc=$(echo $tk'-273.1' | bc)
+  else
+    tc=-9999.
+  fi
+  echo $tc >> tt.txt
+done < tmpt.txt
 
 # Se richiesto, tolgo le intestazioni dal file della pioggia
 if [ $prc = "Y" ] ; then

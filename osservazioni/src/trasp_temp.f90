@@ -33,7 +33,7 @@ PROGRAM trasp_temp
 !   Se i dati in input usano l'altro riferimento, vengono convertiti al
 !   momento della lettura (tlev_in)
 !
-!                                                 V6.1.0, Enrico 11/11/2015
+!                                                 V6.2.0, Enrico 05/12/2017
 !--------------------------------------------------------------------------
 
 USE datetime_class
@@ -83,21 +83,21 @@ REAL :: teta_ref,tt_ref,p_ref,ro_ref,dlnp_ref,rhh
 REAL :: lonh,lath,lon,lat,f1(4),f2(4),z1,z2,sinalp,rad_sum
 REAL :: dz,dtdz,dtpdz,incr,hstaz,ff_sum,tmax,hsup
 INTEGER :: ntemp_in,ntemp_out,hstep,nvars,tlev_in
-INTEGER :: iret,ios,ios1,ios2,irec,kpar,klev,kskip
+INTEGER :: iret,ios,ios1,ios2,irec,kp,kpar,klev,kskip
 INTEGER :: lok,l1,l2,ll,idlev_sup,lmax
 INTEGER :: idstaz,yy,mm,dd,hh,nlev_in,ihstaz
 INTEGER :: idstazn,yyn,mmn,ddn,hhn
 INTEGER :: idstazh,yyh,mmh,ddh,hhh,ihstazh
 INTEGER :: kt_out,kt_in,cnt_temp_skip,cnt_temp_ok,cnt_int_fail
 INTEGER :: k,k2,p1,ks,nstep,njul
-CHARACTER(LEN=100) :: filein,fileasc,filesta,filectl,filedat
+CHARACTER(LEN=100) :: filein,fileasc,filesta,filectl,filedat,chdum
 CHARACTER(LEN=100) :: chfmt1,chfmt2,chfmt3,chfmt4,chfmt5,chfmtgr
 CHARACTER(LEN=24) :: nome_staz,nome_stazh
 CHARACTER(LEN=10) :: idpar(4),idparh(4),labz,labzh
 CHARACTER(LEN=10) :: chpar,ch10a,ch10b,ch10
 CHARACTER(LEN=5) :: id_tlev
-CHARACTER(LEN=3) :: grmm
-LOGICAL :: lskip_sup,lskip_ug,ok
+CHARACTER(LEN=3) :: grmm,next_arg
+LOGICAL :: lskip_sup,lskip_ug,ok,lhstaz,lanag,force_hstaz
 
 ! Interfaccia per la funzione str_fill (e' di tipo: CHARACTER(*) )
 INTERFACE
@@ -113,15 +113,26 @@ INTEGER :: jul
 !--------------------------------------------------------------------------
 ! 1: Preliminari
 
-! 1.1 Eventuale parametro da riga comando
-CALL getarg(1,chpar)
-IF (TRIM(chpar) == '-h') THEN
-  CALL scrive_help
-  STOP 1
-ELSE IF (TRIM(chpar) == '-c') THEN
-  CALL scrive_esempio
-  STOP
-ENDIF
+! 1.1 Prametri da riga comando
+force_hstaz = .FALSE.
+next_arg = ""
+DO kp = 1,HUGE(0)
+  CALL getarg(kp,chdum)
+  IF (TRIM(chdum) == "") THEN
+    EXIT
+  ELSE IF (TRIM(chdum) == "-h") THEN
+    CALL scrive_help
+    STOP
+  ELSE IF (TRIM(chdum) == "-c") THEN
+    CALL scrive_esempio
+    STOP
+  ELSE IF (TRIM(next_arg) == "fh") THEN
+    READ (chdum,*) hstaz
+  ELSE IF (TRIM(chdum) == "-fh") THEN
+    force_hstaz = .TRUE.
+    next_arg = "fh"
+  ENDIF
+ENDDO
 
 ! 1.2 Lettura opzioni
 OPEN (UNIT=21, FILE=filenml, STATUS="OLD", ACTION="READ", & 
@@ -160,6 +171,19 @@ ELSE IF (tlev_out == 2) THEN
 ELSE IF (tlev_out == 3) THEN
   id_tlev = "m-sup"
 ENDIF  
+
+IF (force_hstaz) THEN
+  lhstaz = .TRUE.
+  ihstaz = NINT(hstaz)
+  IF (tlev_out == 3) THEN
+    hsup = 0.
+  ELSE
+    hsup = hstaz
+  ENDIF
+ELSE
+  lhstaz = .FALSE.
+ENDIF
+lanag = .FALSE.
 
 ! 1.3 Elaborazioni e controlli sulla lista dei TEMP richiesti
 CALL proc_lst(filelst,data_ini,data_end,step,ntemp_in,ntemp_out,iret)
@@ -283,13 +307,34 @@ temp: DO kt_in = 1,ntemp_in
     CYCLE temp
   ELSE IF (nlev_in > mxlev_in) THEN
     GOTO 9995
+  ELSE IF (.NOT. force_hstaz .AND. ihstazh == -999.) THEN
+    WRITE (*,*) "* ",TRIM(filein)," quota stazione mancante, metto mancante"
+    CYCLE temp
   ENDIF
 
-  IF (kt_in == 1) THEN
-    idstaz = idstazh
-    nome_staz = nome_stazh
+! Quota stazione (cerco il pirmo rsd con quota stazione valida)
+! lhstaz: .T. se la quota stazione e' gia' nota (letta in precedenza o forzata)
+! force_hstaz: .T. se la quota stazione 'e forzata da riga comando
+  IF (.NOT. lhstaz) THEN
+    lhstaz = .TRUE.
     ihstaz = ihstazh
     hstaz = REAL(ihstaz)
+    IF (tlev_out == 3) THEN
+      hsup = 0.
+    ELSE
+      hsup = hstaz
+    ENDIF
+
+  ELSE IF (ihstazh /= ihstaz) THEN
+    WRITE (*,*) "* ",TRIM(filein)," WARNING: quota stazione diversa: ", &
+       "attesa ",ihstaz," trovata ",ihstazh
+  ENDIF
+
+! Altri parametri contenuti nell'header
+  IF (.NOT. lanag) THEN
+    lanag = .TRUE.
+    idstaz = idstazh
+    nome_staz = nome_stazh
     lat = lath
     lon = lonh
     idpar(1:4) = idparh(1:4)
@@ -302,17 +347,20 @@ temp: DO kt_in = 1,ntemp_in
     ELSE
       GOTO 9993
     ENDIF
-    IF (tlev_out == 3) THEN
-      hsup = 0.
-    ELSE
-      hsup = hstaz
-    ENDIF
 
-  ELSE IF (idstazh/=idstaz .OR. nome_stazh/=nome_staz .OR. ihstazh/=ihstaz .OR. &
+  ELSE IF (idstazh/=idstaz .OR. nome_stazh/=nome_staz .OR. &
            lonh/=lon .OR. lath/=lat .OR. ANY(idparh(1:4)/=idpar(1:4)) .OR. &
            labzh/=labz) THEN
     WRITE (*,*) "* ",TRIM(filein), &
       " WARNING: valori di anagrafica diversi rispetto al primo TEMP"
+    IF (idstazh/=idstaz) WRITE (*,*) "idstazh, idstaz",idstazh,idstaz
+    IF (nome_stazh/=nome_staz) WRITE (*,*) "nome_stazh, nome_staz", &
+      TRIM(nome_stazh),TRIM(nome_staz)
+    IF (lonh/=lon) WRITE (*,* )"lonh,lon ",lonh,lon
+    IF (lath/=lat) WRITE (*,*) "lath,lat ",lath,lat
+    IF (ANY(idparh(1:4)/=idpar(1:4))) WRITE (*,*) &
+      "idparh, idpar ",idparh(1:4)," - ",idpar(1:4)
+    IF (labzh/=labz) WRITE (*,*) "labzh,labz",TRIM(labzh),TRIM(labz)
   ENDIF
   
 ! 2.2.3 Leggo i dati e salvo i valori nei rispettivi array:
@@ -457,7 +505,7 @@ temp: DO kt_in = 1,ntemp_in
 
 !--------------------------------------------------------------------------
 ! 2.4 Calcolo l'inversione al suolo
-
+print *,"hsup ",hsup
 ! Salto eventuali livelli sottoterra
   idlev_sup = nlev_in
   DO k2 = 1,nlev_in
@@ -1226,10 +1274,11 @@ SUBROUTINE scrive_help
 IMPLICIT NONE
 
 WRITE (*,*) 
-WRITE (*,*) "trasp_temp.exe [-h] [-c]"
+WRITE (*,*) "trasp_temp.exe [-h] [-c] [-fh QUOTA]"
 WRITE (*,*) "parametri:"
 WRITE (*,*) " -c      : crea un file trasp_temp.inp di esempio"
 WRITE (*,*) " -h      : visualizza questo help"
+WRITE (*,*) " -fh QUOTA: forza la quota stazione (m SLM)"
 WRITE (*,*) 
 WRITE (*,*) "richiede in input:"
 WRITE (*,*) "  - trasp_temp.inp: namelist opzioni"
