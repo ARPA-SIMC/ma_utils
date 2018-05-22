@@ -945,7 +945,7 @@ WRITE (*,*)  "Header inatteso in ",TRIM(filepts)
 STOP 3
 9996 CONTINUE
 WRITE (*,'(3a,i3)')  "Errore leggendo ",TRIM(filepts)," Record ",npt+1
-WRITE (*,'(a)') ,TRIM(chrec)
+WRITE (*,'(a)') TRIM(chrec)
 STOP 4
 
 9995 CONTINUE
@@ -956,7 +956,7 @@ WRITE (*,*)  "Header inatteso in ",TRIM(filecol)
 STOP 6
 9993 CONTINUE
 WRITE (*,'(3a,i3)')  "Errore leggendo ",TRIM(filecol)," Record ",nvl+1
-WRITE (*,'(a)') ,TRIM(chrec)
+WRITE (*,'(a)') TRIM(chrec)
 STOP 7
 
 9992 CONTINUE
@@ -967,7 +967,7 @@ WRITE (*,*)  "Header inatteso in ",TRIM(filerow)
 STOP 9
 9990 CONTINUE
 WRITE (*,'(3a,i3)')  "Errore leggendo ",TRIM(filerow)," Record ",nrrow+1
-WRITE (*,'(a)') ,TRIM(chrec)
+WRITE (*,'(a)') TRIM(chrec)
 STOP 10
 
 9989 CONTINUE

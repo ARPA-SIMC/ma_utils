@@ -257,6 +257,12 @@ IF (PRESENT(scad)) THEN
       scad(3) = 0
       scad(4) = 0
     ELSE IF (sortt==1 .AND. topd==1 .AND. (pdtn==0 .OR. pdtn==40) .AND. &
+        togp==2 .AND. ft==0) THEN                  ! Previsione +0 (CMAS95)
+      scad(1) = iouotr
+      scad(2) = 0
+      scad(3) = 0
+      scad(4) = 0
+    ELSE IF (sortt==1 .AND. topd==1 .AND. (pdtn==0 .OR. pdtn==40) .AND. &
         togp==2 .AND. ft/=0) THEN                  ! Previsione
       scad(1) = iouotr
       scad(2) = ft  

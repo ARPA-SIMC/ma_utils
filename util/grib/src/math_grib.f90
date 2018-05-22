@@ -348,7 +348,7 @@ ENDDO
 STOP 3
 
 9994 CONTINUE
-WRITE (*,*) "Errore nelle chiavi realtive ai dati mancanti, file ",TRIM(filea)
+WRITE (*,*) "Errore nelle chiavi relative ai dati mancanti, file ",TRIM(filea)
 WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov
 WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
 WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom
@@ -356,7 +356,7 @@ WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(valuesa(:) /= rmiss)
 STOP 4
 
 9993 CONTINUE
-WRITE (*,*) "Errore nelle chiavi realtive ai dati mancanti, file ",TRIM(fileb)
+WRITE (*,*) "Errore nelle chiavi relative ai dati mancanti, file ",TRIM(fileb)
 WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov
 WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
 WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom

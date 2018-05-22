@@ -25,7 +25,7 @@
 # - miglioare gestione errori quando non trova nessun dato
 # - gestire dataset lmruc_* (per dati in tempo reale)
 #
-#                                              Versione 2.4.2, Enrico 31/01/2017
+#                                              Versione 2.4.3, Enrico 18/05/2018
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -73,7 +73,7 @@ function write_help
 # echo "-uv       scrive le componenti del vento (invece di dierzione e modulo)"
   echo ""
   echo "-url URL  indirizzo del server arkimet/arkioss da cui estrarre. Default: "
-  echo "          http://arkimet.metarpa:8090 (GTS), http://arkioss4.metarpa:8090 (non GTS)"
+  echo "          http://arkimet.metarpa:8090 (GTS), http://arkioss.metarpa:8090 (non GTS)"
   echo "-deb      salva i file intermedi, costruisce files di log"
   echo "-h        visualizza questo help"
 #       12345678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -144,7 +144,7 @@ fi
 # Siccome i parametri sta_list e par_list possono essere formati da piu' 
 # parole, tutti i test devono essere compiuti sulla prima parola del parametro
 
-akourl="http://arkioss4.metarpa:8090"
+akourl="http://arkioss.metarpa:8090"
 akmurl="http://arkimet.metarpa:8090"
 def_url=$akourl
 force_url="N"

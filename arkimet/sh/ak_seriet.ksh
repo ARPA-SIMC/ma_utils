@@ -55,7 +55,7 @@
 #   l'append di quelli dei vari segmenti, quindi o non c'e' header, oppure c'e'
 #   un header per ciascun segmento.
 #
-#                                             Versione 1.11.2, Enrico 11/06/2015
+#                                             Versione 1.11.3, Enrico 16/02/2018
 #-------------------------------------------------------------------------------
 #set -x
 #set -e
@@ -773,7 +773,7 @@ elif [ $inpdata = "file" -o $inpdata = "filelst" ] ; then
 #     Estraggo i valori sui punti richiesti
       cnt=`expr $cnt + 1`
       echo "ak_seriet: inizio elaborazione file "$cnt"   "`date "+%Y%m%d %H:%M:%S"`
-      arki-scan --inline ${file}.grib | \
+      arki-query --inline "" ${file}.grib | \
         arki-xargs ${split_opt} ./xargs.ksh ${prog}.gacsv.${cnt} > \
         arki.log.${cnt} 2>&1
         sort --temporary-directory=$AK_TEMP ${prog}.gacsv.${cnt} > tmp.gacsv

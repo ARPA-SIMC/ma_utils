@@ -111,16 +111,16 @@ while read date ; do
   date -d $date +%j >> jul.txt
 done < yyyymmdd.txt
 
-# Converto la temperatura da K a C
-mv tt.txt tmpt.txt
-while read tk ; do
-  if [ $tk != -9999.0 ] ; then
-    tc=$(echo $tk'-273.1' | bc)
-  else
-    tc=-9999.
-  fi
-  echo $tc >> tt.txt
-done < tmpt.txt
+# # Converto la temperatura da K a C (non necessario usando gacsv.nml!)
+# mv tt.txt tmpt.txt
+# while read tk ; do
+#   if [ $tk != -9999.0 ] ; then
+#     tc=$(echo $tk'-273.1' | bc)
+#   else
+#     tc=-9999.
+#   fi
+#   echo $tc >> tt.txt
+# done < tmpt.txt
 
 # Se richiesto, tolgo le intestazioni dal file della pioggia
 if [ $prc = "Y" ] ; then

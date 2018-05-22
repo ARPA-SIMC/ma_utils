@@ -46,7 +46,8 @@ PROGRAM ordina
        nskip, &
        ndays,hour_db1,hour_db2,  &
        nstep, &
-       hstart
+       hstart, &
+       ios
   REAL :: opt_percval,buono
   LOGICAL :: new, unknown, lgrads
   CHARACTER (LEN=4) :: ch4,codparam_gds(nparam_lst),codstat(nstats),intv_gds(nstats)
@@ -156,10 +157,13 @@ PROGRAM ordina
      READ(12,*)
   END DO
   DO k=1,nsens
-     READ(12,'(2(i9,1x),i4,1x,a50,1x,a10,1x,i5,x,a2,1x,2(a50,1x),2(f9.5,1x),i5)') &
+    READ(12,'(2(i9,1x),i4,1x,a50,1x,a10,1x,i5,x,a2,1x,2(a50,1x),2(f9.5,1x),i5)',IOSTAT=ios) &
           idconfsens(k),staz(k),param(k),nomeparam(k), &
           unmis(k),intv_db(k),prov(k),comune(k),nomestaz(k),&
           lon(k),lat(k),alt(k)
+    IF (ios /= 0) THEN
+      WRITE (*,*) "Warning: ordina_dati_tmp, errore leggendo stzqa.tmp, record ",k
+    ENDIF
   END DO
 
   ! 1.3) Controllo della query dati.sql
@@ -167,7 +171,7 @@ PROGRAM ordina
   OPEN(16,file="dati.sql",err=907)
   tab=""
   DO i=1,HUGE(i)
-     READ(16,'(a)'),line
+     READ(16,'(a)') line
      IF(line(1:4)=="from")THEN
         tab=line(6:)
         EXIT

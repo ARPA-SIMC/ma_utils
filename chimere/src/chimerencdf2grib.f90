@@ -5,6 +5,9 @@ PROGRAM chimerencdf2grib
 !                      [-out/-met/-bio/-ini/-bc/-emibio/-eminv/-aodem]
 !
 ! NOTE:
+! La gestione dei files NetCDF con aerosol in formato multi-bin
+! NON E'TESTATA!!
+!
 ! Stato delle opzioni: (label crev)
 ! - funzionanti: out
 ! - da verificare: met, bio, emibio, ini, eminv
@@ -54,7 +57,7 @@ INTEGER :: kbuffer(maxdim),kword,kret,nbit
 REAL    :: psec2(512),psec3(2)
 
 ! Altre variabili del programma
-REAL, ALLOCATABLE :: conc_out(:,:,:),tot(:),conc_miss(:,:,:)
+REAL, ALLOCATABLE :: conc_out(:,:,:),conc_outb(:,:,:,:),tot(:),conc_miss(:,:,:)
 REAL :: x1,y1,x2,y2,dx,dy,xrot,yrot,x2r,y2r,rmis
 INTEGER :: version
 INTEGER :: nvarout,nx,ny,np,smf,nl,slen,mm,nxi,nyi,ntrov,ntrovs,nscri,nscris
@@ -91,7 +94,7 @@ real,allocatable::buf2d1(:,:)
 real,allocatable::emisb(:,:,:),emisb1(:,:)
 real,allocatable::buf3d1(:,:,:)
 real,allocatable::buf4d1(:,:,:,:)
-real,allocatable::conc1(:),conc2(:,:),conc3(:,:,:),,conc3b(:,:,:),conc4(:,:,:,:)
+real,allocatable::conc1(:),conc2(:,:),conc3(:,:,:),conc3b(:,:,:),conc4(:,:,:,:)
 real,allocatable::conc(:,:,:)
 
 ! return status of all netCDF functions calls
@@ -411,7 +414,7 @@ DO
       info_fmt = 3
       nhead = 5
       if (.NOT. lnbin) GOTO 9986 
-    IF (TRIM(chrec) == "V2013") THEN
+    ELSE IF (TRIM(chrec) == "V2013") THEN
       info_fmt = 2
       nhead = 5
     ELSE
@@ -627,32 +630,32 @@ ENDIF
 
 SELECT CASE (inp_fmt)
 CASE (1,2)
-  ALLOCATE(conc_out(nzonal*nmerid,nlev,nvarout))
-  ALLOCATE(varids1(nvarin))
+  ALLOCATE (conc_out(nzonal*nmerid,nlev,nvarout))
+  ALLOCATE (varids1(nvarin))
   ALLOCATE (conc3b(nzonal*nmerid,nlev,nbin))
   ALLOCATE (conc_outb(nzonal*nmerid,nlev,nbin,nvarout))
 CASE (3)
-  ALLOCATE(varids1(nvarin))
+  ALLOCATE (varids1(nvarin))
   ALLOCATE (conc_out(nzonal*nmerid,nlev,nvarout))
   ALLOCATE (tot(nzonal*nmerid))
 CASE (4) 
-  ALLOCATE(varids1(nvarin))
+  ALLOCATE (varids1(nvarin))
   ALLOCATE (conc_out(nzonal*nmerid,nlev,nvarout))
 CASE (5)
-  ALLOCATE(conc(species,nhori,nlev))
+  ALLOCATE (conc(species,nhori,nlev))
   ALLOCATE (conc_out(nhori,nlev,nvarout))
   ALLOCATE (conc_miss(nhori+4,nlev,nvarout))
 CASE (6)
-  ALLOCATE(conc_out(nzonal*nmerid,nlev,nvarout))
-  ALLOCATE(emisb(biospecies,nzonal,nmerid))
-  ALLOCATE(emisb1(biospecies,nzonal*nmerid))
+  ALLOCATE (conc_out(nzonal*nmerid,nlev,nvarout))
+  ALLOCATE (emisb(biospecies,nzonal,nmerid))
+  ALLOCATE (emisb1(biospecies,nzonal*nmerid))
 CASE (7) 
-  ALLOCATE(varids1(nvarin))
+  ALLOCATE (varids1(nvarin))
   ALLOCATE (conc_out(nzonal*nmerid,nlev,nvarout))
   ALLOCATE (conc4(nzonal*nmerid,nlev,typeday,nvarout))
 CASE (8)
   ALLOCATE (conc_out(nzonal*nmerid,nlev,nvarout))
-  ALLOCATE(varids1(nvarin))
+  ALLOCATE (varids1(nvarin))
 END SELECT
 
 ! Disabilito i controlli sui parametri GRIBEX

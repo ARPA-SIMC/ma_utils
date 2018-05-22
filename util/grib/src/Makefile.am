@@ -2,9 +2,9 @@ AM_FCFLAGS = -I/usr/lib64/gfortran/modules -I$(top_builddir)/modules -DPKGDATARO
 LDADD = $(top_builddir)/modules/libmautils.la
 
 if SMND_BUILD
-pkglibexec_PROGRAMS = grib_runmean.exe grib_skip_first.exe math_grib.exe split_grib_par.exe ma_grib1_grib2.exe ma_grib2_grib1.exe
+pkglibexec_PROGRAMS = grib_runmean.exe grib_skip_first.exe grib_smooth.exe math_grib.exe split_grib_par.exe ma_grib1_grib2.exe ma_grib2_grib1.exe
 else
-pkglibexec_PROGRAMS = afa2grib.exe crea_templ_grib2_utm.exe cong2.exe diff_grib.exe diff_gribex.exe diff_header_gribex.exe grib2afa.exe grib2latlon.exe grib_ana2forc.exe grib_ave.exe grib_calc_median.exe grib_daily_stat.exe grib_dist_freq.exe grib_f2s.exe grib_forc2ana.exe grib_local_std.exe grib_runmean.exe grib_s2f.exe grib_set_scanning.exe grib_skip_first.exe grib_stat.exe grib_step_explicit.exe grib_uniq.exe grib_uv2ffdd.exe intercala_grib.exe interp_grib.exe llgrib.exe llgribex.exe ma_grib1_grib2.exe ma_grib2_grib1.exe ma_grib2_grib1_gribex.exe mask_grib.exe math_grib.exe moltiplica_grib.exe proc_flat_grib.exe replace_dat_grib.exe somma_grib.exe split_grib_par.exe split_gribex_par.exe test_1grib.exe tinterp_grib.exe zoom_grib.exe
+pkglibexec_PROGRAMS = afa2grib.exe crea_templ_grib2_utm.exe cong2.exe diff_grib.exe diff_gribex.exe diff_header_gribex.exe grib2afa.exe grib2latlon.exe grib_ana2forc.exe grib_ave.exe grib_calc_median.exe grib_daily_stat.exe grib_dist_freq.exe grib_f2s.exe grib_forc2ana.exe grib_local_std.exe grib_runmean.exe grib_s2f.exe grib_set_scanning.exe grib_smooth.exe grib_skip_first.exe grib_stat.exe grib_step_explicit.exe grib_uniq.exe grib_uv2ffdd.exe intercala_grib.exe interp_grib.exe llgrib.exe llgribex.exe ma_grib1_grib2.exe ma_grib2_grib1.exe ma_grib2_grib1_gribex.exe mask_grib.exe math_grib.exe moltiplica_grib.exe proc_flat_grib.exe replace_dat_grib.exe somma_grib.exe split_grib_par.exe split_gribex_par.exe test_1grib.exe tinterp_grib.exe zoom_grib.exe
 endif
 
 afa2grib_exe_SOURCES = afa2grib.f90
@@ -27,6 +27,7 @@ grib_local_std_exe_SOURCES = grib_local_std.f90
 grib_runmean_exe_SOURCES = grib_runmean.f90
 grib_s2f_exe_SOURCES = grib_s2f.f90
 grib_skip_first_exe_SOURCES = grib_skip_first.f90
+grib_smooth_exe_SOURCES = grib_smooth.f90
 grib_stat_exe_SOURCES = grib_stat.f90
 grib_step_explicit_exe_SOURCES = grib_step_explicit.f90
 grib_uniq_exe_SOURCES = grib_uniq.f90
