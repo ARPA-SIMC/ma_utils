@@ -32,7 +32,7 @@ AC_ARG_ENABLE(smnd-build, AC_HELP_STRING([--enable-smnd-build],
 if test "x$enableval" = "xyes"; then
     LIBS="-lgrib_api -lgrib_api_f90 -lsim_base -lsim_volgrid6d -lsim_vol7d"
 else
-    LIBS="-lgrib_api -lgrib_api_f90 -lgrib_util -lemos -lsim_base -lsim_volgrid6d  -lsim_vol7d -lnetcdf -lnetcdff"
+    LIBS="-lgrib_api -lgrib_api_f90 -lemos -lsim_base -lsim_volgrid6d  -lsim_vol7d -lnetcdf -lnetcdff"
 fi
 
 AM_CONDITIONAL(SMND_BUILD, test "x$enableval" = "xyes")
