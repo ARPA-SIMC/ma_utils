@@ -126,7 +126,7 @@ ENDIF
 
 ! Codice EOF
 CALL get_eof_eor(eof, eor)
-IF (ldeb) WRITE (90,'(a)'),chfmt
+IF (ldeb) WRITE (90,'(a)') chfmt
 
 !--------------------------------------------------------------------------
 ! 2) Lettura e calcolo condizione

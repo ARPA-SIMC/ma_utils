@@ -1,1 +1,1 @@
-dist_pkglibexec_SCRIPTS = crea_anag_arkioss.sh crea_anag_gts.sh crea_anag_oracle.sql estra_oss.sh estra_oss_int.sh estra_qaria.sh get_staz_var.sh get_var_staz.sh split_orari.sh split_orari_sea.sh windrose.sh windrose.r polarplot.r wrom.gs wrom.sh
+dist_pkglibexec_SCRIPTS = crea_anag_arkioss.sh crea_anag_gts.sh crea_anag_stzqa_all.sql estra_oss.sh estra_oss_int.sh estra_qaria.sh get_staz_var.sh get_var_staz.sh split_orari.sh split_orari_sea.sh windrose.sh windrose.r polarplot.r wrom.gs wrom.sh

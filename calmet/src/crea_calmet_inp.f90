@@ -750,7 +750,7 @@ WRITE (70,*) dgridkm,xorigkm,yorigkm,xlat0,xlon0,nx,ny,iutmzn
 WRITE (70,*)
 WRITE (70,*) "staz. quo ",nusta_req," buone ",nusta
 DO k = 1,nusta
-  WRITE (70,*),temp_ok(k),us_str(k),us_name(k),us_id(k),us_x(k),us_y(k), &
+  WRITE (70,*) temp_ok(k),us_str(k),us_name(k),us_id(k),us_x(k),us_y(k), &
     us_ibtz(k),us_file(k)
 ENDDO
 

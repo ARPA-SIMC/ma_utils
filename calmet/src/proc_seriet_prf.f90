@@ -141,7 +141,7 @@ CALL get_eof_eor(eof,eor)
 
 !--------------------------------------------------------------------------
 ! 2.1 Leggo gli header
-WRITE (chfmt,'(a,i2,a)'), "(1x,a",fw,")"
+WRITE (chfmt,'(a,i2,a)') "(1x,a",fw,")"
 
 OPEN (UNIT=30, FILE=filein, STATUS="OLD", ACTION="READ", IOSTAT=ios)
 IF (ios /= 0) GOTO 9999

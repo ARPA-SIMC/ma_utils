@@ -876,7 +876,7 @@ stagioni: DO istag = istag1,istag2
     cl_prev_chi(1:kpt) = MAXLOC(lu_chi(1:kpt,1:9),DIM=2)
     WRITE (95,*) "Celle in cui e' prevalente ciascuna classe LU Chimere:"
     DO k = 1,9
-      WRITE (95,*),idcl_chimere(k),COUNT(cl_prev_chi(:)==k)
+      WRITE (95,*) idcl_chimere(k),COUNT(cl_prev_chi(:)==k)
     ENDDO
   ENDIF
 

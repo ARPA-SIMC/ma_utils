@@ -298,7 +298,7 @@ ENDIF
 IF (inp_data == "hhr" .OR. inp_data == "ser"  .OR. inp_data == "sex" .OR. &
     inp_data == "ddy" .OR. inp_data == "tem") THEN
 
-  WRITE (chfmt0,'(a,i2,a)'), "(1x,a",fw,")"
+  WRITE (chfmt0,'(a,i2,a)') "(1x,a",fw,")"
   DO k = 1,mxpar
     p1 = (k-1) * (fw+1) + 1
     p2 = k * (fw+1)

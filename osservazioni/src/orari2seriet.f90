@@ -151,7 +151,7 @@ ENDIF
 ! 1.3 Costruisco i formati per lettura e scrittura
 
 ! Leggo numero e elenco dei parametri
-WRITE (chfmt0,'(a,i2,a)'), "(1x,a",fw,")"
+WRITE (chfmt0,'(a,i2,a)') "(1x,a",fw,")"
 DO k = 1,mxpar
   p1 = (k-1) * (fw+1) + 1
   p2 = k * (fw+1)
