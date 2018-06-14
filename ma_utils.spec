@@ -41,10 +41,13 @@ rm -rf %{buildroot}
 %doc
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/*.exe
+%{_libexecdir}/%{name}/*.r
 %{_libexecdir}/%{name}/*sh
+
 %if ! 0%{?rhel:1}
-%{_libexecdir}/%{name}/crea_anag_oracle.sql
 %{_libexecdir}/%{name}/wrom.gs
+%{_libexecdir}/%{name}/plot_local_orog.gs
+%{_libexecdir}/%{name}/crea_anag_stzqa_all.sql
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/*
 %endif
