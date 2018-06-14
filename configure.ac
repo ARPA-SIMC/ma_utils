@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(ma_utils, 0.13, dbranchini@arpa.emr.it)
+AC_INIT(ma_utils, 0.13, dbranchini@arpae.it)
 
 m4_pattern_allow([AM_PROG_AR])
 AM_PROG_AR

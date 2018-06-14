@@ -37,7 +37,6 @@ datafilelist = \
  $(top_srcdir)/data/aree_geo.dat \
  $(top_srcdir)/data/aree_utm.dat \
  $(top_srcdir)/data/arkimet_aree.dat \
- $(top_srcdir)/data/domainlist.nml \
  $(top_srcdir)/data/gacsv2seriet.nml.lama.adms \
  $(top_srcdir)/data/param_arkioss.csv \
  $(top_srcdir)/data/param_shortnames.csv \
