@@ -1,7 +1,7 @@
 AM_FCFLAGS = -I/usr/include -I/usr/lib64/gfortran/modules -I/usr/lib/gfortran/modules -I$(top_builddir)/modules -I$(top_builddir)/chimere/src/ver2011 -I$(top_builddir)/chimere/src/ver2007 -DPKGDATAROOTDIR='"$(datarootdir)/$(PACKAGE)"' -cpp
 LDADD = $(top_builddir)/modules/libmautils.la
 
-pkglibexec_PROGRAMS = altipres_sim.exe chimere2grib.exe chimeredep2grib.exe chimerencdf2grib.exe chmbc2cdf.exe column_content.exe crea_coord_chimere.exe exdom_grib.exe filtra_spec_out.exe grib2chimerencdf.exe grib2chimere.exe grib2diagmetncdf.exe lm2ncf.exe merge_unf_chimere.exe mix_ratio.exe pres_ecmwf.exe scale_unf_chimere.exe sum_unf_chimere.exe show_unf_chimere.exe riscrivi_meteonc.exe split_output.exe sum_pm_species.exe tinterp_sim.exe diagmet_LMSMR4.exe diagmet_LAMAZ.exe diagmet_LAMA3.exe
+pkglibexec_PROGRAMS = altipres_sim.exe chimere2grib.exe chimeredep2grib.exe chimerencdf2grib.exe chmbc2cdf.exe column_content.exe crea_coord_chimere.exe exdom_grib.exe filtra_spec_out.exe grib2chimerencdf.exe grib2chimere.exe grib2diagmetncdf.exe lm2ncf.exe merge_unf_chimere.exe mix_ratio.exe pres_ecmwf.exe scale_unf_chimere.exe sum_unf_chimere.exe show_unf_chimere.exe riscrivi_meteonc.exe split_output.exe sum_pm_species.exe tinterp_sim.exe diagmet_LMSMR4.exe diagmet_LAMAZ.exe diagmet_LAMA3.exe diagmet_LAMA5.exe
 
 altipres_sim_exe_SOURCES = altipres_sim.f90      
 chimere2grib_exe_SOURCES = chimere2grib.f90      
@@ -48,6 +48,9 @@ diagmet_LAMAZ_exe_LDADD = $(LDADD) $(top_builddir)/chimere/src/ver2007/libchimer
 
 diagmet_LAMA3_exe_SOURCES = ver2007/modules/chimere_params.LAMA3.F90 ver2007/modules/chimere_consts.F90 ver2007/diag/diagmet_common.LAMA3.F90 ver2007/diag/diagbio_common.LAMA3.F90 ver2007/diag/diagmet_science.LAMA3.F90 ver2007/diag/deepconvtiedke.F90 ver2007/diag/diagmet.LAMA3.F90
 diagmet_LAMA3_exe_LDADD = $(LDADD) $(top_builddir)/chimere/src/ver2007/libchimere2007lama3.la
+
+diagmet_LAMA5_exe_SOURCES = ver2007/modules/chimere_params.LAMA5.F90 ver2007/modules/chimere_consts.F90 ver2007/diag/diagmet_common.LAMA5.F90 ver2007/diag/diagbio_common.LAMA5.F90 ver2007/diag/diagmet_science.LAMA5.F90 ver2007/diag/deepconvtiedke.F90 ver2007/diag/diagmet.LAMA5.F90
+diagmet_LAMA5_exe_LDADD = $(LDADD) $(top_builddir)/chimere/src/ver2007/libchimere2007lama5.la
 
 CLEANFILES = \
 	diagmet_science.mod \

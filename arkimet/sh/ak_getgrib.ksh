@@ -142,6 +142,12 @@ if [ $is_local -eq 0 ] ; then
   export ARKI_ALIASES=$local_aliases
 fi
 
+# 01/06/2018: nell'archivo arkimet adesso i nomi dei dataset mescolano maiuscole e
+# minuscole (es: cosmo_5M_vol_ita), quindi tolgo il cambio di caso dagli script:
+# ak_seriet.ksh, ak_getgrib.ksh, crea_progetto_point.ksh
+# E' possibile ci siano problemi estraendo da alcuni dataset. Alternativa: lasicare
+# la converisone, escludendo i dataset che mescolano maiuscole e minuscole.
+
 # Maiuscole/minuscole nel nome del dataset (arkimet: minusc.; maialinux: maiusc.)
 # if [ `echo $akurl | grep "arkimet.metarpa" | wc -l` -eq 1 ] ; then      # arkimet
 #   ds=`echo $ds | tr '[:upper:]' '[:lower:]'`

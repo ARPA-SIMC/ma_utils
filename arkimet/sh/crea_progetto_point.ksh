@@ -18,7 +18,7 @@
 # LIBSIM_SVN:   esegubili (ad esempio: /home/eminguzzi/svn/libsim; se non 
 #               specificato, usa gli eseguibili in path)
 #
-#                                                 V7.9.3, Enrico 23/02/2016
+#                                                V8.0.0, Enrico 06/06/2018
 #==========================================================================
 
 #==========================================================================
@@ -31,10 +31,12 @@ function write_help
 {
 #       123456789012345678901234567890123456789012345678901234567890123456789012345
   echo "Uso: crea_progetto_point.ksh PROGETTO [-seropt=\"OPT1 OPT2 ...\"] "
+  echo "  [-template lama/adms/calpuff/cosmo/ninfa/pesco] "
   echo "  [-debug] [-batch] [-list] [-h]"
   echo
   echo "PROGETTO: nome del progetto di estrazione"
   echo "-seropt:  eventuali opzioni della chiamata ad ak_seriet"
+  echo "-template usa template di estrazione specifici"
   echo "-debug:   come -seropt=-debug"
   echo "-batch:   estrae e archivia, senza input interattivo"
   echo "-list:    elenca i progetti salvati e termina"
@@ -89,40 +91,38 @@ function intfill
 
 #set -x
 
-# 1.0) HOME_MINGUZZI
-if [ -z $HOME_MINGUZZI ] ; then
-  export HOME_MINGUZZI=/autofs/nethomes/eminguzzi
-  if [ -d $HOME_MINGUZZI ] ; then
-    echo "Variabile d'environment HOME_MINGUZZI non settata, uso "$HOME_MINGUZZI
-  else
-    echo "Path "$HOME_MINGUZZI" irraggiungibile"
-    exit 1
-  fi
-fi
-
-# 1.1) Path
+# 1.1) Path fissi
 if [ -z $work_root ] ; then
   work_root=/autofs/scratch2/eminguzzi/arkimet/tmp_point # root dir lavoro
 fi
-template_dir=${HOME_MINGUZZI}/arkimet/templates    # templates .akq
-fisiog_dir=${HOME_MINGUZZI}/util/grib/lm_ope       # dati fisiografici
-arc_root=${HOME_MINGUZZI}/arkimet/progetti_point   # root arc. estrazioni
+arc_root=/home/eminguzzi/arkimet/progetti_point   # root arc. estrazioni
+doc_file=${arc_root}/_doc/progetti_estra.doc      # elenco progetti archiviati
 
-# 1.2) Utility e files di appoggio non in PATH
-doc_file=${arc_root}/_doc/progetti_estra.doc       
-plot_local_orog=${HOME_MINGUZZI}/arkimet/bin/plot_local_orog.gs
+if [ -z $GASCRP ] ; then
+  export GASCRP=/home/eminguzzi/util/grads/scripts
+fi
+  
+# 1.2) Utility e files di appoggio (da ma_utils)
+# Alcuni files di appoggio reltivi a vecchi archivi sono in:
+# /home/eminguzzi/arkimet/templates (templates per estrazioni arkimet)
+# /home/eminguzzi/util/grib/lm_ope  (dati fisiografici)
 
 if [ -z $MA_UTILS_DAT ] ; then
-  export MA_UTILS_DAT=/usr/share/ma_utils
+  arkimet_aree=/usr/share/ma_utils/arkimet_aree.dat
+  template_dir=/usr/share/ma_utils/
+  fisiog_dir=/usr/share/ma_utils/
 else
   echo "(crea_progetto_point.ksh) Path tabelle ma_utils: "$MA_UTILS_DAT
+  arkimet_aree=${MA_UTILS_DAT}/arkimet_aree.dat
+  template_dir=${MA_UTILS_DAT}
+  fisiog_dir=${MA_UTILS_DAT}
 fi
-arkimet_aree=${MA_UTILS_DAT}/arkimet_aree.dat
 
 if [ -z $MA_UTILS_SVN ] ; then
   ak_seriet=/usr/libexec/ma_utils/ak_seriet.ksh
   sel_punti=/usr/libexec/ma_utils/sel_punti.exe
   gacsv2seriet=/usr/libexec/ma_utils/gacsv2seriet.exe
+  plot_local_orog=/usr/libexec/ma_utils/plot_local_orog.gs
   stat_orari=/usr/libexec/ma_utils/stat_orari.exe
   windrose=/usr/libexec/ma_utils/windrose.sh
 else 
@@ -130,6 +130,7 @@ else
   ak_seriet=${MA_UTILS_SVN}/arkimet/sh/ak_seriet.ksh
   sel_punti=${MA_UTILS_SVN}/arkimet/src/sel_punti.exe
   gacsv2seriet=${MA_UTILS_SVN}/arkimet/src/gacsv2seriet.exe
+  plot_local_orog=${MA_UTILS_SVN}/arkimet/sh/plot_local_orog.gs
   stat_orari=${MA_UTILS_SVN}/osservazioni/src/stat_orari.exe
   windrose=${MA_UTILS_SVN}/osservazioni/sh/windrose.sh
 fi
@@ -149,6 +150,8 @@ dataset="nil"
 proj="nil"
 seropt=""
 batch="N"
+template=""
+ak_template_default="lamaz"
 
 # parsing
 if [ $# -eq 0 ] ; then
@@ -163,6 +166,10 @@ while [ $# -ge 1 ] ; do
   elif [ `echo $1 | awk '{print $1}'` = '-list' ] ; then
     list_proj
     exit
+  elif [ `echo $1 | awk '{print $1}'` = '-template' ] ; then
+    shift
+    template=$1
+    shift
   elif [ `echo $1 | awk '{print $1}'` = '-batch' ] ; then
     batch="Y"
     shift
@@ -185,6 +192,29 @@ done
 if [ $mand_par -ne 1 ] ; then
   write_help
   exit
+fi
+
+# Seleziono dataset e templates
+# Specificare la varibile ak_template se e' diversa dal nome del dataset
+# Specificare la varibile nml_template se diversa dal default
+
+ak_template=""
+nml_template=""
+
+if [ -z $template ] ; then
+  dataset=""
+elif [ $template = "lama" ] ; then
+  dataset=lamaz
+elif [ $template = "adms" ] ; then
+  dataset=lamaz; ak_template=lama.adms; nml_template=lama.adms
+elif [ $template = "calpuff" ] ; then
+  dataset=lamaz; ak_template=lama.calpuff
+elif [ $template = "cosmo" ] ; then
+  dataset=cosmo_5M_vol_ita
+elif [ $template = "ninfa" ] ; then
+  dataset=ninfabpa5
+elif [ $template = "pesco" ] ; then
+  dataset=pescoemrope
 fi
 
 # 1.4) Se questo progetto non ha un numero d'ordine ed esistono progetti
@@ -299,6 +329,10 @@ if [ $batch = "N" -a $modif != "S" ] ; then
     else
       dataset=$dummy
     fi
+    
+  elif [ ! -z $dataset ] ; then
+    echo "Estrazione dal dataset "$dataset
+
   else
     echo "Immetti il nome del dataset da cui estrarre"
     read dataset
@@ -311,8 +345,14 @@ else
   dataset=`head -n 1 ${proj}.ds`
 fi
 
+# 01/06/2018: nell'archivo arkimet adesso i nomi dei dataset mescolano maiuscole e
+# minuscole (es: cosmo_5M_vol_ita), quindi tolgo il cambio di caso da qui e da
+# ak_seriet.ksh
+# E' possibile ci siano problemi estraendo da alcuni dataset. Alternativa: lasicare
+# la converisone, escludendo i dataset che mescolano maiuscole e minuscole.
+
 # passo a lowercase
-dataset=`echo $dataset | tr '[:upper:]' '[:lower:]'`
+# dataset=`echo $dataset | tr '[:upper:]' '[:lower:]'`
 
 # salvo il nome del dataset
 echo $dataset > ${proj}.ds
@@ -320,15 +360,21 @@ echo $dataset > ${proj}.ds
 #--------------------------------------------------------------------------
 # 2.3) Scelta dei campi
 
+if [ -z $ak_template ] ; then
+  ak_template=$dataset
+fi
+
 if [ $batch = "N" -a $modif != "S" ] ; then
   echo "Scegli i campi:"
+
   if [ $modif = "R" -o ! -f ${proj}.akq ] ; then
     rm -f ${proj}.akq
-    if [ -f $template_dir/template.akq.${dataset} ] ; then
-      cp $template_dir/template.akq.${dataset} ./${proj}.akq
+
+    if [ -f $template_dir/template.akq.${ak_template} ] ; then
+      cp $template_dir/template.akq.${ak_template} ./${proj}.akq
     else
-      echo "Template non trovato per il dataset "$dataset
-      cp $template_dir/template.akq.dummy ./${proj}.akq
+      echo "Template non trovato: template.akq."${ak_template}
+      cp $template_dir/template.akq.${ak_template_default} ./${proj}.akq
     fi
   fi
   
@@ -416,8 +462,20 @@ fi
 
 if [ $batch = "N" -a $modif != "S" ] ; then
   echo "Seleziona le opzioni per il formato di output"
+
   if [ $modif = "R" -o ! -f gacsv2seriet.nml ] ; then
-    $gacsv2seriet -c
+    rm -f gacsv2seriet.nml
+
+    if [ ! -z $nml_template ] ; then
+      if [ -f $template_dir/gacsv2seriet.nml.${nml_template} ] ; then
+        cp $template_dir/gacsv2seriet.nml.${nml_template} ./gacsv2seriet.nml
+      else
+        echo "Namelist non trovata "gacsv2seriet.nml.${nml_template}
+        $gacsv2seriet -c
+      fi
+    else
+      $gacsv2seriet -c
+    fi
   fi
   
   $editor gacsv2seriet.nml 2>/dev/null
@@ -485,22 +543,22 @@ if [ $dsarea != "NIL" -a $fisiog = "Y" ] ; then
 
   rm -f $proj".fisiog."${ext}
   for field in $fis_list ; do
-    nf=`ls -1 ${fisiog_dir}/${dsarea}_${field}*.${ext} 2>/dev/null | wc -l`
+    nf=`ls -1 ${fisiog_dir}/${dsarea}_${field}_*.${ext} 2>/dev/null | wc -l`
     if [ $nf -eq 0 ] ; then
       file=""
       echo "Dati fisiografici non disponibili per l'area "$dsarea": "$field
     elif [ $nf -eq 1 ] ; then
-      file=${fisiog_dir}/${dsarea}_${field}*.${ext}
+      file=${fisiog_dir}/${dsarea}_${field}_*.${ext}
     elif [ $nf -gt 1 -a $batch = "N" ] ; then
       echo "Per questa area sono disponibili diversi files di dati fisiografici:"
       echo "selezionare quello da usare per il parametro "$field" (default: il primo)"
-      ls -r1 ${fisiog_dir}/${dsarea}_${field}*.${ext}
+      ls -r1 ${fisiog_dir}/${dsarea}_${field}_*.${ext}
       read file
       if [ -z $file ] ; then
-        file=`ls -r1 ${fisiog_dir}/${dsarea}_${field}*.${ext} | head -n 1`
+        file=`ls -r1 ${fisiog_dir}/${dsarea}_${field}_*.${ext} | head -n 1`
       fi
     elif [ $nf -gt 1 -a $batch = "Y" ] ; then
-      file=`ls -r1 ${fisiog_dir}/${dsarea}_${field}*.${ext} | head -n 1`
+      file=`ls -r1 ${fisiog_dir}/${dsarea}_${field}_*.${ext} | head -n 1`
       echo "uso dati fisiografici da "$file
     fi
 

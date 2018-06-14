@@ -93,8 +93,8 @@ if (type == "seriet") {
 paste("uso variabili ",fn," e ",dn,sep="")
 
 #funzione polar plot
-HOME_BONAFE<-Sys.getenv("HOME_BONAFE")
-source(paste(HOME_BONAFE,"/util/R/scripts/polarplot.r",sep=""))
+polarplotR <- Sys.getenv("polarplotR")
+source(polarplotR)
 
 #-------------------------
 # Inizio funzione windrose

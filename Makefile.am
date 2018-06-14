@@ -38,6 +38,7 @@ datafilelist = \
  $(top_srcdir)/data/aree_utm.dat \
  $(top_srcdir)/data/arkimet_aree.dat \
  $(top_srcdir)/data/domainlist.nml \
+ $(top_srcdir)/data/gacsv2seriet.nml.lama.adms \
  $(top_srcdir)/data/param_arkioss.csv \
  $(top_srcdir)/data/param_shortnames.csv \
  $(top_srcdir)/data/tabella_002_ser.txt \
@@ -58,16 +59,39 @@ datafilelist = \
  $(top_srcdir)/data/tabella_201.txt \
  $(top_srcdir)/data/tabella_203_ser.txt \
  $(top_srcdir)/data/tabella_203.txt \
+ $(top_srcdir)/data/template.akq.cosmo_5M_vol_ita \
+ $(top_srcdir)/data/template.akq.lama5 \
+ $(top_srcdir)/data/template.akq.lamaz \
+ $(top_srcdir)/data/template.akq.lama.adms \
+ $(top_srcdir)/data/template.akq.lama.calpuff \
+ $(top_srcdir)/data/template.akq.ninfa5ub \
+ $(top_srcdir)/data/template.akq.ninfabpa5 \
+ $(top_srcdir)/data/template.akq.pescoemrope \
+ $(top_srcdir)/data/match-alias.conf.arkimet \
  $(top_srcdir)/data/LAMAZ_layers_20120606.grb \
  $(top_srcdir)/data/LAMAZ_layersSup_20120606.grb \
  $(top_srcdir)/data/LAMAZ_orog_20120606.grb \
- $(top_srcdir)/data/LMSMR4_layers_20120606.grb \
- $(top_srcdir)/data/LMSMR4_layersSup_20120606.grb \
- $(top_srcdir)/data/LMSMR4_orog_20120606.grb \
- $(top_srcdir)/data/LMSMR5_layers_20120606.grb \
- $(top_srcdir)/data/LMSMR5_layersSup_20120606.grb \
- $(top_srcdir)/data/LMSMR5_orog_20120606.grb
-
+ $(top_srcdir)/data/LAMAZ_orog_20120606.ctl \
+ $(top_srcdir)/data/LAMAZ_orog_20120606.idx \
+ $(top_srcdir)/data/LAMAZ_layers.grb \
+ $(top_srcdir)/data/LAMAZ_layersSup.grb \
+ $(top_srcdir)/data/LAMAZ_orog.grb \
+ $(top_srcdir)/data/COS5MITR_layers_20180514.grb \
+ $(top_srcdir)/data/COS5MITR_layersSup_20180514.grb \
+ $(top_srcdir)/data/COS5MITR_orog_20180514.grb \
+ $(top_srcdir)/data/COS5MITR_orog_20180514.ctl \
+ $(top_srcdir)/data/COS5MITR_orog_20180514.idx \
+ $(top_srcdir)/data/COS5MITR_layers.grb \
+ $(top_srcdir)/data/COS5MITR_layersSup.grb \
+ $(top_srcdir)/data/COS5MITR_orog.grb \
+ $(top_srcdir)/data/LAMA5_layers_20180514.grb \
+ $(top_srcdir)/data/LAMA5_layersSup_20180514.grb \
+ $(top_srcdir)/data/LAMA5_orog_20180514.grb \
+ $(top_srcdir)/data/LAMA5_orog_20180514.ctl \
+ $(top_srcdir)/data/LAMA5_orog_20180514.idx \
+ $(top_srcdir)/data/LAMA5_layers.grb \
+ $(top_srcdir)/data/LAMA5_layersSup.grb \
+ $(top_srcdir)/data/LAMA5_orog.grb
 
 if SMND_BUILD
 else

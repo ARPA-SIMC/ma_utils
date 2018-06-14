@@ -3,7 +3,7 @@
 # Legge un file di dati osservati relativi a una stazione urbana e lo riscrive nel
 # formato per ADMS
 #
-#                                                 Versione 2.0.0, Enrico 14/07/2017
+#                                                 Versione 2.0.1, Enrico 07/06/2018
 #----------------------------------------------------------------------------------
 #set -x
 function write_help
@@ -47,7 +47,19 @@ done
 
 # Visualizza un esmepio di comando di estrazione
 if [ $demo = "Y" ] ; then
-  echo "estra_oss 20160101 20161231 H06034 158,165,166,160,409"
+  echo "/usr/libexec/ma_utils/estra_oss 20160101 20161231 H06034 158,165,166,160,409"
+  echo ""
+  echo "Codici delle stazioni urbane:"
+  echo "H06030: Piacenza"
+  echo "H06031: Parma"
+  echo "H06032: Reggio nell'Emilia"
+  echo "H06033: Modena"
+  echo "H06034: Bologna"
+  echo "H06035: Ferrara"
+  echo "H06036: Ravenna"
+  echo "H06037: Forli'"
+  echo "H06038: Cesena"
+  echo "H06039: Rimini"
   exit
 fi
   

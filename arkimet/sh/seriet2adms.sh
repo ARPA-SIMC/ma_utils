@@ -2,7 +2,7 @@
 #----------------------------------------------------------------------------------
 # Legge un file seriet e lo riscrive nel formato per ADMS
 #
-#                                                 Versione 2.1.0, Enrico 21/08/2017
+#                                                 Versione 2.2.0, Enrico 07/06/2018
 #----------------------------------------------------------------------------------
 #set -x
 function write_help
@@ -121,6 +121,15 @@ done < yyyymmdd.txt
 #   fi
 #   echo $tc >> tt.txt
 # done < tmpt.txt
+
+# Aggiungo uno zero decimale alla driezione del vento (ADMS non ama numeri come 201.)
+rm -f tmpd1.txt tmpd2.txt dir.txt.org
+mv dir.txt dir.txt.org
+cut -c 2-6 dir.txt.org > tmpd1.txt
+while read ff ; do
+  echo "0" >> tmpd2.txt
+done < dir.txt.org
+paste -d . tmpd1.txt tmpd2.txt > dir.txt
 
 # Se richiesto, tolgo le intestazioni dal file della pioggia
 if [ $prc = "Y" ] ; then

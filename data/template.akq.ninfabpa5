@@ -1,0 +1,30 @@
+!-------------------------------------------------------------------------------
+! Template per estrazioni Arkimet, dataset NINFABPA5C (dal 07/10/2015 in poi)
+! Per estrarre dati di altri periodi, si vedano i files template.akq.ninfabpa5.v*
+!
+! SINTASSI DEL FILE:
+! Le righe vuote e quelle che iniziano con "!" vengono ignorate
+! Le righe che iniziano con "#" separano gruppi che danno luogo a query distinte
+! Le righe non possono essere spezzate
+! Espressioni separate da virgola sono interpretate come AND
+!
+! ESEMPI di sintassi possibili 
+!   (documentazione completa in /usr/share/doc/arkimet*/matcher)
+!
+! reftime: =2009-01-01 00
+! reftime: >=2008-01-01, <=2008-12-31
+! timerange: an            [analisi]
+! timerange: f001          [una specifica previsione istantanea]
+! timerange: f0124         [previsioni istantanee tra +01 e +24]
+! timerange: f2548         [previsioni istantanee tra +25 e +48]
+! timerange: f4972         [previsioni istantanee tra +49 e +72]
+!-------------------------------------------------------------------------------
+! Analisi (59 specie: 5 gas, 8 granulometria aerosol, 23 componenti di PM10 e PM2.5)
+reftime: =yesterday
+product: o3 or no2 or no or co or so2 or pm10 or pm5 or pm25 or pm1 or pm06 or pm03 or pm015 or pm008 or p10ppm or p10h2so4 or p10hno3 or p10nh3 or p10bcar or p10ocar or p10dust or p10ana1d or p10anbmp or p10bia1d or p10bibmp or p10water or p10salt or p10isop1 or p10ana0d or p10ana2d or p10anbip or p10bia0d or p10bia2d or p10isop2 or p10dusb or p10duse or p10dusr or p25ppm or p25h2so4 or p25hno3 or p25nh3 or p25bcar or p25ocar or p25dust or p25ana1d or p25anbmp or p25bia1d or p25bibmp or p25water or p25salt or p25isop1 or p25ana0d or p25ana2d or p25anbip or p25bia0d or p25bia2d or p25isop2 or p25dusb or p25duse or p25dusr
+timerange: an
+#
+! Previsioni
+reftime: =yesterday
+product: o3 or no2 or no or co or so2 or pm10 or pm25
+timerange: f0124 or f2548 or f4972

@@ -366,14 +366,20 @@ elif [ $reqsplit = "def" ] ; then
   fi
 fi
 
+# 01/06/2018: nell'archivo arkimet adesso i nomi dei dataset mescolano maiuscole e
+# minuscole (es: cosmo_5M_vol_ita), quindi tolgo il cambio di caso da qui e da
+# ak_seriet.ksh
+# E' possibile ci siano problemi estraendo da alcuni dataset. Alternativa: lasicare
+# la converisone, escludendo i dataset che mescolano maiuscole e minuscole.
+
 # Maiuscole/minuscole nel nome del dataset (arkimet: minusc.; maialinux: maiusc.)
-if [ $inpdata = "arkimet" ] ; then
-  if [ `echo $akurl | grep "arkimet.metarpa" | wc -l` -eq 1 ] ; then   # arkimet
-    ds=`echo $ds | tr '[:upper:]' '[:lower:]'`
-  elif [ `echo $ds | grep "maialinux.metarpa" | wc -l` -eq 1 ] ; then  # maialinux
-    ds=`echo $akurl | tr '[:lower:]' '[:upper:]'`
-  fi 
-fi
+# if [ $inpdata = "arkimet" ] ; then
+#   if [ `echo $akurl | grep "arkimet.metarpa" | wc -l` -eq 1 ] ; then   # arkimet
+#     ds=`echo $ds | tr '[:upper:]' '[:lower:]'`
+#   elif [ `echo $ds | grep "maialinux.metarpa" | wc -l` -eq 1 ] ; then  # maialinux
+#     ds=`echo $akurl | tr '[:lower:]' '[:upper:]'`
+#   fi 
+# fi
 
 #-------------------------------------------------------------------------------
 # 1.3 Controlli etc.

@@ -5,7 +5,7 @@
 #
 # (usa R, funziona su annapurna)
 #
-#                                       V2.0.0 Johnny & Enrico, 04/08/2009
+#                                       V2.1.0 Johnny & Enrico, 07/06/2018
 #-------------------------------------------------------------------------
 function write_help
 {
@@ -42,11 +42,12 @@ function write_help
 # 1.1.1 Assegno l'ambiente ma_utils
 if [ -z $MA_UTILS_SVN ] ; then
   wroseR=/usr/libexec/ma_utils/windrose.r
-  polplotR=/usr/libexec/ma_utils/polarplot.r
+  polarplotR=/usr/libexec/ma_utils/polarplot.r
 else
   wroseR=${MA_UTILS_SVN}/osservazioni/sh/windrose.r
-  polplotR=${MA_UTILS_SVN}/osservazioni/sh/polplot.r
+  polarplotR=${MA_UTILS_SVN}/osservazioni/sh/polarplot.r
 fi
+export polarplotR
 
 # gestisce l'help
 if [ $# -eq 0 ] ; then
@@ -249,7 +250,7 @@ if [ $check = "ok" ] ; then
  echo $level >> windrose.inp
  echo $fileout >> windrose.inp
 
- R --vanilla --slave < /home/eminguzzi/svn/ma_utils/osservazioni/sh/windrose.r
+ R --vanilla --slave < $wroseR
 
 else
  echo "ATTENZIONE!"

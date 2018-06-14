@@ -1,0 +1,18 @@
+&param
+out_form     = 1,
+out_ndec     = -2
+qcont        = 2,
+libsim       = T,
+step_yy_mm   = T,
+lab3d        = 2,
+lab3ddec     = 1,
+xls_dec_sep  = '.',
+dir_int      = T,
+tem_cel      = T,
+mo_rec       = F,
+sw_down      = T,
+flx_rev      = F,
+cc_fract     = F,
+sca_ini      = F,
+dos          = F
+/

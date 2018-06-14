@@ -1,0 +1,39 @@
+!-------------------------------------------------------------------------------
+! Template per estrazioni Arkimet, dataset NINFA5UB                 (13/10/2015)
+!
+! Il dataset contiene analisi e previsioni di qualita' dell'aria pubblicate sul
+! sito web ARPA. Si tratta dei campi Ninfa5km corretti e riportati a 1 km con
+! i fattori di correzione stagionali ("Ninfa Unbiased" o "Pesco forecast")
+! I dati partono dal run del 06/04/2014
+!
+! SINTASSI DEL FILE:
+! Le righe vuote e quelle che iniziano con "!" vengono ignorate
+! Le righe che iniziano con "#" separano gruppi che danno luogo a query distinte
+! Le righe non possono essere spezzate
+! Espressioni separate da virgola sono interpretate come AND
+!
+! ESEMPI di sintassi possibili 
+!   (documentazione completa in /usr/share/doc/arkimet*/matcher)
+!
+! reftime: =2009-01-01 00
+! reftime: >=2008-01-01, <=2008-12-31
+! timerange: an            [analisi]
+! timerange: f001          [una specifica previsione istantanea]
+! timerange: f0124         [previsioni istantanee tra +01 e +24]
+! timerange: f2548         [previsioni istantanee tra +25 e +48]
+! timerange: f4972         [previsioni istantanee tra +49 e +72]
+!-------------------------------------------------------------------------------
+! PM: media giornaliera
+reftime: =yesterday
+product: pm10 or pm25
+timerange: aa0024 or Timedef,24h,0,24h or Timedef,48h,0,24h or Timedef,72h,0,24h
+# 
+! O3: massimo giornaliero media mobile 8h (fino a 07/10/2015: massimo giornaliero)
+reftime:=yesterday
+product: o3 or no2
+timerange: Timedef,0,206,24h or Timedef,24h,206,24h or Timedef,48h,206,24h or Timedef,72h,206,24h
+# 
+! NO2: massimo giornaliero
+reftime:=yesterday
+product: o3 or no2
+timerange: am0024 or Timedef,24h,2,24h or Timedef,48h,2,24h or Timedef,72h,2,24h

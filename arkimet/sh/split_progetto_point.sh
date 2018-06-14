@@ -9,7 +9,7 @@
 # - aggiungere opzioni per ak_seriet
 # - aggiungere controllo e rilancio dei segmenti incompleti
 #
-#                                         Versione 1.0.0, Enrico 31/21/2016
+#                                         Versione 1.0.1, Enrico 05/06/2018
 #==========================================================================
 #set -x 
 
@@ -121,7 +121,7 @@ if [ $action = "split" ] ; then
     elif [ $yn != "m" -a $yn != "M" -a $yn != "r" -a $yn != "R" ] ; then
       exit
     elif [ $yn = "r" -o $yn = "R" ] ; then
-      rm -Rf ${proj}_#p?
+      rm -Rf ${proj}_#p*
     else
       if [ $nseg != $nseg2 ] ; then
 	echo "Warning: segmenti richiesti "$nseg" presenti "$nseg2"!!!"
@@ -144,8 +144,8 @@ if [ $action = "split" ] ; then
       else
         cp ${proj}/${proj}${suffix} ${projs}/${projs}${suffix}
       fi
-      query_list=$query_list" "${projs}/${projs}".akq"
     done
+    query_list=$query_list" "${projs}/${projs}".akq"
   done
 
   vi $query_list

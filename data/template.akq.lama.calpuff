@@ -1,0 +1,29 @@
+!-------------------------------------------------------------------------------
+! Template per estrazioni Arkimet per CALPUFF, dataset LAMAZ/LAMA5
+!
+! ESEMPI di sintassi possibili 
+!   (documentazione completa in /usr/share/doc/arkimet*/matcher)
+!
+! reftime: =2009-01-01 00                   [un istante preciso]
+! reftime: >=2008-01-01, <=2008-12-31       [tutti i dati tra due istanti]
+! reftime: >=2003-04-01, <=2003-04-10, =11  [solo i dati delle ore 11]
+! reftime: >=2003-04-01 00%6h               [ogni 6 ore a partire da una data]
+!-------------------------------------------------------------------------------
+
+! Profili (per UP.DAT); escludo 1o layer per evitare il doppione con UV10m
+reftime: >=2012-01-01, <=2012-01-05
+product: t or u or v or pr
+level: GRIB1,110,039,040 or GRIB1,110,038,039 or GRIB1,110,037,038 or GRIB1,110,036,037 or GRIB1,110,035,036 or GRIB1,110,034,035 or GRIB1,110,033,034 or GRIB1,110,032,033 or GRIB1,110,031,032 or GRIB1,110,030,031 or GRIB1,110,029,030 or GRIB1,110,028,029 or GRIB1,110,027,028 or GRIB1,110,026,027 or GRIB1,110,025,026 or GRIB1,110,024,025 or GRIB1,110,023,024 or GRIB1,110,022,023 or GRIB1,110,021,022
+#
+! Dati superficiali (per SURF.DAT)
+reftime: >=2012-01-01, <=2012-01-05
+product: pr or tcc or cl or cm or ch
+level: g00 
+#
+reftime: >=2012-01-01, <=2012-01-05
+level: g02 or g10
+product: t or td or u or v
+#
+reftime: >=2012-01-01, <=2012-01-05
+product: tp
+timerange: Timedef,0,,1h

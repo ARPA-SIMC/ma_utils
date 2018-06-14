@@ -1,0 +1,25 @@
+!-------------------------------------------------------------------------------
+! Template per estrazioni Arkimet, dataset PESCOEMROPE (versione 24/01/2012)
+!
+! SINTASSI DEL FILE:
+! Le righe vuote e quelle che iniziano con "!" vengono ignorate
+! Le righe che iniziano con "#" separano gruppi che danno luogo a query distinte
+! Le righe non possono essere spezzate
+! Espressioni separate da virgola sono interpretate come AND
+!
+! ESEMPI di sintassi possibili 
+!   (documentazione completa in /usr/share/doc/arkimet*/matcher)
+!
+! reftime: =2009-01-01 00
+! reftime: >=2008-01-01, <=2008-12-31
+! timerange: aa0024        [media giornaliera]
+!-------------------------------------------------------------------------------
+! Medie giornaliere PM10 e PM25 + incertezze
+reftime: =2012-01-01
+product: pm10 or pm25 or pm10u or pm25u
+timerange: aa0024
+#
+! Medie orarie O3 e NO2 + incertezze
+reftime: =2012-01-01
+product: o3 or no2 or o3u or no2u
+timerange: an

@@ -50,7 +50,7 @@
 #   richiederebbe l'introduzione di nuovi alias per le scadenze previste 
 #   (c0124 -> c0124ph, ...); per le analisi dovrebbe bastare Timedef,0,x,1h
 #
-#                                    Versione 7.7.1 (Arkimet), Enrico 21/09/2015
+#                                    Versione 8.0.0 (Arkimet), Enrico 30/06/2018
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -98,6 +98,7 @@ if [ -z $MA_UTILS_SVN ] ; then
   math_grib=/usr/libexec/ma_utils/math_grib.exe
   grib_runmean=/usr/libexec/ma_utils/grib_runmean.exe
   grib_skip_first=/usr/libexec/ma_utils/grib_skip_first.exe
+  chimere_env=/usr/libexec/ma_utils/chimere_env.sh
 else
   echo "(estra_grib_cosmo.sh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
   post_wind_lm=${MA_UTILS_SVN}/post_lm/src/post_wind_lm.exe
@@ -105,32 +106,31 @@ else
   math_grib=${MA_UTILS_SVN}/util/grib/src/math_grib.exe
   grib_runmean=${MA_UTILS_SVN}/util/grib/src/grib_runmean.exe
   grib_skip_first=${MA_UTILS_SVN}/util/grib/src/grib_skip_first.exe
+  chimere_env=${MA_UTILS_SVN}/chimere/sh/chimere_env.sh
 fi  
 
 #-------------------------------------------------------------------------------
 # 1.3) Definisco le variabili d'ambiente relative a questo run Chimere 
 #      (dipendono  pre_chimere.inp e dalle dir di installazione)
 
-if [ $proj != "none" ] ; then
-  if [ $HOSTNAME = "maialinux" ] ; then           # maialinux fed16
-    chimere_env=$HOME/ver16/ope/ninfa/bin/chimere_env.sh
-  else                                            # lattuga e PCs
-    chimere_env=/home/eminguzzi/chimere/bin/chimere_env.sh
-  fi
-  . $chimere_env $proj || exit 2
-fi
+# if [ $proj != "none" ] ; then
+#   if [ $HOSTNAME = "maialinux" ] ; then           # maialinux fed16
+#     chimere_env=$HOME/ver16/ope/ninfa/bin/chimere_env.sh
+#   else                                            # lattuga e PCs
+#     chimere_env=/home/eminguzzi/chimere/bin/chimere_env.sh
+#   fi
+#   . $chimere_env $proj || exit 2
+# fi
 
-dataset=`echo $dataset | tr [:upper:] [:lower:]`
-if [ -z $akurl ] ; then
-  if [ $dataset = "cosmo_i7" -o $dataset = "COSMO_I7" ] ; then
-    akurl="http://maialinux.metarpa:8090"
-  else
-    akurl="http://arkimet.metarpa:8090"
-  fi
-fi
-if [ $dataset = "cosmo_i7" ] ; then
-  dataset="COSMO_I7"
-fi
+# if [ -z $akurl ] ; then
+#   if [ $dataset = "cosmo_i7" -o $dataset = "COSMO_I7" ] ; then
+#     akurl="http://maialinux.metarpa:8090"
+#   else
+#     akurl="http://arkimet.metarpa:8090"
+#   fi
+# fi
+
+akurl="http://arkimet.metarpa:8090"
 
 # Controlli sui parametri
 if [ $metmod != "LM" ] ; then
@@ -153,7 +153,7 @@ else
     echo "Sono gestiti solo forecast con inizio alle 00Z o 12Z (hh_ini="$hh_ini")"
     exit 2
   fi
-  if [ $dataset != "lm7tmpc" -a $dataset != "COSMO_I7" ] ; then
+  if [ $dataset != "lm7tmpc" -a $dataset != "cosmo_5M_vol_ita" ] ; then
     echo "Dataset non gestito per le previsioni [DATASET]: "$dataset
     exit 2
   fi
@@ -192,23 +192,44 @@ if [ $scad0 = "-1" -o $scad0 = "-0.5" ] ; then                       # analisi
   fi
 
 # expr_trange_ist="an"               # patch fino a ricostruzione indice LAMAZ
-  if [ $dataset = "lamaz" ] ; then
+  if [ $dataset = "lamaz" -o $dataset = "lama5" ] ; then
     expr_trange_ist="Timedef"        # patch fino a ricostruzione indice LAMAZ
     expr_trange_cum="ac0001"
     expr_trange_med="aa0001"
-    expr_proddef=""
-  elif [ $dataset = "lm7tmpc" -o $dataset = "COSMO_I7" ] ; then
-    expr_trange_ist="an"             # patch fino a ricostruzione indice LAMAZ
+    expr_proddef_ist="proddef: GRIB: tod=1"
+    expr_proddef_1hr="proddef: GRIB: tod=1"
+  elif [ $dataset = "lm7tmpc" ] ; then
+    expr_trange_ist="an"
     expr_trange_cum="Timedef"
     expr_trange_med="Timedef"
-    expr_proddef="GRIB: tod=0"
+    expr_proddef_ist="proddef: GRIB: tod=0"
+    expr_proddef_1hr="proddef: GRIB: tod=0"
+  elif [ $dataset = "cosmo_5M_vol_ita" ] ; then
+    expr_trange_ist="an"
+    expr_trange_cum="Timedef"
+    expr_trange_med="Timedef"
+    expr_proddef_ist="proddef: GRIB: tod=1"
+    expr_proddef_1hr="proddef: GRIB: tod=0"
+  else
+    echo "Dataset non gestito "$dataset
+    exit 1
   fi
 
+  if [ $dataset = "cosmo_5M_vol_ita" ] ; then
+  cat <<EOF > 6hr.rule
+if ( P2 != 6 || ( hour != 0 && hour != 12) ) {
+set centre=200;
+write ;
+}
+EOF
+  fi
+  
 else
   expr_reftime_ist="="${datac_akq}" "${hh_ini}
   expr_reftime_cum="="${datac_akq}" "${hh_ini}
   expr_reftime_med="="${datac_akq}" "${hh_ini}
-  expr_proddef="GRIB: tod=1"
+  expr_proddef_ist="proddef: GRIB: tod=1"
+  expr_proddef_1hr="proddef: GRIB: tod=1"
 
   sc1=$scad0
   sc2=`expr $scad0 + $nhours`
@@ -343,7 +364,7 @@ EOF1
     product: $var
     level: $expr_lev3d
     timerange: $expr_trange_ist
-    proddef: $expr_proddef
+    $expr_proddef_ist
 EOF2
 
   fi
@@ -378,24 +399,24 @@ EOF2
 done
 
 # 2.2.4 copio le quote dei livelli per tutti gli istanti richiesti
-  echo "Copio le quote dei livelli per gli istanti richiesti"
-  rm -f zlay.grb tranges.lst 
-  mv ALTI_3D.grb zlay.grb
-  grib_get -p dataDate,dataTime,unitOfTimeRange,P1,P2,timeRangeIndicator \
-    TEMP_3D.grb | uniq > tranges.lst
+echo "Copio le quote dei livelli per gli istanti richiesti"
+rm -f zlay.grb tranges.lst 
+mv ALTI_3D.grb zlay.grb
+grib_get -p dataDate,dataTime,unitOfTimeRange,P1,P2,timeRangeIndicator \
+  TEMP_3D.grb | uniq > tranges.lst
 
-  while read line ; do
-    dd=`echo $line | awk '{print $1}'`
-    dt=`echo $line | awk '{print $2}'`
-    uotr=`echo $line | awk '{print $3}'`
-    p1=`echo $line | awk '{print $4}'`
-    p2=`echo $line | awk '{print $5}'`
-    tri=`echo $line | awk '{print $6}'`
-    rm -f tmp.grb
-    grib_set -s dataDate=${dd},dataTime=${dt},unitOfTimeRange=${uotr},P1=${p1},P2=${p2},timeRangeIndicator=${tri} \
-      zlay.grb tmp.grb
-    cat tmp.grb >> ALTI_3D.grb
-  done < tranges.lst
+while read line ; do
+  dd=`echo $line | awk '{print $1}'`
+  dt=`echo $line | awk '{print $2}'`
+  uotr=`echo $line | awk '{print $3}'`
+  p1=`echo $line | awk '{print $4}'`
+  p2=`echo $line | awk '{print $5}'`
+  tri=`echo $line | awk '{print $6}'`
+  rm -f tmp.grb
+  grib_set -s dataDate=${dd},dataTime=${dt},unitOfTimeRange=${uotr},P1=${p1},P2=${p2},timeRangeIndicator=${tri} \
+    zlay.grb tmp.grb
+  cat tmp.grb >> ALTI_3D.grb
+done < tranges.lst
 
 # 2.2.5 destag e antruto il vento
 if [ $dataset = "lamaz" ] ; then   # patch: in attesa del riallineamento lamaz
@@ -406,7 +427,7 @@ if [ $dataset = "lamaz" ] ; then   # patch: in attesa del riallineamento lamaz
   $post_wind_lm tmp1.grb tmp2.grb ZWIN_3D.grb MWIN_3D.grb -dest -antir || ier=12
   rm tmp1.grb tmp2.grb
 
-elif [ $dataset = "lm7tmpc" -o $dataset = "COSMO_I7" ] ; then
+elif [ $dataset = "lm7tmpc" -o $dataset = "cosmo_5M_vol_ita" ] ; then
   echo "Destag e antirotazione vento (standard)"
   rm -f stag.grb destag.grb tmp.grb tmp1.grb
   $grib_skip_first TEMP_3D.grb tmp1.grb -1
@@ -423,7 +444,7 @@ elif [ $dataset = "lm7tmpc" -o $dataset = "COSMO_I7" ] ; then
 fi
 
 # 2.2.6 gestione cloud water/ice
-if [ $dataset = "lm7tmpc" -o $dataset = "COSMO_I7" ] ; then
+if [ $dataset = "lm7tmpc" -o $dataset = "cosmo_5M_vol_ita" ] ; then
   if [ `echo $plist_3d | grep CLIQ_3D | wc -l` -eq 1 ] ; then
     echo "Calcolo cloud liquid water"
     rm -f sg*.grb tmp.grb
@@ -512,12 +533,15 @@ for param in $plist_2d ; do
   if [ $tipo_sca = "ist" ] ; then
     expr_reftime=$expr_reftime_ist
     expr_trange=$expr_trange_ist
+    expr_proddef=$expr_proddef_ist
   elif [ $tipo_sca = "cum" ] ; then
     expr_reftime=$expr_reftime_cum
     expr_trange=$expr_trange_cum
+    expr_proddef=$expr_proddef_1hr
   elif [ $tipo_sca = "med" ] ; then
     expr_reftime=$expr_reftime_med
     expr_trange=$expr_trange_med
+    expr_proddef=$expr_proddef_1hr
   fi  
 
   rm -f ${param}.query
@@ -526,11 +550,12 @@ for param in $plist_2d ; do
   product: $var
   level: $expr_levsup
   timerange: $expr_trange
-  proddef: $expr_proddef
+  $expr_proddef
 EOF2
 
 # 2.3.3 Estraggo dall' archivio
-  arki-query --data --file=${param}.query -C ${dataset}.conf >> ${param}.grb
+  arki-query --data --sort=reftime,timerange --file=${param}.query \
+    -C ${dataset}.conf >> ${param}.grb
   if [ -s ${param}.grb ] ; then
     echo "Estratti grib: "`du -h  ${param}.grb`
   else
@@ -540,17 +565,25 @@ EOF2
 
 # 2.3.4 Post-processing dei dati non istantanei
   if [ $tipo_sca = "cum" -o $tipo_sca = "med" ] ; then
-    rm -f ${param}.grb.org ${param}.grb.p1 ${param}.grb.ext 
+    rm -f ${param}.grb.org ${param}.grb.p0 ${param}.grb.p1 ${param}.grb.ext 
     mv ${param}.grb ${param}.grb.org
 
-#   Passo a valori relativi all'ora precedente (patch)
-    if [ $dataset = "lm7tmpc" -o $dataset = "COSMO_I7" ] ; then
+# Nelle analisi cosmo_5M_vol_ita, i parametri non istantanei contengono anche
+# campi alle ore 00 e 12 elaborati nelle 6 ore precedenti, che devono essere tolti
+# Successivmaente, passo ai valori relativi all'ora precedente (patch)
+    if [ $dataset = "lm7tmpc" -o $dataset = "cosmo_5M_vol_ita" ] ; then
+      if [ $scad0 = "-1" -o $scad0 = "-0.5" ] ; then
+        grib_filter 6hr.rule -o ${param}.grb.p0 ${param}.grb.org
+      else
+        ln -s ${param}.grb.org ${param}.grb.p0
+      fi
+
       if [ $tipo_sca = "cum" ] ; then
         vg6d_transform --comp-stat-proc=1 --comp-step="0 01" \
-          ${param}.grb.org ${param}.grb.p1 || ier=30
+          ${param}.grb.p0 ${param}.grb.p1 || ier=30
       elif [ $tipo_sca = "med" ] ; then
         vg6d_transform --comp-stat-proc=0 --comp-step="0 01" \
-          ${param}.grb.org ${param}.grb.p1 || ier=31
+          ${param}.grb.p0 ${param}.grb.p1 || ier=31
       fi
     else
       ln -s ${param}.grb.org ${param}.grb.p1
@@ -620,7 +653,7 @@ done
 # /home/eminguzzi/svn/feed_lama/proc_cosmo_ana.sh, sez. 3.5
 
 if [ `echo $plist_2d | grep SOIM_2D | wc -l` -eq 1 -a \
-     \( $dataset = "lm7tmpc" -o $dataset = "COSMO_I7" \) ] ; then
+     \( $dataset = "lm7tmpc" -o $dataset = "cosmo_5M_vol_ita" \) ] ; then
   rm -f sg*.grb tmp*.grb
   mv SOIM_2D.grb SOIM_2D.grb.org
 
