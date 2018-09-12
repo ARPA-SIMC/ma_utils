@@ -7,7 +7,6 @@ Group:      Applications/Meteo
 URL:        http://arpae.it/sim
 Vendor:	    Enrico Minguzzi <eminguzzi@arpae.it>
 Packager:   Daniele Branchini <dbranchini@arpae.it>
-Source0:    %{name}-%{version}.tar.gz
 Source:     https://github.com/arpa-simc/%{name}/archive/v%{version}-%{release}.tar.gz#/%{name}-%{version}-%{release}.tar.gz  
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
