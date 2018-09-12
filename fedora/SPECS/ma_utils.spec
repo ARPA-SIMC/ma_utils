@@ -25,8 +25,8 @@ BuildRequires: eccodes-simc
 BuildRequires: eccodes-simc
 %endif
 
-BuildRequires: libtool netcdf-devel %{grib_sw}-devel libdballe-devel libsim-devel %{!?rhel:libsmr} udunits2-devel cnf-devel
-Requires: libsim >= 6.0 libsim < 7.0 %{!?rhel:libsmr}
+BuildRequires: libtool netcdf-devel %{grib_sw}-devel libdballe-devel libsim-devel %{!?rhel:libsmr} udunits2-devel cnf-devel ksh
+Requires: libsim >= 6.0 libsim < 7.0 %{!?rhel:libsmr} ksh
 
 %description
 
