@@ -74,9 +74,9 @@ IF (iret /= GRIB_SUCCESS) GOTO 9999
 
 CALL grib_open_file(ifout,fileout,"w",iret)
 
-CALL grib_new_from_template(igtemp_utm,"utm_grib2",iret)
-CALL grib_new_from_template(igtemp_geo,"regular_ll_sfc_grib2",iret)
-CALL grib_new_from_template(igtemp_rot,"rotated_ll_sfc_grib2",iret)
+CALL grib_new_from_samples(igtemp_utm,"utm_grib2",iret)
+CALL grib_new_from_samples(igtemp_geo,"regular_ll_sfc_grib2",iret)
+CALL grib_new_from_samples(igtemp_rot,"rotated_ll_sfc_grib2",iret)
 
 IF (iret /= GRIB_SUCCESS) GOTO 9998
 

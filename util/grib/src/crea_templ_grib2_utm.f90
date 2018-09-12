@@ -37,7 +37,7 @@ yf = 412500
 !-------------------------------------------------------------------------------
 ! 2) Costruisco il template (le chiavi con * nel commento sono usate da LibSim)
 
-CALL grib_new_from_template(ig,"GRIB1",iret)
+CALL grib_new_from_samples(ig,"GRIB1",iret)
 
 ! 2.1 Section 0 (Indicator)
 CALL grib_set(ig,"editionNumber",2)

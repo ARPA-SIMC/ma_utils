@@ -65,7 +65,7 @@ DO kpar = 1,8
   WRITE (*,*) " par ",par(kpar)," ave ",SUM(field(1:nx*ny))/REAL(nx*ny)
 
 ! 2.2 Creo un nuovo messaggio GRIB2-UTM
-  CALL grib_new_from_template(igout,"utm_grib2",iret)
+  CALL grib_new_from_samples(igout,"utm_grib2",iret)
   IF (iret /= GRIB_SUCCESS) GOTO 9996
 
 ! 2.3 Assegno le chiavi

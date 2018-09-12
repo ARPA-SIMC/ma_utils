@@ -63,7 +63,7 @@ ENDIF
 CALL grib_open_file(ifin,filein,"r",iret)
 IF (iret /= GRIB_SUCCESS) GOTO 9999
 CALL grib_open_file(ifout,fileout,"w",iret)
-CALL grib_new_from_template(igtemp,"GRIB1",iret)
+CALL grib_new_from_samples(igtemp,"GRIB1",iret)
 IF (iret /= GRIB_SUCCESS) GOTO 9998
 
 !==========================================================================
