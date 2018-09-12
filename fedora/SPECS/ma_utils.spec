@@ -7,8 +7,7 @@ Group:      Applications/Meteo
 URL:        http://arpae.it/sim
 Vendor:	    Enrico Minguzzi <eminguzzi@arpae.it>
 Packager:   Daniele Branchini <dbranchini@arpae.it>
-Source:     https://github.com/arpa-simc/%{name}/archive/v%{version}-%{release}.tar.gz#/%{name}-%{version}-%{release}.tar.gz  
-BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+Source:     https://github.com/arpa-simc/%{name}/archive/v%{version}-%{release}.tar.gz#/%{name}-%{version}-%{release}.tar.gz
 
 %if 0%{?fedora} <= 24
 # grib_api is used only on older fedoras
@@ -38,7 +37,7 @@ sh autogen.sh
 
 %build
 
-%configure %{?rhel:--enable-smnd-build}
+%configure
 make
 
 %install
@@ -55,14 +54,11 @@ rm -rf %{buildroot}
 %{_libexecdir}/%{name}/*.exe
 %{_libexecdir}/%{name}/*.r
 %{_libexecdir}/%{name}/*sh
-
-%if ! 0%{?rhel:1}
 %{_libexecdir}/%{name}/wrom.gs
 %{_libexecdir}/%{name}/plot_local_orog.gs
 %{_libexecdir}/%{name}/crea_anag_stzqa_all.sql
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/*
-%endif
 
 %package -n arkimet-postprocess-seriet
 Summary: GRIB to seriet postprocessor for arkimet
