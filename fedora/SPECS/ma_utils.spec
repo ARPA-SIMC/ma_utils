@@ -23,7 +23,7 @@ BuildRequires: eccodes-simc
 BuildRequires: eccodes-simc
 %endif
 
-BuildRequires: libtool netcdf-devel %{grib_sw}-devel libdballe-devel libsim-devel udunits2-devel cnf-devel ksh
+BuildRequires: libtool gcc-gfortran netcdf-devel %{grib_sw}-devel libdballe-devel libsim-devel udunits2-devel cnf-devel ksh
 Requires: libsim >= 6.0 libsim < 7.0 ksh
 
 %description
