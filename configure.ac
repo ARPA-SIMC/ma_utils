@@ -23,12 +23,14 @@ fi
 # Checks for libraries.
 AM_PROG_LIBTOOL
 
+grib_api_flavor=
 AC_CHECK_LIB(
 	     [eccodes_f90],
 	     [grib_f_open_file],
 	     [
 	      AC_MSG_RESULT([eccodes code included])
 	      LIBS="-leccodes_f90 -leccodes -ljasper"
+              grib_api_flavor=eccodes
 	     ],
 	     [AC_MSG_RESULT([eccodes library not found, trying with legacy grib_api])],
 	     [-leccodes -ljasper]
@@ -40,6 +42,7 @@ AC_CHECK_LIB(
 	     [
 	      AC_MSG_RESULT([gribapi code included])
 	      LIBS="-lgrib_api_f90 -lgrib_api -ljasper"
+              grib_api_flavor=grib_api
 	     ],
 	     [AC_MSG_ERROR([eccodes and grib-api library not found])],
 	     [-lgrib_api -ljasper]
