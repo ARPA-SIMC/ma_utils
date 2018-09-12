@@ -23,16 +23,38 @@ fi
 # Checks for libraries.
 AM_PROG_LIBTOOL
 
+AC_CHECK_LIB(
+	     [eccodes_f90],
+	     [grib_f_open_file],
+	     [
+	      AC_MSG_RESULT([eccodes code included])
+	      LIBS="-leccodes_f90 -leccodes -ljasper"
+	     ],
+	     [AC_MSG_RESULT([eccodes library not found, trying with legacy grib_api])],
+	     [-leccodes -ljasper]
+	    )
+if test "x$grib_api_flavor" = "x"; then
+AC_CHECK_LIB(
+	     [grib_api_f90],
+	     [grib_f_open_file],
+	     [
+	      AC_MSG_RESULT([gribapi code included])
+	      LIBS="-lgrib_api_f90 -lgrib_api -ljasper"
+	     ],
+	     [AC_MSG_ERROR([eccodes and grib-api library not found])],
+	     [-lgrib_api -ljasper]
+	    )
+fi
+
 # Checks for header files.
 
 # Checks for typedefs, structures, and compiler characteristics.
-
 AC_ARG_ENABLE(smnd-build, AC_HELP_STRING([--enable-smnd-build],
   [enable smnd build]), , [enableval=no])dnl default disable
 if test "x$enableval" = "xyes"; then
-    LIBS="-lgrib_api -lgrib_api_f90 -lsim_base -lsim_volgrid6d -lsim_vol7d"
+    LIBS="$LIBS -lsim_base -lsim_volgrid6d -lsim_vol7d"
 else
-    LIBS="-lgrib_api -lgrib_api_f90 -lemos -lsim_base -lsim_volgrid6d  -lsim_vol7d -lnetcdf -lnetcdff"
+    LIBS="$LIBS -lemos -lsim_base -lsim_volgrid6d  -lsim_vol7d -lnetcdf -lnetcdff"
 fi
 
 AM_CONDITIONAL(SMND_BUILD, test "x$enableval" = "xyes")
