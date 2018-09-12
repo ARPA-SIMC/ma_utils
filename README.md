@@ -3,7 +3,16 @@
 Tools, utilties and libraries for environmental meteorology
 in use at ARPAE-SIMC
 
-# Contact and copyright information
+## Build status
+
+| Environment | Status |
+| ----------- | ------ |
+| CentOS 7    | [![Build Status](https://badges.herokuapp.com/travis/ARPA-SIMC/ma_utils?branch=master&env=DOCKER_IMAGE=centos:7&label=centos7)](https://travis-ci.org/ARPA-SIMC/ma_utils) |
+| Fedora 27   | [![Build Status](https://badges.herokuapp.com/travis/ARPA-SIMC/ma_utils?branch=master&env=DOCKER_IMAGE=fedora:27&label=fedora27)](https://travis-ci.org/ARPA-SIMC/ma_utils) |
+| Fedora 28   | [![Build Status](https://badges.herokuapp.com/travis/ARPA-SIMC/ma_utils?branch=master&env=DOCKER_IMAGE=fedora:28&label=fedora28)](https://travis-ci.org/ARPA-SIMC/ma_utils) |
+
+
+## Contact and copyright information
 
 libsim is Copyright (C) 2018  ARPAE-SIMC <urpsim@arpae.it>
 
