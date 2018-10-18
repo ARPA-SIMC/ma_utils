@@ -1,23 +1,22 @@
 # MA - UTILS
 
+[![Build Status](https://badges.herokuapp.com/travis/ARPA-SIMC/ma_utils?branch=master&env=DOCKER_IMAGE=centos:7&label=centos7)](https://travis-ci.org/ARPA-SIMC/ma_utils)
+[![Build Status](https://badges.herokuapp.com/travis/ARPA-SIMC/ma_utils?branch=master&env=DOCKER_IMAGE=fedora:27&label=fedora27)](https://travis-ci.org/ARPA-SIMC/ma_utils)
+[![Build Status](https://badges.herokuapp.com/travis/ARPA-SIMC/ma_utils?branch=master&env=DOCKER_IMAGE=fedora:28&label=fedora28)](https://travis-ci.org/ARPA-SIMC/ma_utils)
+[![Build Status](https://badges.herokuapp.com/travis/ARPA-SIMC/ma_utils?branch=master&env=DOCKER_IMAGE=fedora:29&label=fedora29)](https://travis-ci.org/ARPA-SIMC/ma_utils)
+[![Build Status](https://badges.herokuapp.com/travis/ARPA-SIMC/ma_utils?branch=master&env=DOCKER_IMAGE=fedora:rawhide&label=fedorarawhide)](https://travis-ci.org/ARPA-SIMC/ma_utils)
+
+[![Build Status](https://copr.fedorainfracloud.org/coprs/simc/stable/package/ma_utils/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/simc/stable/package/ma_utils/)
+
 Tools, utilties and libraries for environmental meteorology
 in use at ARPAE-SIMC
 
-## Build status
-
-| Environment | Status |
-| ----------- | ------ |
-| CentOS 7    | [![Build Status](https://badges.herokuapp.com/travis/ARPA-SIMC/ma_utils?branch=master&env=DOCKER_IMAGE=centos:7&label=centos7)](https://travis-ci.org/ARPA-SIMC/ma_utils) |
-| Fedora 27   | [![Build Status](https://badges.herokuapp.com/travis/ARPA-SIMC/ma_utils?branch=master&env=DOCKER_IMAGE=fedora:27&label=fedora27)](https://travis-ci.org/ARPA-SIMC/ma_utils) |
-| Fedora 28   | [![Build Status](https://badges.herokuapp.com/travis/ARPA-SIMC/ma_utils?branch=master&env=DOCKER_IMAGE=fedora:28&label=fedora28)](https://travis-ci.org/ARPA-SIMC/ma_utils) |
-
-
 ## Contact and copyright information
 
-libsim is Copyright (C) 2018  ARPAE-SIMC <urpsim@arpae.it>
+Ma-utils is Copyright (C) 2018  ARPAE-SIMC <urpsim@arpae.it>
 
-Libsim is licensed under the terms of the GNU General Public License version
-2 or successive.  Please see the file LICENSE for details.
+Ma-utils is licensed under the terms of the GNU General Public License version
+2.  Please see the file LICENSE for details.
 
 Contact informations for ARPAE-SIMC (formerly ARPA-SIM):
 
