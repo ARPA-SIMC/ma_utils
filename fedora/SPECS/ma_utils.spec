@@ -1,7 +1,7 @@
 Summary:    Tools, utilties and libraries for environmental meteorology
 Name:       ma_utils
 Version:    0.13
-Release:    500
+Release:    501
 License:    GPL
 Group:      Applications/Meteo
 URL:        http://arpae.it/sim
