@@ -23,8 +23,24 @@ BuildRequires: eccodes-simc
 BuildRequires: eccodes-simc
 %endif
 
-BuildRequires: libtool gcc-gfortran netcdf-devel %{grib_sw}-devel libdballe-devel libsim-devel udunits2-devel cnf-devel ksh libemos jasper-devel libemos shapelib-devel proj-devel netcdf-fortran-devel
-Requires: libsim >= 6.0 libsim < 7.0 ksh
+BuildRequires: libtool
+BuildRequires: gcc-gfortran
+BuildRequires: netcdf-devel
+BuildRequires: %{grib_sw}-devel
+BuildRequires: libdballe-devel
+BuildRequires: libsim-devel
+BuildRequires: udunits2-devel
+BuildRequires: cnf-devel
+BuildRequires: ksh
+BuildRequires: libemos
+BuildRequires: jasper-devel
+BuildRequires: libemos
+BuildRequires: shapelib-devel
+BuildRequires: proj-devel
+BuildRequires: netcdf-fortran-devel
+
+Requires: libsim >= 6.0, libsim < 7.0
+Requires: ksh
 
 %description
 
@@ -63,7 +79,8 @@ rm -rf %{buildroot}
 %package -n arkimet-postprocess-seriet
 Summary: GRIB to seriet postprocessor for arkimet
 BuildArch: noarch
-Requires: arkimet, ma_utils
+Requires: arkimet
+Requires: ma_utils
 
 %description -n arkimet-postprocess-seriet
 GRIB to seriet postprocessor for arkimet
