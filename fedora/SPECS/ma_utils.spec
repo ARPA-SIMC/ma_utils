@@ -30,7 +30,6 @@ BuildRequires: %{grib_sw}-devel
 BuildRequires: libdballe-devel
 BuildRequires: libsim-devel
 BuildRequires: udunits2-devel
-BuildRequires: cnf-devel
 BuildRequires: ksh
 BuildRequires: libemos
 BuildRequires: jasper-devel
