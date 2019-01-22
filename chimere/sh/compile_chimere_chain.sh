@@ -30,7 +30,7 @@ function checkexist {
 if [ $HOSTNAME = "fileserver" ] ; then          # maialinux fed16
   chimere_env=$HOME/ver16/ope/ninfa/bin/chimere_env.sh
 else                                            # lattuga e PCs
-  chimere_env=/home/eminguzzi/chimere/bin/chimere_env.sh
+  chimere_env=~eminguzzi/chimere/bin/chimere_env.sh
 fi
 . $chimere_env $proj
 

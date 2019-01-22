@@ -7,15 +7,15 @@
 # Versioni <7.0 come crea_progetto_estra.ksh
 #
 # Per modificare i path del pacchetto ma_utils, assegnare le variabili:
-# MA_UTILS_DAT: tabelle ma_utils (ad esempio: /home/eminguzzi/svn/ma_utils/data;
+# MA_UTILS_DAT: tabelle ma_utils (ad esempio: ~eminguzzi/svn/ma_utils/data;
 #               se non specificato, usa: /usr/share/ma_utils)
-# MA_UTILS_SVN: esegubili (ad esempio /home/eminguzzi/svn/ma_utils; se non 
+# MA_UTILS_SVN: esegubili (ad esempio ~eminguzzi/svn/ma_utils; se non 
 #   specificato, usa gli eseguibili in /usr/libexec/ma_utils)
 #
 # Per modificare i path di pacchetti libsim/dballe, assegnare le variabili:
 # LIBSIM_DATA:  tabelle libsim (se non specificato usa: /usr/share/libsim)
 # DBA_TABLES:   tabelle dballe (se non specificato usa: /usr/share/wreport)
-# LIBSIM_SVN:   esegubili (ad esempio: /home/eminguzzi/svn/libsim; se non 
+# LIBSIM_SVN:   esegubili (ad esempio: ~eminguzzi/svn/libsim; se non 
 #               specificato, usa gli eseguibili in path)
 #
 #                                                V8.0.0, Enrico 06/06/2018
@@ -95,17 +95,17 @@ function intfill
 if [ -z $work_root ] ; then
   work_root=/autofs/scratch2/eminguzzi/arkimet/tmp_point # root dir lavoro
 fi
-arc_root=/home/eminguzzi/arkimet/progetti_point   # root arc. estrazioni
+arc_root=~eminguzzi/arkimet/progetti_point   # root arc. estrazioni
 doc_file=${arc_root}/_doc/progetti_estra.doc      # elenco progetti archiviati
 
 if [ -z $GASCRP ] ; then
-  export GASCRP=/home/eminguzzi/util/grads/scripts
+  export GASCRP=~eminguzzi/util/grads/scripts
 fi
   
 # 1.2) Utility e files di appoggio (da ma_utils)
 # Alcuni files di appoggio reltivi a vecchi archivi sono in:
-# /home/eminguzzi/arkimet/templates (templates per estrazioni arkimet)
-# /home/eminguzzi/util/grib/lm_ope  (dati fisiografici)
+# ~eminguzzi/arkimet/templates (templates per estrazioni arkimet)
+# ~eminguzzi/util/grib/lm_ope  (dati fisiografici)
 
 if [ -z $MA_UTILS_DAT ] ; then
   arkimet_aree=/usr/share/ma_utils/arkimet_aree.dat

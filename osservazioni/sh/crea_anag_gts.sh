@@ -4,9 +4,9 @@
 # GTS (synop/metar e temp) 
 #
 # Per modificare i path del pacchetto ma_utils, assegnare le variabili:
-# MA_UTILS_DAT: tabelle ma_utils (ad esempio: /home/eminguzzi/svn/ma_utils/data;
+# MA_UTILS_DAT: tabelle ma_utils (ad esempio: ~eminguzzi/svn/ma_utils/data;
 #               se non specificato, usa: /usr/share/ma_utils)
-# MA_UTILS_SVN: eseguibili ma_utils (ad esempio: /home/eminguzzi/svn/ma_utils;
+# MA_UTILS_SVN: eseguibili ma_utils (ad esempio: ~eminguzzi/svn/ma_utils;
 #               se non specificato, usa: /usr/libexec/ma_utils)
 #
 # Per modificare i path di pacchetti libsim/dballe, assegnare le variabili:
@@ -15,7 +15,7 @@
 # DBA_TABLES:   tabelle dballe, ie. file dballe.txt 
 #               (se non specificato usa: /usr/share/wreport)
 # LIBSIM_SVN:   eseguibili libsim (ad esempio:  
-#               /home/eminguzzi/svn/vol7d, /home/dcesari/program/f90/svn/trunk; 
+#               ~eminguzzi/svn/vol7d, /home/dcesari/program/f90/svn/trunk; 
 #               se non specificato, usa: /usr/bin)
 #
 # TODO:
@@ -44,7 +44,7 @@ function write_help
   echo "     [-h] [-ope] [-coo]"
   echo "xmin ymin xmax ymax: estremi dell'aera geografica di ricerca (def: ovunque)"
   echo "data_ini, data_fin: intervallo di date in cui cercare (def: qualsiasi data)"
-  echo "-ope: aggiorna l'anagrafica in /home/eminguzzi/svn/ma_utils/data"
+  echo "-ope: aggiorna l'anagrafica in ~eminguzzi/svn/ma_utils/data"
   echo "-full: scrive anche coordinate, quota e nome stazione (lento; def: solo codice) "
 }
 
@@ -214,8 +214,8 @@ done
 
 # Dir di lavoro e nome files di output
 if [ $ope = "Y" ] ; then
-  fileout1=/home/eminguzzi/svn/ma_utils/data/anag_synop.csv
-  fileout2=/home/eminguzzi/svn/ma_utils/data/anag_temp.csv
+  fileout1=~eminguzzi/svn/ma_utils/data/anag_synop.csv
+  fileout2=~eminguzzi/svn/ma_utils/data/anag_temp.csv
   if [ -z $AK_TEMP ] ; then
     AK_TEMP=$TEMP
   fi

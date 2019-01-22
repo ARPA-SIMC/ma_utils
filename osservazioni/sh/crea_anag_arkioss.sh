@@ -24,7 +24,7 @@ function write_help
   echo "     [-h] [-ope] [-url URL]"
   echo "xmin ymin xmax ymax: estremi dell'aera geografica di ricerca (def: ovunque)"
   echo "data_ini, data_fin: intervallo di date in cui cercare (def: qualsiasi data)"
-  echo "-ope: aggiorna l'anagrafica in /home/eminguzzi/svn/ma_utils/data"
+  echo "-ope: aggiorna l'anagrafica in ~eminguzzi/svn/ma_utils/data"
   echo "URL: indirizzo del server arkioss (def: http://arkioss4.metarpa:8090)"
 }
 
@@ -263,8 +263,8 @@ fi
 
 # Dir di lavoro e nome files di output
 if [ $ope = "Y" ] ; then
-  fileout1=/home/eminguzzi/svn/ma_utils/data/anag_arkioss.csv
-  fileout2=/home/eminguzzi/svn/ma_utils/data/param_arkioss.csv
+  fileout1=~eminguzzi/svn/ma_utils/data/anag_arkioss.csv
+  fileout2=~eminguzzi/svn/ma_utils/data/param_arkioss.csv
   if [ -z $AK_TEMP ] ; then
     AK_TEMP=$TEMP
   fi

@@ -130,8 +130,8 @@ done
 #--------------------------------------------------------------------------
 # 1.2) Path e altri parametri costanti
 
-proj_dir=/home/eminguzzi/calmet/progetti/${proj} # files statici del progett
-dat_dir=/home/eminguzzi/calmet/dat/              # files costanti calmet
+proj_dir=~eminguzzi/calmet/progetti/${proj} # files statici del progett
+dat_dir=~eminguzzi/calmet/dat/              # files costanti calmet
 run_root=/scratch/eminguzzi/calmet/${proj}       # root esecuzione
 
 out_dir=${run_root}/out/                         # prodotti finali
@@ -170,9 +170,9 @@ else
 fi
 
 # Livelli LAMAZ da usare per pseudo-osservazioni
-zlay_lamaz_2003=/home/eminguzzi/util/grib/lm_ope/LAMAZ_layers_20030402.grb
-zlay_lamaz_2006=/home/eminguzzi/util/grib/lm_ope/LAMAZ_layers_20060126.grb
-zlay_lamaz_2012=/home/eminguzzi/util/grib/lm_ope/LAMAZ_layers_20120606.grb
+zlay_lamaz_2003=~eminguzzi/util/grib/lm_ope/LAMAZ_layers_20030402.grb
+zlay_lamaz_2006=~eminguzzi/util/grib/lm_ope/LAMAZ_layers_20060126.grb
+zlay_lamaz_2012=~eminguzzi/util/grib/lm_ope/LAMAZ_layers_20120606.grb
 
 lay_lm_2003="GRIB1,110,035,036 or GRIB1,110,034,035 or GRIB1,110,033,034 or GRIB1,110,032,033 or GRIB1,110,031,032 or GRIB1,110,030,031 or GRIB1,110,029,030 or GRIB1,110,028,029 or GRIB1,110,027,028 or GRIB1,110,026,027 or GRIB1,110,025,026 or GRIB1,110,024,025 or GRIB1,110,023,024 or GRIB1,110,022,023 or GRIB1,110,021,022 or GRIB1,110,020,021 or GRIB1,110,019,020 or GRIB1,110,018,019 or GRIB1,110,017,018 or GRIB1,110,016,017 or GRIB1,110,015,016"
 nlayb_2003="35"

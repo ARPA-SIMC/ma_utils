@@ -46,9 +46,9 @@ if [ $HOSTNAME = "maialinux" ] ; then             # maialinux fed16
   lm_lsm_dir=/lhome/ma_aria/grib/lm_ope           # files lsm COSMO
 
 else                                            # lattuga e PCs
-  chimere_root=/home/eminguzzi/chimere/           # root installazione chimere
+  chimere_root=~eminguzzi/chimere/           # root installazione chimere
   scratch_root=/autofs/scratch2/mstortini/chimere # root albero scratch
-  lm_lsm_dir=/home/eminguzzi/util/grib/lm_ope     # files lsm COSMO
+  lm_lsm_dir=~eminguzzi/util/grib/lm_ope     # files lsm COSMO
   mozart2dir=$scratch_root/BIGFILES/MOZART2/      # dati Mozart
   gocartdir=$scratch_root/BIGFILES/GOCART/        # dati Gocart
   lmdzinca2dir=$scratch_root/BIGFILES/LMDZINCA/   # dati INCA
@@ -74,9 +74,9 @@ if [ $HOSTNAME = "maialinux" ] ; then         # maialinux fed16
   lm_util=$HOME/ver16/grib/bin                    # vecchie utility postproc COSMO
   date_util=$HOME/ver16/bin                       # vecchie utility per date
 else                                          # lattuga e PCs
-  grib_util=/home/eminguzzi/util/grib/bin         # vecchie utility per grib
-  lm_util=/home/eminguzzi/post_lm/bin             # vecchie utility postproc COSMO
-  date_util=/home/eminguzzi/bin                   # vecchie utility per date
+  grib_util=~eminguzzi/util/grib/bin         # vecchie utility per grib
+  lm_util=~eminguzzi/post_lm/bin             # vecchie utility postproc COSMO
+  date_util=~eminguzzi/bin                   # vecchie utility per date
 fi
 days=$date_util/days.exe
 delta_days=$date_util/delta_days.exe
