@@ -1,7 +1,7 @@
 Summary:    Tools, utilties and libraries for environmental meteorology
 Name:       ma_utils
-Version:    0.13
-Release:    501
+Version:    0.14
+Release:    1
 License:    GPL
 Group:      Applications/Meteo
 URL:        http://arpae.it/sim
@@ -23,8 +23,23 @@ BuildRequires: eccodes-simc
 BuildRequires: eccodes-simc
 %endif
 
-BuildRequires: libtool gcc-gfortran netcdf-devel %{grib_sw}-devel libdballe-devel libsim-devel udunits2-devel ksh libemos jasper-devel libemos shapelib-devel proj-devel netcdf-fortran-devel
-Requires: libsim >= 6.0 libsim < 7.0 ksh
+BuildRequires: libtool
+BuildRequires: gcc-gfortran
+BuildRequires: netcdf-devel
+BuildRequires: %{grib_sw}-devel
+BuildRequires: libdballe-devel
+BuildRequires: libsim-devel
+BuildRequires: udunits2-devel
+BuildRequires: ksh
+BuildRequires: libemos
+BuildRequires: jasper-devel
+BuildRequires: libemos
+BuildRequires: shapelib-devel
+BuildRequires: proj-devel
+BuildRequires: netcdf-fortran-devel
+
+Requires: libsim >= 6.0, libsim < 7.0
+Requires: ksh
 
 %description
 
@@ -53,7 +68,7 @@ rm -rf %{buildroot}
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/*.exe
 %{_libexecdir}/%{name}/*.r
-%{_libexecdir}/%{name}/*sh
+%attr(755, root, root) %{_libexecdir}/%{name}/*sh
 %{_libexecdir}/%{name}/wrom.gs
 %{_libexecdir}/%{name}/plot_local_orog.gs
 %{_libexecdir}/%{name}/crea_anag_stzqa_all.sql
@@ -63,7 +78,8 @@ rm -rf %{buildroot}
 %package -n arkimet-postprocess-seriet
 Summary: GRIB to seriet postprocessor for arkimet
 BuildArch: noarch
-Requires: arkimet, ma_utils
+Requires: arkimet
+Requires: ma_utils
 
 %description -n arkimet-postprocess-seriet
 GRIB to seriet postprocessor for arkimet
@@ -73,5 +89,9 @@ GRIB to seriet postprocessor for arkimet
 %{_libdir}/arkimet/seriet
 
 %changelog
+* Tue Jan 22 2019 Daniele Branchini <dbranchini@arpae.it> - 0.14-1
+- fixed bugs in crea_progetto_point.ksh
+- sh in libexec now executables
+
 * Wed Sep 12 2018 Daniele Branchini <dbranchini@arpae.it> - 0.13-500
 - Github/Travis/Copr rebuild
