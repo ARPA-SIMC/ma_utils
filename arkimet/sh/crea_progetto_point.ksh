@@ -303,7 +303,7 @@ if [ $batch = "N" ] ; then
       echo "Errore creando la dir "${work_root}/${proj}
       exit
     fi
-    chgrp ambiente $proj
+    chgrp sim-aria $proj
     chmod g+s $proj
   fi
 fi
