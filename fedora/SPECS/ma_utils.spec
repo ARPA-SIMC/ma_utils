@@ -1,7 +1,7 @@
 Summary:    Tools, utilties and libraries for environmental meteorology
 Name:       ma_utils
 Version:    0.14
-Release:    1
+Release:    2
 License:    GPL
 Group:      Applications/Meteo
 URL:        http://arpae.it/sim
@@ -89,6 +89,9 @@ GRIB to seriet postprocessor for arkimet
 %{_libdir}/arkimet/seriet
 
 %changelog
+* Mon Mar 4 2019 Daniele Branchini <dbranchini@arpae.it> - 0.14-2
+- rebuilt on libsim rebuilt on dballe 8
+
 * Tue Jan 22 2019 Daniele Branchini <dbranchini@arpae.it> - 0.14-1
 - fixed bugs in crea_progetto_point.ksh
 - sh in libexec now executables
