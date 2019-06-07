@@ -20,7 +20,7 @@ matrix:
         - env: DOCKER_IMAGE=fedora:rawhide
 
 before_deploy:
-    - openssl aes-256-cbc -K $encrypted_c6cc4dc9b22c_key -iv $encrypted_c6cc4dc9b22c_iv -in .copr.enc -out .copr -d
+    - openssl aes-256-cbc -K $encrypted_0fdb7e11155b_key -iv $encrypted_0fdb7e11155b_iv -in .copr.enc -out .copr -d
 
 deploy:
     skip_cleanup: true
