@@ -61,7 +61,8 @@ if (opt_out="c")
   'set clevs 0 100 200 500 750 1000 2000 3000'
   'set ccols 45 37 35 32 72 74 76 84 87'
   'd z'
-  'run 'colbar_white.gs
+* 'run 'colbar_white.gs
+  'run 'cbarn_white.gs
   'set clevs -0.02 0.02 100 200 500 750 1000 2000 3000'
   'set ccols 37 45 37 35 32 72 74 76 84 87'
   'd z'
