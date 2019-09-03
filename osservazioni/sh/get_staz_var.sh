@@ -11,7 +11,7 @@
 # - Causa bug arkimet, le query con intervallo di date ritornano meno dati di 
 #   quelle sull'intero dataset (non e' chiaro quale sia quella giusta...)
 #
-#                                              Versione 3.0.0, Enrico 08/04/2016
+#                                              Versione 3.0.1, Enrico 02/09/2019
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -28,7 +28,7 @@ function write_help
   echo "        param_shortnames.csv, in /usr/share/ma_utils)"
   echo "xmin ymin xmax ymax: estremi dell'aera geografica di ricerca (def: ovunque)"
   echo "data_ini, data_fin: intervallo di date in cui cercare (def: qualsiasi data)"
-  echo "URL: indirizzo del server arkioss (def: http://arkioss4.metarpa:8090)"
+  echo "URL: indirizzo del server arkioss (def: http://arkioss.metarpa:8090)"
 }
 
 #===============================================================================
@@ -74,7 +74,6 @@ fi
 
 # Cerco la stazione in anag_meteozen.dat; verifico che le coordinate 
 # corrispondano; leggo quota e nome stazione.
-
 line3=$(grep ^:${id_staz_row}, anag_meteozen.dat)
 if [ $? -eq 0 ] ; then
   line4=$(echo $line3 | sed 's/"//g')
@@ -101,7 +100,8 @@ if [ $? -eq 0 ] ; then
     if [ $pp -gt 0 ] ; then
       quo=$(echo $line4 | cut -c $[pp+7]- | cut -d , -f 1 | cut -d \) -f 1)
     fi
-
+    mz_ok=$[$mz_ok+1]
+    
   else
     echo "Stazione $id_staz $net: coordinate inconsistenti in anag_meteozen.dat"
     echo "  attese "$lon_raw $lat_row" trovate "$lon_mz $lat_mz
@@ -144,7 +144,7 @@ function intfill
 # 1) Preliminari
 
 # Parametri da riga comando
-akurl="http://arkioss4.metarpa:8090"
+akurl="http://arkioss.metarpa:8090"
 id_var=0
 data_restrict="N"
 area_restrict="N"
@@ -224,7 +224,9 @@ fi
 # 2.0 Scarico da meteozen l'anagrafica completa
 
 rm -f tmp.dat anag_meteozen.dat
-curl -u "ugo:Ul1ss&" "http://meteozen.metarpa/simcstations/api/stations" > tmp.dat
+# Alternative URL: data format is different!!
+# curl http://meteozen.metarpa/rt_data/stations > tmp.dat
+curl -u "ugo:Ul1ss&" "http://meteozen.metarpa/simcstations/api/v1/stations" > tmp.dat
 cat tmp.dat | sed 's/{"id"/\n/g' | cut -d , -f 1,3,4,5,6,7 > anag_meteozen.dat
 ns=$(wc -l anag_meteozen.dat |awk '{print $1}')
 echo "Scaricata anagrafica meteozen, stazioni trovate "$ns
@@ -242,6 +244,7 @@ grep /dataset/ tmp.ds | cut -d / -f 3 | cut -d \' -f 1 | grep -v error > ds.lst
 rm -f $fileout
 echo "id_staz,lat,lon,quota,dataset,nome" > $fileout
 
+mz_ok=0
 cnt_net=0
 while read net ; do
   rm -f tmp1.yml tmp2.yml
@@ -259,4 +262,4 @@ while read net ; do
 done < ds.lst
 
 nl=$(wc -l $fileout | awk '{print $1}')
-echo "Totale stazioni trovate: "$[$nl-1]" in "$cnt_net" reti"
+echo "Totale stazioni trovate: "$[$nl-1]" (in anagrafica meteozen "$mz_ok"), in "$cnt_net" reti"

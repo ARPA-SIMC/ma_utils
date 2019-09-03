@@ -16,11 +16,13 @@ function wrom(args)
 *  prodotta anche una mappa con i nomi delle stazioni
 * 
 * NOTE:
-* Lo script "ovelray" (by Johnny) aggiunge le wroses e salva il png; si basa sui
-* programmi composite, pngtopnm, pnmscale e pnmtopng (pacchetti ImageMagick e 
-* netpbm)
+* Lo script "overlay.gs" (by Johnny) aggiunge le wroses e salva il png; si basa 
+* sui programmi composite, pngtopnm, pnmscale e pnmtopng (pacchetti ImageMagick
+* e netpbm, netpbm-progs.x86_64).
+* Il programma pngtopnm e' obsoleto, e dovrebbe essere sostituito con pngtopam
+* Links: http://netpbm.sourceforge.net; https://sourceforge.net/projects/netpbm/
 *
-*                                      Versione 2.1.0 Jhonny & Enrico 07/07/2015
+*                                      Versione 2.1.1 Jhonny & Enrico 03/09/2019
 ********************************************************************************
 
 ********************************************************************************
@@ -94,11 +96,11 @@ res=read(wrom_marks.dat)
 ok=sublin(res,1)
 if(ok=0)
   say "plot mappa stazioni"
-  'draw_orog 'typ' 'area
+  'run ./draw_orog.gs 'typ' 'area' './
   'set lon 'minx' 'maxx
   'set lat 'miny' 'maxy
   'c'
-  'draw_orog 'typ' 'area
+  'run ./draw_orog.gs 'typ' 'area' './
   'set strsiz 0.03'
   'draw_marks ./wrom_marks.dat'
 
@@ -159,11 +161,11 @@ while(ok=0)
     respng=read(file)
     okpng=sublin(respng,1)
     if(flag=0)
-      'overlay -i legend -o wrom -D 'xout' -d 700 -s -7 -4 -p 'legx' 'legy
+      'run ./overlay.gs -i legend -o wrom -D 'xout' -d 700 -s -7 -4 -p 'legx' 'legy
       flag=1
     endif
     if(okpng=0)  
-      'overlay -i 'j' -o wrom -r wrom -D 'xout' -d 300 -s -7 -4 -p 'lon' 'lat
+      'run ./overlay.gs -i 'j' -o wrom -r wrom -D 'xout' -d 300 -s -7 -4 -p 'lon' 'lat
     endif
   endif
 endwhile

@@ -11,7 +11,7 @@
 #   quelle sull'intero dataset (non e' chiaro quale sia quella giusta...)
 # - Estremi zoom: per BPA "6 43.5 14 47", per EmR "9.2 43.8 13 45.2"
 #
-#                                              Versione 3.0.0, Enrico 08/04/2016
+#                                              Versione 3.0.1, Enrico 02/09/2019
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -22,10 +22,12 @@ function write_help
   echo "Costruisce la lsita completa di parametri e stazioni presenti in arkioss"
   echo "Uso: crea_anag_arkioss [-z xmin ymin xmax ymax] [-d data_ini data_fin]"
   echo "     [-h] [-ope] [-url URL]"
+  echo ""
+  echo "Output: files anag_arkioss.csv e param_arkioss.csv, nella dir corrente"
   echo "xmin ymin xmax ymax: estremi dell'aera geografica di ricerca (def: ovunque)"
   echo "data_ini, data_fin: intervallo di date in cui cercare (def: qualsiasi data)"
-  echo "-ope: aggiorna l'anagrafica in ~eminguzzi/svn/ma_utils/data"
-  echo "URL: indirizzo del server arkioss (def: http://arkioss4.metarpa:8090)"
+  echo "-ope: mette i files di ouput nella dir: ~eminguzzi/svn/ma_utils/data"
+  echo "URL: indirizzo del server arkioss (def: http://arkioss.metarpa:8090)"
 }
 
 #===============================================================================
@@ -199,7 +201,7 @@ str_product_csv=${id_var}","${bcode}","${long_name}${ltru}","${short_name}
 # 1) Preliminari
 
 # Parametri da riga comando
-akurl="http://arkioss4.metarpa:8090"
+akurl="http://arkioss.metarpa:8090"
 data_restrict="N"
 area_restrict="N"
 ope="N"
@@ -263,8 +265,8 @@ fi
 
 # Dir di lavoro e nome files di output
 if [ $ope = "Y" ] ; then
-  fileout1=~eminguzzi/svn/ma_utils/data/anag_arkioss.csv
-  fileout2=~eminguzzi/svn/ma_utils/data/param_arkioss.csv
+  fileout1=~eminguzzi/git/ma_utils/data/anag_arkioss.csv
+  fileout2=~eminguzzi/git/ma_utils/data/param_arkioss.csv
   if [ -z $AK_TEMP ] ; then
     AK_TEMP=$TEMP
   fi
@@ -319,7 +321,7 @@ unset http_proxy
 # 2.0 Scarico da meteozen l'anagrafica completa
 
 rm -f tmp.dat anag_meteozen.dat
-curl -u "ugo:Ul1ss&" "http://meteozen.metarpa/simcstations/api/stations" > tmp.dat
+curl -u "ugo:Ul1ss&" "http://meteozen.metarpa/simcstations/api/v1/stations" > tmp.dat
 cat tmp.dat | sed 's/{"id"/\n/g' | cut -d , -f 1,3,4,5,6,7 > anag_meteozen.dat
 ns=$(wc -l anag_meteozen.dat |awk '{print $1}')
 echo "Scaricata anagrafica meteozen, stazioni trovate "$ns

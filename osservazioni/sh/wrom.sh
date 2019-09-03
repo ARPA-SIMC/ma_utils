@@ -1,17 +1,20 @@
-#!/bin/ksh
+#!/bin/bash
 #set -x
 
+#-------------------------------------------------------------------------------
 # Script che fa le windrose (con windrose.ksh) e
 # le mette su una mappa (con overlay.gs)
-# Versione 2.2.0, Giovanni&Enrico 04/06/2015
+#
+#                                     Versione 2.2.1, Giovanni&Enrico 03/09/2019
+#-------------------------------------------------------------------------------
 
 # help
 function write_help
 {
  echo " uso: wrom.ksh [-b] [-m] [-s] [-h] [-os opts1] [-om opts2]"
  echo ""
- echo "      -b   batch, vuole wrom.lst ed eventualmente"
- echo "           wrtmp.gs nella cartella di lavoro"
+ echo "      -b   batch, vuole wrom.lst ed eventualmente wrtmp.gs nella cartella di lavoro"
+ echo "           wrom.lst: una riga per stazione, 3 campi: nome, lon, lat"
  echo "      -m   fa solo la mappa, non anche le w.rose separate"
  echo "      -s   input da seriet (default e' estra_orari)"
  echo "      -h   scrive questo help"
@@ -25,18 +28,26 @@ function write_help
 if [ -z $MA_UTILS_SVN ] ; then
   windrose=/usr/libexec/ma_utils/windrose.sh
   wrom_gs=/usr/libexec/ma_utils/wrom.gs
+  overlay_gs=/usr/libexec/ma_utils/overlay.gs
+  draw_orogy_gs=/usr/libexec/ma_utils/draw_orog.gs
+  geo_file=/usr/share/ma_utils/orog_eur_20km
 else 
   echo "(ak_seriet.ksh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
   windrose=${MA_UTILS_SVN}/osservazioni/sh/windrose.sh
   wrom_gs=${MA_UTILS_SVN}/osservazioni/sh/wrom.gs
+  overlay_gs=${MA_UTILS_SVN}/osservazioni/sh/overlay.gs
+  draw_orog_gs=${MA_UTILS_SVN}/osservazioni/sh/draw_orog.gs
+  geo_file=${MA_UTILS_SVN}/data/orog_eur_20km
 fi
+
+cp $overlay_gs $draw_orog_gs $geo_file.* ./
 
 # opzioni
 interactive=1
 separate=1
 type="-o"
 opts1=""
-opts2=""
+opts2="-a 2"
 while [ $# -ge 1 ] ; do
   if [ $1 = "-h" ] ; then
     write_help
@@ -85,7 +96,7 @@ fi
 rm -f wrose_*.png windrose.log
 j=0
 legend=0
-if [ $separate -eq 1 ] ; then mkdir wrs ; fi
+if [ $separate -eq 1 ] ; then mkdir -p wrs ; fi
 while read line ; do
   j=`expr $j + 1`
   nwr=$j
@@ -93,6 +104,8 @@ while read line ; do
   nrows=`wc $file | awk '{print $1}'`
   nrows=`expr $nrows - 3`
   lim=`expr $nrows / 3`
+  dum=$(basename $file)         # tolgo path
+  fileout=${dum%.*}".png"    # sostituisco estensione con .png
   echo "wrom.sh: plot windrose "$file
 # $windrose $type -m -L minimal -T bars -c transparent -p light -l $lim $file 
   $windrose $type -m -L minimal -T bars -c transparent -p light $opts1 $file \

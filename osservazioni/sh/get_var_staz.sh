@@ -25,7 +25,7 @@ function write_help
   echo "id_staz: id oracle della stazione (vedi file anag_arkioss.csv in"
   echo "  /usr/share/ma_utils)"
   echo "data_ini, data_fin: intervallo di date in cui cercare (def: qualsiasi data)"
-  echo "URL: indirizzo del server arkioss (def: http://arkioss4.metarpa:8090)"
+  echo "URL: indirizzo del server arkioss (def: http://arkioss.metarpa:8090)"
 }
 
 #===============================================================================
@@ -116,7 +116,7 @@ str_product_csv=${id_var}","${bcode}","${long_name}${ltru}","${short_name}
 # 1) Preliminari
 
 # Parametri da riga comando
-akurl="http://arkioss4.metarpa:8090"
+akurl="http://arkioss.metarpa:8090"
 id_staz=0
 data_restrict="N"
 
