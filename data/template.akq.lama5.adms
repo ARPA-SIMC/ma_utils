@@ -1,0 +1,20 @@
+!-------------------------------------------------------------------------------
+! Template per estrazioni Arkimet per ADMS, dataset LAMA5
+!
+! ESEMPI di sintassi possibili 
+!   (documentazione completa in /usr/share/doc/arkimet*/matcher)
+!
+! reftime: =2009-01-01 00                   [un istante preciso]
+! reftime: >=2008-01-01, <=2008-12-31       [tutti i dati tra due istanti]
+! reftime: >=2003-04-01, <=2003-04-10, =11  [solo i dati delle ore 11]
+! reftime: >=2003-04-01 00%6h               [ogni 6 ore a partire da una data]
+!-------------------------------------------------------------------------------
+
+reftime: =2019
+product: swbudg or shf or alb
+level: g00
+#
+! Parametri vicino alla superficie
+reftime: =2019
+product: t or u or v
+level: g02 or g10

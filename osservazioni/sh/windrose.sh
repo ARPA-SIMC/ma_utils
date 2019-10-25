@@ -250,11 +250,9 @@ if [ $check = "ok" ] ; then
  echo $level >> windrose.inp
  echo $fileout >> windrose.inp
 
- R --vanilla --slave < $wroseR
+ R --vanilla --slave < $wroseR || exit 2
 
 else
- echo "ATTENZIONE!"
- echo $filein" deve contenere una direzione e una velocita'"
- echo ""
- exit
+ echo "Errore wrose: "$filein" deve contenere una direzione e una velocita'"
+ exit 1
 fi

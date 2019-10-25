@@ -1,0 +1,49 @@
+&param
+out_form     = 1,
+out_ndec     = -2
+qcont        = 2,
+libsim       = T,
+step_yy_mm   = T,
+lab3d        = 2,
+lab3ddec     = 1,
+xls_dec_sep  = '.',
+dir_int      = T,
+tem_cel      = F,
+mo_rec       = F,
+sw_down      = F,
+flx_rev      = F,
+cc_fract     = F,
+sca_ini      = F,
+dos          = F
+/
+
+
+Opzioni generali:
+out_form    : 1 = ASCII del. spazi (seriet); 2 = CSV
+out_ndec    : numero di decimali in output (solo con out_form = 1)
+               -1 notazione esponenziale; -2 dipendenti dal parametro (def)
+qcont       : trattamento dati sospetti (0: lascia invariati, 1: mette
+              tutti mancanti; 2: corregge solo errori presumibilmente
+              dovuti a troncamento grib, 3: corregge tutti)
+libsim      : se T tiene conto delle modifiche che LibSim fa ai dati (mettere
+              F se il file gacsv e' stato prodotto senza passare da LibSim)
+step_yy_mm  : se T riconosce step di un mese o un anno nei reference time
+
+lab3d       : label dei livelli 3D (0: identificativo liv.; 1: quota SLM;
+              2: quota da superficie). 1 e 2 solo per alcuni archivi
+lab3ddec    : presenza dei decimali nelle label dei livelli (solo con 
+              lab3d = 1 o 2): 0 mai, 1 solo se necessario, 2 sempre
+xls_dec_sep : imposta il separtore decimale in output (solo formato seriet)
+
+Opzioni che vengono sovrascritte se richiedo ISC o ADMS:
+dir_int     : se T scrivo i venti come dir. e int.
+tem_cel     : se T scrivo le temperature in Celsius
+mo_rec      : se T scrivo il reciproco della lughezza di Monin-Obukov
+sw_down     : se T converto da SW budget a SW incoming
+flx_rev     : se T cambio segno ai flussi di calore (>0 se sup.si raffredda)
+cc_fract    : se T esprimo la copertura nuvolosa in frazione (default: %)
+sca_ini     : se T scrivo data e scad dei parametri non istantei relative all'
+                inizio del periodo di elaborazione (default: alla fine).
+                Tutti i parametri devono avere lo stesso periodo di elaborazione!
+dos         : se T scrivo con record DOS (i.e. aggiungo CR a ogni riga)
+

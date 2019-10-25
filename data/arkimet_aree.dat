@@ -1,37 +1,70 @@
-dataset,area,proiezione,fisiog,destag,edition,sop
-calmetbpa,padania1,utm,y,n,2,n
-calmetbpay,padania1,utm,y,n,2,n
-cosmo_5M_vol_ita,cos5mitr,rot,y,y,1,n
-lamaz,lamaz,rot,y,y,1,y
-lama5,lama5,rot,y,y,1,n
-lamaw,lmsmr2,rot,y,n,1,n
-lm7tmpc,lmsmr4,rot,y,y,1,n
-lm7tmpcp,lmsmr4,rot,y,y,1,n
-lm7tmpc%lm7tmpcp,lmsmr4,rot,y,y,1,n
-lm7tmpcp%lm7tmpc,lmsmr4,rot,y,y,1,n
-lm28tmpc,lmsmr5,rot,y,y,1,n
-lm28tmpcp,lmsmr5,rot,y,y,1,n
-lm28tmpc%lm28tmpcp,lmsmr5,rot,y,y,1,n
-lm28tmpcp%lm28tmpc,lmsmr5,rot,y,y,1,n
-lmsmr2031,lmsmr2,rot,y,n,1,n
-lmsmr3x32,lmsmr2,rot,y,n,1,n
-lmsmr4x32,lmsmr4,rot,y,n,1,n
-lmsmr4x34,lmsmr4,rot,y,n,1,n
-lmsmr4x38,lmsmr4,rot,y,n,1,n
-lmsmr4x42,lmsmr4,rot,y,n,1,n
-lmsmr4x46,lmsmr4,rot,y,n,1,n
-lmsmr4x52,lmsmr4,rot,y,n,1,n
-lmsmr4x56,lmsmr4,rot,y,n,1,n
-lmsmr6x48,lmsmr5,rot,y,n,1,n
-lmsmr6x54,lmsmr5,rot,y,n,1,n
-lmsmr6x58,lmsmr5,rot,y,n,1,n
-pescoemrope,pesemr,utm,n,n,2,n
-ninfabpa10,ctnbp1,utm,n,n,2,n
-ninfabpa5,ctnbp2,utm,n,n,2,n
-ninfabpa5c,ctnbp2,utm,n,n,2,n
-prvbpaope,prvemr,geo,n,n,1,n
-chibpa10l4,ctnbp1,utm,n,n,2,n
-chibpa5l5,ctnbp2,utm,n,n,2,n
-aodbpa5l5,ctnbp2,utm,n,n,2,n
-cosmo_5m_vol_ita,cos5mitr,rot,y,y,1,n
-lama5,lama5,rot,y,y,1,n
+# File di appoggio per l'estrazione guidata di dati su punti (crea_progetto_point.ksh)
+# Associa ai principali dataset arkimet:
+# - area (in aree_geo.dat, aree_utm.dat)
+# - template di estrazione (lista dei parametri disponibili)
+# - presenza dei dati fisiografici
+# - edizione GRIB
+# - presenza di dati staggerati e con codifica al secondo ordine
+#
+# Ultimo aggiornamento: 23/10/2019
+
+# Tracciato record:
+# dataset,area,proiezione,fisiog?,destag?,edition,sop?,template
+
+# Analisi Cosmo
+lama5,lama5,rot,y,y,1,n,lama5
+lama5_arc,lama5,rot,y,y,1,n,lama5
+lamaz,lamaz,rot,y,y,1,y,lamaz
+
+# Previsioni Cosmo operative 5Km
+cosmo_5M_ita,cos5mita,rot,y,y,1,n,cosmo
+cosmo_5M_ita_arc,cos5mita,rot,y,y,1,n,cosmo
+cosmo_5M_med,cos5mmedl,rot,n,y,1,n,cosmo
+cosmo_5M_med_arc,cos5mmedl,rot,n,y,1,n,cosmo
+cosmo_5M_vol_ita,cos5mitr,rot,n,y,1,n,cosmo.vol
+cosmo_5M_vol_ita_post,cos5mitr,rot,n,y,1,n,cosmo.vol
+cosmo_5I,cos5mita,rot,y,y,1,n,cosmo
+cosmo_5I_arc,cos5mita,rot,y,y,1,n,cosmo
+
+# Previsioni Cosmo operative 2Km
+cosmo_2I,cos2i,rot,y,y,1,n,cosmo
+cosmo_2I_arc,cos2i,rot,y,y,1,n,cosmo
+cosmo_2I_ruc,cos2i,rot,y,y,1,n,cosmo
+cosmo_2I_ruc_arc,cos2i,rot,y,y,1,n,cosmo
+cosmo_2I_assim,cos2i,rot,y,n,1,n,kenda
+cosmo_2I_assim_arc,cos2i,rot,y,n,1,n,kenda
+
+# Previsioni Cosmo: vecchie catene
+lm7tmpc,lmsmr4,rot,cosmo,y,y,1,n,cosmo.vol
+lm7tmpcp,lmsmr4,rot,cosmo,y,y,1,n,cosmo.vol
+lm28tmpc,lmsmr5,rot,cosmo,y,y,1,n,cosmo.vol
+lm28tmpcp,lmsmr5,rot,cosmo,y,y,1,n,cosmo.vol
+cosmo_28N_ruc,ruc,rot,cosmo,y,y,1,n,cosmo.vol
+
+# Qualità dell'aria
+pescoemrope,pesemr,utm,n,n,2,n,ninfa.ub
+ninfabpa5c,ctnbp2,utm,n,n,2,n,ninfa
+ninfabpa5c_arc,ctnbp2,utm,n,n,2,n,ninfa
+ninfa5ub,pesemr,utm,n,n,2,n,ninfa.ub
+ninfa5ub_arc,pesemr,utm,n,n,2,n,ninfa.ub
+
+# Dataset dismessi
+# calmetbpa,padania1,utm,y,n,2,n
+# calmetbpay,padania1,utm,y,n,2,n
+# lamaw,lmsmr2,rot,y,n,1,n
+# lmsmr2031,lmsmr2,rot,y,n,1,n
+# lmsmr3x32,lmsmr2,rot,y,n,1,n
+# lmsmr4x32,lmsmr4,rot,y,n,1,n
+# lmsmr4x34,lmsmr4,rot,y,n,1,n
+# lmsmr4x38,lmsmr4,rot,y,n,1,n
+# lmsmr4x42,lmsmr4,rot,y,n,1,n
+# lmsmr4x46,lmsmr4,rot,y,n,1,n
+# lmsmr4x52,lmsmr4,rot,y,n,1,n
+# lmsmr4x56,lmsmr4,rot,y,n,1,n
+# lmsmr6x48,lmsmr5,rot,y,n,1,n
+# lmsmr6x54,lmsmr5,rot,y,n,1,n
+# lmsmr6x58,lmsmr5,rot,y,n,1,n
+# prvbpaope,prvemr,geo,n,n,1,n
+# chibpa10l4,ctnbp1,utm,n,n,2,n
+# chibpa5l5,ctnbp2,utm,n,n,2,n
+# aodbpa5l5,ctnbp2,utm,n,n,2,n

@@ -1,15 +1,13 @@
 #!/bin/bash
 #==========================================================================
-# crea_progetto_point.ksh
-#
 # Procedura interattiva per costurire un nuovo progetto di estrazione su 
 # punti da un qualunque archivio Arkimet.
 # Versioni <7.0 come crea_progetto_estra.ksh
 #
 # Per modificare i path del pacchetto ma_utils, assegnare le variabili:
-# MA_UTILS_DAT: tabelle ma_utils (ad esempio: ~eminguzzi/svn/ma_utils/data;
+# MA_UTILS_DAT: tabelle ma_utils (ad esempio: ~eminguzzi/git/ma_utils/data;
 #               se non specificato, usa: /usr/share/ma_utils)
-# MA_UTILS_SVN: esegubili (ad esempio ~eminguzzi/svn/ma_utils; se non 
+# MA_UTILS_SVN: esegubili (ad esempio ~eminguzzi/git/ma_utils; se non 
 #   specificato, usa gli eseguibili in /usr/libexec/ma_utils)
 #
 # Per modificare i path di pacchetti libsim/dballe, assegnare le variabili:
@@ -18,8 +16,17 @@
 # LIBSIM_SVN:   esegubili (ad esempio: ~eminguzzi/svn/libsim; se non 
 #               specificato, usa gli eseguibili in path)
 #
-#                                                V8.0.0, Enrico 06/06/2018
+# Per estrazioni molto pesanti, modificare la dir di lavoro col comando:
+#   export AK_TEMP={path locale} (di deafult e' in ${TEMP}/akq.*)
+#
+# Di deafult, l'estrazione arkimet avviene un reftime alla volta; per
+#   estrarre lunghe serie di pochi parametri, conviene usare l'opzione:
+#   -seropt="-split=day"
+#
+#                                                 V9.0.0, Enrico 25/10/2019
 #==========================================================================
+set -u
+# set -ex   # per attivare set -e, bisogna scommentare tutte le rige #e 
 
 #==========================================================================
 # 0) Funzioni
@@ -31,20 +38,17 @@ function write_help
 {
 #       123456789012345678901234567890123456789012345678901234567890123456789012345
   echo "Uso: crea_progetto_point.ksh PROGETTO [-seropt=\"OPT1 OPT2 ...\"] "
-  echo "  [-template lama/adms/calpuff/cosmo/ninfa/pesco] "
-  echo "  [-debug] [-batch] [-list] [-h]"
+  echo "  [-template adms/calpuff] [-batch] [-list] [-h]"
   echo
   echo "PROGETTO: nome del progetto di estrazione"
-  echo "-seropt:  eventuali opzioni della chiamata ad ak_seriet"
-  echo "-template usa template di estrazione specifici"
-  echo "-debug:   come -seropt=-debug"
+  echo "-seropt:  eventuali opzioni della chiamata ad ak_seriet (vedi: "
+  echo "          /usr/libexec/ma_utils/ak_seriet.ksh -h)"
+  echo "-template imposta template per estrazioni specifiche"
   echo "-batch:   estrae e archivia, senza input interattivo"
   echo "-list:    elenca i progetti salvati e termina"
   echo "-h        visualizza questo help e termina"
   echo ""
-  echo "Per usare versioni di lavoro di programmi e tabelle, esportare le variabili:"
-  echo "          MA_UTILS_DAT, MA_UTILS_SVN, LIBSIM_DATA, DBA_TABLES, LIBSIM_SVN"
-  echo ""
+  echo "Note"
 }
 
 #----------------------------------------------------------------------
@@ -89,19 +93,12 @@ function intfill
 #==========================================================================
 # 1) Preliminari
 
-#set -x
-
 # 1.1) Path fissi
-if [ -z $work_root ] ; then
-  work_root=/autofs/scratch2/eminguzzi/arkimet/tmp_point # root dir lavoro
-fi
-arc_root=~eminguzzi/arkimet/progetti_point   # root arc. estrazioni
+work_root=/autofs/scratch-mod/eminguzzi/arkimet/tmp_point # root dir lavoro
+arc_root=~eminguzzi/arkimet/progetti_point        # root arc. estrazioni
 doc_file=${arc_root}/_doc/progetti_estra.doc      # elenco progetti archiviati
+arc_grp=sim-modellisti
 
-if [ -z $GASCRP ] ; then
-  export GASCRP=~eminguzzi/util/grads/scripts
-fi
-  
 # 1.2) Utility e files di appoggio (da ma_utils)
 # Alcuni files di appoggio reltivi a vecchi archivi sono in:
 # ~eminguzzi/arkimet/templates (templates per estrazioni arkimet)
@@ -146,12 +143,10 @@ fi
 # 1.3) Parametri da riga comando
 
 # default
-dataset="nil"
 proj="nil"
 seropt=""
 batch="N"
-template=""
-ak_template_default="lamaz"
+force_tmpl="nil"
 
 # parsing
 if [ $# -eq 0 ] ; then
@@ -168,7 +163,7 @@ while [ $# -ge 1 ] ; do
     exit
   elif [ `echo $1 | awk '{print $1}'` = '-template' ] ; then
     shift
-    template=$1
+    force_tmpl=$1
     shift
   elif [ `echo $1 | awk '{print $1}'` = '-batch' ] ; then
     batch="Y"
@@ -193,28 +188,9 @@ if [ $mand_par -ne 1 ] ; then
   write_help
   exit
 fi
-
-# Seleziono dataset e templates
-# Specificare la varibile ak_template se e' diversa dal nome del dataset
-# Specificare la varibile nml_template se diversa dal default
-
-ak_template=""
-nml_template=""
-
-if [ -z $template ] ; then
-  dataset=""
-elif [ $template = "lama" ] ; then
-  dataset=lamaz
-elif [ $template = "adms" ] ; then
-  dataset=lamaz; ak_template=lama.adms; nml_template=lama.adms
-elif [ $template = "calpuff" ] ; then
-  dataset=lamaz; ak_template=lama.calpuff
-elif [ $template = "cosmo" ] ; then
-  dataset=cosmo_5M_vol_ita
-elif [ $template = "ninfa" ] ; then
-  dataset=ninfabpa5
-elif [ $template = "pesco" ] ; then
-  dataset=pescoemrope
+if [ $force_tmpl != "nil" -a $force_tmpl != "adms" -a $force_tmpl != "calpuff" ] ; then
+  echo "Template "$force_tmpl" non gestito"
+  exit
 fi
 
 # 1.4) Se questo progetto non ha un numero d'ordine ed esistono progetti
@@ -273,6 +249,7 @@ fi
 
 #--------------------------------------------------------------------------
 # 2.1) Directory di lavoro e gestione di un progetto gia' esistente
+
 if [ $batch = "N" ] ; then
   if [ -d $work_dir ] ; then
     echo "Il progetto "$proj" esiste gia: "
@@ -303,7 +280,7 @@ if [ $batch = "N" ] ; then
       echo "Errore creando la dir "${work_root}/${proj}
       exit
     fi
-    chgrp sim-aria $proj
+    chgrp $arc_grp $proj
     chmod g+s $proj
   fi
 fi
@@ -330,9 +307,6 @@ if [ $batch = "N" -a $modif != "S" ] ; then
       dataset=$dummy
     fi
     
-  elif [ ! -z $dataset ] ; then
-    echo "Estrazione dal dataset "$dataset
-
   else
     echo "Immetti il nome del dataset da cui estrarre"
     read dataset
@@ -348,21 +322,52 @@ fi
 # 01/06/2018: nell'archivo arkimet adesso i nomi dei dataset mescolano maiuscole e
 # minuscole (es: cosmo_5M_vol_ita), quindi tolgo il cambio di caso da qui e da
 # ak_seriet.ksh
-# E' possibile ci siano problemi estraendo da alcuni dataset. Alternativa: lasicare
-# la converisone, escludendo i dataset che mescolano maiuscole e minuscole.
-
-# passo a lowercase
 # dataset=`echo $dataset | tr '[:upper:]' '[:lower:]'`
 
 # salvo il nome del dataset
 echo $dataset > ${proj}.ds
 
+# Cerco le informazioni relative al dataset richiesto
+line=`grep ^$dataset, $arkimet_aree`
+if [ $? -eq 0 ] ; then
+  dsarea=`echo $line | cut -d , -f 2 | tr '[:lower:]' '[:upper:]'`
+  dsproj=`echo $line | cut -d , -f 3 | tr '[:lower:]' '[:upper:]'`
+  fisiog=`echo $line | cut -d , -f 4 | tr '[:lower:]' '[:upper:]'`
+  destag=`echo $line | cut -d , -f 5 | tr '[:lower:]' '[:upper:]'`
+  gredit=`echo $line | cut -d , -f 6`
+  ak_sop=`echo $line | cut -d , -f 7 | tr '[:lower:]' '[:upper:]'`
+  aktmpl=`echo $line | cut -d , -f 8`
+else
+  dsarea="NIL"  
+  dsproj="NIL"
+  fisiog="N"
+  destag="N"
+  gredit=1
+  ak_sop="N"
+  aktmpl="def"
+fi
+
+nmltmpl="def"
+if [ $force_tmpl = "adms" ] ; then
+  aktmpl=lama.adms
+  nmltmpl=lama.adms
+elif [ $force_tmpl = "calpuff" ] ; then
+  aktmpl=lama.calpuff
+fi
+
+iret=$(echo $seropt | awk '{print match($1,"fop")}')
+if [ $ak_sop = "Y" -o $iret -gt 0 ] ; then
+  fop_req="Y"
+else
+  fop_req="N"
+fi
+
+echo "Area: "$dsarea"; proiezione: "$dsproj"; edition: "$gredit
+echo "Fisiog: "$fisiog"; destag: "$destag"; sop: "$fop_req
+echo "Template: "${template_dir}/template.akq.${aktmpl}
+
 #--------------------------------------------------------------------------
 # 2.3) Scelta dei campi
-
-if [ -z $ak_template ] ; then
-  ak_template=$dataset
-fi
 
 if [ $batch = "N" -a $modif != "S" ] ; then
   echo "Scegli i campi:"
@@ -370,11 +375,11 @@ if [ $batch = "N" -a $modif != "S" ] ; then
   if [ $modif = "R" -o ! -f ${proj}.akq ] ; then
     rm -f ${proj}.akq
 
-    if [ -f $template_dir/template.akq.${ak_template} ] ; then
-      cp $template_dir/template.akq.${ak_template} ./${proj}.akq
+    if [ -f ${template_dir}/template.akq.${aktmpl} ] ; then
+      cp ${template_dir}/template.akq.${aktmpl} ./${proj}.akq
     else
-      echo "Template non trovato: template.akq."${ak_template}
-      cp $template_dir/template.akq.${ak_template_default} ./${proj}.akq
+      echo "Template non trovato: template.akq."${aktmpl}
+      cp $template_dir/template.akq.def ./${proj}.akq
     fi
   fi
   
@@ -409,24 +414,6 @@ if [ $batch = "N" -a $modif != "S" ] ; then
   fi
 fi
 
-# Cerco l'area relativa al dataset richiesto
-line=`grep ^$dataset, $arkimet_aree`
-if [ $? -eq 0 ] ; then
-  dsarea=`echo $line | cut -d , -f 2 | tr '[:lower:]' '[:upper:]'`
-  dsproj=`echo $line | cut -d , -f 3 | tr '[:lower:]' '[:upper:]'`
-  fisiog=`echo $line | cut -d , -f 4 | tr '[:lower:]' '[:upper:]'`
-  destag=`echo $line | cut -d , -f 5 | tr '[:lower:]' '[:upper:]'`
-  gredit=`echo $line | cut -d , -f 6 | tr '[:lower:]' '[:upper:]'`
-else
-  dsarea="NIL"  
-  dsproj="NIL"
-  fisiog="N"
-  destag="N"
-  gredit=1
-fi
-echo "Area: "$dsarea"; proiezione: "$dsproj"; parametri fisiografici: "\
-$fisiog"; destag: "$destag
-
 # Scelgo i punti
 if [ $batch = "N" -a $modif != "S" ] ; then
   if [ $new_pts = "Y" ] ; then
@@ -444,8 +431,10 @@ if [ $batch = "N" -a $modif != "S" ] ; then
   
     if [ $dsproj = "GEO" -o $dsproj = "ROT" ] ; then
       echo "1          ! tipo di grigliato modello"       >> sel_punti.inp
-    else
+    elif [ $dsproj = "UTM" ] ; then
       echo "0          ! tipo di grigliato modello"       >> sel_punti.inp
+    else
+      echo "1          ! tipo di grigliato modello"       >> sel_punti.inp
     fi
     echo $dsarea                                          >> sel_punti.inp
     tail -n +8 sel_punti.org                              >> sel_punti.inp
@@ -466,11 +455,11 @@ if [ $batch = "N" -a $modif != "S" ] ; then
   if [ $modif = "R" -o ! -f gacsv2seriet.nml ] ; then
     rm -f gacsv2seriet.nml
 
-    if [ ! -z $nml_template ] ; then
-      if [ -f $template_dir/gacsv2seriet.nml.${nml_template} ] ; then
-        cp $template_dir/gacsv2seriet.nml.${nml_template} ./gacsv2seriet.nml
+    if [ ! -z $nmltmpl ] ; then
+      if [ -f $template_dir/gacsv2seriet.nml.${nmltmpl} ] ; then
+        cp $template_dir/gacsv2seriet.nml.${nmltmpl} ./gacsv2seriet.nml
       else
-        echo "Namelist non trovata "gacsv2seriet.nml.${nml_template}
+        echo "Namelist non trovata "gacsv2seriet.nml.${nmltmpl}
         $gacsv2seriet -c
       fi
     else
@@ -484,8 +473,9 @@ fi
 #--------------------------------------------------------------------------
 # 2.6) Se necessario, gestisco i dati su griglia staggherata
 
-echo $seropt | grep destag >/dev/null
-if [ $destag = "Y" -a  $? -ne 0 ] ; then
+iret=$(echo $seropt | awk '{print match($1,"destag")}')
+
+if [ $destag = "Y" -o  $iret -gt 0 ] ; then
   if [ $batch = "N" -a $modif != "S" ] ; then
     echo "La query contiene dati su griglia staggerata (es. vento sui model levels)? (Y/N)"
     read yn
@@ -502,12 +492,8 @@ fi
 #--------------------------------------------------------------------------
 # 2.7) Se necessario, gestisco i dati con codifica al secondo ordine
 
-echo $seropt | grep fop >/dev/null
-fop_opt=$?
-grep -E "qcr|qis|tke" ${proj}.akq > /dev/null
-fop_req=$?
 
-if [ $destag = "Y" -a  $fop_opt -ne 0 -a $fop_req -eq 0 ] ; then
+if [ $fop_req = "Y" ] ; then
   if [ $batch = "N" -a $modif != "S" ] ; then
     echo "La query contiene dati con codifica al 2o ordine (qcr,qis,tke)? (Y/N)"
     read yn
@@ -531,7 +517,7 @@ fi
 if [ $modif = "S" ] ; then
   fis_list="orog"
 else
-  fis_list="orog z0 alb levels layers"
+  fis_list="orog levels layers"
 fi
 
 if [ $dsarea != "NIL" -a $fisiog = "Y" ] ; then
@@ -545,31 +531,29 @@ if [ $dsarea != "NIL" -a $fisiog = "Y" ] ; then
   for field in $fis_list ; do
     nf=`ls -1 ${fisiog_dir}/${dsarea}_${field}_*.${ext} 2>/dev/null | wc -l`
     if [ $nf -eq 0 ] ; then
-      file=""
+      file="nil"
       echo "Dati fisiografici non disponibili per l'area "$dsarea": "$field
     elif [ $nf -eq 1 ] ; then
       file=${fisiog_dir}/${dsarea}_${field}_*.${ext}
+      echo "Dati fisiografici ok per l'area "$dsarea": "$field
     elif [ $nf -gt 1 -a $batch = "N" ] ; then
       echo "Per questa area sono disponibili diversi files di dati fisiografici:"
-      echo "selezionare quello da usare per il parametro "$field" (default: il primo)"
+      echo "selezionare quello da usare per il parametro "$field
       ls -r1 ${fisiog_dir}/${dsarea}_${field}_*.${ext}
       read file
-      if [ -z $file ] ; then
-        file=`ls -r1 ${fisiog_dir}/${dsarea}_${field}_*.${ext} | head -n 1`
-      fi
     elif [ $nf -gt 1 -a $batch = "Y" ] ; then
       file=`ls -r1 ${fisiog_dir}/${dsarea}_${field}_*.${ext} | head -n 1`
       echo "uso dati fisiografici da "$file
     fi
 
-    if [ ! -z $file ] ; then
+    if [ $file != "nil" ] ; then
       cat $file >> $proj".fisiog.${ext}"
     fi
     if [ $field = "orog" ] ; then
-      if [ ! -z $file ] ; then
+      if [ $file != "nil" ] ; then
         ctl_orog="${fisiog_dir}/"`basename $file $ext`"ctl"
       else
-        ctl_orog=""
+        ctl_orog="nil"
       fi
     fi
 
@@ -577,19 +561,24 @@ if [ $dsarea != "NIL" -a $fisiog = "Y" ] ; then
   if [ $fisiog = "Y" ] ; then
     seropt=$seropt" -fis="$proj".fisiog."${ext}
   fi
+
+else
+  ctl_orog="nil"
+
 fi
 
 # Lancio ak_seriet
 if [ $modif != "S" ] ; then
+#e set +e
   echo "Comando di estrazione:"
   echo $ak_seriet $proj $dataset -inpdata=arkimet -reqdata=pts $seropt
   $ak_seriet $proj $dataset -inpdata=arkimet -reqdata=pts $seropt
-
   errc=$? 
   if [ $errc -ne 0 -a $errc -lt 100 ] ; then
     echo "Errore ak_seriet.ksh, termino"
     exit
   fi
+#e set -e
 fi
 
 #--------------------------------------------------------------------------
@@ -610,7 +599,7 @@ fi
 
 if [ $batch = "N" ] ; then
   echo ""
-  echo "Si vogliono calcolare le statistiche realtive ai dati estratti?"
+  echo "Si vogliono calcolare le statistiche relative ai dati estratti?"
   echo "(0: No; 1: solo punto centrale; 2: tutti i punti)"
   read yn
 else
@@ -638,26 +627,44 @@ if [ $plt -eq 1 ] ; then
 
   echo "Elaboro il punto "$nprq": "$labprq
   intfill $nprq 3
-
+  rm -f wrose.log grads.log ${proj}_punti_*_stats.sta ${proj}_orog_*.png ${proj}_wrose_*.png
+  
+# Stat e Windrose
   if [ $out_form = "1" ] ; then
     $stat_orari -s -liv -prod=stats ${proj}_punti_${str_out}.txt
-    $windrose -s ${proj}_punti_${str_out}.txt
-    if [ $? -ne 0 ] ; then
-      echo "Windrose a 10 m fallita, provo col livello a 9 m"
-      $windrose -s -lev 9 ${proj}_punti_${str_out}.txt
+
+#e  set +e
+    for lev in 10 9 8 7 ; do
+      $windrose -s -lev $lev ${proj}_punti_${str_out}.txt >> wrose.log 2>&1
+      wrret=$?
+      if [ $wrret -eq 1 ] ; then
+        echo "Windrose impossibile, in genere per dati insufficienti (vedi file wrose.log)"
+        break
+      elif [ $wrret -gt 1 ] ; then
+        echo "Windrose a ${lev} m fallita"
+      else
+        echo "Windrose a ${lev} m ok"
+        break
+      fi
+    done
+#e  set -e
+
+    if [ $wrret -eq 0 ] ; then
+      wrfile=`ls -1rt wrose_*.png | tail -n 1`
+      mv $wrfile ${proj}_wrose_${str_out}.png
     fi
-    wrfile=`ls -1rt wrose_*.png | tail -n 1`
-    mv $wrfile ${proj}_wrose_${str_out}.png
   fi
 
   if [ $dsarea = "NIL" ] ; then
     echo "Plot orografia impossibile (area sconosciuta per il dataset "$dataset")"
-  elif [ -z $ctl_orog ] ; then
+  elif [ $ctl_orog = "nil" ] ; then
     echo "Plot orografia impossibile (nessun file di ororgrafia per l'area "$dsarea")"
   elif [ ! -s $ctl_orog ] ; then
     echo "Plot orografia impossibile (file "$ctl_orog" non trovato)"
   else
-    grads -clb 'run '$plot_local_orog' '$ctl_orog' '$dsproj' '$idxprq
+    echo "Plot orografia, punto "$idxprq
+    echo "Comando: grads -clb 'run '$plot_local_orog' '$ctl_orog' '$dsproj' '$idxprq >> grads.log 2>&1"
+    grads -clb 'run '$plot_local_orog' '$ctl_orog' '$dsproj' '$idxprq >> grads.log 2>&1
     mv orog.png ${proj}_orog_${str_out}.png
   fi
 
@@ -665,6 +672,7 @@ if [ $plt -eq 1 ] ; then
 elif [ $plt -eq 2 ] ; then
   tmp_file=`mktemp XXX.pts.csv`
   tail -n +2 ${proj}.pts.csv > $tmp_file
+  rm -f wrose.log grads.log ${proj}_punti_*_stats.sta ${proj}_orog_*.png ${proj}_wrose_*.png
   nprq=0
   while read line ; do
     nprq=`expr $nprq + 1`
@@ -674,18 +682,32 @@ elif [ $plt -eq 2 ] ; then
     intfill $nprq 3
     idp3=$str_out
 
-#   Windrose
+#   Stat e Windrose
     if [ $out_form = "1" ] ; then
       $stat_orari -s -liv -prod=stats ${proj}_punti_${idp3}.txt
-      $windrose -s ${proj}_punti_${idp3}.txt
-      if [ $? -ne 0 ] ; then
-        echo "Windrose a 10 m fallita, provo col livello a 9 m"
-        $windrose -s -lev 9 ${proj}_punti_${idp3}.txt
-      fi
-      wrfile=`ls -1rt wrose_*.png | tail -n 1`
-      mv $wrfile ${proj}_wrose_${idp3}.png
-    fi
 
+#e    set +e
+      for lev in 10 9 8 7 ; do
+        $windrose -s -lev $lev ${proj}_punti_${idp3}.txt >> wrose.log 2>&1
+        wrret=$?
+        if [ $wrret -eq 1 ] ; then
+          echo "Windrose impossibile, in genere per dati insufficienti (vedi file wrose.log)"
+          break
+        elif [ $wrret -gt 1 ] ; then
+          echo "Windrose a ${lev} m fallita"
+        else
+          echo "Windrose a ${lev} m ok"
+          break
+	fi
+      done
+#e    set -e
+
+      if [ $wrret -eq 0 ] ; then
+        wrfile=`ls -1rt wrose_*.png | tail -n 1`
+        mv $wrfile ${proj}_wrose_${idp3}.png
+      fi
+    fi
+      
 #   Orografia locale
     if [ $dsarea = "NIL" ] ; then
       echo "Plot orografia impossibile (area sconosciuta per il dataset "$dataset")"
@@ -694,7 +716,9 @@ elif [ $plt -eq 2 ] ; then
     elif [ ! -s $ctl_orog ] ; then
       echo "Plot orografia impossibile (file "$ctl_orog" non trovato)"
     else
-      grads -clb 'run '$plot_local_orog' '$ctl_orog' '$dsproj' '$idxprq
+      echo "Plot orografia, punto "$idxprq
+      echo " Comando: grads -clb 'run '$plot_local_orog' '$ctl_orog' '$dsproj' '$idxprq  >> grads.log 2>&1"
+      grads -clb 'run '$plot_local_orog' '$ctl_orog' '$dsproj' '$idxprq  >> grads.log 2>&1
       mv orog.png ${proj}_orog_${str_out}.png
     fi
 
@@ -713,7 +737,6 @@ elif [ $plt -eq 2 ] ; then
 
   paste tmp.1.dat tmp.2.dat > ${proj}_allave.dat
 fi
-#rm -f windrose.inp tmp.1.dat tmp.2.dat
 
 #==========================================================================
 # 4) Archiviazione: se richiesto, salvo i files utili nella directory di 
@@ -748,8 +771,9 @@ elif [ $yn = "y" -o $yn = "Y" ] ; then
   else
     mkdir $arc_dir
   fi
-
+  
 # Piano di estrazione
+#e set +e
   cp ${proj}.ds $arc_dir
   cp ${proj}.akq $arc_dir
   cp ${proj}.varliv.csv $arc_dir
@@ -760,7 +784,7 @@ elif [ $yn = "y" -o $yn = "Y" ] ; then
 
 # Serie temporali modello
   cp ${proj}_punti_???.txt $arc_dir
-  for file in `ls ${arc_dir}/${proj}_punti_???.txt` ; do
+  for file in $(ls ${arc_dir}/${proj}_punti_???.txt) ; do
     gzip -f $file
   done
 

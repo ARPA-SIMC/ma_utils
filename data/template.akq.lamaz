@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------
-! Template per estrazioni Arkimet, dataset: LAMAZ (versione 24/01/2012)
+! Template per estrazioni Arkimet, dataset: LAMAZ / LAMA5
 !
 ! - per estrarre su punti qcr,qis,tke serve l'opzione -fop
 ! - non serve l'opzione destag
@@ -13,8 +13,6 @@
 !     tutti i dati, ma alle ore 00 e 12 si ottengono solo le cumulate in 12 ore.
 !   . per tp e i parametri mediati, gli alias ac0001, ac0012 e aa0001 funzionano
 !     regolarmente
-!   . vmax in alcuni istanti ha un timerange sbagliato (1,0,0,13) invece di 
-!     (1,0,1,13): le estrazioni su punto non funzionano
 !
 ! SINTASSI DEL FILE:
 ! Le righe vuote e quelle che iniziano con "!" vengono ignorate
@@ -91,18 +89,7 @@ reftime: =2012-01-01
 product: ssw
 level: lug000010
 #
-! Vento massimo (attualmente ha problemi a timerange, NON estrarre su punti)
-reftime: =2012-01-01
-product: vmax
-level: g10
-#
 ! MSLP
 reftime: =2012-01-01
 product: mslp
 level: msl
-#
-! Precipitazioni cumulate in 12 ore
-reftime: =2012-01-01
-product: tp or cp or sf
-timerange: ac0012
-level: g00

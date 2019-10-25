@@ -1,6 +1,6 @@
 !-------------------------------------------------------------------------------
 ! Template per estrazioni Arkimet, dataset relativi ai volumi COSMO real time:
-! - cosmo_5M_vol_ita / cosmo_5M_vol_ita_post  (COSMO_5M Cineca / postprocessing)
+! cosmo_5M_vol_ita + cosmo_5M_vol_ita_post
 !
 !                                               Ultimo aggiornamento: 01/06/2018
 !-------------------------------------------------------------------------------
