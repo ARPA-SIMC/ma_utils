@@ -23,10 +23,14 @@
 #   estrarre lunghe serie di pochi parametri, conviene usare l'opzione:
 #   -seropt="-split=day"
 #
+# Todo:
+# Gestire il caso in cui $doc_file contiene progetti senza il carattere "_"
+#
 #                                                 V9.0.0, Enrico 25/10/2019
 #==========================================================================
 set -u
 # set -ex   # per attivare set -e, bisogna scommentare tutte le rige #e 
+# set -x
 
 #==========================================================================
 # 0) Funzioni

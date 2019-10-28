@@ -12,14 +12,13 @@ PROGRAM grib23ddat
 ! NOTE: 
 ! - I grib in file_dat:
 !   * devono essere definiti sulla stessa griglia di file_static
-!   * possono contenere analisi COSMO, previsioni COSMO (una sola data di 
-!     emissione), analisi ECMWF
-!   * se si usa l'opzione "grib ordinati" (piu' veloce), devono essere 
-!     ordinati per data di validita' crescente
+!   * possono contenere analisi, oppure previsioni relative a un'unico run
+!   * riferiti a model layers (indicatorOfTypeOfLevel=110)
+!   * devono essere ordinati per data di validita' crescente
 !
 ! - Gestione campi H2O 3d: a quanto pare (subr. RDMM5), Calmet non usa in 
 !   nessun caso W, Qr, Qi, Qs e Qg; usa invece Qc (se presente), per 
-!   calcolare ceiling height. Ho quindi previsto 4 opzioni per i campi in
+!   calcolare ceiling height. Sono quindi previste 4 opzioni per i campi in
 !   ingresso a grib23ddat (parametro inp_h2o:
 !   0) nessun campo reltivo ad H2O
 !   1) solo umidita' specifica (il programma scrive Rh e mix.Ratio)
@@ -45,7 +44,12 @@ PROGRAM grib23ddat
 !   nei parametri superficiali (nell'header dei data record) dovrebbero 
 !   essere messi a 0, invece di -9999. (sub. write_dat)
 !
+! - La quota dei livelli dovrebbe essere indicata da MSL, e non da
+!   superficie (manuale CALPUFF, tabel 8.21)
+!
 ! SVILUPPI: 
+! - ammettere input non a passo orario (spostare hh_step in grib23ddat.inp)
+!
 ! - file_static potrebbe essere ampliato, includendo:
 !   * land fraction: per discriminare punti di terra e di mare (parametro
 !     ilu, usato nelle subr. RDHD5 e RDHD53 quando itwprog=2
@@ -58,8 +62,11 @@ PROGRAM grib23ddat
 ! - file_dat potrebbe essere ampliato, includendo i parametri superficiali
 !   che attualmente sono letti ma non utilizzati (sub. RDMM5, line 20175)
 !
+! Rispetto alla versione 1, sono stati tolti i riferimenti alle opzioni non
+! implementate (dati ECMWF, pressure levels, input non ordinato per
+! verification time)
 !
-!                                                 V1.3.3, Enrico 17/06/2014
+!                                                 V2.0.0, Enrico 25/10/2019
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -92,7 +99,7 @@ TYPE(date) :: data_ini,datac,datag,datav
 REAL :: x1,y1,dx,dy,xx,yy,xrot,yrot,rdum
 INTEGER :: nx,ny,nlev3d,nscad,npar3d,npar2d
 INTEGER :: hh_step,nht,hh_ini,hhc,hhg,hhv,hht,scad(3),lev(3),par(3)
-INTEGER :: tipo_scad,tipo_lev3d,id_model,inp_h2o,inp_sort,out_fmt,dlth,utmz
+INTEGER :: tipo_scad,inp_h2o,out_fmt,dlth,utmz
 INTEGER :: if_static,if_dat,ig_orog,ig,idxl,idxp
 INTEGER :: iret,ier,idum(3),k,kpar,cnt_par,kl,kp,i,j,ilu,cnt_sea,cnt_out
 CHARACTER (LEN=200) :: file_static,file_dat,file_out,error_message,chpar
@@ -139,21 +146,13 @@ ENDDO
 ! 1.2 Leggo le opzioni da grib23dddat.inp
 
 OPEN (UNIT=iunml, FILE=file_nml, STATUS="OLD", ACTION="READ", ERR=9996)
-READ (iunml,*, ERR=9996) id_model
 READ (iunml,*, ERR=9996) tipo_scad
 READ (iunml,*, ERR=9996) nscad
-READ (iunml,*, ERR=9996) tipo_lev3d
 READ (iunml,*, ERR=9996) nlev3d
 ALLOCATE (id_lev3d(1:nlev3d))
 id_lev3d(:) = imis
 READ (iunml,*, ERR=9996) id_lev3d(1:nlev3d)
 READ (iunml,*, ERR=9996) inp_h2o
-READ (iunml,*, ERR=9996) inp_sort
-IF (inp_sort == 0) THEN
-  READ (iunml,'(i4,3i2)', ERR=9996) data_ini%yy,data_ini%mm,data_ini%dd,hh_ini
-ELSE
-  READ (iunml,*)
-ENDIF
 READ (iunml,*, ERR=9996) utmz
 READ (iunml,*, ERR=9996) out_fmt
 CLOSE (iunml)
@@ -161,37 +160,17 @@ CLOSE (iunml)
 !--------------------------------------------------------------------------
 ! 1.3 Controllo che le opzioni di file_nml siano legali 
 
-IF ((id_model/=1 .AND. id_model/=2) .OR. &
-    (tipo_scad/=1 .AND. tipo_scad/=2) .OR. &
+IF ((tipo_scad/=1 .AND. tipo_scad/=2) .OR. &
     nscad < 1 .OR. &
-    (tipo_lev3d/=1 .AND. tipo_lev3d/=2) .OR. &
     nlev3d < 1 .OR. &
     ANY(id_lev3d(1:nlev3d)==imis) .OR. &
     (inp_h2o/=1 .AND. inp_h2o/=2 .AND.inp_h2o/=3) .OR. &
-    (inp_sort/=0 .AND. inp_sort/=1) .OR. &
     (out_fmt/=2 .AND. out_fmt/=3) &
    ) THEN      
 
   WRITE (*,*) "Parametri illegali in ",TRIM(file_nml)
-  WRITE (*,*) id_model,tipo_scad,nscad,tipo_lev3d,nlev3d
+  WRITE (*,*) nscad,nlev3d
   WRITE (*,*) id_lev3d(:)
-  STOP
-ENDIF
-
-IF (id_model == 2) THEN 
-  WRITE (*,*) "Dati ECMWF non ancora gestiti"
-  STOP
-ENDIF
-!IF (tipo_scad == 2) THEN 
-!  WRITE (*,*) "Previsioni non ancora gestite"
-!  STOP
-!ENDIF
-IF (tipo_lev3d == 2) THEN 
-  WRITE (*,*) "Livelli di pressione on ancora gestiti"
-  STOP
-ENDIF
-IF (inp_sort == 0) THEN 
-  WRITE (*,*) "Campi non ordinati non ancora gestiti"
   STOP
 ENDIF
 
@@ -199,78 +178,60 @@ ENDIF
 ! 1.4 Calcolo i parametri dipendenti dalle opzioni di file_nml
 
 ! 1.4.1 Step e durata totale del file (in ore)
-IF (id_model == 1) THEN                                   ! COSMO
-  hh_step = 1 
-ELSE IF (id_model == 2 .AND. tipo_scad == 1) THEN         ! Analisi ECMWF
-  hh_step = 6
-ELSE IF (id_model == 2 .AND. tipo_scad == 2) THEN         ! Forc. ECMWF
-  hh_step = 3
-ENDIF
+hh_step = 1 
 nht = 1+(nscad-1)*hh_step
 
 ! 1.4.2 Numero e codifica parametri e livelli richiesti in input: COSMO
-IF (id_model == 1) THEN
 
 ! Numero e codifica grib dei parametri 3D letti nel file di input
-  IF (inp_h2o == 0) THEN               ! P,T,U,V; ioutmm5 = 81
-    npar3d = 4
-    ALLOCATE (rq_par3d(3,npar3d))
-    rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34/), &
-      (/3,npar3d/))
-    WRITE (hr2,'(5i3)') 0,0,0,0,0
-  
-  ELSE IF (inp_h2o == 1) THEN          ! P,T,U,V,Q; ioutmm5 = 82
-    npar3d = 5
-    ALLOCATE (rq_par3d(3,npar3d))
-    rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34, &
-      200,2,51/),(/3,npar3d/))
-    WRITE (hr2,'(5i3)') 0,1,0,0,0
-  
-  ELSE IF (inp_h2o == 2) THEN          ! T,P,U,V,Q,Qcr; ioutmm5 = 83
-    npar3d = 6
-    ALLOCATE (rq_par3d(3,npar3d))
-    rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34, &
-      200,2,51, 200,2,150/),(/3,npar3d/))
-    WRITE (hr2,'(5i3)') 0,1,1,0,0
-  
-  ELSE IF (inp_h2o == 3) THEN          ! T,P,U,V,Q,Qcr,Qis; ioutmm5 = 83
-    npar3d = 7
-    ALLOCATE (rq_par3d(3,npar3d))
-    rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34, &
-      200,2,51, 200,2,150, 200,2,151/),(/3,npar3d/))
-    WRITE (hr2,'(5i3)') 0,1,1,0,0
-  ENDIF
+IF (inp_h2o == 0) THEN               ! P,T,U,V; ioutmm5 = 81
+  npar3d = 4
+  ALLOCATE (rq_par3d(3,npar3d))
+  rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34/), &
+    (/3,npar3d/))
+  WRITE (hr2,'(5i3)') 0,0,0,0,0
+
+ELSE IF (inp_h2o == 1) THEN          ! P,T,U,V,Q; ioutmm5 = 82
+  npar3d = 5
+  ALLOCATE (rq_par3d(3,npar3d))
+  rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34, &
+    200,2,51/),(/3,npar3d/))
+  WRITE (hr2,'(5i3)') 0,1,0,0,0
+
+ELSE IF (inp_h2o == 2) THEN          ! T,P,U,V,Q,Qcr; ioutmm5 = 83
+  npar3d = 6
+  ALLOCATE (rq_par3d(3,npar3d))
+  rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34, &
+    200,2,51, 200,2,150/),(/3,npar3d/))
+  WRITE (hr2,'(5i3)') 0,1,1,0,0
+
+ELSE IF (inp_h2o == 3) THEN          ! T,P,U,V,Q,Qcr,Qis; ioutmm5 = 83
+  npar3d = 7
+  ALLOCATE (rq_par3d(3,npar3d))
+  rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34, &
+    200,2,51, 200,2,150, 200,2,151/),(/3,npar3d/))
+  WRITE (hr2,'(5i3)') 0,1,1,0,0
+ENDIF
 
 ! Codifica grib dei livelli 3d richiesti
-  ALLOCATE (rq_lev3d(3,nlev3d))
-  IF (id_model == 1 .AND. tipo_lev3d == 1) THEN
-    rq_lev3d(1,:) = 110
-    rq_lev3d(2,:) = id_lev3d(1:nlev3d)
-    rq_lev3d(3,:) = id_lev3d(1:nlev3d) + 1
-  ENDIF
+ALLOCATE (rq_lev3d(3,nlev3d))
+rq_lev3d(1,:) = 110
+rq_lev3d(2,:) = id_lev3d(1:nlev3d)
+rq_lev3d(3,:) = id_lev3d(1:nlev3d) + 1
 
 ! Numero e codifica grib dei parametri 2D letti nel file di input: 
 ! (Temperatura superficie e Preciptazione)
-  npar2d = 2
-  ALLOCATE (rq_par2d(3,npar2d))
-  rq_par2d(:,:) = RESHAPE((/200,2,11, 200,2,61/),(/3,npar2d/))
+npar2d = 2
+ALLOCATE (rq_par2d(3,npar2d))
+rq_par2d(:,:) = RESHAPE((/200,2,11, 200,2,61/),(/3,npar2d/))
 
 ! Codifica grib dei livelli superficiali richiesti
-  ALLOCATE (rq_lev2d(3,npar2d))
-  rq_lev2d(:,:) = RESHAPE((/1,0,0, 1,0,0/),(/3,npar2d/))
+ALLOCATE (rq_lev2d(3,npar2d))
+rq_lev2d(:,:) = RESHAPE((/1,0,0, 1,0,0/),(/3,npar2d/))
 
-! 1.4.3 Numero e codifica parametri e livelli richiesti in input: ECMWF
-ELSE IF (id_model == 0) THEN
-  WRITE (*,*) "ECMWF non ancora gestito"
-  STOP
-ENDIF
 
 ! 1.4.4 Stringhe per log
-IF (id_model == 1) THEN
-  str_model = "COSMO "        
-ELSE IF (id_model == 2) THEN
-  str_model = "ECMWF "        
-ENDIF
+str_model = "COSMO "        
 IF (tipo_scad == 1) THEN
   str_tipo_scad = "Analisi"
 ELSE IF (tipo_scad == 2) THEN
@@ -319,55 +280,50 @@ zlev3d(:,:) = rmis
 CALL grib_get(ig_orog,"values",orog)
 
 ! Se devo elaborare model layers COSMO, ne leggo le quote
-IF (id_model == 1) THEN
-  DO
-    ig = -1
-    CALL grib_new_from_file(if_static,ig,iret)
-    IF (iret == GRIB_END_OF_FILE) EXIT   
+DO
+  ig = -1
+  CALL grib_new_from_file(if_static,ig,iret)
+  IF (iret == GRIB_END_OF_FILE) EXIT   
 
 !   Controlli
-    IF (.NOT. samegrid(ig_orog,ig)) GOTO 9995
-    CALL grib_get(ig,"indicatorOfTypeOfLevel",idum(1))
-    CALL grib_get(ig,"topLevel",idum(2))
-    CALL grib_get(ig,"bottomLevel",idum(3))
-    IF (idum(1) /= 110 .OR. idum(3) /= idum(2)+1) GOTO 9994
+  IF (.NOT. samegrid(ig_orog,ig)) GOTO 9995
+  CALL grib_get(ig,"indicatorOfTypeOfLevel",idum(1))
+  CALL grib_get(ig,"topLevel",idum(2))
+  CALL grib_get(ig,"bottomLevel",idum(3))
+  IF (idum(1) /= 110 .OR. idum(3) /= idum(2)+1) GOTO 9994
 
 !   Se e' uno dei livelli richiesti, salvo le quote
-    DO k = 1,nlev3d
-      IF (idum(2) == id_lev3d(k)) THEN
-        CALL grib_get(ig,"values",zlev3d(:,k))
-        EXIT
-      ENDIF
-    ENDDO
-
-    CALL grib_release(ig)
+  DO k = 1,nlev3d
+    IF (idum(2) == id_lev3d(k)) THEN
+      CALL grib_get(ig,"values",zlev3d(:,k))
+      EXIT
+    ENDIF
   ENDDO
 
-  IF (ANY(zlev3d(:,:) == rmis)) GOTO 9993
+  CALL grib_release(ig)
+ENDDO
 
-ENDIF
+IF (ANY(zlev3d(:,:) == rmis)) GOTO 9993
 
 !==========================================================================
 ! 3) Scrivo gli header di file_out
 
 ! Se i grib sono ordinati, leggo la data iniziale dal primo grib
-IF (inp_sort == 1) THEN
-  CALL grib_open_file(if_dat,file_dat,"r",iret)
-  IF (iret /= GRIB_SUCCESS) GOTO 9991
-  ig = -1
-  CALL grib_new_from_file(if_dat,ig,iret)
-  IF (iret /= GRIB_SUCCESS) GOTO 9990
-  CALL grib_get(ig,"dataDate",idum(1))
-  CALL grib_get(ig,"dataTime",idum(2))
-  
-  data_ini%yy = idum(1)/10000
-  data_ini%mm = MOD(idum(1)/100,100)
-  data_ini%dd = MOD(idum(1),100)
-  hh_ini = idum(2) / 100
+CALL grib_open_file(if_dat,file_dat,"r",iret)
+IF (iret /= GRIB_SUCCESS) GOTO 9991
+ig = -1
+CALL grib_new_from_file(if_dat,ig,iret)
+IF (iret /= GRIB_SUCCESS) GOTO 9990
+CALL grib_get(ig,"dataDate",idum(1))
+CALL grib_get(ig,"dataTime",idum(2))
 
-  CALL grib_release(ig)
-  CALL grib_close_file(if_dat)
-ENDIF
+data_ini%yy = idum(1)/10000
+data_ini%mm = MOD(idum(1)/100,100)
+data_ini%dd = MOD(idum(1),100)
+hh_ini = idum(2) / 100
+
+CALL grib_release(ig)
+CALL grib_close_file(if_dat)
 
 ! Se richiesto, trasformo la data iniziale da GMT a LST
 IF (utmz /= 0) THEN
@@ -474,8 +430,6 @@ WRITE (*,*)
 !==========================================================================
 ! 4) Leggo i dati e scrivo data records: files di input ordinati per 
 !    verification time
-
-IF (inp_sort == 1) THEN
 
 !--------------------------------------------------------------------------
 ! 4.1) Alloco arrays, apro file
@@ -680,24 +634,9 @@ WRITE (*,*) "Totale scadenze scritte: ",cnt_out
 
 CALL grib_close_file(if_dat)
 
-!==========================================================================
-! 5) Leggo i dati e scrivo data records: files di input non ordinati
-
-ELSE IF (inp_sort == 0) THEN
-
-! Procedo comunque elaborando un istante alla volta, e scivendo quando ho
-! raccolto tutti i dati disponibli. Scrivere una subroutine findgrib_api
-! che ritorna il gaid del grib richiesto (se e' presente nel file), in base
-! a parametro, livello, verification time.
-
-  WRITE (*,*) "Elaborazione grib non ordinati non ancora gestita"
-  STOP
-
-ENDIF
 
 !==========================================================================
-! 6) Conclusione
-
+! 5) Conclusione
 
 STOP
 
@@ -799,28 +738,14 @@ CHARACTER (LEN=80),INTENT(IN) :: file_nml
 
 OPEN (UNIT=20, FILE=file_nml, STATUS="REPLACE", FORM="FORMATTED")
 
-!                            1234567890123456789012345678901234567890
-WRITE (20,'(2a)')           "1        ! Modello meteo (1:COSMO, 2: EC", &
-                            "MWF)"
-WRITE (20,'(2a)')           "1        ! Tipo di scadenze (1: analisi,", &
-                            " 2: previsioni)"
-WRITE (20,'(2a)')           "24       ! Numero di scadenze da elabora", &
-                            "re"
-WRITE (20,'(2a)')           "1        ! Tipo dei livelli verticali (1", &
-                            ": model layers, 2: pressure levels)"
-WRITE (20,'(2a)')           "24       ! Numero e lista dei livelli ve", &
-                            "rticali (ksec1(8); ordinati dal basso)"
-WRITE (20,'(a)')            "40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17"
-WRITE (20,'(2a)')           "1        ! input H2O 3d (0:none, 1:Q, 2:", &
-                            "Q+cloud water, 3:Q+cloud water+cloud ice"
-WRITE (20,'(2a)')           "1        ! ordine grib input (1: ordinat", &
-                            "i per verification time, 0: NON GESTITA)"
-WRITE (20,'(2a)')           "2003040100  ! Data-ora iniziale (usata s", &
-                            "olo se i grib non sono ordinati)"
-WRITE (20,'(2a)')           "0        ! Time zone degli orari in outp", &
-                            "ut (0: ore GMT; /=0: LST; 1: LST Italia)"
-WRITE (20,'(2a)')           "3        ! formato in output (2: version", &
-                            "e 2.1; 3: versione 3)"
+!                            12345678901234567890123456789012345678901234567890123456789012345678901234567890
+WRITE (20,'(2a)')           "1        ! Tipo di scadenze (1: analisi, 2: previsioni)"
+WRITE (20,'(2a)')           "24       ! Numero di scadenze da elaborare"
+WRITE (20,'(2a)')           "24       ! Numero e lista dei livelli verticali (chiave ""topLevel""; ordinati dal basso)"
+WRITE (20,'(a)')            "45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17"
+WRITE (20,'(2a)')           "1        ! input H2O 3d (0:none, 1:Q, 2:Q+cloud water, 3:Q+cloud water+cloud ice"
+WRITE (20,'(2a)')           "0        ! Time zone degli orari in output (0: ore GMT; /=0: LST; 1: LST Italia)"
+WRITE (20,'(2a)')           "3        ! formato in output (2: versione 2.1; 3: versione 3)"
 CLOSE (20)
 
 ! Deafult per LAMAZ 35 layers

@@ -14,7 +14,7 @@
 # LIBSIM_SVN:   eseguibili (ad esempio: /home/eminguzzi/svn/libsim; se non 
 #               specificato, usa gli eseguibili in path)
 #
-#                                         Versione 2.0.2, Enrico 11/06/2015
+#                                         Versione 3.0.0, Enrico 28/10/2019
 #--------------------------------------------------------------------------
 #set -x
 
@@ -24,8 +24,9 @@ function write_help
 {
 #       123456789012345678901234567890123456789012345678901234567890123456789012345
   echo ""
-  echo "Uso: ak_getgrib.ksh PROGETTO DATASET [-arc=URL] [-h]"
-  echo "Estrae un gruppo di grib da un archivio arkimet, senza compiere elaborazioni"
+  echo "Uso: ak_getgrib.ksh PROGETTO DATASET [-arc=URL] [-mon=FILE] [-h]"
+  echo "  [-zoom=LON_MIN,LAT_MIN,LON_MAX,LAT_MAX] [-destag] [-split=LENGHT] "
+  echo "Estrae un gruppo di grib da un archivio arkimet"
   echo ""
   echo "PROGETTO: legge la query arkimet dal file PROGETTO.akq (esempi in "
   echo "          ~eminguzzi/arkimet/templates/template.akq.DATASET)"
@@ -35,10 +36,15 @@ function write_help
   echo "          archivio centrale SIMC: http://arkimet.metarpa:8090 (default)"
   echo "          archivio backup maialinux: http://maialinux.metarpa:8090"
   echo "          archivio locale MA su radicchio: /scratch/eminguzzi/local_arkimet"
-  echo "-zoom=LON_MIN,LAT_MIN,LON_MAX,LAT_MAX: ritaglia (lato client) una sottoarea "
-  echo "-mon=FILE scrive su FILE le date estratte, man man che vengono elaborate"
-  echo "          (se usato senza opzione -zoom potrebbe rallentare l'estrazione)"
+  echo "-mon=FILE scrive su FILE le date estratte, appena vengono elaborate"
   echo "-h:       visualizza questo help"
+  echo ""
+  echo "-zoom=LON_MIN,LAT_MIN,LON_MAX,LAT_MAX: ritaglia (lato client) una sottoarea "
+  echo "-destag   destagherizza (riporta su griglia H i punti U e V), lato client"
+  echo "          Puo' essere lento, e fallire se si elaborano molti dati"
+  echo "-split=LENGHT (solo con -zoom o -destag): fissa la lunghezza dei segmenti in"
+  echo "          cui lo stream GRIB viene suddiviso."
+  echo "          Valori gestiti: hour, day, month, trange; default: hour "
   echo ""
   echo "Per usare versioni di lavoro di programmi e tabelle, esportare le variabili:"
   echo "          MA_UTILS_DAT, MA_UTILS_SVN, LIBSIM_DATA, DBA_TABLES, LIBSIM_SVN"
@@ -59,11 +65,12 @@ fi
 
 split="N"
 zoom="N"
+destag="N"
 mon="N"
 filemon=""
 akurl="http://arkimet.metarpa:8090"
 local_aliases=/autofs/nethomes/eminguzzi/arkimet/dat/match-alias.conf.local
-split_opt="--time-interval=day"
+split_req="nil"
 
 mand_par=0
 while [ $# -ge 1 ] ; do
@@ -86,6 +93,12 @@ while [ $# -ge 1 ] ; do
     lon_max=`echo $str_zoom | cut -d , -f 3`
     lat_max=`echo $str_zoom | cut -d , -f 4`
     shift
+  elif [ `echo $1 | awk '{print substr($1,1,7)}'` = '-destag' ] ; then
+    destag="Y"
+    shift
+  elif [ `echo $1 | awk '{print substr($1,1,7)}'` = '-split' ] ; then
+    split_req=`echo $1 | cut -d = -f 2`
+    shift
   elif [ $mand_par -eq 0 ] ; then
     prog=$1
     mand_par=1
@@ -100,13 +113,30 @@ while [ $# -ge 1 ] ; do
   fi
 done
 
+if [ $split_req = "hour" -o $split_req = "day" -o $split_req = "month" ] ; then
+  split_opt="--time-interval=${split_req}"
+elif [ $split_req = "trange" ] ; then
+  split_opt="--split-timerange"
+elif [ $split_req = "nil" ] ; then
+  split_opt="--time-interval=hour"
+else
+  echo "Opzione -split=${split_opt} non gestita"
+  exit 1
+fi 
+
 # Controlli sui parametri
 if [ $mand_par -ne 2 ] ; then
   write_help
   exit 1
 fi
-if [ $zoom = "Y" -o $mon = "Y" ] ; then
+if [ $zoom = "Y" -o $mon = "Y" -o $destag = "Y" ] ; then
   split="Y"
+fi
+if [ $destag = "Y" ] ; then
+  echo ""
+  echo "WRANING: l'opozione destag puo' essere lenta, e fallire se si elaborano molti dati"
+  echo "Nel caso, suddividere la query in segmenti piu' brevi"
+  echo ""
 fi
 
 # 1.2 Path e utility
@@ -195,17 +225,26 @@ echo "Pronto per estrarre, lancero' "$cntq" query"
 # 2.3 Se richiesto, costruisco lo script per arki-xargs
 if [ $split = "Y" ] ; then
   rm -f xargs.ksh
-  echo "rm -f tmp.grb" >> xargs.ksh
-  if [ $zoom = "Y" ] ; then
-    echo "vg6d_subarea --trans-type=zoom --sub-type=coordbb --ilon=$lon_min --ilat=$lat_min --flon=$lon_max --flat=$lat_max \$2 tmp.grb" >> xargs.ksh
+  echo "rm -f tmp1.xargs.grb tmp2.xargs.grb" >> xargs.ksh
+
+  if [ $destag = "Y" ] ; then
+    echo "vg6d_transform --trans-mode=p --a-grid \$2 tmp1.xargs.grb" >> xargs.ksh
   else
-    echo mv $2 tmp.grb
+    echo mv \$2 tmp1.xargs.grb >> xargs.ksh
   fi
+
+  if [ $zoom = "Y" ] ; then
+    echo "vg6d_transform --trans-mode=s --trans-type=zoom --sub-type=coordbb --ilon=$lon_min --ilat=$lat_min --flon=$lon_max --flat=$lat_max tmp1.xargs.grb tmp2.xargs.grb" >> xargs.ksh
+  else
+    echo mv tmp1.xargs.grb tmp2.xargs.grb >> xargs.ksh
+  fi
+
   if [ $mon = "Y" ] ; then
-    echo "curr_date=\`grib_get -P dataDate tmp.grb | head -n 1\`" >> xargs.ksh
+    echo "curr_date=\`grib_get -P dataDate tmp2.xargs.grb | head -n 1\`" >> xargs.ksh
     echo "echo \$curr_date >> $filemon" >> xargs.ksh
   fi
-  echo "cat tmp.grb >> \$1" >> xargs.ksh
+
+  echo "cat tmp2.xargs.grb >> \$1" >> xargs.ksh
   chmod +x xargs.ksh
 fi
 
