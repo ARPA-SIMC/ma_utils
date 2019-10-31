@@ -730,14 +730,14 @@ CHARACTER (LEN=80),INTENT(IN) :: file_nml
 
 OPEN (UNIT=20, FILE=file_nml, STATUS="REPLACE", FORM="FORMATTED")
 
-!                            12345678901234567890123456789012345678901234567890123456789012345678901234567890
-WRITE (20,'(2a)')           "1        ! Tipo di scadenze (1: analisi, 2: previsioni)"
-WRITE (20,'(2a)')           "24       ! Numero di scadenze da elaborare"
-WRITE (20,'(2a)')           "24       ! Numero e lista dei livelli verticali (chiave ""topLevel""; ordinati dal basso)"
-WRITE (20,'(a)')            "45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17"
-WRITE (20,'(2a)')           "1        ! input H2O 3d (0:none, 1:Q, 2:Q+cloud water, 3:Q+cloud water+cloud ice"
-WRITE (20,'(2a)')           "0        ! Time zone degli orari in output (0: ore GMT; /=0: LST; 1: LST Italia)"
-WRITE (20,'(2a)')           "3        ! formato in output (2: versione 2.1; 3: versione 3)"
+!                 12345678901234567890123456789012345678901234567890123456789012345678901234567890
+WRITE (20,'(a)') "1        ! Type of timerange (1: analysis, 2: forecast)"
+WRITE (20,'(a)') "24       ! Number of time stamps to process"
+WRITE (20,'(a)') "24       ! Number and list of model layers (grib-api key ""topLevel""; sorted from ground level to model top)"
+WRITE (20,'(a)') "45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17"
+WRITE (20,'(a)') "1        ! Option for input of 3D water parameters (0:none, 1:Q, 2:Q+cloud water, 3:Q+cloud water+cloud ice"
+WRITE (20,'(a)') "0        ! Time zone of input data (0: GMT; /=0: LST; 1: LST Italy)"
+WRITE (20,'(a)') "3        ! 3D.DAT output format (2: version 2.1; 3: version 3)"
 CLOSE (20)
 
 ! Deafult per LAMAZ 35 layers
