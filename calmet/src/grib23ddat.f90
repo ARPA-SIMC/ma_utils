@@ -1,70 +1,62 @@
 PROGRAM grib23ddat
 !--------------------------------------------------------------------------
-! Legge un blocco di dati in formato GRIB e li riscrive nel formato 3D.DAT,
-! versione 2.1 oppure 3.
-! Uso: grib3ddat.exe file_static file_dat file_out
+! Reads the ouptut of a NWP model (GRIB format), and writes it in 3D.DAT 
+! format, version 2.1 or 3.
+! Use: grib3ddat.exe file_static file_dat file_out
 !
 ! Input:
-! - file_static: orografia, quote dei model layers
-! - file_dat:    dati meteo, in formato grib;
-! - grib23dddat.inp: opzioni del programma
+! - file_static: topography and height of model layers
+! - file_dat:    meteorolgical data, GRIB1 format
+! - grib23dddat.inp: program namelist
 !
-! NOTE: 
-! - I grib in file_dat:
-!   * devono essere definiti sulla stessa griglia di file_static
-!   * possono contenere analisi, oppure previsioni relative a un'unico run
-!   * riferiti a model layers (indicatorOfTypeOfLevel=110)
-!   * devono essere ordinati per data di validita' crescente
+! NOTES: 
+! - GRIB data in file_dat:
+!   * must be defined on the same grid as file_static
+!   * can contain analysis, or forecast from a single model run (only 
+!     one reference time)
+!   * muts be defined on model layers (indicatorOfTypeOfLevel=110)
+!   * must be sorted for increasing verfication time 
 !
-! - Gestione campi H2O 3d: a quanto pare (subr. RDMM5), Calmet non usa in 
-!   nessun caso W, Qr, Qi, Qs e Qg; usa invece Qc (se presente), per 
-!   calcolare ceiling height. Sono quindi previste 4 opzioni per i campi in
-!   ingresso a grib23ddat (parametro inp_h2o:
-!   0) nessun campo reltivo ad H2O
-!   1) solo umidita' specifica (il programma scrive Rh e mix.Ratio)
-!   2) Q + Cloud water
-!   3) Q + Cloud water + cloud ice (in questo caso, scrivo la loro somma 
-!     come cloud water, e non scrivo cloud ice)
+! - Management of 3D water variables: apparently (subroutine RDMM5),
+!   calmet never uses the variables W, Qr, Qi, Qs e Qg; it uses Qc (if
+!   availbale), to calculate Ceiling Height. Therefore, this program
+!   allows 4 options for input fields related with water (keyword inp_h2o):
+!   0) None
+!   1) Only specific humidity (the program writes RH and mix.ratio)
+!   2) Specific humidity + cloud water
+!   3) Specific humidity + cloud water + cloud ice (the program writes
+!      cloud water + cloud ice as cloud water, cloud ice is not written) 
 !
-! - Lettura del 3D.DAT nelle varie versioni Calmet. Sono coinvolte le sub.:
-!     - rdhd5 (versione del formato 3D.DAT)
-!     - rdhd52/rdhd53 (lettura headers)
-!     - rdmm5 (lettura dati)
-!   Calmet desume la versione del file 3D.DAT dal contenuto dei primi 2 
-!   record e la salva nella variabile imm53d (sub. rdhd5), che vale:
-!     0: MM5.DAT   - Calmet V?.?, sub. rdhd51 (attualmente non gestita)
-!     1: 3D.DAT V1 - Calmet V5.2, sub. rdhd52 (attualmente non gestita)
+! - How Calmet reads 3D.DAT file. This involves subroutines:
+!     - rdhd5 (version of 3D.DAT format)
+!     - rdhd52/rdhd53 (headers)
+!     - rdmm5 (data record)
+!   Calmet deduce the version of 3D.DAT file from the content of the first
+!   2 records, and save it in the variable imm53d (sub. rdhd5), that can be:
+!     0: MM5.DAT   - Calmet V?.?, sub. rdhd51 (presently not implemented)
+!     1: 3D.DAT V1 - Calmet V5.2, sub. rdhd52 (presently not implemented)
 !     2: 3D.DAT V2 - Calmet V5.5/5.8 sub rdhd53
 !     3: 3D.DAT V3 - Calmet V6.*
-!   Tutte le versioni di Calmet continuano a gestire le versioni precedenti
-!   del file 3D.DAT. La varibile ioutmm5 (sub. rdhd5*) codifica la lista
-!   dei parametri disponibli in input.
+!   All Calmet versions continue to read older versions of 3D.DAT file. 
+!   The variable ioutmm5 (sub. rdhd5*) encode the list of parameters 
+!   available in input.
+! 
+! - According to documnetation (version 2.1 of outputs), missing values in 
+!   surface fields (in the header of data records) should be set to 0., 
+!   instead of -9999. (subroutine write_dat)
 !
-! - Secondo la documentazione (versione 2.1 degli output), i dati mancanti
-!   nei parametri superficiali (nell'header dei data record) dovrebbero 
-!   essere messi a 0, invece di -9999. (sub. write_dat)
+! - The height of model layers should be considered from MSL, and not from
+!   the surface (CALPUFF manual, table 8.21)
 !
-! - La quota dei livelli dovrebbe essere indicata da MSL, e non da
-!   superficie (manuale CALPUFF, tabel 8.21)
-!
-! SVILUPPI: 
-! - ammettere input non a passo orario (spostare hh_step in grib23ddat.inp)
-!
-! - file_static potrebbe essere ampliato, includendo:
-!   * land fraction: per discriminare punti di terra e di mare (parametro
-!     ilu, usato nelle subr. RDHD5 e RDHD53 quando itwprog=2
-!   * albedo: necessario per tentare di riconoscere la presenza di neve al 
-!     suolo (neve presente quando alb(t) /= alb_fisiografico)
-!   * emissivita' termica: preso dai parametri fisiografici di COSMO; 
-!     necessario, assieme all'albedo, per il calcolo della radiaz. IR 
-!     incdente (se mai dovesse servisse)
-!
-! - file_dat potrebbe essere ampliato, includendo i parametri superficiali
-!   che attualmente sono letti ma non utilizzati (sub. RDMM5, line 20175)
-!
-! Rispetto alla versione 1, sono stati tolti i riferimenti alle opzioni non
-! implementate (dati ECMWF, pressure levels, input non ordinato per
-! verification time)
+! FUTURE DEVELOPEMENTS:
+! - allow no-hourly input
+! - allow input on pressure levels
+! - add more fields to file_static:
+!   * land fraction: to discriminate points of land and sea (keyword
+!     ilu, used in subr. RDHD5 e RDHD53 when itwprog=2
+!   * albedo: to try to evaluate the presence of snow on the ground 
+! - Add to file_dat the surface fields that are read but not used 
+!   (sub. RDMM5, line 20175)
 !
 !                                                 V2.0.0, Enrico 25/10/2019
 !--------------------------------------------------------------------------
@@ -765,15 +757,15 @@ IMPLICIT NONE
 
 !                12345678901234567890123456789012345678901234567890123456789012345678901234567890
 WRITE (*,*)
-WRITE (*,'(a)') "Uso: grib3ddat.exe file_static file_dat file_out [-h] [-c] [-modif]"
+WRITE (*,'(a)') "Use: grib3ddat.exe file_static file_dat file_out [-h] [-c] [-modif]"
 WRITE (*,'(a)') ""
-WRITE (*,'(a)') "file_static: in formato grib; contine orografia (1o campo) e quote model layers"
-WRITE (*,'(a)') "file_dat:    dati meteo in formato grib; obbligatori P,T,U,V,Prc,Tsup"
-WRITE (*,'(a)') "             opzionali Q,Qcr,Qis "
-WRITE (*,'(a)') "file_out:    file di ouput, in formato 3D.DAT"
-WRITE (*,'(a)') "-h:          visualizza questo help"
-WRITE (*,'(a)') "-c:          costruisce un file grib23ddat.inp di esempio"
-WRITE (*,'(a)') "-modif:      scrive valori inventati per test/debug"
+WRITE (*,'(a)') "file_static: grib format; contains topography (1st field) and height of model layers"
+WRITE (*,'(a)') "file_dat:    meteorological input, grib format; mandatory fields: P,T,U,V,Prc,Tsup;"
+WRITE (*,'(a)') "             optional fields: Q,Qcr,Qis "
+WRITE (*,'(a)') "file_out:    ouptut file, 3D.DAT format"
+WRITE (*,'(a)') "-h:          print this help"
+WRITE (*,'(a)') "-c:          build a template for file grib23ddat.inp and terminates"
+WRITE (*,'(a)') "-modif:      write in output ""fake"" values for test/debug"
 WRITE (*,'(a)') ""
 
 RETURN
