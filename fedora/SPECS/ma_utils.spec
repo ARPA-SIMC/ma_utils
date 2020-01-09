@@ -17,8 +17,8 @@ Source:     https://github.com/arpa-simc/%{name}/archive/v%{version}-%{release}.
 BuildRequires: eccodes-simc
 %endif
 
-# expliciting eccodes for centos7
-%if 0%{?el7}
+%if 0%{?rhel} >= 7
+# expliciting eccodes for centos 7 and 8
 %define grib_sw eccodes
 BuildRequires: eccodes-simc
 %endif
