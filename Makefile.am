@@ -58,14 +58,18 @@ datafilelist = \
  $(top_srcdir)/data/tabella_201.txt \
  $(top_srcdir)/data/tabella_203_ser.txt \
  $(top_srcdir)/data/tabella_203.txt \
- $(top_srcdir)/data/template.akq.cosmo_5M_vol_ita \
+ $(top_srcdir)/data/template.akq.cosmo \
+ $(top_srcdir)/data/template.akq.cosmo.vol \
+ $(top_srcdir)/data/template.akq.def \
+ $(top_srcdir)/data/template.akq.kenda \
  $(top_srcdir)/data/template.akq.lama5 \
+ $(top_srcdir)/data/template.akq.lama5.adms \
+ $(top_srcdir)/data/template.akq.lama5.calpuff \
  $(top_srcdir)/data/template.akq.lamaz \
- $(top_srcdir)/data/template.akq.lama.adms \
- $(top_srcdir)/data/template.akq.lama.calpuff \
- $(top_srcdir)/data/template.akq.ninfa5ub \
- $(top_srcdir)/data/template.akq.ninfabpa5 \
- $(top_srcdir)/data/template.akq.pescoemrope \
+ $(top_srcdir)/data/template.akq.lamaz.adms \
+ $(top_srcdir)/data/template.akq.lamaz.calpuff \
+ $(top_srcdir)/data/template.akq.ninfa \
+ $(top_srcdir)/data/template.akq.ninfa.ub \
  $(top_srcdir)/data/match-alias.conf.arkimet \
  $(top_srcdir)/data/LAMAZ_layers_20120606.grb \
  $(top_srcdir)/data/LAMAZ_layersSup_20120606.grb \
