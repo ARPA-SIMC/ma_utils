@@ -1,0 +1,1 @@
+dist_pkglibexec_SCRIPTS = big.gs cbar_line.gs cbarn_col.gs cbarn_white.gs define_colors.gs draw_marks.gs draw_orog.gs draw_shape.gs grb2grads.ksh overlay.gs parseopt.gsf parsestr.gsf save_png.gs timeaxis.gsf timeaxis_new.gsf tskip.gs white.gs

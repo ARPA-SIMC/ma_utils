@@ -1,18 +1,16 @@
 ****************************************************************************
 * Script per disegnare un'orografia di background per una mappa GRADS
 *
-*                                 Versione 1.0.1, Johnny & Enrico 03/09/2019
+*                                 Versione 2.0.0, Johnny & Enrico 29/01/2020
 ****************************************************************************
 function drworog(args)
 
-file_5km='orog_calmet_5km'
-file_20km='orog_eur_20km'
-file_7km='orog_lmbpa_7km'
-file_2p8km='orog_lmbpa_2p8km'
-file_1p1km='orog_lmbpa_1p1km'
-file_5kmutm='orog_bpa_5km_utm'
-file_lmsmr4='orog_lmsmr4_7km'
-file_NIta2Km='orog_NIta2Km'
+filegeo.1=eur20k_orog
+filegeo.2=nita1k_orog
+filegeo.3=COS2I_orog
+filegeo.4=COS5MITR_orog
+filegeo.5=LAMAZ_orog
+filegeo.6=nita5kutm_orog
 
 *-------------------
 * Gestione parametri
@@ -32,51 +30,29 @@ if (opt='-h' | opt='h' | opt='')
   say ' 7 : solo contour, grigio chiaro, dettagliato'
   say ''
   say 'aree implementate:'
-  say ' 1 : bacino padano adriatico 5km (default)'
-  say ' 2 : Europa 20 km (area ECMWF)'
-  say ' 3 : bacino padano adriatico 7km'
-  say ' 4 : bacino padano adriatico 2.8km'
-  say ' 5 : bacino padano adriatico 1.1km'
-  say ' 6 : bacino padano adriatico 5km UTM'
-  say ' 7 : dominio COSMO lmsmr4 7km'
-  say ' 8 : Nord Italia, lat-lon, 2km'
+  say ' 1 : Europa, 20 km, lat-lon'
+  say ' 2 : Nord Italia, 1 km, lat-lon'
+  say ' 3 : COSMO2I, 2 km, ruotata new'
+  say ' 4 : COSMO5M, 5 km, ruotata new'
+  say ' 5 : LAMAZ, 7 km, ruotata old'
+  say ' 6 : Nord Italia, 5km, UTM'
   say ''
-  say ' geo_dir: directory con i grib orografia '
-  say '   (default: /autofs/nfshomes/eminguzzi/server/util/grads/dat)'
+  say ' geodir: directory con i grib orografia '
+  say '   (default: /usr/share/ma_utils)'
 
   return
 endif
 
 area=subwrd(args,2)
-file_name=file_5km
-if (area='2')
-  file_name=file_20km
-endif
-if (area='3')
-  file_name=file_7km
-endif
-if (area='4')
-  file_name=file_2p8km
-endif
-if (area='5')
-  file_name=file_1p1km
-endif
-if (area='6')
-  file_name=file_5kmutm
-endif
-if (area='7')
-  file_name=file_lmsmr4
-endif
-if (area='8')
-  file_name=file_NIta2Km
+file_name=filegeo.area
+
+geodir=subwrd(args,3)
+if (geodir='')
+  geodir='/usr/share/ma_utils'
 endif
 
-geo_dir=subwrd(args,3)
-if (geo_dir='')
-  geo_dir='/autofs/nfshomes/eminguzzi/server/util/grads/dat'
-endif
-
-file_orog=geo_dir'/'file_name
+file_orog=geodir'/'file_name
+say 'uso orografia: 'file_orog
 
 *---------------------
 * Conto i files aperti 
@@ -122,7 +98,7 @@ if (opt=1)
   'set clab 'off
   'set ccolor '0
   'set clevs '100' '500' '1000
-  'd 'distsfc
+  'd z'
   done=1
 endif
 
@@ -139,7 +115,7 @@ if (opt=2)
   'set rgb '18' '150' '150' '150
   'set ccols '1' '16' '17' '18
   'set clevs '100' '500' '1000
-  'd 'distsfc
+  'd z'
   done=1
 endif
 
@@ -153,7 +129,7 @@ if (opt=3)
   'set clab 'off
   'set ccolor '1
   'set clevs '100' '500' '1000
-  'd 'distsfc
+  'd z'
   done=1
 endif
 
@@ -168,7 +144,7 @@ if (opt=4)
   'define_colors'
   'set ccols 1  82  83  84  85  86   87   88   0'
   'set clevs  50 100 200 400 800 1500 2000 3000'
-  'd 'distsfc
+  'd z'
   done=1
 endif
 
@@ -182,7 +158,7 @@ if (opt=5)
   'set clab 'off
   'set ccolor '15
   'set clevs 50 100 200 400 800 1500 2000 3000'
-  'd 'distsfc
+  'd z'
   done=1
 endif
 
@@ -197,7 +173,7 @@ if (opt=6)
   'define_colors'
   'set ccols 44 36 34  32  22  24  73   76   84  87'
   'set clevs   0 50 100 200 400 800 1500 2000 3000'
-  'd 'distsfc
+  'd z'
   done=1
 endif
 
@@ -219,7 +195,7 @@ if (opt=7)
   'set rgb 89  80  80  80 '
   'set ccols 1  82  83  84  85  86   87   88   89'
   'set clevs  50 100 200 400 800 1500 2000 3000'
-  'd 'distsfc
+  'd z'
   done=1
 endif
 
@@ -234,7 +210,7 @@ if (opt=8)
   'define_colors'
   'set ccols 1  81  82  83  84  85   86   87   88'
   'set clevs  50 100 200 400 800 1500 2000 3000'
-  'd 'distsfc
+  'd z'
   done=1
 endif
 

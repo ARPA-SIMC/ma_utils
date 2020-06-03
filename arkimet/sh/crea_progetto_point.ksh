@@ -26,9 +26,8 @@
 # Todo:
 # Gestire il caso in cui $doc_file contiene progetti senza il carattere "_"
 #
-#                                                 V9.0.0, Enrico 25/10/2019
+#                                                 V9.1.0, Enrico 08/01/2020
 #==========================================================================
-set -u
 # set -ex   # per attivare set -e, bisogna scommentare tutte le rige #e 
 # set -x
 
@@ -126,6 +125,7 @@ if [ -z $MA_UTILS_SVN ] ; then
   plot_local_orog=/usr/libexec/ma_utils/plot_local_orog.gs
   stat_orari=/usr/libexec/ma_utils/stat_orari.exe
   windrose=/usr/libexec/ma_utils/windrose.sh
+  GASCRP=/usr/libexec/ma_utils/
 else 
   echo "(crea_progetto_point.ksh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
   ak_seriet=${MA_UTILS_SVN}/arkimet/sh/ak_seriet.ksh
@@ -134,6 +134,7 @@ else
   plot_local_orog=${MA_UTILS_SVN}/arkimet/sh/plot_local_orog.gs
   stat_orari=${MA_UTILS_SVN}/osservazioni/src/stat_orari.exe
   windrose=${MA_UTILS_SVN}/osservazioni/sh/windrose.sh
+  GASCRP=${MA_UTILS_SVN}
 fi
 
 if [ ! $EDITOR ] ; then
@@ -433,7 +434,7 @@ if [ $batch = "N" -a $modif != "S" ] ; then
     echo $proj                                            > sel_punti.inp
     head -n 5 sel_punti.org | tail -n 4                   >> sel_punti.inp
   
-    if [ $dsproj = "GEO" -o $dsproj = "ROT" ] ; then
+    if [ $dsproj = "GEO" -o $dsproj = "ROT" -o $dsproj = "ROT1" -o $dsproj = "ROT2" ] ; then
       echo "1          ! tipo di grigliato modello"       >> sel_punti.inp
     elif [ $dsproj = "UTM" ] ; then
       echo "0          ! tipo di grigliato modello"       >> sel_punti.inp
@@ -704,7 +705,6 @@ elif [ $plt -eq 2 ] ; then
           break
 	fi
       done
-#e    set -e
 
       if [ $wrret -eq 0 ] ; then
         wrfile=`ls -1rt wrose_*.png | tail -n 1`

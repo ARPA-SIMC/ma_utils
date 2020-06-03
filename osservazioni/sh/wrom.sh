@@ -5,7 +5,7 @@
 # Script che fa le windrose (con windrose.ksh) e
 # le mette su una mappa (con overlay.gs)
 #
-#                                     Versione 2.2.1, Giovanni&Enrico 03/09/2019
+#                                     Versione 2.2.3, Giovanni&Enrico 28/01/2020
 #-------------------------------------------------------------------------------
 
 # help
@@ -14,7 +14,7 @@ function write_help
  echo " uso: wrom.ksh [-b] [-m] [-s] [-h] [-os opts1] [-om opts2]"
  echo ""
  echo "      -b   batch, vuole wrom.lst ed eventualmente wrtmp.gs nella cartella di lavoro"
- echo "           wrom.lst: una riga per stazione, 3 campi: nome, lon, lat"
+ echo "           wrom.lst: una riga per stazione, 3 campi: nome_file lon lat (separti da spazi)"
  echo "      -m   fa solo la mappa, non anche le w.rose separate"
  echo "      -s   input da seriet (default e' estra_orari)"
  echo "      -h   scrive questo help"
@@ -35,8 +35,8 @@ else
   echo "(ak_seriet.ksh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
   windrose=${MA_UTILS_SVN}/osservazioni/sh/windrose.sh
   wrom_gs=${MA_UTILS_SVN}/osservazioni/sh/wrom.gs
-  overlay_gs=${MA_UTILS_SVN}/osservazioni/sh/overlay.gs
-  draw_orog_gs=${MA_UTILS_SVN}/osservazioni/sh/draw_orog.gs
+  overlay_gs=${MA_UTILS_SVN}/util/grads/sh/overlay.gs
+  draw_orog_gs=${MA_UTILS_SVN}/util/grads/sh/draw_orog.gs
   geo_file=${MA_UTILS_SVN}/data/orog_eur_20km
 fi
 

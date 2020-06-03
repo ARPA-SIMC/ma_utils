@@ -1,0 +1,330 @@
+function timeaxis(args)
+
+
+
+******************************************************
+* Write time axis labels                             *
+* Version 0.2, 29/03/2006                            *
+* Giovanni Bonafe', Based on script by               *
+* Markku Kangas, Based on script by Brian E. Doty    *
+* NB there are some bugs, to be modified!!!!         *
+******************************************************
+
+**** Parse argument and set string size
+**** NOTE : string attributes not restored
+labloc = subwrd(args,1)
+*'set strsiz 0.12 0.14'
+*'set string 1'
+
+*** Formats
+fmt="hhmm"
+*fmt="hh"
+
+*** Parameters:
+*    space between labels
+space = 0.2
+
+**** Save time limits for restoring when stopping
+'q dims'
+xrec = sublin(result,5)
+tfrst = subwrd(xrec,11)
+tlast = subwrd(xrec,13)
+
+
+**** Get x/y axis limits
+'q gxinfo'
+xrec = sublin(result,3)
+yrec = sublin(result,4)
+xmn = subwrd(xrec,4)
+xmx = subwrd(xrec,6)
+ymn = subwrd(yrec,4)
+ymx = subwrd(yrec,6)
+
+
+**** Get grid "corners"
+'q xy2gr 'xmn' 'ymn
+imin = subwrd(result,3)
+jmin = subwrd(result,6)
+'q xy2gr 'xmx' 'ymx
+imax = subwrd(result,3)
+jmax = subwrd(result,6)
+irange=imax-imin
+
+**** Get string dimension
+'q string o'
+sdim=subwrd(result,4)
+sdim=sdim/0.12
+
+if (labloc = top)
+  jloc = jmax
+  tick1a =  0.05
+  tick1b = -0.05
+  offs1  = 3*tick1a+( 0.10*sdim)
+  offs2  = 3*tick1a+( 0.26*sdim)
+  offs3  = 3*tick1a+( 0.42*sdim)
+else
+  jloc = jmin
+  tick1a = -0.06
+  tick1b =  0.04
+  offs1  = 3*tick1a+(-0.12*sdim)
+  offs2  = 3*tick1a+(-0.28*sdim)
+  offs3  = 3*tick1a+(-0.44*sdim)
+endif
+
+*** Check the length of the time range
+trange=tlast-tfrst+1
+
+'q ctlinfo'
+ctl=result
+i=0
+lin="_"
+while(lin!="")
+ i=i+1
+ lin=sublin(ctl,i)
+ dum=subwrd(lin,1)
+ if(dum="tdef")
+  wrd="_"
+  j=2
+  while(wrd!="")
+   j=j+1
+   wrd=subwrd(lin,j)
+   tstep=subwrd(lin,j-1)
+  endwhile
+ endif
+endwhile
+
+dum="_"
+i=2
+while(dum!="")
+ i=i+1
+ dum=substr(tstep,i,1)
+ if(dum!="")
+  tunit=substr(tstep,i-1,2)
+  nunit=substr(tstep,1,i-2)
+ endif
+endwhile
+if(tunit="mn");munit=1;endif
+if(tunit="hr");munit=60;endif
+if(tunit="dy");munit=1440;endif
+if(tunit="mo");munit=43200;endif
+if(tunit="yr");munit=525600;endif
+mstep=munit*nunit
+mrange=trange*mstep
+say "step:  "tstep
+say "range: "mrange"mn"
+
+**** Get first time label date data
+'set t ' tfrst' 'tfrst+1
+'q time'
+xrec = subwrd(result,3)
+dum=substr(xrec,3,1)
+if(dum=":")
+ hr=substr(xrec,1,2)
+ mn=substr(xrec,4,2)
+ dy=substr(xrec,7,2)
+ mo=substr(xrec,9,3)
+ yr=substr(xrec,12,4)
+endif
+if(dum="Z")
+ mn="00"
+ hr=substr(xrec,1,2)
+ dy=substr(xrec,4,2)
+ mo=substr(xrec,6,3)
+ yr=substr(xrec,9,4)
+endif
+
+**** Plot first time label (always)
+*'q gr2xy 'imin' '%(jloc+0.5)
+'q gr2xy 'imin' '%(jloc)
+x = subwrd(result,3)
+y = subwrd(result,6)
+lab1=hr':'mn
+lab2=dy''mo
+lab3=yr
+
+'q string 'lab1
+len1 = subwrd(result,4)
+'q string 'lab2
+len2 = subwrd(result,4)
+'q string 'lab3
+len3 = subwrd(result,4)
+
+'draw string '%(x-len1/2)%' 'y+offs1' 'lab1
+'draw string '%(x-len2/2)%' 'y + offs2' 'lab2
+'draw string '%(x-len3/2)%' 'y + offs3' 'lab3
+'draw line 'x' 'y+tick1a' 'x' 'y+tick1b
+
+  mnpr=mn
+  hrpr=hr
+  dypr=dy
+  mopr=mo
+  yrpr=yr
+  maxlen=0
+  if(len1>maxlen);maxlen=len1;endif
+  if(len2>maxlen);maxlen=len2;endif
+  if(len3>maxlen);maxlen=len3;endif
+  maxlenpr=maxlen
+  xpr=x
+
+**** Plot rest of the labels
+ik=0
+it = math_int(tfrst + 1)
+while (it <= tlast)
+
+
+  tdiff = it - tfrst
+  'set t 'it' 'it+1
+  'q time'
+  xrec = subwrd(result,3)
+  dum=substr(xrec,3,1)
+  if(dum=":")
+   hr=substr(xrec,1,2)
+   mn=substr(xrec,4,2)
+   dy=substr(xrec,7,2)
+   mo=substr(xrec,9,3)
+   yr=substr(xrec,12,4)
+  endif
+  if(dum="Z")
+   mn="00"
+   hr=substr(xrec,1,2)
+   dy=substr(xrec,4,2)
+   mo=substr(xrec,6,3)
+   yr=substr(xrec,9,4)
+  endif
+
+*  'q gr2xy 'imin+(irange/(trange-1))*tdiff' '%(jloc+0.5)
+  'q gr2xy 'imin+(irange/(trange-1))*tdiff' '%(jloc)
+  x = subwrd(result,3)
+  y = subwrd(result,6)
+
+*** Build labels
+  lab1=""
+  lab2=""
+  lab3=""
+
+  if(mrange>10     )
+   lab1=hr':'mn
+   if(dy!=dypr)
+    lab2=dy''mo
+   else
+    lab2=""
+   endif
+   if(yr!=yrpr)
+    lab3=yr
+   else
+    lab3=""
+   endif
+  endif
+  if(mrange>600    )
+   if(hr!=hrpr & mn="00")
+    lab1=hr':'mn
+   else
+    lab1=""
+   endif
+   if(dy!=dypr)
+    lab2=dy''mo
+    lab1=hr':'mn
+   else
+    lab2=""
+   endif
+   if(yr!=yrpr)
+    lab2=dy''mo
+    lab3=yr
+   else
+    lab3=""
+   endif
+  endif
+  if(mrange>15000  )
+   if(dy!=dypr & hr="00" & mn="00")
+    lab1=dy''mo
+   else
+    lab1=""
+   endif
+   if(yr!=yrpr)
+    lab2=yr
+   else
+    lab2=""
+   endif
+   lab3=""
+  endif
+  if(mrange>400000 )
+   if(mo!=mopr & dy="00")
+    lab1=mo
+   else
+    lab1=""
+   endif
+   if(yr!=yrpr)
+    lab2=yr
+   else
+    lab2=""
+   endif
+  lab3=""
+  endif
+  if(mrange>5000000)
+   if(yr!=yrpr)
+    lab1=yr
+   else
+    lab1=""
+   endif
+  lab2=""
+  lab3=""
+  endif
+* say lab1' 'lab2' 'lab3
+
+** Calculate label length
+   len1=0
+   len2=0
+   len3=0
+   if(lab1!="")
+    'q string 'lab1
+    len1 = subwrd(result,4)
+   endif
+   if(lab2!="")
+    'q string 'lab2
+    len2 = subwrd(result,4)
+   endif
+   if(lab3!="")
+    'q string 'lab3
+    len3 = subwrd(result,4)
+   endif
+  maxlen=0
+  if(len1>maxlen);maxlen=len1;endif
+  if(len2>maxlen);maxlen=len2;endif
+  if(len3>maxlen);maxlen=len3;endif
+
+** Plot only certain hours and avoid overlapping of labels
+  ik=ik+1
+  if(xpr+maxlenpr/2+maxlen/2+space<x & (lab1!="" | lab2!="" | lab3!=""))
+   ik=0
+  mnpr=mn
+  hrpr=hr
+  dypr=dy
+  mopr=mo
+  yrpr=yr
+  len1pr=len1
+  len2pr=len2
+  len3pr=len3
+  maxlenpr=maxlen
+  xpr=x
+
+   if(lab1!="")
+    'draw string '%(x-len1/2)%' 'y+offs1' 'lab1
+   endif
+   if(lab2!="")
+    'draw string '%(x-len2/2)%' 'y + offs2' 'lab2
+   endif
+   if(lab3!="")
+    'draw string '%(x-len3/2)%' 'y + offs3' 'lab3
+   endif
+   'draw line 'x' 'y+tick1a' 'x' 'y+tick1b
+  endif
+
+
+  it = it + 1
+
+
+endwhile
+
+
+**** Restore time limits as saved in the beginning
+'set t 'tfrst' 'tlast

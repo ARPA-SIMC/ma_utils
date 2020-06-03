@@ -21,7 +21,7 @@ if(file='' | proj='' | np='' | file='-h')
   say "Uso: plot_local_orog.gs file proj np"
   quit
 endif
-if(proj!='UTM' & proj!='GEO' & proj!='ROT')
+if(proj!='UTM' & proj!='GEO' & proj!='ROT' & proj!='ROT1' & proj!='ROT2' )
   say "Proiezione "proj" non gestita"
   quit
 endif
@@ -78,8 +78,11 @@ endif
 if(proj="GEO")
   'draw_shape regit'
 endif
-if(proj="ROT")
+if(proj="ROT" | proj="ROT1")
   'draw_shape regitrot'
+endif
+if(proj="ROT2")
+  'draw_shape regitrot2'
 endif
 if(proj="UTM")
   'draw_shape regitutm -k -l'

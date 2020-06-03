@@ -162,10 +162,10 @@
  228  pnh3      Ammonium particulate in aerosl (ug/m3)    15232
  229  pasoa     Anthropogenic Sec. Org. Aerosol (ug/m3)   15233
  230  pbsoa     Biogenic Sec. Org. Aerosol (ug/m3)        15234
- 231  PM5       Total aerosol < 5 um (ug/m3)              15202
- 232  PM1       Total aerosol < 1.25 um (ug/m3)           15203
- 233  PM03      Total aerosol < 0.312 um (ug/m3)          15205
- 234  PM008     Total aerosol < 0.078 um (ug/m3)          15207
+ 231  pm5       Total aerosol < 5 um (ug/m3)              15202
+ 232  pm1       Total aerosol < 1.25 um (ug/m3)           15203
+ 233  pm03      Total aerosol < 0.312 um (ug/m3)          15205
+ 234  pm008     Total aerosol < 0.078 um (ug/m3)          15207
  235  pm06      Tot aero < 0.625 um (classes 1-3, ug/m3)  15204
  236  pm015     Tot aero < 0.156 um (classes 1-2, ug/m3)  15206
  237  pm004     Total aerosol < 0.04 um (class 1, ug/m3)

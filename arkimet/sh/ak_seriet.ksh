@@ -680,6 +680,9 @@ if [ $inpdata = "arkimet" ] ; then
 
     if [ -s ${prog}.gacsv.${cnt} ] ; then
       filesok=`expr $filesok + 1`
+
+cp ${prog}.gacsv.${cnt} ${prog}.gacsv.${cnt}.org
+      
       sort --temporary-directory=$AK_TEMP ${prog}.gacsv.${cnt} > tmp.gacsv
       mv tmp.gacsv ${prog}.gacsv.${cnt}
 
