@@ -15,7 +15,7 @@
 !         elementi di 1 grado x 1 grado (nomi files: N??E???.hgt).
 !         Formato: INTEGR*2, big-endian, punti ordinati dall'angolo NW,
 !         il nome file individua l'angolo SE.
-!         Dati disponibli su: ftp://e0srp01u.ecs.nasa.gov/srtm/version2/SRTM3
+!         Dati disponibli su: https://dds.cr.usgs.gov/srtm/version2_1/SRTM3
 !
 ! LAND USE:
 ! - BATS: dataset a 30" dal sito USGS, con classificazione BATS. File
@@ -77,7 +77,7 @@
 ! - volendo la correzione alle coordinate Lambert potrebbe essere affinata,
 !   rendendo piu' precisa l'analisi nei punti di test (vedi subdir Lambert) 
 !
-!                                         Versione 2.4.5, Enrico 21/12/2012 
+!                                         Versione 2.4.6, Enrico 14/01/2020 
 !==========================================================================
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -137,8 +137,7 @@ CHARACTER (LEN=40), PARAMETER :: usgs_orog_path = "fisiog/dataset/dem_usgs"
 
 ! Parametri realtivi al dataset di orografia NASA
 ! (vedi anche subr. read_orog_nasa)
-CHARACTER (LEN=40), PARAMETER :: nasa_env = "HOME_MINGUZZI"
-CHARACTER (LEN=40), PARAMETER :: nasa_path = "fisiog/dataset/dem_nasa"
+CHARACTER (LEN=80), PARAMETER :: nasa_path = "/autofs/scratch-mod/eminguzzi/fisiog/dem_nasa"
 
 ! Lista classi di LU Calmet (per classe prevalente e log statistico)
 INTEGER, PARAMETER :: ncl_calmet = 12                  !n.ro classi
@@ -1958,8 +1957,7 @@ DO ids = INT(lon1_out),INT(lon2_out)
 
 ! apro il file dati
   IF (.NOT. los) THEN
-    CALL GETENV(nasa_env,ch40)
-    WRITE (nfile,'(7a)') TRIM(ch40),"/",TRIM(nasa_path),"/",ch3,ch4,".hgt"
+    WRITE (nfile,'(7a)') TRIM(nasa_path),"/",ch3,ch4,".hgt"
     WRITE (*,*) "Leggo file ",TRIM(nfile)
     OPEN(31, FILE=nfile, FORM='UNFORMATTED', STATUS='OLD', IOSTAT=ios, &
          ACCESS='DIRECT',CONVERT='BIG_ENDIAN',RECL=npds*2)
