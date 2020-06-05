@@ -28,7 +28,7 @@ PROGRAM grib_daily_stat
 ! - Per rendere piu' leggibile il codice, il programma fa comunque tutti i
 !   calcoli, ma scrive solo gli output richiesti
 !
-!                                         Versione 6.0.0, Enrico 27/08/2019
+!                                         Versione 6.0.0, Enrico 19/03/2020
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -66,7 +66,7 @@ CHARACTER (LEN=200) :: filein,chpar
 CHARACTER (LEN=10) :: ch10,ch10_dv,ch10_dvs
 CHARACTER (LEN=8) :: ch8
 CHARACTER (LEN=3) :: next_arg
-LOGICAL :: deb
+LOGICAL :: deb,deb2
 
 !##########################################################################
 ! 1) Preliminari
@@ -78,6 +78,7 @@ next_arg = ""
 cnt_par = 0
 ios = 0
 deb = .FALSE.
+deb2 = .FALSE.
 lave = .FALSE.
 lmax = .FALSE.
 ldty = .FALSE.
@@ -314,6 +315,10 @@ grib: DO kg = 1,HUGE(0)
    "Letto grb: data, ora ",ch10_dv(1:8),ch10_dv(9:10)," scad ",sca(:), &
    " nok,ave: ",nok,fave
 
+! debug
+  IF (deb2) WRITE (96,'(4a,i3)') &
+    " precedente: data, ora ",ch10_dvs(1:8),ch10_dvs(9:10)," dlth ",dlth
+
 !==========================================================================
 ! Switch principale. Il campo appena letto puo' essere:
 ! - il primo campo del file (par 2.2)
@@ -367,11 +372,11 @@ grib: DO kg = 1,HUGE(0)
       cnt_ok_rm(1:np,1:nrm) = 0
     ENDWHERE
 
-!   Debug
-!   IF (deb) WRITE (97,*) "init: ",hhv,field(pdb),field_ave(pdb),cnt_ok(pdb)
-!   IF (deb) WRITE (97,'(a,i3,3x,8(1x,f6.2),3x,8(1x,i2),3x,f6.2,1x,i2)') &
-!     "init:             ",hhv,field_rm(pdb,1:nrm),cnt_ok_rm(pdb,1:nrm), &
-!     field_mxrm(pdb),cnt_ok_mxrm(pdb)
+!  Debug
+   IF (deb2) WRITE (97,*) "init: ",hhv,field(pdb),field_ave(pdb),cnt_ok(pdb)
+   IF (deb2) WRITE (97,'(a,i3,3x,8(1x,f6.2),3x,8(1x,i2),3x,f6.2,1x,i2)') &
+     "init:             ",hhv,field_rm(pdb,1:nrm),cnt_ok_rm(pdb,1:nrm), &
+     field_mxrm(pdb),cnt_ok_mxrm(pdb)
 
 !==========================================================================
 ! 2.3) Se la data non e'cambiata, aggiorno i contatori
@@ -379,6 +384,9 @@ grib: DO kg = 1,HUGE(0)
   ELSE IF (ch10_dv(1:8) == ch10_dvs(1:8)) THEN
     IF (deb) WRITE (97,*) "(same day) input: ",ch10_dv(1:8)," ",ch10_dv(9:10),field(pdb)
            
+!   Salvo la data corrente per quando elaborero' la prossima
+    datav_sav = datav
+
 !   Shift medie mobili
     DO kh = nrm, dlth+1, -1
       field_rm(1:np,kh) = field_rm(1:np,kh-dlth)
@@ -429,10 +437,10 @@ grib: DO kg = 1,HUGE(0)
     IF (deb .AND. (lmxrm1 .OR. lmxrm2)) WRITE (97,*) &
       "Media mobile ore prec.: ",field_rm(pdb,nrm)
 
-!   IF (deb) WRITE (97,*) "proc stessa data: ",hhv,field(pdb),field_ave(pdb),cnt_ok(pdb)
-!   IF (deb) WRITE (97,'(a,i3,3x,8(1x,f6.2),3x,8(1x,i2),3x,f6.2,1x,i2)') &
-!     "proc stessa data: ",hhv,field_rm(pdb,1:nrm),cnt_ok_rm(pdb,1:nrm), &
-!     field_mxrm(pdb),cnt_ok_mxrm(pdb)
+   IF (deb2) WRITE (97,*) "proc stessa data: ",hhv,field(pdb),field_ave(pdb),cnt_ok(pdb)
+   IF (deb2) WRITE (97,'(a,i3,3x,8(1x,f6.2),3x,8(1x,i2),3x,f6.2,1x,i2)') &
+     "proc stessa data: ",hhv,field_rm(pdb,1:nrm),cnt_ok_rm(pdb,1:nrm), &
+     field_mxrm(pdb),cnt_ok_mxrm(pdb)
 
 !==========================================================================
 ! 2.4) Se ho iniziato una nuova giornata, elaboro le statistiche del giorno
@@ -602,7 +610,7 @@ grib: DO kg = 1,HUGE(0)
 !--------------------------------------------------------------------------
 !   2.4.3 Aggiorno o re-inizializzo i contatori
 
-!   Aggiorno data precedente
+!   Salvo la data corrente per quando elaborero' la prossima
     datav_sav = datav
 
 !   Shift medie mobili
@@ -665,10 +673,10 @@ grib: DO kg = 1,HUGE(0)
     ENDWHERE
 
 !   Debug
-!   IF (deb) WRITE (97,*) "proc nuova data: ",hhv,field(pdb),field_ave(pdb),cnt_ok(pdb)
-!   IF (deb) WRITE (97,'(a,i3,3x,8(1x,f6.2),3x,8(1x,i2),3x,f6.2,1x,i2)') &
-!     "proc nuova data:  ",hhv,field_rm(pdb,1:nrm),cnt_ok_rm(pdb,1:nrm), &
-!     field_mxrm(pdb),cnt_ok_mxrm(pdb)
+   IF (deb2) WRITE (97,*) "proc nuova data: ",hhv,field(pdb),field_ave(pdb),cnt_ok(pdb)
+   IF (deb2) WRITE (97,'(a,i3,3x,8(1x,f6.2),3x,8(1x,i2),3x,f6.2,1x,i2)') &
+     "proc nuova data:  ",hhv,field_rm(pdb,1:nrm),cnt_ok_rm(pdb,1:nrm), &
+     field_mxrm(pdb),cnt_ok_mxrm(pdb)
 
   ENDIF
 ! Chiusura dello switch principale (fra i paragrafi 2.2, 2.3 e 2.4)

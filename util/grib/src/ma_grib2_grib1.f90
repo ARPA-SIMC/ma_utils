@@ -176,7 +176,10 @@ DO kg = 1,HUGE(0)
 ! - nel GRIB1-UTM grib_api: gradi (corrispondono ai km.), in quanto ho 
 !                           scelto di usare sempre le chiavi *InDegrees
 ! - nel GRIB1-UTM gribex:   millesimi di grado (corrispondono ai m.)
-
+!
+! Per compatibilita' con GRADS, nei grib regolari o ruotati scrivo le
+! longitudini ovest come negative
+  
   IF (grid_type == "rotated_ll") THEN
     drt = 10
   ELSE
@@ -189,8 +192,17 @@ DO kg = 1,HUGE(0)
     yi_out = yi_in / 1000.
     yf_out = yf_in / 1000.
   ELSE IF (grid_type == "regular_ll" .OR. grid_type == "rotated_ll") THEN
-    xi_out = xi_in
-    xf_out = xf_in
+    IF (xi_in < 180) THEN
+      xi_out = xi_in
+    ELSE
+      xi_out = xi_in - 360.
+    ENDIF
+    IF (xf_in < 180) THEN
+      xf_out = xf_in
+    ELSE
+      xf_out = xf_in - 360.
+    ENDIF
+
     yi_out = yi_in
     yf_out = yf_in
   ENDIF

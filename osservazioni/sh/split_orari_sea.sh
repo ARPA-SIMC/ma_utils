@@ -4,9 +4,9 @@
 # contiene i dati di una stagione.
 # Utile ad esempio per studiare l'andamento stagionale delle rose dei venti
 #
-#                                              Verisone 1.0.0, Enrico 05/06/2017
+#                                              Verisone 2.0.1, Enrico 25/03/2020
 #-------------------------------------------------------------------------------
-#set -x
+set -x
 #-------------------------------------------------------------------------------
 # Scrive a schermo l'help della procedura
 function write_help
@@ -15,7 +15,7 @@ function write_help
   echo "Uso: split_orari_sea.sh filein formato"
   echo "formato (input): s (seriet), h (oss. orarie), d (oss. giornaliere) "
   echo "Le stagioni sono attribuite all'anno in cui cominciano"
-  echo "NOTA: formati s,h non testati! Il 29/02 viene escluso dai conti..."
+  echo "NOTA: formati d,h non testati!"
 }
 
 # Parametri da riga comando
@@ -46,56 +46,37 @@ if [ $mand_par -ne 2 -o \
   exit 1
 fi
 
+sea_str=( djf mam jja son )
+file_root=${filein%.*}
+ext=${filein##*.}
+
 # Variaibli per il ritaglio del file
 if [ $format = "s" ] ; then
   nhead=6
-  ch1=7 ; ch2=10
+  grep_str[0]="^...12|^...01|^...02"
+  grep_str[1]="^...03|^...04|^...05"
+  grep_str[2]="^...06|^...07|^...08"
+  grep_str[3]="^...09|^...10|^...11"
+
 elif [ $format = "h" -o $format = "d" ] ; then
   nhead=3
-  ch1=1 ; ch2=4
+  grep_str[0]="^.....12|^.....01|^.....02"
+  grep_str[1]="^.....03|^.....04|^.....05"
+  grep_str[2]="^.....06|^.....07|^.....08"
+  grep_str[3]="^.....09|^.....10|^.....11"
 fi
 
 nheadp1=$[$nhead+1]
-ch1m1=$[$ch1-1]
 
-# Suddivido header e dati
-rm -f tmp.dat header.dat ${filein}.#*
+# Separo header e dati
+rm -f dati.dat header.dat
 head -n $nhead $filein > header.dat
-tail -n +$nheadp1 $filein > tmp.dat
+tail -n +$nheadp1 $filein > dati.dat
 
-# Trovo la lista degli anni presenti nel file
-plist=$(cut -c ${ch1}-${ch2} tmp.dat | uniq)
+for id in 0 1 2 3 ; do
+  fileout=${file_root}_${sea_str[$id]}.${ext}
+  cp header.dat $fileout
+  grep -E ${grep_str[$id]} dati.dat >> $fileout
+done
 
-#
-for year in $plist ; do
-  for sea in mam jja son djf ; do
-    if [ $sea = "mam" ] ; then
-      mm1="03"
-      mm2="05"
-      dd2="31"
-    elif [ $sea = "jja" ] ; then
-      mm1="06"
-      mm2="08"
-      dd2="31"
-    elif [ $sea = "son" ] ; then
-      mm1="09"
-      mm2="11"
-      dd2="30"
-    elif [ $sea = "djf" ] ; then
-      mm1="12"
-      mm2="02"
-      dd2="28"
-    fi
-      
-    if [ $format = "s" ] ; then
-      data1="01/"$mm1"/"$year" 00"
-      data2=$dd2"/"$mm1"/"$year" 00"
-    elif [ $format = "h" ] ; then
-      data1=$year" "$mm1" 01 00"
-      data2=$year" "$mm1" 01 00"
-    elif [ $format = "d" ] ; then
-      data1=$year" "$mm1" 01"
-    fi
-	
-  done
-done 
+exit

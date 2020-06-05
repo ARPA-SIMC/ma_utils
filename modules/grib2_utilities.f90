@@ -48,7 +48,7 @@ INTEGER, INTENT(OUT), OPTIONAL :: par(3),lev(3),scad(4),iret
 REAL :: voffs,vosfs
 INTEGER :: en,ier,yy,mon,dd,hh,min
 INTEGER :: toffs,svoffs,sfoffs,tosfs,sfosfs,svosfs,pc,pn,ct
-INTEGER :: sortt,topd,pdtn,togp,ft,iouotr,toti,tosp,iouftr,lotr
+INTEGER :: sortt,topd,pdtn,ft,iouotr,toti,tosp,iouftr,lotr
 
 !--------------------------------------------------------------------------
 
@@ -82,7 +82,7 @@ IF (PRESENT(par)) THEN
   ELSE IF (en == 2) THEN  
     CALL grib_get(gaid,"productDefinitionTemplateNumber",pdtn)
 
-    IF (pdtn == 0 .OR. pdtn == 8) THEN    ! analisi o previ "standard"
+    IF (pdtn == 0 .OR. pdtn == 1 .OR. pdtn == 8) THEN  ! analisi o previsioni
       CALL grib_get(gaid,"parameterCategory",par(2))
       CALL grib_get(gaid,"parameterNumber",par(3))
 
@@ -211,6 +211,14 @@ IF (PRESENT(lev)) THEN
       lev(1) = 112                ! Layer between two depths below land
       lev(2) = NINT(voffs)
       lev(3) = NINT(vosfs)
+    ELSE IF (toffs == 150) THEN
+      lev(1) = 109                ! Generalised vert. height coord. (= model level)
+      lev(2) = NINT(voffs)
+      lev(3) = 0
+    ELSE IF (toffs == 162 .OR. toffs == 165 .OR. toffs == 166) THEN
+      lev(1) = 1                  ! Special levels: river/sediment bottom, Zi
+      lev(2) = 0
+      lev(3) = 0
     ELSE
       WRITE (*,'(2a,6i8)') "Livello grib2 non gestito", &
         " toffs,sfoffs,svoffs,tosfs,sfosfs,svosfs", &
@@ -222,7 +230,13 @@ IF (PRESENT(lev)) THEN
 ENDIF
 
 !--------------------------------------------------------------------------
-! 4) Scadenza
+! 4) Timerange
+! 03/12/2019: tolti i controlli su togp (code table 4.3)
+! In base alla definizione WMO ("describe the type of process that a
+! generated the data") e in analogia con le chiavi contigue nel template 4.0
+! (backgroundProcess e generatingProcessIdentifier), sembra che togp non si
+! riferisca al timerange, ma sia piuttosto un identificativo del modello. 
+! Libsim dovrebbe copiarla dal template senza modifiche.
 
 IF (PRESENT(scad)) THEN
   scad(:) = imiss
@@ -236,7 +250,7 @@ IF (PRESENT(scad)) THEN
     CALL grib_get(gaid,"significanceOfReferenceTime",sortt)
     CALL grib_get(gaid,"typeOfProcessedData",topd)
     CALL grib_get(gaid,"productDefinitionTemplateNumber",pdtn)
-    CALL grib_get(gaid,"typeOfGeneratingProcess",togp)
+!   CALL grib_get(gaid,"typeOfGeneratingProcess",togp)
     CALL grib_get(gaid,"forecastTime",ft)
     CALL grib_get(gaid,"indicatorOfUnitOfTimeRange",iouotr)
     IF (pdtn == 8) THEN
@@ -256,28 +270,33 @@ IF (PRESENT(scad)) THEN
     ENDIF
 
 !   4.1 Scadenze istantanee
-    IF (sortt==0 .AND. topd==0 .AND. (pdtn==0 .OR. pdtn==40) .AND. &
-        togp==0 .AND. ft==0) THEN                  ! Analisi
+    IF (sortt==0 .AND. &
+        (topd==0 .OR. topd==2 .OR. topd==3 .OR. topd==4 .OR. topd==5) .AND. &
+        (pdtn==0 .OR. pdtn==1 .OR. pdtn==40) .AND. &
+        ft==0) THEN                                ! Analisi (togp = 0?)
       scad(1) = iouotr
       scad(2) = 0  
       scad(3) = 0
       scad(4) = 0
-    ELSE IF (sortt==1 .AND. topd==1 .AND. (pdtn==0 .OR. pdtn==40) .AND. &
-        togp==2 .AND. ft==0) THEN                  ! Previsione +0 (CMAS95)
+    ELSE IF (sortt==1 .AND. &
+        (topd==1 .OR. topd==2 .OR. topd==3 .OR. topd==4 .OR. topd==5) .AND. &
+        (pdtn==0 .OR. pdtn==1 .OR. pdtn==40) .AND. &
+        ft==0) THEN                                ! Previsione +0 (togp = 2?)
       scad(1) = iouotr
       scad(2) = 0
       scad(3) = 0
       scad(4) = 0
-    ELSE IF (sortt==1 .AND. topd==1 .AND. (pdtn==0 .OR. pdtn==40) .AND. &
-        togp==2 .AND. ft/=0) THEN                  ! Previsione
+    ELSE IF (sortt==1 .AND. &
+        (topd==1 .OR. topd==2 .OR. topd==3 .OR. topd==4 .OR. topd==5) .AND. &
+        (pdtn==0 .OR. pdtn==1 .OR. pdtn==40) .AND. &
+        ft/=0) THEN                                ! Previsione (togp = 2?)
       scad(1) = iouotr
       scad(2) = ft  
       scad(3) = 0
       scad(4) = 0
 
-!   4.2 Analisi non istantanee
-    ELSE IF (sortt==0 .AND. topd==0 .AND. pdtn==8 .AND. togp==0 .AND. &
-             ft==0 .AND. toti==1) THEN
+!   4.2 Analisi non istantanee (togp = 0?)
+    ELSE IF (sortt==0 .AND. topd==0 .AND. pdtn==8 .AND. ft==0 .AND. toti==1) THEN
       scad(1) = iouotr
       scad(2) = 0
       scad(3) = lotr
@@ -292,9 +311,8 @@ IF (PRESENT(scad)) THEN
         scad(4) = 17
       ENDIF
 
-!   4.3 Prevsioni non istantanee
-    ELSE IF (sortt==1 .AND. topd==1 .AND. pdtn==8 .AND. togp==2 .AND. &
-             toti==2) THEN
+!   4.3 Prevsioni non istantanee (togp = 2?)
+    ELSE IF (sortt==1 .AND. topd==1 .AND. pdtn==8 .AND. toti==2) THEN
       scad(1) = iouotr
       scad(2) = ft 
       scad(3) = ft + lotr
@@ -309,15 +327,9 @@ IF (PRESENT(scad)) THEN
         scad(4) = 7
       ENDIF
 
-!   4.4 Altri casi
-    ELSE IF (sortt==1 .AND. topd==2 .AND. pdtn==40 .AND. togp==2) THEN
-      scad(1) = iouotr               ! Analisi o previ ist. MACC
-      scad(2) = ft 
-      scad(3) = 0
-      scad(4) = 0
     ELSE
       WRITE (*,'(2a,6i8)') "[get_grib1_header] Timerange non gestito; ", &
-        "sort,topd,pdtn,togp,ft,toti ",sortt,topd,pdtn,togp,ft,toti
+        "sortt,topd,pdtn,ft,toti ",sortt,topd,pdtn,ft,toti
       ier = 4
     ENDIF
 

@@ -166,11 +166,25 @@ PROGRAM bufr_csv2orari
 ! Programma chiamato da estra_oss.ksh
 !
 ! Todo:
+! - Gestione delle date non ordinate (13/01/2020)
+!   Puo' capitare che un messaggio Synop si fuori posto, o sia scritto 
+!   male (es: S16044, 20110925h00, B04002 (mese) = 8). Al momento il
+!   programma si ferma (GOTO 9992): bisogna modificare a mano il file 
+!   eo.csv e rilanciare. Si potrebbe:
+!   - migliorare la diagnostica
+!   - introdurre un controllo basato su "representative_time"
+!   - sostituire il "fatal" con un "warning", e far proseguire il programma
+!   finche' non trova una data successiva all'ultima letta (pero' se in un
+!   messaggio e' sbagliato l'anno, si rischia di saltare tutto l'anno
+!   successivo!)
+!
 ! - Fare in modo che se ci sono due messaggi synop consecutivi relativi 
 !   alla stessa ora prenda i dati del secondo.
+!
 ! - Aggiungere informazioni all'header (nome staz, nome rete,coordinate); 
 !   Metodi possibili: passare da  riga comando, leggere B01194, accedre 
 !   ad anagrafica ufficiale info.
+!
 ! - Aggiungere opzione -uv per scrivere le componenti del vento invece di
 !   direzione e modulo. 
 !   Metodo: alla lettura dei parametri richiesti, bisogna abbinare le 
@@ -181,7 +195,7 @@ PROGRAM bufr_csv2orari
 !   ottavi (adesso esce in %; assicurarsi che alameno sia consistente nella
 !   serie storica dei synop)
 ! 
-!                                         Versione 2.2.1, Enrico 02/02/2016
+!                                         Versione 2.2.3, Enrico 27/01/2020
 !--------------------------------------------------------------------------
 
 USE file_utilities
@@ -207,10 +221,11 @@ TYPE (csv_record) :: csvline
 TYPE (datetime) :: datah_req1,datah_req2,datah_in1,datah_in2
 TYPE (datetime) :: datah_req,datah_next,datah_dum
 REAL, ALLOCATABLE :: values(:)
+REAL :: valmin_out, valmax_out
 INTEGER :: idum,ios,eof,eor,ier(10),iret,k,kp,kskip,kd,kh
 INTEGER :: idp,yy,mm,dd,hh,mn,nf,pp,npar,ndays,ndec,ndiff
 INTEGER :: cnt_date_in,cnt_date_miss,cnt_date_skip,cnt_valok_out
-INTEGER :: cnt_istok_out,cnt_msg_skip,cnt_diff,cnt_ist_diff
+INTEGER :: cnt_istok_out,cnt_msg_skip,cnt_diff,cnt_ist_diff,cnt_fmt_fail
 CHARACTER (LEN=200) :: filein,fileout,filepar,filelog,fileana
 CHARACTER (LEN=200) :: chdum,chrec,chrecw,chfmt1,chfmt2,key
 CHARACTER (LEN=20) :: idsta
@@ -329,8 +344,12 @@ ALLOCATE (values(npar),par_ok(npar))
 
 WRITE (chfmt1,'(a,i3,a)') "(a13,",npar,"(1x,a10))"
 IF (ndec >= 0 .AND. ndec <= 7) THEN
+  valmin_out = 1. - 10.**(8-ndec)
+  valmax_out = 10.**(9-ndec) - 1.
   WRITE (chfmt2,'(a,2(i3,a))') "(i4.4,3(1x,i2.2),",npar,"(1x,f10.",ndec,"))"
 ELSE
+  valmin_out = -HUGE(0.)
+  valmax_out = HUGE(0.)
   WRITE (chfmt2,'(a,i3,a)') "(i4.4,3(1x,i2.2),",npar,"(1x,e10.3))"
 ENDIF
 
@@ -366,6 +385,7 @@ cnt_istok_out = 0
 cnt_msg_skip = 0
 cnt_diff = 0
 cnt_ist_diff = 0
+cnt_fmt_fail = 0 
 par_ok(:) = .FALSE.
 end_inp = .FALSE.
 
@@ -533,6 +553,14 @@ DO kh = 0,23
   ENDWHERE
   WHERE (values(1:npar) == rmiss) values(1:npar) = rmiss_out
   CALL getval(datah_req, YEAR=yy, MONTH=mm, DAY=dd, HOUR=hh)
+
+! Metto mancanti i dati che non possono essere scritti nel formato di output
+  DO kp = 1,npar
+    IF (values(kp) < valmin_out .OR. values(kp) > valmax_out) THEN
+      values(kp) = rmiss_out
+      cnt_fmt_fail = cnt_fmt_fail + 1
+    ENDIF
+  ENDDO
   WRITE (iu_out,chfmt2) yy,mm,dd,hh,values(1:npar)
 
 ENDDO
@@ -571,9 +599,15 @@ WRITE (*,'(2(a,i6))')          "  parametri con dati: ",COUNT(par_ok(1:npar)), &
 WRITE (*,'(a,2(i6,a))') "  saltati ",cnt_date_skip," istanti, ", &
   cnt_msg_skip," messaggi"
 IF (cnt_diff > 0) WRITE (*,'(2(a,i5))') &
-  "Dati diversi relativi allo stesso istante: dati ",cnt_diff, &
+  "WARNING Dati diversi relativi allo stesso istante: dati ",cnt_diff, &
   " istanti ",cnt_ist_diff
-
+IF (cnt_fmt_fail > 0) THEN
+  WRITE (*,'(a,i5)') &
+  "WARNING Dati messi mancanti perche' non possono essere scritti coi decimali richiesti: ", &
+  cnt_fmt_fail
+  WRITE (*,'(a)') "Valutare l'uso dell'opzione -ndec"
+ENDIF
+  
 ! Chiudo files
 CLOSE(iu_in)
 CLOSE(iu_out)
@@ -1270,7 +1304,7 @@ WRITE (*,*) "data_fin: ultima data richiesta in output (AAAAMMGG)"
 WRITE (*,*) "filepar: lista dei parametri richiesti in output (formato param_arkioss.csv)"
 WRITE (*,*) "idsta:   codice stazione (per header e nome file output; char, len<=20)"
 WRITE (*,*) "-ndec N: forza a N il numero di decimali in output (-1 per notazione exp)"
-WRITE (*,*) "-uv      scrive le temperature in gradi centigradi (def: K)"
+! WRITE (*,*) "-uv      scrive le componenti del vento (def: direzione e modulo)"
 WRITE (*,*) "-tc      scrive le temperature in gradi centigradi (def: K)"
 WRITE (*,*) "-phpa    scrive le presisoni in hPa (def: Pa)"
 WRITE (*,*) "-deb:    scrive su file .log la sequenza dei dati trovati in input"
