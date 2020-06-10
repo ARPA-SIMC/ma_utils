@@ -24,3 +24,8 @@ Makefile
 *.mod
 *~
 \#*\#
+**/*.exe
+arkimet/postprocessors/seriet
+ar-lib
+compile
+chimere/src/**/.dirstamp
