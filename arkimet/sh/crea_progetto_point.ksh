@@ -354,10 +354,11 @@ fi
 
 nmltmpl="def"
 if [ $force_tmpl = "adms" ] ; then
-  aktmpl=lama.adms
-  nmltmpl=lama.adms
+  aktmpl=${aktmpl}.adms
+  nmltmpl=1
+  adms
 elif [ $force_tmpl = "calpuff" ] ; then
-  aktmpl=lama.calpuff
+  aktmpl=${aktmpl}.calpuff
 fi
 
 iret=$(echo $seropt | awk '{print match($1,"fop")}')
