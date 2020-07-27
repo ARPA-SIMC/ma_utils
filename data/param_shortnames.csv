@@ -18,6 +18,7 @@ id_hfr,bcode_syn,short_name
 160,,Prc 1hr
 167,B10004,Prs ist
 164,,Rad ist
+409,,Rad ist
 !
 ! Parametri specifici dei Synop
 ,B10051,SLP

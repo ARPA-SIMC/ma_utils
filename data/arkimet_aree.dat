@@ -6,7 +6,7 @@
 # - edizione GRIB
 # - presenza di dati staggerati e con codifica al secondo ordine
 #
-# Ultimo aggiornamento: 08/01/2020
+# Ultimo aggiornamento: 27/07/2020
 
 # Tracciato record:
 # dataset,area,proiezione,fisiog?,destag?,edition,sop?,template
@@ -15,15 +15,15 @@
 # Analisi Cosmo
 lama5,lama5,rot2,y,y,1,n,lama5
 lama5_arc,lama5,rot2,y,y,1,n,lama5
-lamaz,lamaz,rot1,y,y,1,y,lamaz
+lamaz,lamaz,rot1,y,n,1,y,lamaz
 
 # Previsioni Cosmo operative 5Km
 cosmo_5M_ita,cos5mita,rot2,y,y,1,n,cosmo
 cosmo_5M_ita_arc,cos5mita,rot2,y,y,1,n,cosmo
-cosmo_5M_med,cos5mmedl,rot2,n,y,1,n,cosmo
-cosmo_5M_med_arc,cos5mmedl,rot2,n,y,1,n,cosmo
-cosmo_5M_vol_ita,cos5mitr,rot2,n,y,1,n,cosmo.vol
-cosmo_5M_vol_ita_post,cos5mitr,rot2,n,y,1,n,cosmo.vol
+cosmo_5M_med,cos5mmedl,rot2,y,y,1,n,cosmo
+cosmo_5M_med_arc,cos5mmedl,rot2,y,y,1,n,cosmo
+cosmo_5M_vol_ita,cos5mitr,rot2,y,y,1,n,cosmo.vol
+cosmo_5M_vol_ita_post,cos5mitr,rot2,y,y,1,n,cosmo.vol
 cosmo_5I,cos5mita,rot2,y,y,1,n,cosmo
 cosmo_5I_arc,cos5mita,rot2,y,y,1,n,cosmo
 
@@ -36,11 +36,11 @@ cosmo_2I_assim,cos2i,rot2,y,n,1,n,kenda
 cosmo_2I_assim_arc,cos2i,rot2,y,n,1,n,kenda
 
 # Previsioni Cosmo: vecchie catene
-lm7tmpc,lmsmr4,rot1,cosmo,y,y,1,n,cosmo.vol
-lm7tmpcp,lmsmr4,rot1,cosmo,y,y,1,n,cosmo.vol
-lm28tmpc,lmsmr5,rot1,cosmo,y,y,1,n,cosmo.vol
-lm28tmpcp,lmsmr5,rot1,cosmo,y,y,1,n,cosmo.vol
-cosmo_28N_ruc,ruc,rot1,cosmo,y,y,1,n,cosmo.vol
+lm7tmpc,lmsmr4,rot1,cosmo,n,y,1,n,cosmo.vol
+lm7tmpcp,lmsmr4,rot1,cosmo,n,y,1,n,cosmo.vol
+lm28tmpc,lmsmr5,rot1,cosmo,n,y,1,n,cosmo.vol
+lm28tmpcp,lmsmr5,rot1,cosmo,n,y,1,n,cosmo.vol
+cosmo_28N_ruc,ruc,rot1,cosmo,n,y,1,n,cosmo.vol
 
 # Qualita' dell'aria
 pescoemrope,pesemr,utm,n,n,2,n,ninfa.ub

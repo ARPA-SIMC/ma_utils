@@ -26,10 +26,10 @@
 # Todo:
 # Gestire il caso in cui $doc_file contiene progetti senza il carattere "_"
 #
-#                                                 V9.1.0, Enrico 08/01/2020
+#                                                 V9.1.1, Enrico 02/07/2020
 #==========================================================================
 # set -ex   # per attivare set -e, bisogna scommentare tutte le rige #e 
-# set -x
+#set -x
 
 #==========================================================================
 # 0) Funzioni
@@ -99,7 +99,7 @@ function intfill
 # 1.1) Path fissi
 work_root=/autofs/scratch-mod/eminguzzi/arkimet/tmp_point # root dir lavoro
 arc_root=~eminguzzi/arkimet/progetti_point        # root arc. estrazioni
-doc_file=${arc_root}/_doc/progetti_estra.doc      # elenco progetti archiviati
+doc_file=${arc_root}/_doc/progetti_estra.list     # elenco progetti archiviati
 arc_grp=sim-modellisti
 
 # 1.2) Utility e files di appoggio (da ma_utils)
@@ -134,7 +134,7 @@ else
   plot_local_orog=${MA_UTILS_SVN}/arkimet/sh/plot_local_orog.gs
   stat_orari=${MA_UTILS_SVN}/osservazioni/src/stat_orari.exe
   windrose=${MA_UTILS_SVN}/osservazioni/sh/windrose.sh
-  GASCRP=${MA_UTILS_SVN}
+  GASCRP=${MA_UTILS_SVN}/util/grads/sh
 fi
 
 if [ ! $EDITOR ] ; then
@@ -333,7 +333,8 @@ fi
 echo $dataset > ${proj}.ds
 
 # Cerco le informazioni relative al dataset richiesto
-line=`grep ^$dataset, $arkimet_aree`
+dataset1=$(echo $dataset | cut -d % -f 1)
+line=`grep ^$dataset1, $arkimet_aree`
 if [ $? -eq 0 ] ; then
   dsarea=`echo $line | cut -d , -f 2 | tr '[:lower:]' '[:upper:]'`
   dsproj=`echo $line | cut -d , -f 3 | tr '[:lower:]' '[:upper:]'`
@@ -355,8 +356,7 @@ fi
 nmltmpl="def"
 if [ $force_tmpl = "adms" ] ; then
   aktmpl=${aktmpl}.adms
-  nmltmpl=1
-  adms
+  nmltmpl="adms"
 elif [ $force_tmpl = "calpuff" ] ; then
   aktmpl=${aktmpl}.calpuff
 fi
@@ -523,7 +523,7 @@ fi
 if [ $modif = "S" ] ; then
   fis_list="orog"
 else
-  fis_list="orog levels layers"
+  fis_list="orog layers"
 fi
 
 if [ $dsarea != "NIL" -a $fisiog = "Y" ] ; then

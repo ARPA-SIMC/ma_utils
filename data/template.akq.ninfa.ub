@@ -21,7 +21,7 @@
 !-------------------------------------------------------------------------------
 
 ! Nei files seriet, i dati sono scritti con riferimento all'istante finale del
-! periodo di validità. Quindi ad esempio:
+! periodo di validita'. Quindi ad esempio:
 ! - i forecast con sca=48 sono eleborati fra +24h e +48h
 ! - le analisi relative al 01/01/2020 h00 sono elaborate tra le 00 e le 24 del 31/12/2019
 

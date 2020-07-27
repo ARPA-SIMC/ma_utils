@@ -39,46 +39,34 @@ datafilelist = \
  $(top_srcdir)/data/aree_utm.dat \
  $(top_srcdir)/data/arkimet_aree.dat \
  $(top_srcdir)/data/COS2I_orog_20180825.grb \
- $(top_srcdir)/data/COS2I_orog.ctl \
- $(top_srcdir)/data/COS2I_orog.grb \
- $(top_srcdir)/data/COS2I_orog.idx \
+ $(top_srcdir)/data/COS2I_orog_20180825.ctl \
+ $(top_srcdir)/data/COS2I_orog_20180825.idx \
  $(top_srcdir)/data/COS5MITA_orog_20170405.grb \
- $(top_srcdir)/data/COS5MITA_orog.ctl \
- $(top_srcdir)/data/COS5MITA_orog.grb \
- $(top_srcdir)/data/COS5MITA_orog.idx \
+ $(top_srcdir)/data/COS5MITA_orog_20170405.ctl \
+ $(top_srcdir)/data/COS5MITA_orog_20170405.idx \
  $(top_srcdir)/data/COS5MITR_layers_20180514.grb \
- $(top_srcdir)/data/COS5MITR_layers.grb \
  $(top_srcdir)/data/COS5MITR_layersSup_20180514.grb \
- $(top_srcdir)/data/COS5MITR_layersSup.grb \
  $(top_srcdir)/data/COS5MITR_orog_20180514.grb \
- $(top_srcdir)/data/COS5MITR_orog.ctl \
- $(top_srcdir)/data/COS5MITR_orog.grb \
- $(top_srcdir)/data/COS5MITR_orog.idx \
+ $(top_srcdir)/data/COS5MITR_orog_20180514.ctl \
+ $(top_srcdir)/data/COS5MITR_orog_20180514.idx \
  $(top_srcdir)/data/COS5MMEDL_orog_20170405.grb \
- $(top_srcdir)/data/COS5MMEDL_orog.ctl \
- $(top_srcdir)/data/COS5MMEDL_orog.grb \
- $(top_srcdir)/data/COS5MMEDL_orog.idx \
+ $(top_srcdir)/data/COS5MMEDL_orog_20170405.ctl \
+ $(top_srcdir)/data/COS5MMEDL_orog_20170405.idx \
  $(top_srcdir)/data/eur20k_orog.ctl \
  $(top_srcdir)/data/eur20k_orog.grb \
  $(top_srcdir)/data/eur20k_orog.idx \
  $(top_srcdir)/data/gacsv2seriet.nml.def \
- $(top_srcdir)/data/gacsv2seriet.nml.lama.adms \
+ $(top_srcdir)/data/gacsv2seriet.nml.adms \
  $(top_srcdir)/data/LAMA5_layers_20180514.grb \
- $(top_srcdir)/data/LAMA5_layers.grb \
  $(top_srcdir)/data/LAMA5_layersSup_20180514.grb \
- $(top_srcdir)/data/LAMA5_layersSup.grb \
  $(top_srcdir)/data/LAMA5_orog_20180514.grb \
- $(top_srcdir)/data/LAMA5_orog.ctl \
- $(top_srcdir)/data/LAMA5_orog.grb \
- $(top_srcdir)/data/LAMA5_orog.idx \
+ $(top_srcdir)/data/LAMA5_orog_20180514.ctl \
+ $(top_srcdir)/data/LAMA5_orog_20180514.idx \
  $(top_srcdir)/data/LAMAZ_layers_20120606.grb \
- $(top_srcdir)/data/LAMAZ_layers.grb \
  $(top_srcdir)/data/LAMAZ_layersSup_20120606.grb \
- $(top_srcdir)/data/LAMAZ_layersSup.grb \
  $(top_srcdir)/data/LAMAZ_orog_20120606.grb \
- $(top_srcdir)/data/LAMAZ_orog.ctl \
- $(top_srcdir)/data/LAMAZ_orog.grb \
- $(top_srcdir)/data/LAMAZ_orog.idx \
+ $(top_srcdir)/data/LAMAZ_orog_20120606.ctl \
+ $(top_srcdir)/data/LAMAZ_orog_20120606.idx \
  $(top_srcdir)/data/marks_emr.dat \
  $(top_srcdir)/data/marks_ita_rot1.dat \
  $(top_srcdir)/data/marks_ita_rot2.dat \

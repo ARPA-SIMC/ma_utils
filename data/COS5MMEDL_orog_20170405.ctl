@@ -1,7 +1,7 @@
-dset ^COS5MMEDL_orog.grb
-index ^COS5MMEDL_orog.idx
+dset ^COS5MMEDL_orog_20170405.grb
+index ^COS5MMEDL_orog_20170405.idx
 undef -0.999E+03
-title COS5MMEDL_orog.grb
+title COS5MMEDL_orog_20170405.grb
 *  produced by grib2ctl v0.9.12.5p39a
 dtype grib 255
 * Rotated LatLon grid: South pole lat -47.000000 lon 10.000000  rot angle 0.000000

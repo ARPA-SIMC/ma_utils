@@ -1,7 +1,7 @@
-dset ^LAMAZ_orog.grb
-index ^LAMAZ_orog.idx
+dset ^LAMAZ_orog_20120606.grb
+index ^LAMAZ_orog_20120606.idx
 undef -0.999E+03
-title LAMAZ_orog.grb
+title LAMAZ_orog_20120606.grb
 *  produced by grib2ctl v0.9.12.5p39a
 dtype grib 255
 * Rotated LatLon grid: South pole lat -32.500000 lon 10.000000  rot angle 0.000000
