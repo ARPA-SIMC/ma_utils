@@ -12,7 +12,7 @@ PROGRAM grib_dist_freq
 !   mancanti; e' ammesso che ci sia un diverso numero di dati mancanti nei
 !   diversi grib
 !
-!                                         Versione 2.0.1, Enrico 13/01/2014
+!                                         Versione 2.0.2, Enrico 01/12/2020
 !--------------------------------------------------------------------------
 
 USE date_handler
@@ -202,10 +202,10 @@ ELSE
 ENDIF
 WRITE (*,*) "N.ro totale di dati in ciascun intervallo:"
 DO kbin = 1,nbin
-  WRITE (*,'(a,e12.5,a,i8)') "<= ",val_bin(kbin)," : ", &
+  WRITE (*,'(a,e12.5,a,i10)') "<= ",val_bin(kbin)," : ", &
     SUM(count_binh(1:np_sav,kbin,0:23))
 ENDDO
-WRITE (*,'(a,e12.5,a,i8)') " > ",val_bin(nbin)," : ", &
+WRITE (*,'(a,e12.5,a,i10)') " > ",val_bin(nbin)," : ", &
   SUM(count_binh(1:np_sav,nbin+1,0:23))
 
 WRITE (*,*)
@@ -224,26 +224,44 @@ ENDIF
 ! 3.2 Calcolo le %
 IF (fraz_missing) THEN
   DO kh = 0,23
-    fraz_binh(1:np_sav,0:nbin+1,kh) = &
-      REAL(count_binh(1:np_sav,0:nbin+1,kh)) / &
-      REAL(ngribinh(kh))
+    IF (ngribinh(kh) > 0) THEN
+      fraz_binh(1:np_sav,0:nbin+1,kh) = &
+        REAL(count_binh(1:np_sav,0:nbin+1,kh)) / &
+        REAL(ngribinh(kh))
+    ELSE
+      fraz_binh(1:np_sav,0:nbin+1,kh) = rmis
+    ENDIF
   ENDDO
-  fraz_bint(1:np_sav,0:nbin+1) = &
-    REAL(SUM(count_binh(1:np_sav,0:nbin+1,0:23),DIM=3)) / &
-    REAL(SUM(ngribinh(0:23)))
+  IF (SUM(ngribinh(0:23)) > 0) THEN
+    fraz_bint(1:np_sav,0:nbin+1) = &
+      REAL(SUM(count_binh(1:np_sav,0:nbin+1,0:23),DIM=3)) / &
+      REAL(SUM(ngribinh(0:23)))
+  ELSE
+    fraz_bint(1:np_sav,0:nbin+1) = rmis
+  ENDIF
 
 ELSE
   DO kbin = 1,nbin+1
-    fraz_binh(1:np_sav,kbin,0:23) = &
-      REAL(count_binh(1:np_sav,kbin,0:23)) / REAL(count_okh(1:np_sav,0:23))
-    fraz_bint(1:np_sav,kbin) = &
-      REAL(SUM(count_binh(1:np_sav,kbin,0:23),DIM=2)) / &
-      REAL(SUM(count_okh(1:np_sav,0:23),DIM=2))
+    WHERE (count_okh(1:np_sav,0:23) > 0)
+      fraz_binh(1:np_sav,kbin,0:23) = &
+        REAL(count_binh(1:np_sav,kbin,0:23)) / REAL(count_okh(1:np_sav,0:23))
+    ELSEWHERE
+      fraz_binh(1:np_sav,kbin,0:23) = rmis
+    ENDWHERE
+
+    WHERE (SUM(count_okh(1:np_sav,0:23),DIM=2) > 0)
+      fraz_bint(1:np_sav,kbin) = &
+        REAL(SUM(count_binh(1:np_sav,kbin,0:23),DIM=2)) / &
+        REAL(SUM(count_okh(1:np_sav,0:23),DIM=2))
+    ELSEWHERE
+      fraz_bint(1:np_sav,kbin) = rmis
+    ENDWHERE
   ENDDO
+
 ENDIF
 
 ! 3.3 Scrivo i grib 
-ksec1_sav(5) = 128             ! includo area ma non bitmap
+ksec1_sav(5) = 192             ! includo area e bitmap
 ksec3(:) = 0
 psec3(2) = rmis                ! dati mancanti = rmis (ma non ce ne sono!)
 ksec4(1) = np_sav              ! numero di punti
@@ -255,10 +273,12 @@ DO kbin = 0,nbin+1
 
   IF (kbin == 0) THEN
     WRITE(*,'(a,i2,a,e12.5)') "Dati mancanti: ",kbin," fraz. media = ", &
-      SUM(fraz_bint(1:np_sav,kbin))/REAL(np_sav)
+     SUM(fraz_bint(1:np_sav,kbin), MASK=fraz_bint(1:np_sav,kbin)/=rmis) / &
+       REAL(COUNT(fraz_bint(1:np_sav,kbin) /= rmis))
   ELSE
     WRITE(*,'(a,i2,a,e12.5)') "Intervallo nr: ",kbin," fraz. media = ", &
-      SUM(fraz_bint(1:np_sav,kbin))/REAL(np_sav)
+     SUM(fraz_bint(1:np_sav,kbin), MASK=fraz_bint(1:np_sav,kbin) /= rmis) / &
+       REAL(COUNT(fraz_bint(1:np_sav,kbin) /= rmis))
   ENDIF
 
   WRITE (fileout,'(a,i2.2,a)') TRIM(file_root),kbin,".grb"
@@ -417,6 +437,7 @@ WRITE (*,'(a)') "     -h: visualizza questo help"
 WRITE (*,'(a)') "     -mday: scrive le % relative a cisacuna ora (24 grib in ogni output file)"
 WRITE (*,'(a)') "     -miss: nel calcolo delle % considera i dati mancanti come una classe"
 WRITE (*,'(a)') "            (di default, le % sono relative ai soli dati validi)" 
+WRITE (*,'(a)') "            !! OPZIONE POCO TESTATA !!" 
 WRITE (*,'(a)') "" 
 WRITE (*,'(a)') "Legge tutti i grib di filein e calcola i campi con la frazione di dati"
 WRITE (*,'(a)') "  che appartengono a un certo intervallo di valori. Gli intervalli sono "

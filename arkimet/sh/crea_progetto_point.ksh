@@ -29,7 +29,7 @@
 #                                                 V9.1.1, Enrico 02/07/2020
 #==========================================================================
 # set -ex   # per attivare set -e, bisogna scommentare tutte le rige #e 
-#set -x
+# set -x
 
 #==========================================================================
 # 0) Funzioni
@@ -100,7 +100,6 @@ function intfill
 work_root=/autofs/scratch-mod/eminguzzi/arkimet/tmp_point # root dir lavoro
 arc_root=~eminguzzi/arkimet/progetti_point        # root arc. estrazioni
 doc_file=${arc_root}/_doc/progetti_estra.list     # elenco progetti archiviati
-arc_grp=sim-modellisti
 
 # 1.2) Utility e files di appoggio (da ma_utils)
 # Alcuni files di appoggio reltivi a vecchi archivi sono in:
@@ -136,6 +135,12 @@ else
   windrose=${MA_UTILS_SVN}/osservazioni/sh/windrose.sh
   GASCRP=${MA_UTILS_SVN}/util/grads/sh
 fi
+
+# Scelgo il gruppo per le dir di lavoro e di archiviazione
+arc_grp=$(groups | awk '{print $1}')
+groups | grep sim-modellisti > /dev/null && arc_grp=sim-modellisti
+groups | grep sim-aria > /dev/null && arc_grp=sim-aria
+echo "Grupppo per files da archiviare: "$arc_grp
 
 if [ ! $EDITOR ] ; then
   editor=emacs
@@ -269,6 +274,8 @@ if [ $batch = "N" ] ; then
       modif="S"
     elif [ $yn = "r" -o $yn = "R" ] ; then
       modif="R"
+      chgrp $arc_grp $work_dir
+      chmod g+s $work_dir
     else
       modif="M"
     fi
@@ -770,11 +777,21 @@ elif [ $yn = "y" -o $yn = "Y" ] ; then
       exit
     elif [ $yn = "C" -o $yn = "c" ] ; then
       rm -f $arc_dir/*
+      chgrp $arc_grp $arc_dir
+      chmod g+s $arc_dir
     elif [ $yn != "S" -a $yn != "s" ] ; then
       exit
     fi
+
   else
     mkdir $arc_dir
+    if [ $? -ne 0 ] ; then
+      echo "Errore creando la dir "$arc_dir
+      exit
+    fi
+    chgrp $arc_grp $arc_dir
+    chmod g+s $arc_dir
+ 
   fi
   
 # Piano di estrazione

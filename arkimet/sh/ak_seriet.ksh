@@ -668,20 +668,20 @@ if [ $inpdata = "arkimet" ] ; then
   cnt=1
   filesok=0
   gacsv_list=""
+
   while [ $cnt -le $cntq ] ; do
     echo "ak_seriet: inizio estrazione query "$cnt"    "`date "+%Y%m%d %H:%M:%S"`
   
 #   Per ciscuna delle query rettangolari, estraggo i dati in formato gacsv
 #    echo "arki-query --config=${ds}.conf --file=query.${cnt} --inline | arki-xargs ${split_opt} ./xargs.ksh ${prog}.gacsv.${cnt}"
-
     arki-query --config=${ds}.conf --file=query.${cnt} --inline  | \
       arki-xargs ${split_opt} ./xargs.ksh ${prog}.gacsv.${cnt} > \
       arki.log.${cnt} 2>&1
-
+    
     if [ -s ${prog}.gacsv.${cnt} ] ; then
       filesok=`expr $filesok + 1`
 
-cp ${prog}.gacsv.${cnt} ${prog}.gacsv.${cnt}.org
+      cp ${prog}.gacsv.${cnt} ${prog}.gacsv.${cnt}.org
       
       sort --temporary-directory=$AK_TEMP ${prog}.gacsv.${cnt} > tmp.gacsv
       mv tmp.gacsv ${prog}.gacsv.${cnt}

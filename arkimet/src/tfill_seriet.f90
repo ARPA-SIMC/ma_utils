@@ -25,6 +25,7 @@ REAL, ALLOCATABLE :: val(:)
 INTEGER :: idp,kp,eof,eor,ios,k,yy,mm,dd,hh,sca,ncol,cnt_ok,cnt_mod
 CHARACTER (LEN=10000) :: rec,rec_stored(0:23)
 CHARACTER (LEN=250) :: filein,fileout,chdum
+LOGICAL :: lok
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
@@ -52,7 +53,56 @@ DO kp = 1,HUGE(0)
   ENDIF
 ENDDO
 
-! 1.2 apro files, ricopio headers
+! 1.2 codice per eof
+CALL get_eof_eor(eof,eor)
+
+!--------------------------------------------------------------------------
+! 2) Leggo filein una prima volta e per ogni ora salvo il primo record con 
+!    dati validi; se non trovo almeno un record valido per ogni ora,
+!    termino con errore.
+
+! 2.1 Skip headers, alloco vettore per i valori
+OPEN (UNIT=30, FILE=filein, STATUS="OLD",ERR=9999)
+DO k = 1,nhead
+  READ (30,'(a)') rec
+ENDDO
+ncol = (LEN(TRIM(rec))-chhead) / (fw+1)
+IF (MOD(LEN(TRIM(rec))-chhead,fw+1) /= 0) GOTO 9998
+ALLOCATE (val(ncol))
+
+! 2.2 Leggo filein, e per ogni ora salvo il primo record con tutti i dati
+! validi
+
+rec_stored(:) = ""
+lok = .FALSE.
+
+DO k = 1,HUGE(0)
+  READ (30,'(a)',IOSTAT=ios) rec
+  IF (ios == eof) EXIT
+  IF (ios /= 0) GOTO 9997
+  READ (rec,'(i2,1x,i2,1x,i4,1x,i2,1x,i3)') dd,mm,yy,hh,sca
+  READ (rec(chhead+1:),*) val(1:ncol)
+  IF (sca /= 0 ) GOTO 9995
+
+  IF (ALL(val(1:ncol) /= rmis_ser) .AND. ALL(val(1:ncol) /= rmis_sex) .AND. &
+    TRIM(rec_stored(hh)) == "") rec_stored(hh) = rec(chhead+1:)
+
+  IF (ALL(rec_stored(:) /= "")) THEN
+    WRITE (*,*) "Inizializzati i record relativi a tutte le ore; record letti: ",k
+    lok = .TRUE.
+    EXIT
+  ENDIF
+    
+ENDDO
+CLOSE (30)
+
+! Se ci sono ore senza record validi, termino senza scivere fileout
+IF (.NOT. lok) GOTO 9996
+
+!--------------------------------------------------------------------------
+! 3) Leggo filein una seconda volta, ricopiando su fileout
+
+! 3.1 apro files, ricopio headers
 OPEN (UNIT=30, FILE=filein, STATUS="OLD",ERR=9999)
 OPEN (UNIT=31, FILE=fileout, STATUS="REPLACE")
 
@@ -60,17 +110,8 @@ DO k = 1,nhead
   READ (30,'(a)') rec
   WRITE (31,'(a)') TRIM(rec)
 ENDDO
-ncol = (LEN(TRIM(rec))-chhead) / (fw+1)
-IF (MOD(LEN(TRIM(rec))-chhead,fw+1) /= 0) GOTO 9998
-ALLOCATE (val(ncol))
 
-! 1.3 codice per eof
-CALL get_eof_eor(eof,eor)
-
-!--------------------------------------------------------------------------
-! 2) Lettura/scrittura
-
-rec_stored(:) = ""
+! 3.2 Lettura / scrittura (sequenziale)
 cnt_ok = 0
 cnt_mod = 0
 
@@ -83,7 +124,6 @@ DO k = 1,HUGE(0)
   IF (sca /= 0 ) GOTO 9995
 
   IF (ANY(val(1:ncol) == rmis_ser) .OR. ANY(val(1:ncol) == rmis_sex)) THEN
-    IF (TRIM(rec_stored(hh)) == "") GOTO 9996
     WRITE (31,'(i2.2,a1,i2.2,a1,i4.4,1x,i2.2,1x,i3.3,a)') &
       dd,"/",mm,"/",yy,hh,0,TRIM(rec_stored(hh))
     cnt_mod = cnt_mod + 1
@@ -115,7 +155,7 @@ WRITE (*,*)  "Errore leggendo ",TRIM(filein)
 STOP 3
 
 9996 CONTINUE
-WRITE (*,*)  "Errore: presenti dati mancanti nel primo record relativo alle ore ",hh
+WRITE (*,*)  "Errore: nel file di input ci sono ore (00-23) senza alcun record completo"
 STOP 4
 
 9995 CONTINUE

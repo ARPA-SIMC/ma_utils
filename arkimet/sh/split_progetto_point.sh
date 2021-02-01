@@ -9,7 +9,7 @@
 # - aggiungere opzioni per ak_seriet
 # - aggiungere controllo e rilancio dei segmenti incompleti
 #
-#                                         Versione 1.0.1, Enrico 05/06/2018
+#                                         Versione 1.0.2, Enrico 06/08/2020
 #==========================================================================
 #set -x 
 
@@ -148,7 +148,7 @@ if [ $action = "split" ] ; then
     query_list=$query_list" "${projs}/${projs}".akq"
   done
 
-  vi $query_list
+  vim $query_list
 fi
 
 #==========================================================================
@@ -222,4 +222,7 @@ if [ $action = "merge" ] ; then
   nist_ok=$[$nl-6]
   echo "Istanti in output "$nist" di cui completi "$nist_ok
   done
+
+  cp ${proj}_#p1/${proj}_#p1_fisiog.csv ${proj}/${proj}_fisiog.csv 
+
 fi

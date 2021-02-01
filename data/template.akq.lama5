@@ -23,6 +23,10 @@
 ! level: levels            [tutti i model levels diponibili]
 ! level: hl046             [uno specifico model level]
 !
+! I livelli salvati nel dataset lama5_arc cambiano:
+! fino a 29/02/2020 (37 layers): 01, 02, 04, 06, 08, 10, 12, 14, 16, 18-45
+! da 01/03/2020 (36 layers)    : 10-45
+!
 ! timerange: an            [analisi istantanea]
 ! timerange: aa00XX        [analisi media nelle XX ore precedenti]
 ! timerange: ac00XX        [analisi cumulata nelle XX ore precedenti]

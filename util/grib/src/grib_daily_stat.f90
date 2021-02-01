@@ -9,7 +9,8 @@ PROGRAM grib_daily_stat
 ! Dalla versione 6, il programma usa grib_api / eccodes.
 ! - Il test delle varie funzionalita' e' parziale (possibili bug!)
 ! - Non c'e' piu' il controllo sull'uguaglianza della griglia tra i campi
-!   in input, ma solo sul numero di punti (par 2.2.2 + label 9997)
+!   in input, ma solo sul numero di punti, oltre a grib edition, parametro
+!   e livello (par 2.1.2 + label 9997)
 !
 ! Note 
 ! - I grib devono essere definiti sulla stessa area, riferirsi a un unico
