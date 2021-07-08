@@ -4,9 +4,9 @@
 # contiene i dati di una stagione.
 # Utile ad esempio per studiare l'andamento stagionale delle rose dei venti
 #
-#                                              Verisone 2.0.1, Enrico 25/03/2020
+#                                              Versione 2.0.2, Enrico 22/04/2022
 #-------------------------------------------------------------------------------
-set -x
+#set -x
 #-------------------------------------------------------------------------------
 # Scrive a schermo l'help della procedura
 function write_help
@@ -15,7 +15,6 @@ function write_help
   echo "Uso: split_orari_sea.sh filein formato"
   echo "formato (input): s (seriet), h (oss. orarie), d (oss. giornaliere) "
   echo "Le stagioni sono attribuite all'anno in cui cominciano"
-  echo "NOTA: formati d,h non testati!"
 }
 
 # Parametri da riga comando
@@ -47,7 +46,8 @@ if [ $mand_par -ne 2 -o \
 fi
 
 sea_str=( djf mam jja son )
-file_root=${filein%.*}
+file_name=$(basename $filein)
+file_root=${file_name%.*}
 ext=${filein##*.}
 
 # Variaibli per il ritaglio del file

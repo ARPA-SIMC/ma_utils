@@ -70,9 +70,9 @@ AC_ARG_ENABLE(debug-mode, AC_HELP_STRING([--enable-debug-mode],
   [enable debug mode]), , [enableval=no])dnl default disable
 if test "x$enableval" = "xyes"; then
    if test "x$FC" = "xgfortran"; then
-      FCFLAGS="$FCFLAGS -g -fbounds-check -O0 -fexceptions -Wall -pg -ffpe-trap=invalid,zero,overflow,underflow,inexact"
-#     FCFLAGS="$FCFLAGS -g -fbounds-check -O0 -fexceptions -Wall -pg"
-#     FCFLAGS="$FCFLAGS -g -fbounds-check -O0 -fexceptions -Wall"
+      FCFLAGS="$FCFLAGS -g -fbounds-check -O0 -fexceptions -Wall -pg -ffpe-trap=invalid,zero,overflow,underflow"
+# the "inexact" flag has problems with WRITE(*,*) (28/04/2021, gfortran 10.2.1)
+#     FCFLAGS="$FCFLAGS -g -fbounds-check -O0 -fexceptions -Wall -pg -ffpe-trap=invalid,zero,overflow,underflow,inexact"
    else
       FCFLAGS="$FCFLAGS -g -C"
    fi
