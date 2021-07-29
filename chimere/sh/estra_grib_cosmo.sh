@@ -50,7 +50,7 @@
 #   richiederebbe l'introduzione di nuovi alias per le scadenze previste 
 #   (c0124 -> c0124ph, ...); per le analisi dovrebbe bastare Timedef,0,x,1h
 #
-#                                    Versione 8.0.0 (Arkimet), Enrico 30/06/2018
+#                                    Versione 8.1.0 (Arkimet), Enrico 23/07/2021
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -315,16 +315,35 @@ cd $tmp_dir
 echo "Dir di lavoro: "`pwd`
 
 unset http_proxy
-rm -f ${dataset}.conf
-arki-mergeconf ${akurl}/dataset/${dataset} > ${dataset}.conf || exit 3
 
-# Se gli alias non sono gia' stati assegnati, li scarico dal server (servono per
-# le query arkimet sui files di lavoro)
-if [ -z "${ARKI_ALIASES:-}" ] ; then
-  arki-dump --aliases ${akurl} > ./match_alias.conf || exit 3
-  export ARKI_ALIASES=`pwd`/match_alias.conf
+# Se non ho specificato $source, assumo che i dati vengono estratti da arkimet
+if [ -z "${source:-}" ] ; then
+  source="a"
 fi
 
+# 26/07/2021: Gestione alias
+# Gli alias sono necessari sia per estrarre da arkimet (se $source="a"),
+# sia per fare elaborazioni sui files locali.
+# Per elaborare files locali, bisogna esportare un file di alias locali
+# ($local_aliases), che rischiano di essere in conflitto con quelli sul server.
+# Per evitare problemi, prima di fare richieste al server disabilito gli 
+# alias locali (labels: #alias)
+# Vedi anche: feed_postcosmo.sh
+
+# Se non e' stato assegnato un file per gli alias locali, provo a scaricarli dal
+# server arkimet operativo
+if [ -z "${local_aliases:-}" ] ; then
+  arki-dump --aliases http://arkiope.metarpa:8090 > match-alias.conf || exit 3
+  export local_aliases=${pwd}/match-alias.conf
+fi
+
+if [ $source = "a" ] ; then
+  unset ARKI_ALIASES                 #alias
+  rm -f ${dataset}.conf
+  arki-mergeconf ${akurl}/dataset/${dataset} > ${dataset}.conf || exit 3
+  export ARKI_ALIASES=$local_aliases #alias
+fi
+  
 #-------------------------------------------------------------------------------
 # 2.2) Parametri 3D
 
@@ -369,7 +388,7 @@ EOF2
 
   fi
 
-# 2.2.3 Estraggo dall'archivio e ordino i livelli
+# 2.2.3 Estraggo  e ordino i livelli
 # Note:
 # - diagmet richiede che i livelli siano ordinati dal basso: in caso contrario 
 #   gira comunque, ma alcuni calcoli danno risultati sbagliati.
@@ -381,9 +400,17 @@ EOF2
   if [ $param = "ALTI_3D" ] ; then
     arki-query --data --sort=-level --file=${param}.query grib:${file_layersSup} > \
       ${param}.grb
+
   else
-    arki-query --data --sort=reftime,timerange,-level --file=${param}.query \
-      -C ${dataset}.conf > ${param}.grb
+    if [ $source = "a" ] ; then
+      unset ARKI_ALIASES                 #alias
+      arki-query --data --sort=reftime,timerange,-level --file=${param}.query \
+        -C ${dataset}.conf > ${param}.grb
+      export ARKI_ALIASES=$local_aliases #alias
+    elif [ $source = "f" ] ; then
+      arki-query --data --sort=reftime,timerange,-level --file=${param}.query \
+        $ak_file > ${param}.grb
+    fi
   fi
 
   if [ -s ${param}.grb ] ; then
@@ -431,7 +458,7 @@ elif [ $dataset = "lm7tmpc" -o $dataset = "cosmo_5M_vol_ita" ] ; then
   echo "Destag e antirotazione vento (standard)"
   rm -f stag.grb destag.grb tmp.grb tmp1.grb
   $grib_skip_first TEMP_3D.grb tmp1.grb -1
-  cat tmp.grb ZWIN_3D.grb MWIN_3D.grb >> stag.grb
+  cat tmp1.grb ZWIN_3D.grb MWIN_3D.grb >> stag.grb
   rm tmp.grb ZWIN_3D.grb MWIN_3D.grb
   vg6d_transform --a-grid stag.grb destag.grb || ier=13
   rm stag.grb
@@ -553,9 +580,17 @@ for param in $plist_2d ; do
   $expr_proddef
 EOF2
 
-# 2.3.3 Estraggo dall' archivio
-  arki-query --data --sort=reftime,timerange --file=${param}.query \
-    -C ${dataset}.conf >> ${param}.grb
+# 2.3.3 Estraggo i dati
+  if [ $source = "a" ] ; then
+    unset ARKI_ALIASES                 #alias
+    arki-query --data --sort=reftime,timerange --file=${param}.query \
+      -C ${dataset}.conf >> ${param}.grb
+    export ARKI_ALIASES=$local_aliases #alias
+  elif [ $source = "f" ] ; then
+    arki-query --data --sort=reftime,timerange --file=${param}.query \
+      $ak_file >> ${param}.grb
+  fi
+    
   if [ -s ${param}.grb ] ; then
     echo "Estratti grib: "`du -h  ${param}.grb`
   else
@@ -568,11 +603,13 @@ EOF2
     rm -f ${param}.grb.org ${param}.grb.p0 ${param}.grb.p1 ${param}.grb.ext 
     mv ${param}.grb ${param}.grb.org
 
-# Nelle analisi cosmo_5M_vol_ita, i parametri non istantanei contengono anche
-# campi alle ore 00 e 12 elaborati nelle 6 ore precedenti, che devono essere tolti
-# Successivmaente, passo ai valori relativi all'ora precedente (patch)
+# Se i parametri non istantanei possono contengono due campi relativi alla stessa ora
+# (campi alle ore 00 e 12 elaborati nelle 6 ore precedenti), li tolgo
+# Successivamente, passo ai valori relativi all'ora precedente (patch)
     if [ $dataset = "lm7tmpc" -o $dataset = "cosmo_5M_vol_ita" ] ; then
-      if [ $scad0 = "-1" -o $scad0 = "-0.5" ] ; then
+      ngt=$(grib_count ${param}.grb.org)
+      ngu=$(grib_get -p dataDate,dataTime ${param}.grb.org | sort | uniq | wc -l)
+      if [ \( $scad0 = "-1" -o $scad0 = "-0.5" \) -a $ngt -gt $ngu ] ; then
         grib_filter 6hr.rule -o ${param}.grb.p0 ${param}.grb.org
       else
         ln -s ${param}.grb.org ${param}.grb.p0
