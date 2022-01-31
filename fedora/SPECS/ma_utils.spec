@@ -38,7 +38,7 @@ BuildRequires: shapelib-devel
 BuildRequires: proj-devel
 BuildRequires: netcdf-fortran-devel
 
-Requires: libsim >= 6.0, libsim < 7.0
+Requires: libsim >= 6.0
 Requires: ksh
 
 %description
