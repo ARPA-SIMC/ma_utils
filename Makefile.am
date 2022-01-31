@@ -24,6 +24,7 @@ SUBDIRS = \
 	osservazioni/sh \
 	post_lm/src \
 	util/grads/src \
+	util/grads/sh \
 	util/grib/src
 endif
 

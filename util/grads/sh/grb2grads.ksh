@@ -1,6 +1,6 @@
 #! /bin/ksh
 #--------------------------------------------------------------------------
-# Procedura per importare in GRADS un GRIB generico
+# Procedura per importare in GRADS un GRIB1 SIMC
 #
 # In tutti i casi, importa in grads un solo file, eventualmente salvando
 # in files separati i campi che non possono coesistere nello stesso dataset
@@ -17,7 +17,7 @@
 # modifcare le opzioni che escludono variabili sull'esempio di -scale, ie.
 # non copiando il file originale, ma importandone uno con estenzione diversa
 #
-#                               Versione 6.10.0, Enrico & Jhonny 20/07/2015
+#                               Versione 7.0.0, Enrico & Jhonny 31/01/2022
 #--------------------------------------------------------------------------
 #set -x
 
@@ -28,7 +28,6 @@ function write_help
 #       123456789012345678901234567890123456789012345678901234567890123456789012345
   echo "Uso: grb2grads file [-h][-i][-b] [-forc] [-tsz N][-tst STEP] [-utmHR]"
   echo "     [-scale FNORM OFFSET] [-t N] [-lsort][-lsup/-lgrp]"
-  echo "     [-tsp][-tspc][-w][-tke] [-cal/-lm]"
   echo ""
   echo "Opzioni generali"
   echo "  file   input file (grib), senza l'estensione .grb o .grib"
@@ -49,18 +48,6 @@ function write_help
   echo "  -lsup  mantiene i nomi delle var.sup. distinti da quelle in quota [LM]"
   echo "  -lgrp  raggruppa le var.sup. a quelle in quota [Calmet]"
   echo ""
-  echo "Opzioni per escludere alcune variabili (rinominano il file .grb)"
-  echo "  -tsp   sposta in 2 files a parte le variabili delle tab. 201 e 203 [LM]"
-  echo "  -tspc  sposta in un file a parte le variabili della tabella 199 [Chimere]"
-  echo "  -w     sposta in un file a parte la variabile 40 (velocita verticale)"
-  echo "  -tke   sposta in un file a parte la variabile 152 (TKE)"
-  echo "  -uv    sposta in un file a parte il vento orizzontale LM"
-  echo ""
-  echo "Opzioni complessive:"
-  echo "  -lev   equivale a: -lsort -lgrp"
-  echo "  -cal   equivale a: -t 200 -lsort -lgrp"
-  echo "  -lm    equivale a: -t 2 -tsp"
-  echo ""
   echo "Per usare versioni di lavoro di programmi e tabelle, esportare le variabili:"
   echo "          MA_UTILS_DAT, MA_UTILS_SVN, LIBSIM_DATA, DBA_TABLES, LIBSIM_SVN"
 #       123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -72,18 +59,17 @@ function write_help
 
 # 1.1) Assegno l'ambiente
 
-cong=/usr/bin/cong
-grib2ctl=/usr/local/bin/grib2ctl.pl
-
 if [ -z $MA_UTILS_SVN ] ; then
   interp_grib=/usr/libexec/ma_utils/interp_grib.exe
   grib_utm_scale=/usr/libexec/ma_utils/grib_utm_scale.exe
   adjust_ctl=/usr/libexec/ma_utils/adjust_ctl.exe
+  grib2ctl=/usr/libexec/ma_utils/grib2ctl.pl
 else 
   echo "(grb2grads.ksh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
   interp_grib=${MA_UTILS_SVN}/util/grib/src/interp_grib.exe
   grib_utm_scale=${MA_UTILS_SVN}/util/grads/src/grib_utm_scale.exe
   adjust_ctl=${MA_UTILS_SVN}/util/grads/src/adjust_ctl.exe
+  grib2ctl=${MA_UTILS_SVN}/util/grads/sh/grib2ctl.pl
 fi
 
 if [ -z $MA_UTILS_DAT ] ; then
@@ -103,11 +89,6 @@ utm_scale="NO"
 adj_var="NO"
 adj_lev="0"
 sort_lev="NO"
-tabsplit="NO"
-tabsplitc="NO"
-noww="NO"
-notke="NO"
-nouv="NO"
 
 if [ $# -eq 0 ] ; then
   write_help
@@ -170,36 +151,6 @@ while [ $# -ge 1 ] ; do
     adj_lev="1"
     shift
 
-  elif [ $1 = '-tsp' ] ; then
-    tabsplit="YES"
-    shift
-  elif [ $1 = '-tspc' ] ; then
-    tabsplitc="YES"
-    shift
-  elif [ $1 = '-w' ] ; then
-    noww="YES"
-    shift
-  elif [ $1 = '-tke' ] ; then
-    notke="YES"
-    shift
-  elif [ $1 = '-uv' ] ; then
-    nouv="YES"
-    shift
-
-  elif [ $1 = '-lev' ] ; then
-    sort_lev="YES"
-    adj_lev="2"
-    shift
-  elif [ $1 = '-cal' ] ; then
-    adj_var="200"
-    sort_lev="YES"
-    adj_lev="2"
-    shift
-  elif [ $1 = '-lm' ] ; then
-    adj_var="002"
-    tabsplit="YES"
-    shift
-
   else
     prog=$1
     shift
@@ -220,75 +171,7 @@ fi
 #---------------------------------------------------------------------------
 # 2) Modifiche al grib (se richieste)
 
-if [ $noww = "YES" -o $notke = "YES" -o $tabsplit = "YES" \
-     -o $tabsplitc = "YES" ] ; then
-  echo "Salvo il file originale in "$prog.$ext".org"
-  cp ${prog}.${ext} ${prog}.${ext}.org
-fi
-
-# 2.1) Metto i parametri delle tabelle 201 e 203 (LAMI) in files a parte
-if [ $tabsplit = "YES" ] ; then
-  rm -f %tmp.grb%
-  echo "***** Scorporo eventuali parametri delle tabelle 201 e 203 *****" 
-  $cong ${prog}.${ext} %tmp.grb% \
-    +"setkey var:-1,2,-1"
-  $cong ${prog}.${ext} ${prog}_tab201.${ext} \
-    +"setkey var:-1,201,-1"
-  $cong ${prog}.${ext} ${prog}_tab203.${ext} \
-    +"setkey var:-1,203,-1"
-  mv %tmp.grb% ${prog}.${ext}
-fi
-
-# 2.2) Metto i parametri della tabella 199 (Chimere aero) in un file a parte
-if [ $tabsplitc = "YES" ] ; then
-  rm -f %tmp.grb%
-  echo "***** Scorporo eventuali parametri della tabella 199 *****" 
-  $cong ${prog}.${ext} %tmp.grb% \
-    +"setkey var:-1,200,-1"
-  $cong ${prog}.${ext} ${prog}_tab199.${ext} \
-    +"setkey var:-1,199,-1"
-  mv %tmp.grb% ${prog}.${ext}
-fi
-
-# 2.3) Metto la velocita' verticale in un file a parte
-if [ $noww = "YES" ] ; then
-  rm -f %tmp.grb%
-  echo "***** Scorporo la velocita verticale *****" 
-  $cong ${prog}.${ext} ${prog}_ww.${ext} \
-    +"setkey var:-1,-1,40"
-  $cong ${prog}.${ext} %tmp.grb% \
-    -"setkey var:-1,-1,40"
-  mv %tmp.grb% ${prog}.${ext}
-fi
-
-# 2.4) Metto la TKE in un file a parte
-if [ $notke = "YES" ] ; then
-  rm -f %tmp.grb%
-  echo "***** Scorporo la TKE *****" 
-  $cong ${prog}.${ext} ${prog}_tke.${ext} \
-    +"setkey var:-1,-1,152"
-  $cong ${prog}.${ext} %tmp.grb% \
-    -"setkey var:-1,-1,152"
-  mv %tmp.grb% ${prog}.${ext}
-fi
-
-# 2.5) Metto il vento orizzontale in un file a parte
-if [ $nouv = "YES" ] ; then
-  echo "***** Scorporo il vento orizzontale *****" 
-
-  rm -f %tmp.grb%
-  echo "+setkey var:-1,2,33 liv:-1,-1,-1" > %tmp.lst%
-  echo "+setkey var:-1,2,34 liv:-1,-1,-1" >> %tmp.lst%
-  $cong ${prog}.${ext} ${prog}_uv.${ext} -f%tmp.lst%
-
-  echo "-setkey var:-1,2,33 liv:-1,-1,-1" > %tmp.lst%
-  echo "-setkey var:-1,2,34 liv:-1,-1,-1" >> %tmp.lst%
-  $cong ${prog}.${ext} %tmp.grb% -f%tmp.lst%
-  mv %tmp.grb% ${prog}.${ext}
-  rm %tmp.lst%
-fi
-
-# 2.6) Interpolo su griglia regolare
+# 2.1) Interpolo su griglia regolare
 if [ $interp = "YES" ] ; then
   echo "***** Interpolo su griglia regolare *****" 
   rm -f ${prog}.${ext}.int 
@@ -301,7 +184,7 @@ if [ $interp = "YES" ] ; then
   fi
 fi
 
-# 2.7) Riscalo (ie. divido per 100) estremi e passo delle griglie UTM
+# 2.2) Riscalo (ie. divido per 100) estremi e passo delle griglie UTM
 if [ $utm_scale = "YES" ] ; then
   echo "***** Riscalo estremi griglia *****" 
   rm -f ${prog}.${ext}.scaled

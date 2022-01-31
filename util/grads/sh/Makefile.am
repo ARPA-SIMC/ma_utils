@@ -1,1 +1,1 @@
-dist_pkglibexec_SCRIPTS = big.gs cbar_line.gs cbarn_col.gs cbarn_white.gs define_colors.gs draw_marks.gs draw_orog.gs draw_shape.gs grb2grads.ksh overlay.gs parseopt.gsf parsestr.gsf save_png.gs timeaxis.gsf timeaxis_new.gsf tskip.gs white.gs
+dist_pkglibexec_SCRIPTS = big.gs cbarn_col.gs define_colors.gs draw_orog.gs g2ctl grb2grads.ksh parseopt.gsf save_png.gs timeaxis_new.gsf white.gs cbar_line.gs cbarn_white.gs draw_marks.gs draw_shape.gs g2g.sh grib2ctl.pl overlay.gs parsestr.gsf timeaxis.gsf tskip.gs
