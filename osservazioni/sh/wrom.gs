@@ -42,7 +42,7 @@ if(ok_xout=1); xout=_.xxx.1; else; xout=1000; endif
 
 say 'typ='typ', area='area', xout='xout
 
-* Leggo da wrom.lst le coordinate esteme delle stazioni  
+* Leggo da wrom.lst le coordinate estreme delle stazioni  
 ok=0
 j=0
 minlon=99999

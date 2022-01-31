@@ -356,9 +356,10 @@ ENDIF
 !    file .stz
 
 IF (n_list_stz > 0) THEN
-  WRITE (*,*) "Trovo stazioni piu' vicine"
-  CALL find_staz(xutm(1:npunti),yutm(1:npunti),xgeo(1:npunti),ygeo(1:npunti),&
-    label(1:npunti),npunti,n_list_stz,progetto,iz0)
+!  WRITE (*,*) "Trovo stazioni piu' vicine"
+!  CALL find_staz(xutm(1:npunti),yutm(1:npunti),xgeo(1:npunti),ygeo(1:npunti),&
+!    label(1:npunti),npunti,n_list_stz,progetto,iz0)
+  WRITE (*,*) "La funzione per cercare le stazioni piu vicine non e attiva"
 ENDIF
 
 !--------------------------------------------------------------------------

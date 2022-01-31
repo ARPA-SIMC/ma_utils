@@ -76,7 +76,7 @@ datafilelist = \
  $(top_srcdir)/data/marks_nord_rot2.dat \
  $(top_srcdir)/data/marks_nord_rot_c1043.dat \
  $(top_srcdir)/data/marks_nord_rot_c1057.dat \
- $(top_srcdir)/data/match-alias.conf.arkimet \
+ $(top_srcdir)/data/match-alias.simc.conf \
  $(top_srcdir)/data/nita1k_orog.ctl \
  $(top_srcdir)/data/nita1k_orog.grb \
  $(top_srcdir)/data/nita1k_orog.idx \

@@ -1,16 +1,15 @@
 ****************************************************************************
 * Script per disegnare un'orografia di background per una mappa GRADS
 *
-*                                 Versione 2.0.0, Johnny & Enrico 29/01/2020
+*                                 Versione 2.0.1, Johnny & Enrico 31/01/2022
 ****************************************************************************
 function drworog(args)
 
-filegeo.1=eur20k_orog
-filegeo.2=nita1k_orog
-filegeo.3=COS2I_orog
-filegeo.4=COS5MITR_orog
-filegeo.5=LAMAZ_orog
-filegeo.6=nita5kutm_orog
+filegeo.1="eur20k_orog"
+filegeo.2="nita1k_orog"
+filegeo.3="LAMA5_orog_20180514"
+filegeo.4="LAMAZ_orog_20120606"
+filegeo.5="nita5kutm_orog"
 
 *-------------------
 * Gestione parametri
@@ -30,12 +29,11 @@ if (opt='-h' | opt='h' | opt='')
   say ' 7 : solo contour, grigio chiaro, dettagliato'
   say ''
   say 'aree implementate:'
-  say ' 1 : Europa, 20 km, lat-lon'
-  say ' 2 : Nord Italia, 1 km, lat-lon'
-  say ' 3 : COSMO2I, 2 km, ruotata new'
-  say ' 4 : COSMO5M, 5 km, ruotata new'
-  say ' 5 : LAMAZ, 7 km, ruotata old'
-  say ' 6 : Nord Italia, 5km, UTM'
+  say ' 1 : lat-lon, Europa, 20 km'
+  say ' 2 : lat-lon, Nord Italia, 1 km'
+  say ' 3 : ruotata (10,43), Italia, 5 km'
+  say ' 4 : ruotata (10,57.5), Italia, 7 km'
+  say ' 5 : UTM32, Nord Italia, 5km'
   say ''
   say ' geodir: directory con i grib orografia '
   say '   (default: /usr/share/ma_utils)'

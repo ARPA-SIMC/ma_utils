@@ -69,7 +69,7 @@ destag="N"
 mon="N"
 filemon=""
 akurl="http://arkimet.metarpa:8090"
-local_aliases=/autofs/nethomes/eminguzzi/arkimet/dat/match-alias.conf.local
+local_aliases=/usr/share/ma_utils/match-alias.simc.conf
 split_req="nil"
 
 mand_par=0

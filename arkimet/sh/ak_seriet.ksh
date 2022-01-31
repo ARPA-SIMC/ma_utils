@@ -250,7 +250,7 @@ tdeb="N"
 filemon=""
 mon="N"
 akurl="http://arkimet.metarpa:8090"
-local_aliases=/autofs/nethomes/eminguzzi/arkimet/dat/match-alias.conf.local
+local_aliases=/usr/share/ma_utils/match-alias.simc.conf
 force_fop="N"
 
 if [ $# -eq 0 ] ; then
