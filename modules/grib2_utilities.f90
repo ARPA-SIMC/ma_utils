@@ -8,7 +8,7 @@ MODULE grib2_utilities
 ! get_grib_time
 ! check_consistency
 !
-!                                         Versione 1.4.0, Enrico 13/10/2015
+!                                         Versione 1.5.0, Enrico 20/08/2021
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -192,6 +192,10 @@ IF (PRESENT(lev)) THEN
     ELSE IF (toffs == 100) THEN
       lev(1) = 100                ! Isobaric surface
       lev(2) = NINT(voffs)
+      lev(3) = 0
+    ELSE IF (toffs == 101) THEN
+      lev(1) = 102                ! Mean Sea Level
+      lev(2) = 0
       lev(3) = 0
     ELSE IF (toffs == 103) THEN
       lev(1) = 105                ! Specified height level above ground m
