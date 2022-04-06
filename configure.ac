@@ -95,6 +95,7 @@ AC_CONFIG_FILES([Makefile
 		osservazioni/sh/Makefile
 		post_lm/src/Makefile
 		util/grads/src/Makefile
+		util/grads/sh/Makefile
 		util/grib/src/Makefile])
 
 AC_OUTPUT

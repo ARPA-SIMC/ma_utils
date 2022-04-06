@@ -503,7 +503,8 @@ grib: DO kg = 1,HUGE(0)
 
 !   Codifico data e ora per scrivere i grib relativi al giorno precedente
     CALL grib_clone(igin,igout)
-
+    CALL grib_set(igout,"missingValue",rmiss)
+    
     CALL getval(datav_sav, SIMPLEDATE=ch8)
     READ (ch8,'(i8)') data_out
     CALL grib_set(igout,"dataDate",data_out)
@@ -749,6 +750,7 @@ IF (ngribin > 0) THEN
 
 ! Codifico la data da scrivere
   CALL grib_clone(igin_first,igout)
+  CALL grib_set(igout,"missingValue",rmiss)
 
   CALL getval(datav_sav, SIMPLEDATE=ch8)
   READ (ch8,'(i8)') data_out
@@ -859,6 +861,7 @@ IF (ngribin > 0) THEN
 
 ! Codifico la data del primo grib
   CALL grib_clone(igin_first,igout)
+  CALL grib_set(igout,"missingValue",rmiss)
 
   CALL getval(datav_ini, SIMPLEDATE=ch8)
   READ (ch8,'(i8)') data_out
