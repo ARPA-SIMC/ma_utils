@@ -1,7 +1,7 @@
 Summary:    Tools, utilties and libraries for environmental meteorology
 Name:       ma_utils
 Version:    0.15
-Release:    3
+Release:    4
 License:    GPL
 Group:      Applications/Meteo
 URL:        http://arpae.it/sim
@@ -91,6 +91,9 @@ GRIB to seriet postprocessor for arkimet
 %{_libdir}/arkimet/seriet
 
 %changelog
+* Thu May 18 2023 Emanuele Di Giacomo <edigiacomo@arpae.it> - 0.15-4
+- Added missing scripts to spec file
+
 * Mon Oct  3 2022 Daniele Branchini <dbranchini@arpae.it> - 0.15-3
 - Updated the utilities to plot GRIB files (editions 1 and 2) with GRADS
 - Partial removal of old hardcoded path
