@@ -66,10 +66,13 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %doc
 %dir %{_libexecdir}/%{name}
+%{_libexecdir}/%{name}/g2ctl
 %{_libexecdir}/%{name}/*.exe
 %{_libexecdir}/%{name}/*.r
 %attr(755, root, root) %{_libexecdir}/%{name}/*sh
 %{_libexecdir}/%{name}/*.gs
+%{_libexecdir}/%{name}/*.gsf
+%{_libexecdir}/%{name}/*.pl
 %{_libexecdir}/%{name}/crea_anag_stzqa_all.sql
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/*
