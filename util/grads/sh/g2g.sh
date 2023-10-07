@@ -16,11 +16,22 @@ else
 fi
 
 # Command line
-filein=$1
-type=$2
-
-if [ $# -ne 2 ] ; then
-  echo "Use: g2g.sh file ana/for"
+batch="N"
+if [ $# -lt 2 ] ; then
+  echo "Use: g2g.sh file ana/for [-b]"
+  exit 1
+elif [ $# -eq 2 ] ; then
+  filein=$1
+  type=$2
+elif [ $# -eq 3 ] ; then
+  filein=$1
+  type=$2
+  opt=$3
+  if [ $opt = "-b" ] ; then
+    batch="Y"
+  fi
+else
+  echo "Use: g2g.sh file ana/for [-b]"
   exit 1
 fi
 
@@ -49,5 +60,7 @@ fi
 gribmap -i ${rname}.ctl
 
 # Run GRADS (interactively)
-grads -cl 'open '${rname}'.ctl'
+if [ $batch = "N" ] ; then
+  grads -cl 'open '${rname}'.ctl'
+fi
 

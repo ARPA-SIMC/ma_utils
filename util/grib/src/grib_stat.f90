@@ -3,7 +3,7 @@ PROGRAM grib_stat
 ! Legge un file son molti grib; scrive il file STAT.grib, con intestazione
 ! uguale al primo file in input e valori relativi alla statistica richiesta.
 !
-!                                         Versione 2.1.0, Enrico 09/06/2014
+!                                         Versione 2.2.0, Enrico 06/09/2022
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -71,7 +71,7 @@ ENDDO
 
 ! Controlli sui parametri
 IF (stat/="max" .AND. stat/="min" .AND. stat/="ave" .AND. stat/="std" .AND. &
-    stat/="nth" .AND. stat/="ntl" .AND.  stat/="nex") THEN
+    stat/="nth" .AND. stat/="ntl" .AND. stat/="nex" .AND. stat/="sum") THEN
   CALL write_help
   STOP 1
 ENDIF  
@@ -118,7 +118,7 @@ DO kg = 1,HUGE(0)
     ELSE IF (stat =="min") THEN
       ALLOCATE (val_min(ni*nj))
       val_min(:) = rmiss
-    ELSE IF (stat == "ave") THEN
+    ELSE IF (stat == "ave" .OR. stat == "sum") THEN
       ALLOCATE (val_sum(ni*nj))
       val_sum(:) = 0.
     ELSE IF (stat == "std") THEN
@@ -171,7 +171,7 @@ DO kg = 1,HUGE(0)
       val_min(:) = field_in(:) 
     ENDWHERE
 
-  ELSE IF (stat == "ave") THEN
+  ELSE IF (stat == "ave" .OR. stat == "sum") THEN
     WHERE (field_in(:) /= rmiss)
       val_sum(:) = val_sum(:) + field_in(:)
     ENDWHERE
@@ -241,6 +241,9 @@ ELSE IF (stat == "ave") THEN
   ELSEWHERE
     field_out(:) = rmiss
   ENDWHERE
+
+ELSE IF (stat == "sum") THEN
+  field_out(:) = val_sum(:)
 
 ELSE IF (stat == "std") THEN
   WHERE (val_nok(:) > 0)
@@ -318,6 +321,7 @@ WRITE (*,*) "Statistiche gestite:"
 WRITE (*,*) "  max  : massimo"
 WRITE (*,*) "  min  : minimo"
 WRITE (*,*) "  ave  : media"
+WRITE (*,*) "  sum  : somma"
 WRITE (*,*) "  std  : deviazione standard"
 WRITE (*,*) "  nth N: N-mo valore piu' alto"
 WRITE (*,*) "  ntl N: N-mo valore piu' basso"

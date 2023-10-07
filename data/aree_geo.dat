@@ -28,6 +28,7 @@ cos5mmedl   270  139  -25.223  -12.983   23.198   11.858   10.000   43.000 010 !
 cos2i       576  701   -3.800   -8.500    7.700    5.500   10.000   43.000 010 ! Area operativa COSMO_2I (0.02 x 0.02)
 dwd_fisiog  961  769  -26.750  -38.750   33.250    9.250   10.000   57.500 010 ! Area del dataset fisiografico europeo DWD (0.0625 x 0.0625)
 emrgeo      101   41    9.000   43.600   13.000   45.200    0.000    0.000 010 ! Emilia Romagna a 5 km, lat-lon (0.04 x 0.04)
+icon2i      761  761    3.000   33.700   22.000   48.900    0.000    0.000 010 ! Area operativa ICON_2I (0.025 x 0.02)
 lamaz       169  181   -2.937  -21.125    7.563   -9.875   10.000   57.500 010 ! Sottoarea di LMSMR2 e LMSMR4, usata per l'archivio LAMAZ (0.0625 x 0.0625)
 lama5s      201  233   -2.430   -6.300    6.570    4.140   10.000   43.000 010 ! Possibile sottoarea minima di cos5mitr per archvio LAMA5 (0.045 x 0.045)
 lama5       212  233   -2.925   -6.300    6.570    4.140   10.000   43.000 010 ! Sottoarea di cos5mitr per archvio LAMA5 (0.045 x 0.045)

@@ -97,7 +97,8 @@ function intfill
 # 1) Preliminari
 
 # 1.1) Path fissi
-work_root=/autofs/scratch-mod/eminguzzi/arkimet/tmp_point # root dir lavoro
+#work_root=/autofs/scratch-mod/eminguzzi/arkimet/tmp_point # root dir lavoro
+work_root=/scratch/fpizzotti # root dir lavoro
 arc_root=~eminguzzi/arkimet/progetti_point        # root arc. estrazioni
 doc_file=${arc_root}/_doc/progetti_estra.list     # elenco progetti archiviati
 
