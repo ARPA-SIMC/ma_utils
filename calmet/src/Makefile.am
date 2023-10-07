@@ -1,7 +1,9 @@
 AM_FCFLAGS = -I/usr/lib64/gfortran/modules -I$(top_builddir)/modules -DPKGDATAROOTDIR='"$(datarootdir)/$(PACKAGE)"' -cpp
 LDADD = $(top_builddir)/modules/libmautils.la
 
-pkglibexec_PROGRAMS = append_calmet_dat.exe asc2calmet_dat.exe calc_staz_dist.exe calmet2grib.exe calmet_dat2asc.exe crea_calmet_inp.exe crea_date_calmet.exe crea_prq_surf.exe  crea_wt_dat.exe crea_surf_dat.exe crea_surf_req.exe dummy_grib_calmet.exe extrap_wind.exe geo_dat2grib.exe grib23ddat.exe grib2mm5.exe grib2up_dat.exe proc_seriet_prf.exe proc_seriet_surf.exe proc_st1a.exe rw_dat_calmet.exe rw_xout_calmet.exe sel_staz_calmet.exe test_inp_calmet.exe xout2grib.exe
+pkglibexec_PROGRAMS = append_calmet_dat.exe asc2calmet_dat.exe calc_staz_dist.exe calmet_dat2asc.exe crea_calmet_inp.exe crea_date_calmet.exe crea_prq_surf.exe crea_wt_dat.exe crea_surf_dat.exe crea_surf_req.exe extrap_wind.exe geo_dat2grib.exe grib23ddat.exe proc_seriet_prf.exe proc_seriet_surf.exe proc_st1a.exe rw_dat_calmet.exe rw_xout_calmet.exe sel_staz_calmet.exe test_inp_calmet.exe
+
+## Programs that call emoslib: dummy_grib_calmet.exe grib2up_dat.exe calmet2grib.exe grib2mm5.exe  xout2grib.exe
 
 append_calmet_dat_exe_SOURCES = append_calmet_dat.f90
 asc2calmet_dat_exe_SOURCES = asc2calmet_dat.f90
