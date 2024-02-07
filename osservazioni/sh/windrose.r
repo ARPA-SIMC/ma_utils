@@ -63,8 +63,9 @@ if (type == "ossmeteo") {
  dum    <- read.fwf(file = filein,na.strings="    -9999.0",
                   widths=c(4,3,3,3,rep(11,nvar)),skip=3,col.names=t(header))
  nrows  <- dim(dum)[1]
- dum2   <- as.vector(dum)
- dum2   <- subset(dum2,select=c(aaaa,mm,gg,hh,FF.ist,DD.ist))
+# dum2   <- as.vector(dum)
+# dum2   <- subset(dum2,select=c(aaaa,mm,gg,hh,FF.ist,DD.ist))
+ dum2   <- subset(dum,select=c(aaaa,mm,gg,hh,FF.ist,DD.ist))
  dum2   <- subset(dum2,!is.na(match(mm,mms)))
  dum2   <- subset(dum2,!is.na(match(hh,hhs)))
  dati   <- dum2
@@ -84,8 +85,9 @@ if (type == "seriet") {
  fn     <- paste("Mod.wind",level,sep=".")
  dn     <- paste("Dir.wind",level,sep=".")
  nrows  <- dim(dum)[1]
- dum2   <- as.vector(dum)
- dum2   <- subset(dum2,select=c(aaaa,mm,gg,hh,get(fn),get(dn)))
+# dum2   <- as.vector(dum)
+# dum2   <- subset(dum2,select=c(aaaa,mm,gg,hh,get(fn),get(dn)))
+ dum2   <- subset(dum,select=c(aaaa,mm,gg,hh,get(fn),get(dn)))
  dum2   <- subset(dum2,!is.na(match(mm,mms)))
  dum2   <- subset(dum2,!is.na(match(hh,hhs)))
  dati   <- dum2

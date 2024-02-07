@@ -8,7 +8,7 @@ MODULE grib2_utilities
 ! get_grib_time
 ! check_consistency
 !
-!                                         Versione 1.5.0, Enrico 20/08/2021
+!                                         Versione 1.6.0, Enrico 01/02/2022
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -567,6 +567,7 @@ SUBROUTINE check_consistency(iga,igb,cl_grid,cl_time,cl_vtime,cl_lev, &
 
 USE grib_api
 USE datetime_class
+USE missing_values
 IMPLICIT NONE
 !
 INTEGER, INTENT(IN) :: iga,igb
@@ -579,8 +580,8 @@ REAL, PARAMETER :: eps = 0.0015
 TYPE(datetime) :: vtimea,vtimeb
 REAL :: xia,yia,xfa,yfa,xrota,yrota,fea
 REAL :: xib,yib,xfb,yfb,xrotb,yrotb,feb
-INTEGER :: nia,nja,sma,za,dda,dta
-INTEGER :: nib,njb,smb,zb,ddb,dtb
+INTEGER :: nia,nja,npa,sma,za,dda,dta
+INTEGER :: nib,njb,npb,smb,zb,ddb,dtb
 INTEGER :: para(3),leva(3),scada(4),parb(3),levb(3),scadb(4)
 INTEGER :: ireta,iretb
 CHARACTER(LEN=40) :: gta,gtb
@@ -614,21 +615,33 @@ CALL grib_get(iga,"gridType",gta)
 IF (gta == "regular_ll" .OR. gta == "rotated_ll") THEN
   CALL grib_get(iga,"numberOfPointsAlongAParallel",nia)
   CALL grib_get(iga,"numberOfPointsAlongAMeridian",nja)
+  npa = nia*nja
+ELSE IF (gta == "unstructured_grid") THEN
+  CALL grib_get(iga,"numberOfDataPoints",npa)
+  nia = imiss
+  nja = imiss
 ELSE
   CALL grib_get(iga,"Ni",nia)
   CALL grib_get(iga,"Nj",nja)
+  npa = nia*nja
 ENDIF
 
 CALL grib_get(igb,"gridType",gtb)
 IF (gtb == "regular_ll" .OR. gtb == "rotated_ll") THEN
   CALL grib_get(igb,"numberOfPointsAlongAParallel",nib)
   CALL grib_get(igb,"numberOfPointsAlongAMeridian",njb)
+  npb = nib*njb
+ELSE IF (gta == "unstructured_grid") THEN
+  CALL grib_get(igb,"numberOfDataPoints",npb)
+  nib = imiss
+  njb = imiss
 ELSE
   CALL grib_get(igb,"Ni",nib)
   CALL grib_get(igb,"Nj",njb)
+  npb = nib*njb
 ENDIF
 
-IF (nia == nib .AND. nja == njb) THEN
+IF (nia == nib .AND. nja == njb .AND. npa == npb) THEN
   clret(0) = 0
 ELSE
   ier = 1

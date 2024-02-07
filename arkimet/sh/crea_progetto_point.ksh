@@ -26,7 +26,7 @@
 # Todo:
 # Gestire il caso in cui $doc_file contiene progetti senza il carattere "_"
 #
-#                                                 V9.1.1, Enrico 02/07/2020
+#                                                 V9.1.2, Enrico 07/02/2024
 #==========================================================================
 # set -ex   # per attivare set -e, bisogna scommentare tutte le rige #e 
 # set -x
@@ -96,9 +96,21 @@ function intfill
 #==========================================================================
 # 1) Preliminari
 
-# 1.1) Path fissi
+# 1.1) Path di base
 #work_root=/autofs/scratch-mod/eminguzzi/arkimet/tmp_point # root dir lavoro
-work_root=/scratch/fpizzotti # root dir lavoro
+if [ ! -z $WORK_ROOT ] ; then
+  if [ -d $WORK_ROOT ] ; then
+    work_root=$WORK_ROOT
+  fi
+elif [ ! -z $SCRATCH ] ; then
+  if [ -d $SCRATCH ] ; then
+    work_root=$SCRATCH
+  fi
+else
+  echo "Root delle dir di lavoro indefinita: assegnare la variabile WORK_ROOT"
+  exit 2
+fi
+
 arc_root=~eminguzzi/arkimet/progetti_point        # root arc. estrazioni
 doc_file=${arc_root}/_doc/progetti_estra.list     # elenco progetti archiviati
 
@@ -136,6 +148,7 @@ else
   windrose=${MA_UTILS_SVN}/osservazioni/sh/windrose.sh
   GASCRP=${MA_UTILS_SVN}/util/grads/sh
 fi
+export GASCRP
 
 # Scelgo il gruppo per le dir di lavoro e di archiviazione
 arc_grp=$(groups | awk '{print $1}')
@@ -229,8 +242,8 @@ if [ $batch = "N" ] ; then
 fi
 
 # 1.5) Variabili dipendenti dai parametri
-arc_dir=${arc_root}/${proj}                     # dir. archiviazione
 work_dir=${work_root}/${proj}                   # dir. di lavoro
+arc_dir=${arc_root}/${proj}                     # dir. archiviazione
 
 # 1.6) Se e' richiesta l'elaborazione batch, controllo che ci siano tutti
 #      i files necessari
@@ -303,6 +316,7 @@ echo "Directory di lavoro del progetto: "`pwd`
 if [ $modif = "R" ] ; then
   rm -f * > /dev/null
 fi
+echo "Directory di archiviazione del progetto: "$arc_dir
 
 #--------------------------------------------------------------------------
 # 2.2) Scelta del dataset

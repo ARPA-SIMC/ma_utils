@@ -5,7 +5,7 @@ PROGRAM math_grib
 ! Gestisce GRIB1 e GRIB"
 ! Sostituisce ed integra somma_grib.f90 e moltiplica_grib.f90
 !
-!                                         Versione 1.4.0, Enrico 27/11/2017
+!                                         Versione 1.5.0, Enrico 01/02/2024
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -18,10 +18,10 @@ REAL, ALLOCATABLE :: valuesa(:),valuesb(:),valuesout(:),valuesout2(:)
 REAL :: coeffa,coeffb
 INTEGER :: ifa,ifb,ifout,iga=0,igb=0,igout=0
 INTEGER :: idp,kp,ios(4),ier,iret,kga,k,bpv
-INTEGER :: clret(0:6),cllog(0:6),nmiss,ni,nj,ni_sav,nj_sav,en,gnov,nom,nocv
+INTEGER :: clret(0:6),cllog(0:6),nmiss,ni,nj,np,ni_sav,nj_sav,np_sav,en,gnov,nom,nocv
 CHARACTER (LEN=250) :: filea,fileb,fileout,chdum,check_list
 CHARACTER(LEN=40) :: gta
-CHARACTER (LEN=5) :: oper
+CHARACTER (LEN=7) :: oper
 CHARACTER (LEN=3) :: next_arg,lsgn
 LOGICAL :: cl_grid,cl_time,cl_vtime,cl_lev,cl_var,lbconst,luseb,lforce,lverbose
 
@@ -85,7 +85,7 @@ DO kp = 1,HUGE(0)
     CASE (5)
       fileout = chdum
     CASE (6)
-      oper = chdum(1:5)
+      oper = chdum(1:7)
     CASE DEFAULT
       CALL write_help
       STOP 1
@@ -100,11 +100,13 @@ IF (check_list /= "") CALL parse_check_list(check_list,cl_grid,cl_time, &
 
 IF (ANY(ios(:) /= 0) .OR. ier /= 0 .OR. idp /= 6 .OR. &
     (oper/="sum" .AND. oper/="mul" .AND. oper/="div" .AND. &
-     oper/="div2" .AND. oper/="lin" .AND. oper/="mskg" &
-     .AND. oper/="mskl") .OR. &
+     oper/="div2" .AND. oper/="lin" .AND. oper/="mskg" .AND. oper/="mskl" .AND. &
+     oper/="mskoutg" .AND. oper/="mskoutl") .OR. &
     (lsgn/="nil" .AND. lsgn/="c" .AND. lsgn/="p" .AND. &
      lsgn/="m" .AND. lsgn/="zp" .AND. lsgn/="zm") ) &
     THEN
+  WRITE (*,*) "Error in commando line parameters"
+  WRITE (*,*) "N.er of arguments ",idp," operator ",oper
   CALL write_help
   STOP 1
 
@@ -129,6 +131,10 @@ ENDIF
 
 !--------------------------------------------------------------------------
 ! 2) Ciclo sui grib
+
+ni_sav = imiss
+nj_sav = imiss
+np_sav = imiss
 
 DO kga = 1,HUGE(0)
 
@@ -164,16 +170,23 @@ DO kga = 1,HUGE(0)
   IF (gta == "regular_ll" .OR. gta == "rotated_ll") THEN
     CALL grib_get(iga,"numberOfPointsAlongAParallel",ni)
     CALL grib_get(iga,"numberOfPointsAlongAMeridian",nj)
+    np = ni*nj
+  ELSE IF (gta == "unstructured_grid") THEN
+    CALL grib_get(iga,"numberOfDataPoints",np)
+    ni = imiss
+    nj = imiss
   ELSE
     CALL grib_get(iga,"Ni",ni)
     CALL grib_get(iga,"Nj",nj)
+    np = ni*nj
   ENDIF
-  IF (kga == 1 .OR. ni /= ni_sav .OR. nj /= nj_sav) THEN
+  IF (kga == 1 .OR. ni /= ni_sav .OR. nj /= nj_sav .OR. np /= np_sav) THEN
     IF (kga > 1) DEALLOCATE (valuesa,valuesb,valuesout,valuesout2)
-    ALLOCATE (valuesa(ni*nj),valuesb(ni*nj),valuesout(ni*nj),valuesout2(ni*nj))
+    ALLOCATE (valuesa(np),valuesb(np),valuesout(np),valuesout2(np))
     ni_sav = ni
     nj_sav = nj
-  ENDIF
+    np_sav = np
+ ENDIF
 
 ! Leggo i campi
   CALL grib_get(iga,"getNumberOfValues",gnov)    ! totale di punti nel grib
@@ -219,7 +232,21 @@ DO kga = 1,HUGE(0)
         valuesout(:) = (coeffa * valuesa(:)) + coeffb
       ENDWHERE
 
-    CASE("mskg")  
+    CASE("mskoutg")
+      WHERE (valuesa(:) /= rmiss .AND. valuesa(:) > (coeffa * valuesb(:)) + coeffb)
+        valuesout(:) = rmiss
+      ELSEWHERE
+        valuesout(:) = valuesa(:)
+      ENDWHERE
+
+    CASE("mskoutl")
+      WHERE (valuesa(:) /= rmiss .AND. valuesa(:) < (coeffa * valuesb(:)) + coeffb)
+        valuesout(:) = rmiss
+      ELSEWHERE
+        valuesout(:) = valuesa(:)
+      ENDWHERE
+
+   CASE("mskg")  
       WHERE (valuesa(:) /= rmiss .AND. valuesa(:) > coeffa)
         valuesout(:) = 1.
       ENDWHERE
@@ -457,6 +484,8 @@ WRITE (*,*) "    mul       : fileout = (a + fileA) * (b + fileB)"
 WRITE (*,*) "    div       : fileout = (a + fileA) / (b + fileB)"
 WRITE (*,*) "    div2      : fileout = (b + fileB) / (a + fileA)"
 WRITE (*,*) "    lin       : fileout = (a * fileA) + b "
+WRITE (*,*) "    mskoutg   : fileout = *missing* se fileA > (a * fileB) + b, fileA altrimenti"
+WRITE (*,*) "    mskoutl   : fileout = *missing* se fileA < (a * fileB) + b, fileA altrimenti"
 WRITE (*,*) "    mskg      : fileout = 1 se (fileA > a), 0 altrimenti"
 WRITE (*,*) "    mskl      : fileout = 1 se (fileA < a), 0 altrimenti"
 WRITE (*,*) "  Con le operazioni lin, mskg e mskl, fileB non viene usato (mettere una stringa qualsiasi)"
@@ -471,11 +500,11 @@ WRITE (*,*) "    vtime     : verification time"
 WRITE (*,*) "    time      : reference time e timerange"
 WRITE (*,*) "    lev       : livello"
 WRITE (*,*) "    var       : parametro"
-WRITE (*,*) "    nil       : solo la forma della griglia (nx, ny)"
+WRITE (*,*) "    nil       : solo la forma della griglia (nx-ny, oppure np)"
 WRITE (*,*) ""
 WRITE (*,*) "-bconst     : legge solo il primo campo di fileB, e applica queti valori a"
 WRITE (*,*) "              tutti i campi contenuti in fileA"
-WRITE (*,*) "-sgn OPT    : modifica il segno del cmapo in ouput. Valori ammessi per OPT:"
+WRITE (*,*) "-sgn OPT    : modifica il segno del campo in ouput. Valori ammessi per OPT:"
 WRITE (*,*) "              c  -> -field"
 WRITE (*,*) "              p  -> ABS(field)"
 WRITE (*,*) "              m  -> -ABS(field)"

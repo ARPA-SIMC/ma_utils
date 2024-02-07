@@ -7,7 +7,7 @@ PROGRAM convert_shape
 !
 ! Todo: gestire proiezioni (incluso errore riga comando)
 !
-!                                         Versione 2.0.0, Enrico 20/06/2017
+!                                         Versione 2.1.0, Enrico 06/03/2023
 !--------------------------------------------------------------------------
 
 IMPLICIT NONE
@@ -19,7 +19,8 @@ CHARACTER (LEN=200) :: filein,fileout,chdum,chrec
 LOGICAL :: lrev
 
 ! Proiezione geografica in e out: GEO (geografica), U32 (UTM 32),
-! U33 (UTM 33), R43 (ruotate, centro 10,43), R57 (ruotate, centro 10,57.5)
+! U33 (UTM 33), R43 (ruotate, centro 10,43), R57 (ruotate, centro 10,57.5),
+! R50 (ruotate, centro 10,50.0)
 CHARACTER (LEN=3) :: proj_in, proj_out
 
 !--------------------------------------------------------------------------
@@ -63,7 +64,7 @@ OPEN (UNIT=31, FILE=fileout, STATUS="REPLACE", FORM="FORMATTED")
 CALL get_eof_eor(eof,eor)
 
 proj_in = "R57"
-proj_out = "R43"
+proj_out = "R50"
 
 !--------------------------------------------------------------------------
 ! 1) Leggo e riscrivo convertendo le coordinate
@@ -87,6 +88,8 @@ DO kin = 1, HUGE(0)
 ! Converto le coordinate in ingresso a geografiche
   IF (proj_in == "R57") THEN
     CALL rtll(xin,yin,10.,57.5,xgeo,ygeo)
+  ELSE IF (proj_in == "R50") THEN
+    CALL rtll(xin,yin,10.,50.,xgeo,ygeo)
   ELSE IF (proj_in == "R43") THEN
     CALL rtll(xin,yin,10.,43.,xgeo,ygeo)
   ELSE IF (proj_in == "U32") THEN
@@ -103,6 +106,8 @@ DO kin = 1, HUGE(0)
     CALL tll(xgeo,ygeo,10.,57.5,xout,yout)
   ELSE IF (proj_out == "R43") THEN
     CALL tll(xgeo,ygeo,10.,43.,xout,yout)
+  ELSE IF (proj_out == "R50") THEN
+    CALL tll(xgeo,ygeo,10.,50.,xout,yout)
   ELSE IF (proj_out == "U32") THEN
     CALL ll2utm(ygeo,xgeo,32,xout,yout,idum)
    ELSE IF (proj_out == "U33") THEN
@@ -112,7 +117,8 @@ DO kin = 1, HUGE(0)
     yout = ygeo
   ENDIF
   
-  IF (proj_out == "R57" .OR. proj_out == "R43" .OR. proj_out == "GEO") THEN
+  IF (proj_out == "R57" .OR. proj_out == "R50" .OR. &
+      proj_out == "R43" .OR. proj_out == "GEO") THEN
     WRITE (31,'(f9.4,1x,f9.4)') yout,xout
   ELSE IF (proj_out == "U32" .OR. proj_out == "U33") THEN
 ! Todo
@@ -213,6 +219,7 @@ WRITE (*,*) "fileout: in formato shape GRADS con tracciato YY,XX"
 WRITE (*,*) "proj_in, proj_out: proiezione geografica in input e output; valori gestiti:"
 WRITE (*,*) "  GEO (lat-lon), U32 (UTM fuso 32), U33 (UTM fuso 33), R57 (ruotate con "
 WRITE (*,*) "  centro 57,10 - vecchio Cosmo), R43 (ruotate con centro 43,10 - nuovo Cosmo)."
+WRITE (*,*) "  R50 (ruotate con centro 50,10 - Cosmo-LEPS)."
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 
 RETURN
