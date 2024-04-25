@@ -115,6 +115,8 @@ datafilelist = \
  $(top_srcdir)/data/template.akq.cosmo.vol \
  $(top_srcdir)/data/template.akq.def \
  $(top_srcdir)/data/template.akq.kenda \
+ $(top_srcdir)/data/template.akq.iama5 \
+ $(top_srcdir)/data/template.akq.icon_2I \
  $(top_srcdir)/data/template.akq.lama5 \
  $(top_srcdir)/data/template.akq.lama5.adms \
  $(top_srcdir)/data/template.akq.lama5.calpuff \

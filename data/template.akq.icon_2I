@@ -1,0 +1,84 @@
+!-------------------------------------------------------------------------------
+! Template per estrazioni Arkimet, dataset icon_2I (aggiornamento: 25/04/2024)
+!
+! SINTASSI DEL FILE:
+! Le righe vuote e quelle che iniziano con "!" vengono ignorate
+! Le righe che iniziano con "#" separano gruppi che danno luogo a query distinte
+! Le righe non possono essere spezzate
+! Espressioni separate da virgola sono interpretate come AND
+!
+! ESEMPI di sintassi possibili 
+!   (documentazione completa in /usr/share/doc/arkimet*/matcher)
+!
+! reftime: =2009-01-01 00                   [un istante preciso]
+! reftime: >=2008-01-01, <=2008-12-31       [tutti i dati tra due istanti]
+! reftime: >=2003-04-01, <=2003-04-10, =11  [solo i dati delle ore 11]
+! reftime: >=2003-04-01 00%6h               [ogni 6 ore a partire da una data]
+!
+! level: layers            [tutti i model layers diponibili (52, da #65 a #14)]
+! level: laypbl65          [model layers fino a 3000 m di quota (28, da #65 a #38)]
+! level: hld4546           [uno specifico model layer]
+! level: levels            [tutti i model levels diponibili]
+! level: hl046             [uno specifico model level]
+!
+! timerange: an            [analisi istantanea]
+! timerange: aa00XX        [analisi media su XX ore]
+! timerange: ac00XX        [analisi cumulata su XX ore]
+! timerange: am00XX        [analisi massima su XX ore]
+! timerange: Timedef,,,1h  [dato relativo all'ora precedente (non istantaneo)]
+!
+!-------------------------------------------------------------------------------
+
+! 1) Parametri 3D pressure levels
+reftime: =2024-04-25 00
+product: z or t or u or v or q or r or omega
+level: plevs
+timerange: Timedef,,254
+#
+! 2) Parametri  istantanei superficiali
+reftime: =2024-04-25 00
+product: pr or t or tcc or wsnow or alb or tqv or twater or lpi
+level: g00
+timerange: Timedef,,254
+#
+! 3) Parametri istantanei sulla colonna
+reftime: =2024-04-25 00
+product: clay or snowlmt or cape or cin
+level: lcl or lcm or lch or 0isot or atm
+timerange: Timedef,,254
+#
+! 4) Parametri superficiali cumulati (reftime = inizio intervallo!)
+reftime: =2024-04-25 00
+product: tp or rain_gsp or snow_gsp or rain_con or snow_con or grau_gsp
+level: g00
+timerange: Timedef,,1
+#
+! 5) Parametri superficiali mediati (reftime = inizio intervallo!)
+reftime: =2024-04-25 00
+product: swbudg or lwbudg or radir or radif or dlwrf or ulwrf or shf or lhf or umfl or vmfl
+level: g00
+timerange: Timedef,,0
+#
+! 6) Parametri superficiali massimi (reftime = inizio intervallo!)
+reftime: =2024-04-25 00
+product: vmax
+level: g10
+timerange: Timedef,,2
+#
+! 7) Parametri vicino alla superficie istantanei
+reftime: =2024-04-25 00
+product: t or td or u or v
+level: g02 or g10
+timerange: Timedef,,254
+#
+! 8) Parametri nel suolo
+reftime: =2024-04-25 00
+product: st or ssw
+level: ug or lug
+timerange: Timedef,,254
+#
+! 9) MSLP
+reftime: =2024-04-25 00
+product: mslp
+level: msl
+timerange: Timedef,,254

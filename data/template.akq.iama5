@@ -1,0 +1,66 @@
+!-------------------------------------------------------------------------------
+! Template per estrazioni Arkimet, dataset iama5 (aggiornamento: 25/04/2024)
+!
+! SINTASSI DEL FILE:
+! Le righe vuote e quelle che iniziano con "!" vengono ignorate
+! Le righe che iniziano con "#" separano gruppi che danno luogo a query distinte
+! Le righe non possono essere spezzate
+! Espressioni separate da virgola sono interpretate come AND
+!
+! ESEMPI di sintassi possibili 
+!   (documentazione completa in /usr/share/doc/arkimet*/matcher)
+!
+! reftime: =2009-01-01 00                   [un istante preciso]
+! reftime: >=2008-01-01, <=2008-12-31       [tutti i dati tra due istanti]
+! reftime: >=2003-04-01, <=2003-04-10, =11  [solo i dati delle ore 11]
+! reftime: >=2003-04-01 00%6h               [ogni 6 ore a partire da una data]
+!
+! level: layers            [tutti i model layers diponibili (52, da #65 a #14)]
+! level: laypbl65          [model layers fino a 3000 m di quota (28, da #65 a #38)]
+! level: hld4546           [uno specifico model layer]
+! level: levels            [tutti i model levels diponibili]
+! level: hl046             [uno specifico model level]
+!
+! timerange: an            [analisi istantanea]
+! timerange: aa00XX        [analisi media su XX ore]
+! timerange: ac00XX        [analisi cumulata su XX ore]
+! timerange: am00XX        [analisi massima su XX ore]
+! timerange: Timedef,,,1h  [dato relativo all'ora precedente (non istantaneo)]
+!
+!-------------------------------------------------------------------------------
+
+! Parametri 3D model layers
+reftime: =2024-04-17 06
+product: t or u or v or pr or q or qc or qr or qi or qs or qg
+level: laypbl65
+timerange: an
+#
+! Parametri superficiali istantanei
+reftime: =2024-04-17 06
+product: pr or t or tcc or clay or gzo or alb
+level: g00 or lcl or lcm or lch
+timerange: an
+#
+! Parametri superficiali e vicino superficie elaborati (reftime = inizio intervallo!)
+reftime: =2024-04-17 05 
+product: tp or rain_gsp or snow_gsp or swbudg or lwbudg or shf or lhf or umfl or vmfl or radir or radif or vmax
+level: g00 or g10
+timerange: aa0001 or ac0001 or am0001
+#
+! Parametri vicino alla superficie istantanei
+reftime: =2024-04-17 06
+product: t or td or u or v
+level: g02 or g10
+timerange: an
+#
+! Parametri nel suolo
+reftime: =2024-04-17 06
+product: st or ssw
+level: ug or lug
+timerange: an
+#
+! MSLP
+reftime: =2024-04-17 06
+product: mslp
+level: msl
+timerange: an
