@@ -1,5 +1,5 @@
 !-------------------------------------------------------------------------------
-! Template per estrazioni Arkimet, dataset icon_2I (aggiornamento: 25/04/2024)
+! Template per estrazioni Arkimet, dataset icon_2I (aggiornamento: 10/05/2024)
 !
 ! SINTASSI DEL FILE:
 ! Le righe vuote e quelle che iniziano con "!" vengono ignorate
@@ -35,16 +35,16 @@ product: z or t or u or v or q or r or omega
 level: plevs
 timerange: Timedef,,254
 #
-! 2) Parametri  istantanei superficiali
+! 2) Parametri istantanei superficiali
 reftime: =2024-04-25 00
-product: pr or t or tcc or wsnow or alb or tqv or twater or lpi
+product: pr or t or tcc or wsnow or alb or tqv or twater or lpi or lsm
 level: g00
 timerange: Timedef,,254
 #
 ! 3) Parametri istantanei sulla colonna
 reftime: =2024-04-25 00
-product: clay or snowlmt or cape or cin
-level: lcl or lcm or lch or 0isot or atm
+product: clay or snowlmt or cape or cin or height
+level: lcl or lcm or lch or atm or hsurf or 0isot
 timerange: Timedef,,254
 #
 ! 4) Parametri superficiali cumulati (reftime = inizio intervallo!)

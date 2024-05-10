@@ -14,7 +14,7 @@
 # LIBSIM_SVN:   eseguibili (ad esempio: /home/eminguzzi/svn/libsim; se non 
 #               specificato, usa gli eseguibili in path)
 #
-#                                         Versione 3.0.0, Enrico 28/10/2019
+#                                         Versione 3.1.0, Enrico 09/05/2024
 #--------------------------------------------------------------------------
 #set -x
 
@@ -36,6 +36,7 @@ function write_help
   echo "          archivio centrale SIMC: http://arkimet.metarpa:8090 (default)"
   echo "          archivio backup maialinux: http://maialinux.metarpa:8090"
   echo "          archivio locale MA su radicchio: /scratch/eminguzzi/local_arkimet"
+  echo "-file     estrae da un file locale, $DATASET è' il nome del file"
   echo "-mon=FILE scrive su FILE le date estratte, appena vengono elaborate"
   echo "-h:       visualizza questo help"
   echo ""
@@ -63,6 +64,7 @@ if [ $# -eq 0 ] ; then
   exit 1
 fi
 
+source="A"
 split="N"
 zoom="N"
 destag="N"
@@ -70,6 +72,7 @@ mon="N"
 filemon=""
 akurl="http://arkimet.metarpa:8090"
 local_aliases=/usr/share/ma_utils/match-alias.simc.conf
+#local_aliases=/home/eminguzzi@ARPA.EMR.NET/enr/git/arkimet/conf/match-alias.simc.conf
 split_req="nil"
 
 mand_par=0
@@ -79,6 +82,9 @@ while [ $# -ge 1 ] ; do
     exit 1
   elif [ `echo $1 | awk '{print substr($1,1,4)}'` = '-arc' ] ; then
     akurl=`echo $1 | cut -d = -f 2`
+    shift
+  elif [ `echo $1 | awk '{print substr($1,1,7)}'` = '-file' ] ; then
+    source="F"
     shift
   elif [ `echo $1 | awk '{print substr($1,1,4)}'` = '-mon' ] ; then
     mon="Y"
@@ -96,7 +102,7 @@ while [ $# -ge 1 ] ; do
   elif [ `echo $1 | awk '{print substr($1,1,7)}'` = '-destag' ] ; then
     destag="Y"
     shift
-  elif [ `echo $1 | awk '{print substr($1,1,7)}'` = '-split' ] ; then
+  elif [ `echo $1 | awk '{print substr($1,1,6)}'` = '-split' ] ; then
     split_req=`echo $1 | cut -d = -f 2`
     shift
   elif [ $mand_par -eq 0 ] ; then
@@ -167,7 +173,7 @@ if [ ! -z $http_proxy ] ; then
 fi
 
 is_local=`echo $akurl | grep "http" | wc -l`
-if [ $is_local -eq 0 ] ; then
+if [ $is_local -eq 0 -o $source = "F" ] ; then
   echo "Richiesta estrazione da un DB locale, uso gli alias in "$local_aliases
   export ARKI_ALIASES=$local_aliases
 fi
@@ -191,18 +197,20 @@ fi
 rm -f ${prog}.akq.proc ${prog}.query.* ${ds}.conf ${prog}.grb
 
 # 2.1 Costriusco il config
-rm -f ${ds}.conf
-nsep=`echo $ds | awk '{print gsub("%","###",$1)}'`
-cntds=0
-while [ $cntds -le $nsep ] ; do
-  cntds=`expr $cntds + 1`
-  dsc=`echo $ds | cut -d % -f $cntds`
-  arki-mergeconf ${akurl}/dataset/${dsc} >> ${ds}.conf 2>/dev/null
-  if [ $? -ne 0 ] ; then
-    echo "Errore nell'accesso al dataset: ${akurl}/dataset/${dsc}"
-    exit 3
-  fi
-done
+if [ $source = "A" ] ; then
+  rm -f ${ds}.conf
+  nsep=`echo $ds | awk '{print gsub("%","###",$1)}'`
+  cntds=0
+  while [ $cntds -le $nsep ] ; do
+    cntds=`expr $cntds + 1`
+    dsc=`echo $ds | cut -d % -f $cntds`
+    arki-mergeconf ${akurl}/dataset/${dsc} >> ${ds}.conf 2>/dev/null
+    if [ $? -ne 0 ] ; then
+      echo "Errore nell'accesso al dataset: ${akurl}/dataset/${dsc}"
+      exit 3
+    fi
+  done
+fi
 
 # 2.2 Elaboro il file con i dati richiesti (.akq)
 
@@ -252,11 +260,17 @@ fi
 cnt=1
 while [ $cnt -le $cntq ] ; do
   echo "Elaboro query "$cnt"      "`date "+%Y%m%d %H:%M:%S"`
-  if [ $split = "Y" ] ; then
-    arki-query --config=${ds}.conf --file=${prog}.query.${cnt} --inline | \
-      arki-xargs ${split_opt} ./xargs.ksh ${prog}.grb 
-  elif [ $split = "N" ] ; then
-    arki-query --config=${ds}.conf --file=${prog}.query.${cnt} --data >> ${prog}.grb 
+  if [ $source = "A" ] ; then
+    if [ $split = "Y" ] ; then
+      arki-query --config=${ds}.conf --file=${prog}.query.${cnt} --inline | \
+        arki-xargs ${split_opt} ./xargs.ksh ${prog}.grb 
+    elif [ $split = "N" ] ; then
+      arki-query --config=${ds}.conf --file=${prog}.query.${cnt} --data >> ${prog}.grb 
+    fi
+
+  elif [ $source = "F" ] ; then
+    arki-query --file=${prog}.query.${cnt} --data grib:${ds} >> ${prog}.grb 
+
   fi
   cnt=`expr $cnt + 1`
 done
