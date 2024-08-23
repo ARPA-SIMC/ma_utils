@@ -1038,6 +1038,8 @@ WRITE (*,*) "         [per calcoli di legge: NRM=8, NVALRM=6, X=120., NVAL=???]"
 WRITE (*,*) "-exc X   (exc.grb) scrive 1. nei punti in cui la media giornaliera supera la"
 WRITE (*,*) "         soglia X, 0., nei punti in cui non la supera"
 WRITE (*,*)
+WRITE (*,*) "NB: i dati non istantanei sono sempre attribuiti al giorno in cui termina"
+WRITE (*,*) "    l'intervallo di elaborazione!"
 !            123456789012345678901234567890123456789012345678901234567890123456789012345678
 
 RETURN

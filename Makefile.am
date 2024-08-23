@@ -91,8 +91,10 @@ datafilelist = \
  $(top_srcdir)/data/shape_regit.dat \
  $(top_srcdir)/data/shape_regitrot1.dat \
  $(top_srcdir)/data/shape_regitrot2.dat \
+ $(top_srcdir)/data/shape_regitrot3.dat \
  $(top_srcdir)/data/shape_regitrot_c1043.dat \
  $(top_srcdir)/data/shape_regitrot_c1057.dat \
+ $(top_srcdir)/data/shape_regitrot_c1050.dat \
  $(top_srcdir)/data/tabella_002_ser.txt \
  $(top_srcdir)/data/tabella_002.txt \
  $(top_srcdir)/data/tabella_128_ser.txt \
