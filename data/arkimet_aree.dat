@@ -6,7 +6,7 @@
 # - edizione GRIB
 # - presenza di dati staggerati e con codifica al secondo ordine
 #
-# Ultimo aggiornamento: 27/07/2020
+# Ultimo aggiornamento: 22/05/2024
 
 # Tracciato record:
 # dataset,area,proiezione,fisiog?,destag?,edition,sop?,template
@@ -36,7 +36,8 @@ cosmo_2I_assim,cos2i,rot2,y,n,1,n,kenda
 cosmo_2I_assim_arc,cos2i,rot2,y,n,1,n,kenda
 
 # Previsioni ICON operative 2 km
-icon_2I,icon2i,geo,n,n,2,n,cosmo
+icon_2I,icon2i,geo,n,n,2,n,icon_2I
+icon_2I_arc,icon2i,geo,n,n,2,n,icon_2I
 
 # Previsioni Cosmo: vecchie catene
 lm7tmpc,lmsmr4,rot1,cosmo,n,y,1,n,cosmo.vol

@@ -315,6 +315,14 @@ IF (PRESENT(scad)) THEN
         scad(4) = 17
       ENDIF
 
+!   Patch: il dataset rad-pluv_naz e' scritto con sortt=1 (start of forecast), anche se sono osservazioni
+!   La chiave topd=2 (analysis and forecast) e' corretta, ma non usata altrove
+    ELSE IF (sortt==1 .AND. topd==2 .AND. pdtn==8 .AND. ft==0 .AND. toti==1 .AND. tosp==1) THEN
+      scad(1) = iouotr
+      scad(2) = 0
+      scad(3) = lotr
+      scad(4) = 15      ! cumulata, reftime = inizio intervallo di elaborazione
+
 !   4.3 Prevsioni non istantanee (togp = 2?)
     ELSE IF (sortt==1 .AND. topd==1 .AND. pdtn==8 .AND. toti==2) THEN
       scad(1) = iouotr
