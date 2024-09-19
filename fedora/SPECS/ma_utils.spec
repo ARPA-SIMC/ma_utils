@@ -1,7 +1,7 @@
 Summary:    Tools, utilties and libraries for environmental meteorology
 Name:       ma_utils
 Version:    0.17
-Release:    1
+Release:    2
 License:    GPL
 Group:      Applications/Meteo
 URL:        http://arpae.it/sim
@@ -89,6 +89,9 @@ GRIB to seriet postprocessor for arkimet
 %{_libdir}/arkimet/seriet
 
 %changelog
+* Thu Sep 19 2024 Daniele Branchini <dbranchini@arpae.it> - 0.17-2
+- Fixed grib_api check
+
 * Thu Sep 19 2024 Daniele Branchini <dbranchini@arpae.it> - 0.17-1
 - Added templates for ICON model
 - Added program grib2_forc2ana.exe
