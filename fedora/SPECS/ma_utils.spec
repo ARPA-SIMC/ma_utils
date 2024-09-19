@@ -1,6 +1,6 @@
 Summary:    Tools, utilties and libraries for environmental meteorology
 Name:       ma_utils
-Version:    0.16
+Version:    0.17
 Release:    1
 License:    GPL
 Group:      Applications/Meteo
@@ -31,9 +31,7 @@ BuildRequires: libdballe-devel
 BuildRequires: libsim-devel
 BuildRequires: udunits2-devel
 BuildRequires: ksh
-BuildRequires: libemos
 BuildRequires: jasper-devel
-BuildRequires: libemos
 BuildRequires: shapelib-devel
 BuildRequires: proj-devel
 BuildRequires: netcdf-fortran-devel
@@ -91,6 +89,12 @@ GRIB to seriet postprocessor for arkimet
 %{_libdir}/arkimet/seriet
 
 %changelog
+* Thu Sep 19 2024 Daniele Branchini <dbranchini@arpae.it> - 0.17-1
+- Added templates for ICON model
+- Added program grib2_forc2ana.exe
+- Other minor updates
+- Removed libemos dependency
+
 * Thu Apr 4 2024 Enrico Minguzzi <eminguzzi@arpae.it> - 0.16-1
 - Bug fix in windrose
 - Minor developments to math_grib and grads plots
