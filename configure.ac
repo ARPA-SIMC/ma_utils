@@ -28,22 +28,14 @@ PKG_CHECK_EXISTS([eccodes_f90], [enableval=yes], [enableval=no])
 if test "x$enableval" = "xyes"; then
   AC_MSG_RESULT([eccodes code included])
   PKG_CHECK_MODULES(GRIBAPI, [eccodes_f90])
-  AC_DEFINE(HAVE_LIBGRIBAPI, 1, [Enable gribapi code])
-  AC_SUBST(GRIBAPI_LIBS)
-  GRIBAPI_PKGCONFIG="eccodes_f90"
-  AC_SUBST(GRIBAPI_PKGCONFIG)
   grib_api_flavor=eccodes
+  LIBS="-leccodes_f90 -leccodes -ljasper"
 else
   AC_CHECK_LIB(
        [eccodes_f90],
        [grib_f_open_file],
        [
-        AC_MSG_RESULT([eccodes code included])
-        AC_DEFINE(HAVE_LIBGRIBAPI, 1, [Enable gribapi code])
-        GRIBAPI_LIBS="-leccodes_f90 -leccodes -ljasper"
-        AC_SUBST(GRIBAPI_LIBS)
-        GRIBAPI_PKGCONFIG="eccodes_f90"
-        AC_SUBST(GRIBAPI_PKGCONFIG)
+        LIBS="-leccodes_f90 -leccodes -ljasper"
         grib_api_flavor=eccodes
        ],
        [AC_MSG_RESULT([eccodes library not found, trying with legacy grib_api])],
@@ -56,12 +48,7 @@ AC_CHECK_LIB(
 	     [grib_api_f90],
 	     [grib_f_open_file],
 	     [
-	      AC_MSG_RESULT([gribapi code included])
-	      AC_DEFINE(HAVE_LIBGRIBAPI, 1, [Enable gribapi code])
-	      GRIBAPI_LIBS="-lgrib_api_f90 -lgrib_api"
-	      AC_SUBST(GRIBAPI_LIBS)
-	      GRIBAPI_PKGCONFIG="grib_api_f90"
-	      AC_SUBST(GRIBAPI_PKGCONFIG)
+	      LIBS="-lgrib_api_f90 -lgrib_api"
 	      grib_api_flavor=grib_api
 	     ],
 	     [AC_MSG_ERROR([eccodes and grib-api library not found])],
