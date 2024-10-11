@@ -1,8 +1,7 @@
-[![Build Status](https://simc.arpae.it/moncic-ci/ma_utils/centos7.png)](https://simc.arpae.it/moncic-ci/ma_utils/)
 [![Build Status](https://simc.arpae.it/moncic-ci/ma_utils/rocky8.png)](https://simc.arpae.it/moncic-ci/ma_utils/)
 [![Build Status](https://simc.arpae.it/moncic-ci/ma_utils/rocky9.png)](https://simc.arpae.it/moncic-ci/ma_utils/)
-[![Build Status](https://simc.arpae.it/moncic-ci/ma_utils/fedora36.png)](https://simc.arpae.it/moncic-ci/ma_utils/)
 [![Build Status](https://simc.arpae.it/moncic-ci/ma_utils/fedora38.png)](https://simc.arpae.it/moncic-ci/ma_utils/)
+[![Build Status](https://simc.arpae.it/moncic-ci/ma_utils/fedora40.png)](https://simc.arpae.it/moncic-ci/ma_utils/)
 [![Build Status](https://copr.fedorainfracloud.org/coprs/simc/stable/package/ma_utils/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/simc/stable/package/ma_utils/)
 
 # MA - UTILS
@@ -12,7 +11,7 @@ in use at ARPAE-SIMC
 
 ## Contact and copyright information
 
-Ma-utils is Copyright (C) 2020-2022  ARPAE-SIMC <urpsim@arpae.it>
+Ma-utils is Copyright (C) 2020-2024  ARPAE-SIMC <urpsim@arpae.it>
 
 Ma-utils is licensed under the terms of the GNU General Public License version
 2.  Please see the file LICENSE for details.

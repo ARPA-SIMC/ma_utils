@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(ma_utils, 0.16, dbranchini@arpae.it)
+AC_INIT(ma_utils, 0.17, dbranchini@arpae.it)
 
 m4_pattern_allow([AM_PROG_AR])
 AM_PROG_AR
@@ -24,28 +24,35 @@ fi
 AM_PROG_LIBTOOL
 
 grib_api_flavor=
-AC_CHECK_LIB(
-	     [eccodes_f90],
-	     [grib_f_open_file],
-	     [
-	      AC_MSG_RESULT([eccodes code included])
-	      LIBS="-leccodes_f90 -leccodes -ljasper"
-              grib_api_flavor=eccodes
-	     ],
-	     [AC_MSG_RESULT([eccodes library not found, trying with legacy grib_api])],
-	     [-leccodes -ljasper]
-	    )
+PKG_CHECK_EXISTS([eccodes_f90], [enableval=yes], [enableval=no])
+if test "x$enableval" = "xyes"; then
+  AC_MSG_RESULT([eccodes code included])
+  PKG_CHECK_MODULES(GRIBAPI, [eccodes_f90])
+  grib_api_flavor=eccodes
+  LIBS="-leccodes_f90 -leccodes -ljasper"
+else
+  AC_CHECK_LIB(
+       [eccodes_f90],
+       [grib_f_open_file],
+       [
+        LIBS="-leccodes_f90 -leccodes -ljasper"
+        grib_api_flavor=eccodes
+       ],
+       [AC_MSG_RESULT([eccodes library not found, trying with legacy grib_api])],
+       [-leccodes -ljasper]
+      )
+fi
+
 if test "x$grib_api_flavor" = "x"; then
 AC_CHECK_LIB(
 	     [grib_api_f90],
 	     [grib_f_open_file],
 	     [
-	      AC_MSG_RESULT([gribapi code included])
-	      LIBS="-lgrib_api_f90 -lgrib_api -ljasper"
-              grib_api_flavor=grib_api
+	      LIBS="-lgrib_api_f90 -lgrib_api"
+	      grib_api_flavor=grib_api
 	     ],
 	     [AC_MSG_ERROR([eccodes and grib-api library not found])],
-	     [-lgrib_api -ljasper]
+	     [-lgrib_api]
 	    )
 fi
 
