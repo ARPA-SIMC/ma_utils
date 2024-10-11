@@ -542,11 +542,14 @@ ALLOCATE (zlev(npt,maxaklev),zlay(npt,maxaklay))
 
 IF(((sw_down .OR. add_albedo) .AND. .NOT. tvar_alb) .OR. &
    (out_form == 5 .AND. .NOT. tvar_z0) .OR. &
-   (.NOT. libsim .AND. ANY(varliv_req(4,1:nvl) == 109)) .OR. &
-   (.NOT. libsim .AND. ANY(varliv_req(4,1:nvl) == 110)) .OR. &
-   (libsim .AND. ANY(varliv_req(4,1:nvl) == 105)) ) &
+   (.NOT. libsim .AND. ANY(varliv_req(1,1:nvl) == 255 .AND. varliv_req(4,1:nvl) == 109)) .OR. &
+   (.NOT. libsim .AND. ANY(varliv_req(1,1:nvl) == 255 .AND. varliv_req(4,1:nvl) == 110)) .OR. &
+   (.NOT. libsim .AND. ANY(varliv_req(1,1:nvl) /= 255 .AND. varliv_req(4,1:nvl) == 150)) .OR. &
+   (libsim .AND. ANY(varliv_req(4,1:nvl) == 105)) .OR. &
+   (libsim .AND. ANY(varliv_req(4,1:nvl) == 150)) ) THEN
   CALL read_fisiog_gacsv(filefis,npt,req_lat(1:npt),req_lon(1:npt),libsim,&
     alb_fis,z0_fis,zlev,zlay,orog)
+ENDIF
 
 IF ((lab3d == 1 .OR. lab3d == 2) .AND. &
     ((.NOT. libsim .AND. ANY(varliv_req(4,1:nvl) == 109)) .OR. &
@@ -1242,6 +1245,7 @@ IF (out_form == 1 .OR. out_form == 2) THEN
   ENDIF
 
   DO k = 1,nvl
+
     IF (varliv(4,k) == 1) THEN
       tipo_lev = "sup"                     ! Surface
       zid = 0.
@@ -1258,9 +1262,9 @@ IF (out_form == 1 .OR. out_form == 2) THEN
       tipo_lev = "msl"                     ! Mean Sea Level
       zid = 0.
 
-    ELSE IF (varliv(4,k) == 105 .AND. &
+    ELSE IF (varliv(1,k) == 255 .AND. varliv(4,k) == 105 .AND. &
       (varliv(5,k) == varliv(6,k) .OR. .NOT. c_e(varliv(6,k))) ) THEN 
-      tipo_lev = "lev"                     ! Hybrid level
+      tipo_lev = "lev"                     ! Hybrid level GRIB1
       IF (varliv(5,k) > 0 .AND. varliv(5,k) <= maxaklev .AND. &
           lab3d == 1) THEN
         zid = zlev(kpt,varliv(5,k))
@@ -1271,8 +1275,33 @@ IF (out_form == 1 .OR. out_form == 2) THEN
         zid = REAL(varliv(5,k))
       ENDIF
 
-    ELSE IF (varliv(4,k) == 105 .AND. varliv(5,k) /= varliv(6,k)) THEN 
-      tipo_lev = "lay"                     ! Hybrid layer
+    ELSE IF (varliv(1,k) /= 255 .AND. varliv(4,k) == 150 .AND. &
+      (varliv(5,k) == varliv(6,k) .OR. .NOT. c_e(varliv(6,k))) ) THEN 
+      tipo_lev = "lev"                     ! Hybrid level GRIB2
+      IF (varliv(5,k) > 0 .AND. varliv(5,k) <= maxaklev .AND. &
+          lab3d == 1) THEN
+        zid = zlev(kpt,varliv(5,k))
+      ELSE IF (varliv(5,k) > 0 .AND. varliv(5,k) <= maxaklev .AND. &
+          lab3d == 2 .AND. orog(kpt) /= rmiss) THEN
+        zid = zlev(kpt,varliv(5,k)) - orog(kpt)
+      ELSE
+        zid = REAL(varliv(5,k))
+      ENDIF
+
+    ELSE IF (varliv(1,k) == 255 .AND. varliv(4,k) == 105 .AND. varliv(5,k) /= varliv(6,k)) THEN 
+      tipo_lev = "lay"                     ! Hybrid layer GRIB1
+      IF (varliv(5,k) > 0 .AND. varliv(5,k) <= maxaklev .AND. &
+          lab3d == 1) THEN
+        zid = zlay(kpt,varliv(5,k))
+      ELSE IF (varliv(5,k) > 0 .AND. varliv(5,k) <= maxaklev .AND. &
+          lab3d == 2 .AND. orog(kpt) /= rmiss) THEN
+        zid = zlay(kpt,varliv(5,k)) - orog(kpt)
+      ELSE
+        zid = REAL(varliv(5,k))
+      ENDIF
+
+    ELSE IF (varliv(1,k) /= 255 .AND. varliv(4,k) == 150 .AND. varliv(5,k) /= varliv(6,k)) THEN 
+      tipo_lev = "lay"                     ! Hybrid layer GRIB2
       IF (varliv(5,k) > 0 .AND. varliv(5,k) <= maxaklev .AND. &
           lab3d == 1) THEN
         zid = zlay(kpt,varliv(5,k))

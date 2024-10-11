@@ -60,8 +60,8 @@ INTEGER, PARAMETER :: maxpt = 1000    ! punti richiesti
 INTEGER, PARAMETER :: maxqry = 20     ! sotto-query rettangolari
 
 ! Dimensionamenti massimi relativi agli archivi COSMO
-INTEGER, PARAMETER :: maxaklay = 45  ! model layers
-INTEGER, PARAMETER :: maxaklev = 46  ! model levels
+INTEGER, PARAMETER :: maxaklay = 65  ! model layers
+INTEGER, PARAMETER :: maxaklev = 66  ! model levels
 
 ! Tipo derivato "data e scadenza"
 ! I parametri del timerange sono quelli del tipo derivato "vol7d_timerange"
@@ -128,11 +128,12 @@ INTEGER, PARAMETER :: varliv_z0(6,nvl_z0) = RESHAPE((/ &
   (/6,nvl_alb/) )
 
 ! Orografia
-INTEGER, PARAMETER :: nvl_orog = 3
+INTEGER, PARAMETER :: nvl_orog = 4
 INTEGER, PARAMETER :: varliv_orog(6,nvl_orog) = RESHAPE((/ &
  -999,  2,  8,  1,  0,  0, &
  -999,200,122,  1,  0,  0, &
- -999,200,  8,  1,  0,  0 /), &
+ -999,200,  8,  1,  0,  0, &
+    0,  3,  6,  1,  0,  0 /), &
   (/6,nvl_orog/) )
 
 ! Tracciato dei files grib_api_csv. In caso di modifica, aggiornare:
@@ -147,7 +148,7 @@ CHARACTER (LEN=25), PARAMETER, PRIVATE :: chf_gacsv(nf_gacsv) = (/ &
   "level1                   ", &
   "l1                       ", &
   "l2                       ", &
-  "centre                   ", &
+  "discipline               ", &
   "category                 ", &
   "number                   ", &
   "npoint                   ", &
@@ -171,7 +172,7 @@ CHARACTER (LEN=25), PARAMETER, PRIVATE :: chf_lspts(nf_lspts) = (/ &
 INTEGER, PARAMETER ::  nf_lscol = 12
 CHARACTER (LEN=25), PARAMETER, PRIVATE :: chf_lscol(nf_lscol) = (/ &
 !  1234567890123456789012345
-  "centre                   ", &
+  "discipline               ", &
   "category                 ", &
   "number                   ", &
   "cv2                      ", &
@@ -450,7 +451,7 @@ SUBROUTINE read_fisiog_gacsv(filefis,npt,req_lat,req_lon,libsim, &
 ! Legge da filefis i parametri non dipendenti dal tempo relativi ai punti 
 ! richiesti (alb, z0, zlay, zlevs, orog).
 ! Filefis puo' non essere presente, oppure contenere solo alcuni parametri.
-! Il tracciato e' lo stesso dei dati (gacsv) + header; i campi reletivi a 
+! Il tracciato e' lo stesso dei dati (gacsv) + header; i campi relativi a 
 ! reftime e timerange vengono ignorati.
 ! Viene construito passando vg6d_getopint sui grib statici relativi al 
 ! dataset da cui sto estraendo.
@@ -530,7 +531,6 @@ input: DO cnt = 1,HUGE(0)
 ! 2.3 Se ho letto i dati di un punto richiesto, cerco a quale parametro 
 !     corrisponde e ne salvo il valore
   IF (pts_map(record%np) < 0) CYCLE
-
 ! Orografia
   DO k = 1, nvl_orog
     IF (ALL(record%varliv(2:4) == varliv_orog(2:4,k))) THEN
@@ -557,18 +557,28 @@ input: DO cnt = 1,HUGE(0)
 
 ! Model layers e model levels COSMO (la quota dei livelli Chimere e' 
 ! variabile, e non puo' essere scritta nell'intestazione dei files seriet)
-  IF (libsim .AND. ALL(record%varliv(2:4) == (/2,8,105/))) THEN
+  IF (ALL(record%varliv(1:4) == (/255,2,8,105/))) THEN
+    IF (libsim) THEN
+      IF (c_e(record%varliv(6))) THEN
+        zlay(pts_map(record%np),record%varliv(5)) = record%value
+      ELSE
+        zlev(pts_map(record%np),record%varliv(5)) = record%value
+      ENDIF
+    ELSE
+      IF (ALL(record%varliv(2:4) == (/2,8,110/))) THEN
+        zlay(pts_map(record%np),record%varliv(5)) = record%value
+      ELSE IF (ALL(record%varliv(2:4) == (/2,8,109/))) THEN
+        zlev(pts_map(record%np),record%varliv(5)) = record%value
+      ENDIF
+    ENDIF
+
+  ELSE IF (ALL(record%varliv(1:4) == (/0,3,6,150/))) THEN
     IF (c_e(record%varliv(6))) THEN
       zlay(pts_map(record%np),record%varliv(5)) = record%value
     ELSE
       zlev(pts_map(record%np),record%varliv(5)) = record%value
     ENDIF
-  ELSE IF (.NOT. libsim) THEN
-    IF (ALL(record%varliv(2:4) == (/2,8,110/))) THEN
-      zlay(pts_map(record%np),record%varliv(5)) = record%value
-    ELSE IF (ALL(record%varliv(2:4) == (/2,8,109/))) THEN
-      zlev(pts_map(record%np),record%varliv(5)) = record%value
-    ENDIF
+
   ENDIF
 
 ENDDO input
@@ -832,6 +842,127 @@ IF (verbose) WRITE (*,'(a,i3,2a)') "(var2spec) Parametro",var(3), &
 RETURN
 
 END SUBROUTINE var2spec
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+SUBROUTINE var2spec2(var,ndec,vmin,vmax,str,cp2,ier)
+!--------------------------------------------------------------------------
+! Data la codifica GRIB2 di una variabile (disc,cat,num), cerca nel file
+! tabella_grib2_ser.txt una serie di informazioni:
+! - n.ro di decimali piu' appropriato per rappresentarla (-1 = notazione
+!   esponenziale)
+! - valori minimo e massimo accettabili
+! - stringa identificativa della variabile
+! - codice del tipo di varibile (comp2), che vale:
+!     se e' comp.U del vento = codice dellacomp.V
+!     se e' comp.V del vento = 500 + codice della comp.U
+!     se e' temperatura      = -1
+!     se e' Monin-Obukov     = -2
+!     se e' SW Budget        = -3
+!     se e' cloud cover      = -4
+!     se e' flusso di calore = -5
+!     se e' specie chimica   = -6
+!     negli altri casi       =  0
+!
+! Note:
+! - cerca la tabella_xxx_ser.txt in $MA_UTILS_DAT (se asseganto), o in 
+!   /usr/share/ma_utils; se non la trova, usa valori di defualt.
+! - Codici d'errore (se /= 0 la subroutine ritorna dei valori di dafault):
+!   0 = tutto ok
+!   -1 = parametro non presente in tabella
+!   -2 = file tabella_xxx_ser.txt non trovato
+!   -3 = errore lettura dal file tabella_xxx_ser.txt 
+!--------------------------------------------------------------------------
+USE file_utilities
+IMPLICIT NONE
+
+! Argomenti della subroutine
+INTEGER, INTENT(IN) :: var(3)
+REAL, INTENT(OUT) :: vmin,vmax
+INTEGER, INTENT(OUT) :: ndec,cp2,ier
+CHARACTER (*), INTENT(OUT) :: str
+
+! Path di default delle tabelle seriet
+! PKGDATAROOTDIR viene sostituito in fase di compilazione con il path delle
+! tabelle seriet (di solito /usr/share/ma_utils). La sostituzione sfrutta 
+! il comando gfortran -D; vedi Makefile.am nelle singole dir.
+CHARACTER (LEN=40) :: tab_path_def = PKGDATAROOTDIR
+CHARACTER (LEN=40) :: tab_env = "MA_UTILS_DAT"
+
+! Variabili locali
+REAL :: vmin_t,vmax_t
+INTEGER :: ndec_t,cp2_t,dis,cat,num
+INTEGER :: ios,ios2,iu,k
+CHARACTER (LEN=200) :: tab_file,tab_path
+CHARACTER (LEN=80) :: ch80
+CHARACTER (LEN=8) :: ch8
+CHARACTER (LEN=3) :: ch3
+LOGICAL :: verbose
+
+!--------------------------------------------------------------------------
+
+! Assegno valori di default
+verbose = .TRUE.
+ndec = -1
+vmin = -HUGE(0.)
+vmax = HUGE(0.)
+WRITE (str,'(i3.3,a1,i3.3)') var(2),"_",var(3)
+cp2 = 0
+
+! Apro la tabella richiesta
+tab_path = ""
+CALL GETENV(tab_env,tab_path)
+IF (TRIM(tab_path) == "") tab_path = tab_path_def
+WRITE (tab_file,'(2a)') TRIM(tab_path),"/tabella_grib2_ser.txt"
+iu = getunit()
+OPEN (UNIT=iu, FILE=tab_file, STATUS="OLD", ACTION="READ", IOSTAT=ios)
+IF (ios /= 0) THEN
+  IF (verbose) WRITE (*,*) "(var2spec2) Tabella seriet grib2 non trovata: ",TRIM(tab_file)
+  ier = -2
+  RETURN
+ENDIF
+
+! Cerco il parametro richiesto
+DO k = 1,HUGE(0)
+  READ (iu,'(a)',IOSTAT=ios) ch80  
+  IF (ios /= 0) EXIT
+  IF (TRIM(ch80) == "" .OR. ch80(1:1) == "!") CYCLE
+
+  READ (ch80,'(3(1x,i3),2x,a8,2x,a3,2(2x,f10.2),2x,i3)',IOSTAT=ios) &
+    dis,cat,num,ch8,ch3,vmin_t,vmax_t,cp2_t
+
+  IF (ch3 == "exp") THEN
+    ndec_t = -1
+  ELSE
+    READ (ch3,*,IOSTAT=ios2) ndec_t
+  ENDIF
+
+  IF (ios /= 0 .OR. ios2 /= 0) THEN
+    IF (verbose) WRITE (*,'(4a,i3)') "(var2spec2) ", &
+      "Errore di lettura tabella seriet: ",TRIM(tab_file)," riga ",k
+    ier = -3
+    RETURN
+  ENDIF
+  
+  IF (dis /= var(1) .OR. cat /= var(2) .OR. num /= var(3)) CYCLE
+
+  str = ch8
+  ndec = ndec_t
+  vmin = vmin_t
+  vmax = vmax_t
+  cp2 = cp2_t
+  ier = 0
+  CLOSE (iu)
+  RETURN
+
+ENDDO
+
+ier = -1
+IF (verbose) WRITE (*,'(a,i3,2a)') "(var2spec2) Parametro",var(3), &
+  " non trovato in ",TRIM(tab_file)
+RETURN
+
+END SUBROUTINE var2spec2
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 

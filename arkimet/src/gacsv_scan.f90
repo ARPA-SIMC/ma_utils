@@ -302,9 +302,12 @@ IF (out_col) THEN
   DO kvl = 1,nvl
 
 !   leggo dalle tabelle i parametri aggiuntivi per seriet.
-    CALL var2spec(varliv(1:3,kvl),ndec,vmin,vmax,str_var,cp2,iret)
+    IF (varliv(1,kvl) == 255) THEN    ! La chiave grib "discipline" e' missing -> GRIB1
+      CALL var2spec(varliv(1:3,kvl),ndec,vmin,vmax,str_var,cp2,iret)
+    ELSE                          ! GRIB2
+      CALL var2spec2(varliv(1:3,kvl),ndec,vmin,vmax,str_var,cp2,iret)
+    ENDIF
     IF (iret /= 0) ndef = ndef + 1
-    
 
     CALL init(colcsv)
     CALL csv_record_addfield(colcsv,varliv(1,kvl))    

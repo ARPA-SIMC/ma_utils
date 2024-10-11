@@ -86,7 +86,7 @@ datafilelist = \
  $(top_srcdir)/data/nita5kutm_orog.idx \
  $(top_srcdir)/data/param_arkioss.csv \
  $(top_srcdir)/data/param_shortnames.csv \
- $(top_srcdir)/data/shape_emr.dat \
+ $(top_srcdir)/data/shape_premr.dat \
  $(top_srcdir)/data/shape_eur.dat \
  $(top_srcdir)/data/shape_regit.dat \
  $(top_srcdir)/data/shape_regitrot1.dat \

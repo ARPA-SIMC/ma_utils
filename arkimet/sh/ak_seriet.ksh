@@ -638,7 +638,7 @@ fi
 cat <<EOF2 >> xargs.ksh
 $profiler $getpoint --output-td=0 --coord-file=${prog}_anag.v7d \
   --trans-type=inter --sub-type=near --coord-format=native --output-format=grib_api_csv $getpoint_opt \
-  --output-keys=gacsv:simpledate,gacsv:p1h,gacsv:p2h,gacsv:timerange,gacsv:level1,gacsv:l1,gacsv:l2,gacsv:centre,gacsv:category,gacsv:number,gacsv:npoint,gacsv:lon,gacsv:lat,gacsv:value,editionNumber \
+  --output-keys=gacsv:simpledate,gacsv:p1h,gacsv:p2h,gacsv:timerange,gacsv:level1,gacsv:l1,gacsv:l2,gacsv:discipline,gacsv:category,gacsv:number,gacsv:npoint,gacsv:lon,gacsv:lat,gacsv:value,editionNumber \
   tmp3.grb tmp.gacsv
 cat tmp.gacsv >> \$1
 EOF2
@@ -845,7 +845,7 @@ echo "ak_seriet: converto in formato seriet   "`date "+%Y%m%d %H:%M:%S"`
 if [ $fis = "Y" ] ; then
   $getpoint --coord-file=${prog}_anag.v7d --coord-format=native \
   --trans-type=inter --sub-type=near  --output-format=grib_api_csv \
-  --output-keys=gacsv:simpledate,gacsv:p1h,gacsv:p2h,gacsv:timerange,gacsv:level1,gacsv:l1,gacsv:l2,gacsv:centre,gacsv:category,gacsv:number,gacsv:npoint,gacsv:lon,gacsv:lat,gacsv:value,editionNumber \
+  --output-keys=gacsv:simpledate,gacsv:p1h,gacsv:p2h,gacsv:timerange,gacsv:level1,gacsv:l1,gacsv:l2,gacsv:discipline,gacsv:category,gacsv:number,gacsv:npoint,gacsv:lon,gacsv:lat,gacsv:value,editionNumber \
   $filefis ${prog}.fisiog.gacsv
   seriet_opt=${seriet_opt}" -f ${prog}.fisiog.gacsv"
 fi
@@ -936,7 +936,7 @@ fi
 # 2.4.4 Cancello la dir. di lavoro dell'estrazione
 if [ $debug = "N" ] ; then
   echo "Cancello dir di lavoro "${AK_TEMP}/akq.${qid}
-  rm -fR ${AK_TEMP}/akq.${qid}
+#  rm -fR ${AK_TEMP}/akq.${qid}
   if [ $mon = "Y" ] ; then
     echo "Cancello "$filemon
     rm $filemon

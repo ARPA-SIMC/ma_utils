@@ -1,0 +1,56 @@
+!--------------------------------------------------------------------------
+! Sigla identificativa e altri parametri richiesti da trasp_seriet relativi
+! ai parametri GRIB2
+!
+! Contenuto dei campi
+! Dis:     discipline
+! Cat:     category
+! Num:     parameter number
+! Sigla:   identificativo del parametro nell'output seriet
+! dec:     numero di decimali nell'output seriet
+! val.min: valore minimo accettabile
+! val.max: valore massimo accettabile
+! cp2:     Num della 2a componente (se vento U); 
+!          500 + Num del1a 1a componente (se vento V);
+!          -1 (se temperatura); -2 (se lugh.MO); -3 (se sw budget); 
+!          -4 (se cloud cover); -5 (se flussi di calore); 
+!          -6 (se specie chimiche); 0 (altri casi)
+!
+!                                          Ultimo aggiornamento: 09/10/2024
+!--------------------------------------------------------------------------
+!123-123-123--12345678--123--1234567890--1234567890--123
+!Dis Cat Num  Sigla     dec     val.min     val.max  cp2
+   0   0   0  Temp        1      193.16      323.16   -1
+   0   0   6  td          1      173.16      323.16    0
+   0   0  10  LHF         1    -1000.00     1000.00   -5
+   0   0  11  SHF         1    -1000.00     1000.00   -5
+   0   1   0  q         exp        0.00        1.00    0
+   0   1  22  qc        exp        0.00        0.10    0   
+   0   1  24  qr        exp        0.00        0.10    0   
+   0   1  25  qs        exp        0.00        0.10    0   
+   0   1  32  qg        exp        0.00        0.10    0   
+   0   1  82  qi        exp        0.00        0.10    0   
+   0   1  52  tp          2        0.00     1000.00    0
+   0   1  56  gspsno      2        0.00     1000.00    0
+   0   1  75  gspgra      2        0.00     1000.00    0
+   0   1  77  gsprai      2        0.00     1000.00    0
+   0   2   2  U-wind      1      -60.00       70.00    3
+   0   2   3  V-wind      1      -60.00       50.00  502
+   0   2   9  W-wind      4       -5.00        5.00    0
+   0   2  17  umfl        4    -9999.99    99999.99    0
+   0   2  18  vmfl        4    -9999.99    99999.99    0
+   0   2  22  vmax        2    -9999.99    99999.99    0   
+   0   3   0  pr          0       10.00   105000.00    0
+   0   3   1  msl         0      950.00   105000.00    0
+   0   3   4  z           4    -9999.99    99999.99    0
+   0   4   9  SW_Budg     1        0.00     1300.00   -3
+   0   4 198  radir       1        0.00     1300.00    0
+   0   4 199  radiff      1        0.00     1300.00    0
+   0   5   5  LW_Budg     1    -1000.00     1000.00    0
+   0   6   1  tcc         0        0.00      100.00   -4
+   0   6  22  clay        0        0.00      100.00   -4
+   0  19   1  alb         4        0.00      100.00    0
+   2   0   1  z0          4        0.00       50.00    0
+   2   3  18  tg          4      243.16      323.16    0
+   2   3  20  wg          4        0.00    99999.99    0
+!123-123-123--12345678--123--1234567890--1234567890--123

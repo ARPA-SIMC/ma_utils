@@ -35,9 +35,17 @@ cosmo_2I_ruc_arc,cos2i,rot2,y,y,1,n,cosmo
 cosmo_2I_assim,cos2i,rot2,y,n,1,n,kenda
 cosmo_2I_assim_arc,cos2i,rot2,y,n,1,n,kenda
 
-# Previsioni ICON operative 2 km
-icon_2I,icon2i,geo,n,n,2,n,icon_2I
-icon_2I_arc,icon2i,geo,n,n,2,n,icon_2I
+# Previsioni Icon-2I
+icon_2I,i2all2km,geo,y,n,2,n,icon_2I
+icon_2I_arc,i2all2km,geo,y,n,2,n,icon_2I
+icon_2I_assim,i2all2km,geo,y,n,2,n,iama5
+icon_2I_fcast,i2all2km,geo,y,n,2,n,iama5
+icon_2I_assim_ita2km,i2ita2km,geo,y,n,2,n,iama5
+icon_2I_fcast_ita2km,i2ita2km,geo,y,n,2,n,iama5
+
+# Analisi Icon-2I
+iama5,i2ita2km,geo,y,n,2,n,iama5
+iama2,i2Nita2km,geo,y,n,2,n,iama5
 
 # Previsioni Cosmo: vecchie catene
 lm7tmpc,lmsmr4,rot1,cosmo,n,y,1,n,cosmo.vol
