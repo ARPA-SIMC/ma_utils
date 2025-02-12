@@ -8,7 +8,7 @@ MODULE grib2_utilities
 ! get_grib_time
 ! check_consistency
 !
-!                                         Versione 1.6.0, Enrico 01/02/2022
+!                                         Versione 1.7.0, Enrico 09/12/2024
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -26,8 +26,8 @@ SUBROUTINE get_grib1_header(gaid,reftime,par,lev,scad,iret)
 ! Dato il puntatore a un grib1 o grib2, ritorna alcune informazioni 
 ! contenute dell'header, nello stile "GRIB1"
 ! 1) reftime: reference time
-! 2) par: centre, table, parameter
-! 3) lev: level_type, level1, level2
+! 2) par: centre,table,parameter (grib1); discipline,category,number (grib2)
+! 3) lev: level_type,level1,level2
 ! 4) scad: unit, p1, p2, timerange
 !
 ! Note:
@@ -48,7 +48,7 @@ INTEGER, INTENT(OUT), OPTIONAL :: par(3),lev(3),scad(4),iret
 REAL :: voffs,vosfs
 INTEGER :: en,ier,yy,mon,dd,hh,min
 INTEGER :: toffs,svoffs,sfoffs,tosfs,sfosfs,svosfs,pc,pn,ct
-INTEGER :: sortt,topd,pdtn,ft,iouotr,toti,tosp,iouftr,lotr
+INTEGER :: sortt,topd,pdtn,ft,iouotr,iouotr_g1,toti,tosp,lotr
 
 !--------------------------------------------------------------------------
 
@@ -235,12 +235,20 @@ ENDIF
 
 !--------------------------------------------------------------------------
 ! 4) Timerange
+!
 ! 03/12/2019: tolti i controlli su togp (code table 4.3)
 ! In base alla definizione WMO ("describe the type of process that a
 ! generated the data") e in analogia con le chiavi contigue nel template 4.0
 ! (backgroundProcess e generatingProcessIdentifier), sembra che togp non si
 ! riferisca al timerange, ma sia piuttosto un identificativo del modello. 
 ! Libsim dovrebbe copiarla dal template senza modifiche.
+!
+! 16/01/2025: tolti i controlli su "unit of timerange"
+! grib2: "indicatorOfUnitOftimerange" e "indicatorOfUnitFortimerange" usano
+!   la stessa table 4.4 (e la seconda chiave potrebbe essere obsoleta)
+! grib1: "unitOfTimeRange" usa la tabella 4
+! Le due tabelle sono moolto simili: l'unica differenza rilevante sono i
+! secondi, che sono 13 nel grib2 e 254 nel grib1
 
 IF (PRESENT(scad)) THEN
   scad(:) = imiss
@@ -257,20 +265,21 @@ IF (PRESENT(scad)) THEN
 !   CALL grib_get(gaid,"typeOfGeneratingProcess",togp)
     CALL grib_get(gaid,"forecastTime",ft)
     CALL grib_get(gaid,"indicatorOfUnitOfTimeRange",iouotr)
-    IF (pdtn == 8) THEN
+    IF (pdtn == 8 .OR. pdtn == 11) THEN
       CALL grib_get(gaid,"typeOfTimeIncrement",toti)
       CALL grib_get(gaid,"typeOfStatisticalProcessing",tosp)
-      CALL grib_get(gaid,"indicatorOfUnitForTimeRange",iouftr)
+      CALL grib_get(gaid,"indicatorOfUnitForTimeRange",iouotr)
       CALL grib_get(gaid,"lengthOfTimeRange",lotr)
     ELSE
       toti = imiss
       tosp = imiss
-      iouftr = imiss
+      iouotr_g1 = imiss
       lotr = imiss
     ENDIF
-    IF (iouotr/=1 .OR. (pdtn==8 .AND. iouftr/=1)) THEN
-      WRITE (*,*) "Unit of timerange is not hour"
-      ier = 3
+    IF (iouotr == 13) THEN
+      iouotr_g1 = 254
+    ELSE
+      iouotr_g1 = iouotr
     ENDIF
 
 !   4.1 Scadenze istantanee
@@ -278,7 +287,7 @@ IF (PRESENT(scad)) THEN
         (topd==0 .OR. topd==2 .OR. topd==3 .OR. topd==4 .OR. topd==5) .AND. &
         (pdtn==0 .OR. pdtn==1 .OR. pdtn==40) .AND. &
         ft==0) THEN                                ! Analisi (togp = 0?)
-      scad(1) = iouotr
+      scad(1) = iouotr_g1
       scad(2) = 0  
       scad(3) = 0
       scad(4) = 0
@@ -286,7 +295,7 @@ IF (PRESENT(scad)) THEN
         (topd==1 .OR. topd==2 .OR. topd==3 .OR. topd==4 .OR. topd==5) .AND. &
         (pdtn==0 .OR. pdtn==1 .OR. pdtn==40) .AND. &
         ft==0) THEN                                ! Previsione +0 (togp = 2?)
-      scad(1) = iouotr
+      scad(1) = iouotr_g1
       scad(2) = 0
       scad(3) = 0
       scad(4) = 0
@@ -294,14 +303,14 @@ IF (PRESENT(scad)) THEN
         (topd==1 .OR. topd==2 .OR. topd==3 .OR. topd==4 .OR. topd==5) .AND. &
         (pdtn==0 .OR. pdtn==1 .OR. pdtn==40) .AND. &
         ft/=0) THEN                                ! Previsione (togp = 2?)
-      scad(1) = iouotr
+      scad(1) = iouotr_g1
       scad(2) = ft  
       scad(3) = 0
       scad(4) = 0
 
-!   4.2 Analisi non istantanee (togp = 0?)
-    ELSE IF (sortt==0 .AND. topd==0 .AND. pdtn==8 .AND. ft==0 .AND. toti==1) THEN
-      scad(1) = iouotr
+!   4.2 Analisi non istantanee (togp = 0?): reftime = inizio dell'intervallo di elaborazione
+    ELSE IF (sortt==0 .AND. topd==0 .AND. (pdtn==8 .OR. pdtn==11) .AND. ft==0 .AND. toti==1) THEN
+      scad(1) = iouotr_g1
       scad(2) = 0
       scad(3) = lotr
 
@@ -318,14 +327,14 @@ IF (PRESENT(scad)) THEN
 !   Patch: il dataset rad-pluv_naz e' scritto con sortt=1 (start of forecast), anche se sono osservazioni
 !   La chiave topd=2 (analysis and forecast) e' corretta, ma non usata altrove
     ELSE IF (sortt==1 .AND. topd==2 .AND. pdtn==8 .AND. ft==0 .AND. toti==1 .AND. tosp==1) THEN
-      scad(1) = iouotr
+      scad(1) = iouotr_g1
       scad(2) = 0
       scad(3) = lotr
       scad(4) = 15      ! cumulata, reftime = inizio intervallo di elaborazione
 
 !   4.3 Prevsioni non istantanee (togp = 2?)
-    ELSE IF (sortt==1 .AND. topd==1 .AND. pdtn==8 .AND. toti==2) THEN
-      scad(1) = iouotr
+    ELSE IF (sortt==1 .AND. (topd==1 .OR. topd==4 .OR. topd==5) .AND. (pdtn==8 .OR. pdtn==11) .AND. toti==2) THEN
+      scad(1) = iouotr_g1
       scad(2) = ft 
       scad(3) = ft + lotr
 
@@ -359,7 +368,7 @@ SUBROUTINE calc_grib2_trange(scad,lforc,sortt,topd,pdtn,togp,ft,tosp, &
   toti,lotr,ier)
 
 !--------------------------------------------------------------------------
-! Dato un timerange GRIB1, calcola le chiavi GRIB2  corrispondenti
+! Dato un timerange GRIB1, calcola le chiavi GRIB2 corrispondenti
 ! Se lforc=.T., scrive i campi relativi ad analisi (istantanee o elaborate) 
 !   come forecast +0
 !
@@ -470,12 +479,17 @@ END SUBROUTINE calc_grib2_trange
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-SUBROUTINE get_grib_time(gaid,rtime,vtime,iret)
+SUBROUTINE get_grib_time(gaid,rtime,vtime,vtime1,vtime2,iret)
 !--------------------------------------------------------------------------
 ! Dato il puntatore a un grib1 o grib2, ne ritorna reference time e 
 ! verification time.
+! Se il grib si riferisce a un dato istantaneo, vtime = vtime1 = vtime2
+! Se il grib si riferisce a un dato non istantaneo,
+! vtime1 = inizio intervallo, vtime = vtime2 = fine intervallo.   
 !
 ! Note:
+! - Il parametro vtime e' superfluo, viene mantenuto per comodita' e
+!   compatibilita'
 ! - Al momento la gestione dei GRIB2 e' incompleta, e dipende dalla subr.
 ! get_grib1_header. 
 ! - Questa subr. potrebbe essere inglobata in get_grib1_header: per ora la
@@ -493,18 +507,18 @@ IMPLICIT NONE
 
 ! Argomenti della subroutine
 INTEGER, INTENT(IN) :: gaid
-TYPE(datetime), INTENT(OUT), OPTIONAL :: rtime,vtime
+TYPE(datetime), INTENT(OUT), OPTIONAL :: rtime,vtime,vtime1,vtime2
 INTEGER, INTENT(OUT), OPTIONAL :: iret
 
 ! Variabili locali
 INTEGER :: scad(4),rdate(4),ier
 !INTEGER :: dd,dt,dda
-TYPE(datetime) :: rtime_work,vtime_work
+TYPE(datetime) :: rtime_work,vtime1_work,vtime2_work
 
 !--------------------------------------------------------------------------
 
 ! 1) Trovo reference time
-IF (PRESENT(rtime) .OR. PRESENT(vtime)) THEN
+IF (PRESENT(rtime) .OR. PRESENT(vtime) .OR. PRESENT(vtime1) .OR. PRESENT(vtime2)) THEN
   CALL grib_get(gaid,"year",rdate(1))
   CALL grib_get(gaid,"month",rdate(2))                             
   CALL grib_get(gaid,"day",rdate(3))                               
@@ -520,39 +534,49 @@ IF (PRESENT(rtime) .OR. PRESENT(vtime)) THEN
 ENDIF
 
 ! 2) Trovo verification time
-IF (PRESENT(vtime)) THEN
+IF (PRESENT(vtime) .OR. PRESENT(vtime1) .OR. PRESENT(vtime2)) THEN
   ier = 0
   CALL get_grib1_header(gaid, SCAD=scad, IRET=ier)
 
   IF (ier /= 0) THEN
-    IF (PRESENT(iret)) iret = 1
-    vtime_work = datetime_miss
+    WRITE (*,*) "Errore get_grib1_header, ier ",ier 
+    IF (PRESENT(iret)) iret = ier
+    vtime1_work = datetime_miss
+    vtime2_work = datetime_miss
 
   ELSE
     SELECT CASE (scad(4))
-    CASE(0)
-      vtime_work = rtime_work + timedelta_new(hour=scad(2))
+    CASE(0)                   ! istantaneo
+      vtime1_work = rtime_work + timedelta_new(hour=scad(2))
+      vtime2_work = vtime1_work
+      
+    CASE(1)                   ! analisi inizializzata
+      vtime1_work = rtime_work
+      vtime2_work = vtime1_work
 
-    CASE(1)
-      vtime_work = rtime_work
+    CASE(2,3,4,6,7,14,15,16,17) ! elaborato; se analisi, reftime = inizio intervallo
+      vtime1_work = rtime_work + timedelta_new(hour=scad(2))
+      vtime2_work = rtime_work + timedelta_new(hour=scad(3))
 
-    CASE(2,3,4,5,14,15)
-      vtime_work = rtime_work + timedelta_new(hour=scad(3))
+    CASE(13)                  ! elaborato, reftime = fine intervallo (analisi Cosmo, scad(2)=0)
+      vtime1_work = rtime_work - timedelta_new(hour=scad(3)-scad(2))
+      vtime2_work = rtime_work
 
-    CASE(13)
-      vtime_work = rtime_work
-
-    CASE DEFAULT
+    CASE DEFAULT              ! non gestito
+      WRITE (*,*) "[get_grib_time]: scad(4) non gestito ",scad(4)
       IF (PRESENT(iret)) iret = 2
-      vtime_work = datetime_miss
+      vtime1_work = datetime_miss
+      vtime2_work = datetime_miss
 
     END SELECT
   ENDIF
 ENDIF
 
 ! 3) Ritorno i parametri richiesti
-IF (PRESENT(vtime)) vtime = vtime_work
 IF (PRESENT(rtime)) rtime = rtime_work
+IF (PRESENT(vtime1)) vtime1 = vtime1_work
+IF (PRESENT(vtime2)) vtime2 = vtime2_work
+IF (PRESENT(vtime)) vtime = vtime2_work
 IF (PRESENT(iret)) iret = 0
 
 RETURN

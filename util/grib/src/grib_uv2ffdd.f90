@@ -1,191 +1,300 @@
 PROGRAM grib_uv2ffdd
 !--------------------------------------------------------------------------
-! Programma che legge un file con le componenti u e uno con le componenti
-! v, e ne scrive due con direzione e modulo.
-!
-! Note:
-! - Controlla che tutti i grib siano definiti sulla stessa area (sez.2)
-! - Controlla che ciascuna coppia di grib si riferisca alla stessa scadenza
-!   (sez 1)
-! - Le altre sezioni sono prese dall'utlimo grib del file
-!
-!                                         Versione 1.3.4, Enrico 27/11/2017
+! Legge due file grib con le componenti U e V del vento (campi
+! corrispondenti), scrive due files con i campi "direzione" e "modulo"
+! Programma derivato dalla vecchia versione gribex e da grib_rms_diff.f90
+!  
+!                                         Versione 1.0.0, Enrico 28/01/2025
 !--------------------------------------------------------------------------
-
+USE grib_api
+USE missing_values
+USE grib2_utilities
 IMPLICIT NONE
 
-! Parametri costanti
-REAL, PARAMETER :: rmis = -9999.           ! valore per dati mancanti
-!REAL, PARAMETER :: rmis = -HUGE(0.)       ! valore per dati mancanti
-INTEGER, PARAMETER :: maxdim = 500000      ! dimensione massima dei GRIB
+! 1.1 Variabili locali
+REAL, ALLOCATABLE :: valuesu(:),valuesv(:),valuesf(:),valuesd(:)
+INTEGER :: ifu,ifv,iff,ifd,igu=0,igv=0,igf=0,igd=0
+INTEGER :: idp,kp,iret,ier,ni,nj,np,ni_sav,nj_sav,np_sav,gnov,nom,nocv,k,kgu,nmiss
+INTEGER :: enu,du,pcu,pnu,env,dv,pcv,pnv,enout
+INTEGER :: clret(0:6),cllog(0:6)
+CHARACTER (LEN=250) :: fileu,filev,filef,filed,chdum,check_list
+CHARACTER(LEN=40) :: gtu
+LOGICAL :: cl_grid,cl_time,cl_vtime,cl_lev,cl_var,lverbose,lforce
 
-! Dichiarazioni per GRIBEX.
-INTEGER :: ksec0u(2),ksec1u(1024),ksec2u(1024),ksec3u(2),ksec4u(512)
-INTEGER :: ksec0v(2),ksec1v(1024),ksec2v(1024),ksec3v(2),ksec4v(512)
-INTEGER :: ksec0d(2),ksec1d(1024),ksec2d(1024),ksec3d(2),ksec4d(512)
-INTEGER :: ksec0f(2),ksec1f(1024),ksec2f(1024),ksec3f(2),ksec4f(512)
+! 1.2 Parametri da riga comando
+check_list = ""
+idp = 0
+DO kp = 1,HUGE(0)
+  CALL getarg(kp,chdum)
+  IF (TRIM(chdum) == "") THEN
+    EXIT
+  ELSE IF (TRIM(chdum) == "-h") THEN
+    CALL write_help
+    STOP 1
+  ELSE IF (chdum(1:7) == "-check=") THEN
+    check_list = chdum(8:)
+  ELSE 
+    idp = idp + 1
+    SELECT CASE (idp)
+    CASE (1)
+      fileu = chdum
+    CASE (2)
+      filev = chdum
+    CASE DEFAULT
+      CALL write_help
+      STOP 1
+    END SELECT
+  ENDIF
+ENDDO
+IF (idp < 2) THEN
+  CALL write_help
+  STOP 1
+ENDIF
 
-INTEGER :: kbuffer(maxdim), klen, kret
-REAL :: psec2u(512),psec3u(2),psec2v(512),psec3v(2)
-REAL :: psec2d(512),psec3d(2),psec2f(512),psec3f(2)
-REAL :: field_uu(maxdim),field_vv(maxdim)
-REAL :: field_ff(maxdim),field_dd(maxdim)
+! 1.3 Inizializzazioni
 
-! Altre variabili del programma
-REAL :: fave
-INTEGER :: ngrib,iuin1,iuin2,iuout1,iuout2,nok,np_sav,np,kk
-CHARACTER (LEN=200) :: filein1,filein2,fileout1,fileout2
+lverbose = .FALSE.
+lforce = .FALSE.
+filef = "ff.grib"
+filed = "dd.grib"
+
+CALL grib_open_file(ifu,fileu,"r",iret)
+IF (iret /= GRIB_SUCCESS) GOTO 9999
+CALL grib_open_file(ifv,filev,"r",iret)
+IF (iret /= GRIB_SUCCESS) GOTO 9998
+CALL grib_open_file(iff,filef,"w",iret)
+CALL grib_open_file(ifd,filed,"w",iret)
+
+IF (lforce) THEN
+  cllog(:) = 0
+  nmiss = 0
+ENDIF
 
 !--------------------------------------------------------------------------
-! 1) Preliminari
+! 2) Ciclo sui grib
 
-! 1.1 Parametri da riga comando
-CALL getarg(1,filein1)
-CALL getarg(2,filein2)
-CALL getarg(3,fileout1)
-CALL getarg(4,fileout2)
+DO kgu = 1,HUGE(0)
 
-IF (filein1 == "" .OR. filein2 == "" .OR. &
-    fileout1 == "" .OR. fileout2 == "" .OR. &
-    TRIM(filein1) == "-h") THEN
-  WRITE (*,*) "Uso: grib_uv2ffdd.exe [-h] file_uu file_vv file_dd file_ff" 
-  STOP
-ENDIF
+! 2.1) Leggo il prossimo GRIB da fileu e filev
+  CALL grib_new_from_file(ifu,igu,iret)
+  IF (iret == GRIB_END_OF_FILE) EXIT
+  IF (iret /= GRIB_SUCCESS) GOTO 9997
 
-! 1.2 Disabilito i controlli sui parametri GRIBEX
-CALL grsvck(0)
+  CALL grib_new_from_file(ifv,igv,iret)
+  IF (iret == GRIB_END_OF_FILE) EXIT
+  IF (iret /= GRIB_SUCCESS) GOTO 9996
 
-! 1.3 Apro i files
-CALL PBOPEN (iuin1,filein1,'R',kret)
-IF (kret /= 0) THEN 
-  WRITE(*,*) "Errore aprendo ",filein1," kret ",kret
-  STOP
-ENDIF
-
-CALL PBOPEN (iuin2,filein2,'R',kret)
-IF (kret /= 0) THEN 
-  WRITE(*,*) "Errore aprendo ",filein2," kret ",kret
-  STOP
-ENDIF
-
-CALL PBOPEN (iuout1,fileout1,'W',kret)
-CALL PBOPEN (iuout2,fileout2,'W',kret)
-
-OPEN (UNIT=96, FILE="grib_uv2ddff.log", STATUS="REPLACE", ACTION="WRITE")
-
-!--------------------------------------------------------------------------
-! 2) Lettura - Scrittura (ciclo sui grib)
-
-ngrib = 0
-
-grib: DO
-
-! 2.1) Leggo e decodifico il grib uu
-  CALL PBGRIB(iuin1,kbuffer,maxdim*4,klen,kret)
-  IF (kret.eq.-1) THEN 
-    EXIT grib
-  ELSE IF (kret < -1) THEN
-    WRITE(*,*) "Error pbgrib: kret ",kret
-    STOP
+! 2.2) Controlli di consistenza  
+  CALL check_consistency(igu,igv,cl_grid,cl_time,cl_vtime,cl_lev,cl_var, &
+    lverbose,clret,ier)
+  IF (.NOT. lforce .AND. ier /= 0) THEN
+    GOTO 9995
+  ELSE IF (lforce .AND. ier /= 0) THEN
+    nmiss = nmiss + 1
+    WHERE (clret(:) /= 0)
+      cllog(:) = cllog(:) + 1
+    ENDWHERE
   ENDIF
 
-  psec3u(2) = rmis                                   ! dati mancanti = rmis
-  CALL GRIBEX (ksec0u,ksec1u,ksec2u,psec2u,ksec3u,psec3u,ksec4u, &
-               field_uu,maxdim,kbuffer,maxdim,klen,'D',kret)
-  if (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-
-! 2.2) Leggo & decodifico il grib vv
-  CALL PBGRIB(iuin2,kbuffer,maxdim*4,klen,kret)
-  IF (kret.eq.-1) THEN 
-    WRITE(*,*) "Errore, il file vv continene meno grib del file uu"
-    STOP
-  ELSE IF (kret < -1) THEN
-    WRITE(*,*) "Error pbgrib: kret ",kret
-    STOP
-  ENDIF
-
-  psec3v(2) = rmis                                   ! dati mancanti = rmis
-  CALL GRIBEX (ksec0v,ksec1v,ksec2v,psec2v,ksec3v,psec3v,ksec4v, &
-               field_vv,maxdim,kbuffer,maxdim,klen,'D',kret)
-  if (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
-
-! 2.3) Controllo che uu e vv siano compatibili: deve essere diverso solo il
-!      codice parametro ksec1(6)
-
-  IF (ANY(ksec1v(:5) /= ksec1u(:5)) .OR. (ksec1v(6) == ksec1u(6)) .OR. &
-      ANY(ksec1v(7:24) /= ksec1u(7:24))) THEN
-    WRITE (*,*) "Dati incompatibili nella sez. 1, grib ",ngrib + 1
-    DO kk = 1,24
-      IF (ksec1v(kk) /= ksec1u(kk) .OR. kk == 6) THEN
-        WRITE (*,*) "file U, ksec1(",kk,") " ,ksec1u(kk)
-        WRITE (*,*) "file V, ksec1(",kk,") " ,ksec1v(kk)
-      ENDIF
-    ENDDO
-    STOP
-
-  ELSE IF (ANY(ksec2v(1:19) /= ksec2u(1:19))) THEN
-    WRITE (*,*) "Dati incompatibili nella sez. 2, grib ",ngrib + 1
-    DO kk = 1,19
-      IF (ksec2v(kk) /= ksec2u(kk)) THEN
-        WRITE (*,*) "file U, ksec2(",kk,") " ,ksec2u(kk)
-        WRITE (*,*) "file V, ksec2(",kk,") " ,ksec2v(kk)
-      ENDIF
-    ENDDO
-    STOP
-
-  ENDIF
-
-  ngrib = ngrib +1
-
-! 2.4) Calcolo i campi direzione e modulo e li scrivo
-  np = ksec4u(1)
-  CALL uv2dirint(field_uu(1:np),field_vv(1:np),field_dd(1:np), &
-    field_ff(1:np),np,rmis)
-
-! Scrivo dd
-  ksec1d(:) = ksec1u(:)
-  ksec1d(6) = 35
-  psec3d(2) = rmis                                   ! dati mancanti = rmis
-  CALL GRIBEX (ksec0d,ksec1d,ksec2u,psec2u,ksec3u,psec3d,ksec4u, &
-               field_dd,maxdim,kbuffer,maxdim,klen,'C',kret)
-  IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-  CALL PBWRITE (iuout1,kbuffer,ksec0d(1),kret)
-  
-! Log ff
-  nok = COUNT(field_ff(1:np) /= rmis)
-  IF (nok > 0) THEN
-    fave = SUM(field_ff(1:np), MASK = field_ff(1:np)/=rmis) / REAL(nok)
+! 2.3) Alloco gli array per i campi
+  CALL grib_get(igu,"gridType",gtu)
+  IF (gtu == "regular_ll" .OR. gtu == "rotated_ll") THEN
+    CALL grib_get(igu,"numberOfPointsAlongAParallel",ni)
+    CALL grib_get(igu,"numberOfPointsAlongAMeridian",nj)
+    np = ni*nj
+  ELSE IF (gtu == "unstructured_grid") THEN
+    CALL grib_get(igu,"numberOfDataPoints",np)
+    ni = imiss
+    nj = imiss
   ELSE
-    fave = rmis
+    CALL grib_get(igu,"Ni",ni)
+    CALL grib_get(igu,"Nj",nj)
+    np = ni*nj
   ENDIF
-  WRITE (96,'(a,i4,i6,f8.2)') "Scritti dd,ff ;prog, dati ok, ff media ", &
-    ngrib,nok,fave
 
-! Scrivo ff
-  ksec1f(:) = ksec1u(:)
-  ksec1f(6) = 36
-  psec3f(2) = rmis                                   ! dati mancanti = rmis
-  CALL GRIBEX (ksec0f,ksec1f,ksec2u,psec2u,ksec3u,psec3f,ksec4u, &
-               field_ff,maxdim,kbuffer,maxdim,klen,'C',kret)
-  IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-  CALL PBWRITE (iuout2,kbuffer,ksec0f(1),kret)
+  IF (kgu == 1) THEN
+    ALLOCATE (valuesu(np),valuesv(np),valuesf(np),valuesd(np))
+    ni_sav = ni
+    nj_sav = nj
+    np_sav = np
+  ELSE If (ni /= ni_sav .OR. nj /= nj_sav .OR. np /= np_sav) THEN
+    GOTO 9992
+  ENDIF
 
-  WRITE (*,*) "Scritti dd,ff ",ngrib
+! 2.4.1) Leggo il prossimo campo U
+  CALL grib_get(igu,"editionNumber",enu)         ! grib edition
+  IF (enu == 1) THEN
+    GOTO 9990
+  ELSE
+    CALL grib_get(igu,"discipline",du)
+    CALL grib_get(igu,"parameterCategory",pcu)
+    CALL grib_get(igu,"parameterNumber",pnu)
+    IF (du/=0 .OR. pcu/=2 .OR. pnu/=2) GOTO 9989
+  ENDIF  
 
-ENDDO grib
+  CALL grib_get(igu,"getNumberOfValues",gnov)    ! totale di punti nel grib
+  CALL grib_get(igu,"numberOfMissing",nom)       ! n.ro dati mancanti
+  CALL grib_get(igu,"numberOfCodedValues",nocv)  ! n.ro dati validi
+  IF (nocv == 0) THEN
+    valuesu(:) = rmiss
+  ELSE
+    CALL grib_set(igu,"missingValue",rmiss)
+    CALL grib_get(igu,"values",valuesu(:))
+  ENDIF
+  IF (nom + nocv /= gnov .OR. &
+    (nocv /= 0 .AND. nocv /= COUNT(valuesu(:) /= rmiss))) GOTO 9994
+
+! 2.4.2) Leggo il prossimo campo V
+  CALL grib_get(igv,"editionNumber",env)         ! grib edition
+  IF (env == 1) THEN
+    GOTO 9990
+  ELSE
+    CALL grib_get(igv,"discipline",dv)
+    CALL grib_get(igv,"parameterCategory",pcv)
+    CALL grib_get(igv,"parameterNumber",pnv)
+    IF (dv/=0 .OR. pcv/=2 .OR. pnv/=3) GOTO 9988
+ ENDIF
+
+  CALL grib_get(igv,"getNumberOfValues",gnov)    ! totale di punti nel grib
+  CALL grib_get(igv,"numberOfMissing",nom)       ! n.ro dati mancanti
+  CALL grib_get(igv,"numberOfCodedValues",nocv)  ! n.ro dati validi
+  IF (nocv == 0) THEN
+    valuesv(:) = rmiss
+  ELSE
+    CALL grib_set(igv,"missingValue",rmiss)
+    CALL grib_get(igv,"values",valuesv(:))
+  ENDIF
+  IF (nom + nocv /= gnov .OR. &
+    (nocv /= 0 .AND. nocv /= COUNT(valuesv(:) /= rmiss))) GOTO 9993
+
+  IF (enu /= env) THEN
+    GOTO 9987
+  ELSE
+    enout = enu
+  ENDIF
+  
+! 2.5) Calcolo FF e DD
+  CALL uv2dirint(valuesu(1:np),valuesv(1:np),valuesd(1:np), &
+    valuesf(1:np),np,rmiss)
+
+! 2.6.1) Scrivo output: direzione
+  CALL grib_clone(igu,igd)
+  IF (.NOT. ALL(c_e(valuesd(:)))) THEN
+    IF (enout == 1) THEN
+      CALL grib_set(igd,"bitmapPresent",1)
+    ELSE IF (enout == 2) THEN
+      CALL grib_set(igd,"bitMapIndicator",0)
+    ENDIF
+    CALL grib_set(igd,"missingValue",rmiss)
+  ENDIF
+  CALL grib_set(igd,"parameterNumber",0)
+  CALL grib_set(igd,"values",valuesd(:))
+  CALL grib_write (igd,ifd)
+  
+! 2.6.1) Scrivo output: velocita'
+  CALL grib_clone(igu,igf)
+  IF (.NOT. ALL(c_e(valuesf(:)))) THEN
+    IF (enout == 1) THEN
+      CALL grib_set(igf,"bitmapPresent",1)
+    ELSE IF (enout == 2) THEN
+      CALL grib_set(igf,"bitMapIndicator",0)
+    ENDIF
+    CALL grib_set(igf,"missingValue",rmiss)
+  ENDIF
+  CALL grib_set(igf,"parameterNumber",1)
+  CALL grib_set(igf,"values",valuesf(:))
+  CALL grib_write (igf,iff)
+
+! 2.7) Libero memoria
+  CALL grib_release(igu)
+  CALL grib_release(igv)
+  CALL grib_release(igf)
+  CALL grib_release(igd)
+ENDDO
 
 !--------------------------------------------------------------------------
-! 3) Conclusione
+! 3) Output
 
-CALL PBCLOSE (iuin1,kret)
-CALL PBCLOSE (iuin2,kret)
-CALL PBCLOSE (iuout1,kret)
-CALL PBCLOSE (iuout2,kret)
-CLOSE (96)
+! Log a schermo
+WRITE (*,*) "Elaborati ",kgu-1," campi"
+IF (lforce .AND. nmiss > 0) THEN
+  WRITE (*,*) "Campi inconsistenti messi mancanti: ",nmiss
+  DO k = 0,5
+    IF (cllog(k) > 0) WRITE (*,*) &
+      "Test ",cllab(k)," fallito ",cllog(k)," volte"
+  ENDDO
+ENDIF
+STOP
+
+!--------------------------------------------------------------------------
+
+9999 CONTINUE
+WRITE (*,*)  "File non trovato ",TRIM(fileu)
+STOP 2
+
+9998 CONTINUE
+WRITE (*,*)  "File non trovato ",TRIM(filev)
+STOP 2
+
+9997 CONTINUE
+WRITE (*,*)  "Errore leggendo ",TRIM(fileu)," campo ",kgu
+STOP 2
+
+9996 CONTINUE
+WRITE (*,*)  "Errore leggendo ",TRIM(filev)," campo ",kgu
+STOP 2
+
+9995 CONTINUE
+WRITE (*,*)  "Grib inconsistenti, campo ",kgu
+DO k = 0,5
+  IF (clret(k) == -1) WRITE (*,*) cllab(k),": test non eseguito"
+  IF (clret(k) == 0)  WRITE (*,*) cllab(k),": test superato"
+  IF (clret(k) == 1)  WRITE (*,*) cllab(k),": test non passato"
+ENDDO
+STOP 3
+
+9994 CONTINUE
+WRITE (*,*) "Errore nelle chiavi relative ai dati mancanti, file ",TRIM(fileu)
+WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov
+WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
+WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom
+WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(valuesu(:) /= rmiss)
+STOP 4
+
+9993 CONTINUE
+WRITE (*,*) "Errore nelle chiavi relative ai dati mancanti, file ",TRIM(filev)
+WRITE (*,*) "Dati totali (getNumberOfValues):   ",gnov
+WRITE (*,*) "Dati validi (numberOfCodedValues): ",nocv
+WRITE (*,*) "Dati mancanti (numberOfMissing):   ",nom
+WRITE (*,*) "Dati mancanti (matrice grib):      ",COUNT(valuesv(:) /= rmiss)
+STOP 4
+
+9992 CONTINUE
+WRITE (*,*) "Numero di punti diverso nel campo ",kgu," mi fermo"
+WRITE (*,*) "Trovati (ni,nj,np) ",ni,nj,np
+WRITE (*,*) "Attesi  (ni,nj,np) ",ni_sav,nj_sav,np_sav
+STOP 5
+
+9990 CONTINUE
+WRITE (*,*) "grib editon 1 not yet implemented ",kgu
+STOP 6
+
+9989 CONTINUE
+WRITE (*,*) "Not a U component ",kgu
+STOP 6
+
+9988 CONTINUE
+WRITE (*,*) "Not a V component ",kgu
+STOP 6
+
+9987 CONTINUE
+WRITE (*,*) "Differen edition number for U and V ",kgu
+STOP 6
 
 END PROGRAM grib_uv2ffdd
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
 SUBROUTINE uv2dirint(u,v,dd,ff,nval,rmis)
 !
 ! Dati i vettori di componenti u e v, ritona quelli di direzione e modulo
@@ -229,4 +338,102 @@ ENDDO
 
 RETURN
 END SUBROUTINE uv2dirint
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+SUBROUTINE parse_check_list(check_list,cl_grid,cl_time,cl_vtime,cl_lev, &
+  cl_var,ier)
+!
+! Interpreta la check-list da riga comando
+!
+IMPLICIT NONE
+
+CHARACTER (LEN=250), INTENT(IN) :: check_list
+LOGICAL, INTENT(OUT) :: cl_grid,cl_time,cl_vtime,cl_lev,cl_var
+INTEGER, INTENT(OUT) :: ier
+
+INTEGER :: p1,p2,pp
+LOGICAL :: lexit
+
+!--------------------------------------------------------------------------
+
+cl_grid  = .FALSE.
+cl_time  = .FALSE.
+cl_vtime = .FALSE.
+cl_lev   = .FALSE.
+cl_var   = .FALSE.
+
+ier = 0
+p1 = 0
+lexit = .FALSE.
+DO
+  pp = INDEX(check_list(p1+1:),",")
+  IF (pp == 0) THEN
+    p2 = LEN(TRIM(check_list(p1+1:))) + p1 + 1
+    lexit = .TRUE.
+  ELSE
+    p2 = pp + p1
+  ENDIF
+
+  SELECT CASE (check_list(p1+1:p2-1))
+  CASE("all")
+    cl_grid  = .TRUE.
+    cl_time  = .TRUE.
+    cl_lev   = .TRUE.
+    cl_var   = .TRUE.
+  CASE("grid")
+    cl_grid  = .TRUE.
+  CASE("vtime")
+    cl_vtime = .TRUE.
+  CASE("time")
+    cl_time  = .TRUE.
+  CASE("lev")
+    cl_lev   = .TRUE.
+  CASE("var")
+    cl_var   = .TRUE.
+  CASE("nil")
+    cl_grid  = .FALSE.
+    cl_vtime = .FALSE.
+    cl_time  = .FALSE.
+    cl_lev   = .FALSE.
+    cl_var   = .FALSE.
+  CASE DEFAULT
+    ier = 1
+    RETURN
+  END SELECT
+  p1 = p2
+
+  IF (lexit) EXIT
+ENDDO
+
+RETURN
+END SUBROUTINE parse_check_list
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+SUBROUTINE write_help
+! Scrive a schermo l'help del programma
+
+!            123456789012345678901234567890123456789012345678901234567890123456789012345
+WRITE (*,*) "Uso: grib_uv2ffdd.exe fileU fileV [-check=check_list]"
+WRITE (*,*) ""
+WRITE (*,*) "fileU,fileV : files da cui leggere i dati (contengono uno o piu' GRIB)"
+WRITE (*,*) "  scrive i files: dd.grib, ff.grib (con le chiavi come il primo campo di fileU)"
+WRITE (*,*) ""
+WRITE (*,*) "check_list  : definisce gli elementi che devono essere uguali in due grib"
+WRITE (*,*) "              corrispondenti di fileU e fileV. Possono essere specificate"
+WRITE (*,*) "              piu' chiavi, sperate da virgole."
+WRITE (*,*) "    [default] : grid,time,lev"
+WRITE (*,*) "    all       : grid,time,lev,var"
+WRITE (*,*) "    grid      : grigliato"
+WRITE (*,*) "    vtime     : verification time"
+WRITE (*,*) "    time      : reference time e timerange"
+WRITE (*,*) "    lev       : livello"
+WRITE (*,*) "    var       : parametro"
+WRITE (*,*) "    nil       : solo la forma della griglia (nx-ny, oppure np)"
+WRITE (*,*) ""
+RETURN
+END SUBROUTINE write_help
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 

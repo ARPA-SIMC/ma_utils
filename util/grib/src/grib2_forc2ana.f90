@@ -262,8 +262,10 @@ WRITE (*,*) "  [-isti]: analisi istantanee, con reftime=inizio intervallo di ela
 WRITE (*,*) "  [-istf]: analisi istantanee, con reftime=fine intervallo di elaborazione"
 WRITE (*,*) "  [-ftmp]: forza la chiave grib ""productDefinitionTemplateNumber"" a 0 (ist)"
 WRITE (*,*) "           oppure 8 (proc). Rende i dati di output piu' omogenei, ma in rari"
-WRITE (*,*) "           casi corrompe altre chbiavi dei grib (es. livelli delle nubi su"
+WRITE (*,*) "           casi corrompe altre chiavi dei grib (es. livelli delle nubi su"
 WRITE (*,*) "           strati, livelli nel suolo). Usare con cautela"
+WRITE (*,*)
+WRITE (*,*) "#####    VEDI ANCHE: grib_forc2ana.exe     #####"
 WRITE (*,*)
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 

@@ -59,7 +59,7 @@ DO kg = 1,HUGE(0)
   CALL grib_clone(igin,igout)
 
 ! Trovo verification time
-  CALL get_grib_time(igin,rtime_in,vtime_in,iret)
+  CALL get_grib_time(igin,RTIME=rtime_in,VTIME=vtime_in,IRET=iret)
   IF (iret /= 0) GOTO 9996
   dlt = vtime_in - rtime_out
   CALL getval(dlt, AHOUR=scad_out)

@@ -6,14 +6,14 @@ module chimere_params
   ! A - parameters that can be set-up by user's scripts
  
   ! A-0: Domain
-  character(len=*),parameter :: domain ='LMSMR4'
+  character(len=*),parameter :: domain ='LAMA5'
 
   ! A-1: Model geometry
   integer,parameter :: ivsurf    = 1 ! Emission sublayer (2) or not (1)
   integer,parameter :: nvert_raw = 8 ! Raw nb of vertical levels, before insert. of sublayer
-  integer,parameter :: nzonal    = 297 ! Number of zonal cells
-  integer,parameter :: nmerid    = 313 ! Number of meridional cells
-  integer,parameter :: nsho      = 46777 ! Cell for screen display (NSHO<=NHORIZ)
+  integer,parameter :: nzonal    = 200 ! Number of zonal cells
+  integer,parameter :: nmerid    = 263 ! Number of meridional cells
+  integer,parameter :: nsho      = 40285 ! Cell for screen display (NSHO<=NHORIZ) 11.64/44.66 SPC
   integer,parameter :: nivout    = 8 ! Number of vertical layers in output files
   integer,parameter :: nvexcha     = 1   ! Number of soil layer
   ! derived
@@ -62,8 +62,8 @@ module chimere_params
   integer,parameter :: nphour_ref  = 6 ! Number of physical steps per hour
   integer,parameter :: ichemstep   = 4 ! Number of chemical refined iterations
   
-  integer,parameter :: nzdoms    = 20 ! Number of MPI subdomains in zonal direction
-  integer,parameter :: nmdoms    = 20 ! Number of MPI subdomains in meridian direction
+  integer,parameter :: nzdoms    = 9 ! Number of MPI subdomains in zonal direction
+  integer,parameter :: nmdoms    = 5 ! Number of MPI subdomains in meridian direction
   integer,parameter :: nitgs     = 1 ! Number of Gauss-Seidel iters. for TWOSTEP
   integer,parameter :: nitgssu   = 1 ! Number of G-S iters. for TWOSTEP during spin-up
   integer,parameter :: ihoursu   = 1 ! Number of spin-up hours

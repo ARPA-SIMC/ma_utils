@@ -1,4 +1,4 @@
-PROGRAM grib2diagmetncdf
+PROGRAM  prepcosmomed
 !-------------------------------------------------------------------------------
 ! This program reads a LM-output file interpolated horizontally (GRIB), 
 ! extracts the variables required by CHIMERE, and generates a netCDF file,
@@ -10,11 +10,13 @@ PROGRAM grib2diagmetncdf
 ! - check the consitency of grid extremes and scanning mode in input files
 ! - read model grid from input file (instead of namelist)
 !
-!                                    Versione 3.0.1, Michele & Enrico 30/12/2014
+!                                    Versione 3.0.2, Michele & Enrico
+!                                    07/04/2017
+!differenza con grib2diagmetncdf.F90   fnout  che viene gestito, prepcosmomed.inp   e USE calendar !
+!modifiche Matteo per lettura psfc,cice,namelists..
 !-------------------------------------------------------------------------------
-
 USE netcdf
-USE calendar
+!USE calendar
 USE grib_api
 #ifdef IFORT
 USE ifport
@@ -72,7 +74,7 @@ INTEGER, PARAMETER :: nfilmax=50    ! Max number of input meteo files
 INTEGER :: ifn_alti,ifn_pres,ifn_zwin,ifn_mwin,ifn_mixr,ifn_temp
 INTEGER :: ifn_tem2,ifn_swrd,ifn_alb,ifn_cliq,ifn_cice,ifn_rain,ifn_clol
 INTEGER :: ifn_clom,ifn_cloh,ifn_u10m,ifn_v10m,ifn_usta,ifn_sshf,ifn_slhf
-INTEGER :: ifn_pblh,ifn_lspc,ifn_copc,ifn_soim
+INTEGER :: ifn_pblh,ifn_lspc,ifn_copc,ifn_soim,ifn_psfc
 INTEGER :: ifn_minf,ifn_coo
 
 !INTEGER :: ig_alti=0,ig_pres=0,ig_zwin=0,ig_mwin=0,ig_mixr=0,ig_temp=0
@@ -89,13 +91,13 @@ real, allocatable, dimension(:,:,:) :: alti,pres,temp,mixr,zwin,mwin,cliq,cice,r
 
 ! 2D input fields
 real, allocatable, dimension(:,:) :: clol,clom,cloh,pblh,u10m,v10m,usta,tem2,swrd, &
-  alb,sshf,slhf,lspc,copc,soim
+  alb,sshf,slhf,lspc,copc,soim,psfc
 
 ! Identifiers of vertical levels
 integer, allocatable, dimension(:,:) :: idlev
 
 ! Other variables
-INTEGER :: iret(24),kf,idum,n1,i1
+INTEGER :: iret(25),kf,idum,n1,i1   !!24
 
       real crhl,crhm,crhh
 
@@ -154,6 +156,7 @@ INTEGER :: iret(24),kf,idum,n1,i1
       character*132 fniLSPC  ! 2D Large-scale precipitation file
       character*132 fniCOPC  ! 2D Convective precipitation file
       character*132 fniSOIM  ! 2D Soil Moisture
+      character*132 fniPSURF ! 2D surface pressure 
 
       character*132 fnicoo   ! Coordinate of grid points
       character*132 fnimet   ! Namelist file
@@ -161,6 +164,7 @@ INTEGER :: iret(24),kf,idum,n1,i1
 
   ! Indexes to variables
   ! Order is not significant.
+
   !! CAUTION !!
   ! If you add variables, please insert them between IFIRST
   ! and ILAST.
@@ -191,6 +195,7 @@ INTEGER :: iret(24),kf,idum,n1,i1
   integer,parameter :: ISOIM  = __LINE__ -IFIRST
   integer,parameter :: ISWD   = __LINE__ -IFIRST
   integer,parameter :: IALB   = __LINE__ -IFIRST
+  integer,parameter :: ISURP  = __LINE__ -IFIRST !!!
   integer,parameter :: ILAST  = __LINE__ -IFIRST
 
   integer,parameter :: nvars= ILAST -1
@@ -254,8 +259,8 @@ INTEGER :: iret(24),kf,idum,n1,i1
   character(len=255) :: cwd
 
 ! File names
-fnout   = 'METEOINP.nc'
-fniMET  = 'grib2diagmetncdf.inp'
+!!!fnout   = 'METEOINP.nc'
+fniMET  = 'prepcosmomed.inp'
 
 fniU    = 'ZWIN_3D.grb'
 fniV    = 'MWIN_3D.grb'
@@ -268,7 +273,7 @@ fniA    = 'ALTI_3D.grb'
 fniP    = 'PRES_3D.grb'
 fniTEM2 = 'TEM2_2D.grb'
 fniSWRD = 'SWRD_2D.grb'
-fniALB  = 'ALB_2D.grb'
+fniALB  =  'ALB_2D.grb'
 fniSSHF = 'SSHF_2D.grb'
 fniSLHF = 'SLHF_2D.grb'
 fniU10M = 'U10M_2D.grb'
@@ -282,6 +287,7 @@ fniLSPC = 'TOPC_2D.grb'
 fniLSPC = 'TOPC_2D.grb'
 fniCOPC = 'COPC_2D.grb'
 fniSOIM = 'SOIM_2D.grb'
+fniPSURF = 'SURP_2D.grb' !!
 
 ! Meteorological variables names
 vname(1)   = 'ALTI_3D'
@@ -306,7 +312,7 @@ vname(19) = 'PBLH_2D'
 vname(20) = 'TOPC_2D'
 vname(21) = 'COPC_2D'
 vname(22) = 'SOIM_2D'
-
+vname(23) = 'SURP_2D'
 !*******************************************************************************
 
 ! Read namelist file (grib2diagmetncdf.inp)
@@ -326,8 +332,9 @@ read(ifn_minf,*)iopt_clom,crhm
 read(ifn_minf,*)iopt_cloh,crhh
 read(ifn_minf,*)iopt_soim
 read(ifn_minf,*)iopt_cloudw
+read(ifn_minf,'(a)')fnout
+fnout=trim(fnout)
 fnicoo=trim(fnicoo)
-domain=fnicoo
 
 ! Check which of the optional fields must be read
 iread_u10m = 0
@@ -344,24 +351,26 @@ iread_cliq= 0
 iread_copc = 0
 iread_lspc = 1
 
-if(iopt_u10m.eq.0) iread_u10m = 1
-if(iopt_usta.eq.0) iread_usta = 1
-if(iopt_flux.eq.0) iread_flux = 1
-if(iopt_pblh.eq.0) iread_pblh = 1
-if(iopt_cice.eq.0) iread_cice = 1
-if(iopt_rain.eq.0) iread_rain = 1
-if(iopt_soim.eq.0) iread_soim = 1
-if(iopt_clol.eq.0 .or. iopt_cloudw.eq.1) iread_clol = 1
-if(iopt_clom.eq.0 .or. iopt_cloudw.eq.1) iread_clom = 1
-if(iopt_cloh.eq.0 .or. iopt_cloudw.eq.1) iread_cloh = 1
-if(iopt_cloudw.eq.0) iread_cliq = 1
-if(iopt_cloudw.eq.1) iread_cliq = 0
+if(iopt_u10m.eq.1) iread_u10m = 1
+if(iopt_usta.eq.1) iread_usta = 1
+if(iopt_flux.eq.1) iread_flux = 1
+if(iopt_pblh.eq.1) iread_pblh = 1
+if(iopt_cice.eq.1) iread_cice = 1
+if(iopt_rain.eq.1) iread_rain = 1
+if(iopt_soim.eq.1) iread_soim = 1
+if(iopt_clol.eq.1 .or. iopt_cloudw.eq.2) iread_clol = 1
+if(iopt_clom.eq.1 .or. iopt_cloudw.eq.2) iread_clom = 1
+if(iopt_cloh.eq.1 .or. iopt_cloudw.eq.2) iread_cloh = 1
+if(iopt_cloudw.eq.1) iread_cliq = 1
+if(iopt_cloudw.eq.2) iread_cliq = 0
 ! if(iopt_cloudw.eq.0) iread_cliq = 1
 
 !  Open files for mandatory parameters
 iret(:) = 0
 CALL grib_open_file(ifn_alti,fniA,"r",iret(1))
+
 CALL grib_open_file(ifn_pres,fniP,"r",iret(2))
+
 CALL grib_open_file(ifn_zwin,fniU,"r",iret(3))
 CALL grib_open_file(ifn_mwin,fniV,"r",iret(4))
 CALL grib_open_file(ifn_mixr,fniQ,"r",iret(5))
@@ -369,23 +378,54 @@ CALL grib_open_file(ifn_temp,fniT,"r",iret(6))
 CALL grib_open_file(ifn_tem2,fniTEM2,"r",iret(7))
 CALL grib_open_file(ifn_alb,fniALB,"r",iret(8))
 CALL grib_open_file(ifn_swrd,fniSWRD,"r",iret(9))
-
+CALL grib_open_file(ifn_psfc,fniPSURF,"r",iret(10)) !!!
 !  Open files for optional parameters
-IF (iread_cliq == 1) CALL grib_open_file(ifn_cliq,fniL,"r",iret(10))
-IF (iread_cice == 1) CALL grib_open_file(ifn_cice,fniI,"r",iret(11))
-IF (iread_rain == 1) CALL grib_open_file(ifn_rain,fniR,"r",iret(12))
-IF (iread_clol == 1) CALL grib_open_file(ifn_clol,fniLOWC,"r",iret(13))
-IF (iread_clom == 1) CALL grib_open_file(ifn_clom,fniMEDC,"r",iret(14))
-IF (iread_cloh == 1) CALL grib_open_file(ifn_cloh,fniHIGC,"r",iret(15))
-IF (iread_u10m == 1) CALL grib_open_file(ifn_u10m,fniU10M,"r",iret(16))
-IF (iread_u10m == 1) CALL grib_open_file(ifn_v10m,fniV10M,"r",iret(17))
-IF (iread_usta == 1) CALL grib_open_file(ifn_usta,fniUSTA,"r",iret(18))
-IF (iread_flux == 1) CALL grib_open_file(ifn_sshf,fniSSHF,"r",iret(19))
-IF (iread_flux == 1) CALL grib_open_file(ifn_slhf,fniSLHF,"r",iret(20))
-IF (iread_pblh == 1) CALL grib_open_file(ifn_pblh,fniPBLH,"r",iret(21))
-IF (iread_lspc == 1) CALL grib_open_file(ifn_lspc,fniLSPC,"r",iret(22))
-IF (iread_copc == 1) CALL grib_open_file(ifn_copc,fniCOPC,"r",iret(23))
-IF (iread_soim == 1) CALL grib_open_file(ifn_soim,fniSOIM,"r",iret(24))
+IF (iread_cliq == 1)  then
+CALL grib_open_file(ifn_cliq,fniL,"r",iret(11))
+endif
+
+IF (iread_cice == 1) then
+CALL grib_open_file(ifn_cice,fniI,"r",iret(12))
+endif
+IF (iread_rain == 1) then
+CALL grib_open_file(ifn_rain,fniR,"r",iret(13))
+endif
+IF (iread_clol == 1) then
+CALL grib_open_file(ifn_clol,fniLOWC,"r",iret(14))
+endif
+IF (iread_clom == 1) then
+CALL grib_open_file(ifn_clom,fniMEDC,"r",iret(15))
+endif
+IF (iread_cloh == 1) then
+CALL grib_open_file(ifn_cloh,fniHIGC,"r",iret(16))
+endif
+IF (iread_u10m == 1) then
+CALL grib_open_file(ifn_u10m,fniU10M,"r",iret(17))
+endif
+IF (iread_u10m == 1)then
+ CALL grib_open_file(ifn_v10m,fniV10M,"r",iret(18))
+endif
+IF (iread_usta == 1) then
+CALL grib_open_file(ifn_usta,fniUSTA,"r",iret(19))
+endif
+IF (iread_flux == 1) then
+CALL grib_open_file(ifn_sshf,fniSSHF,"r",iret(20))
+endif
+IF (iread_flux == 1) then
+CALL grib_open_file(ifn_slhf,fniSLHF,"r",iret(21))
+endif
+IF (iread_pblh == 1) then
+CALL grib_open_file(ifn_pblh,fniPBLH,"r",iret(22))
+endif
+IF (iread_lspc == 1) then
+ CALL grib_open_file(ifn_lspc,fniLSPC,"r",iret(23))
+endif
+IF (iread_copc == 1) then
+CALL grib_open_file(ifn_copc,fniCOPC,"r",iret(24))
+endif
+IF (iread_soim == 1) then
+CALL grib_open_file(ifn_soim,fniSOIM,"r",iret(25))
+endif
 
 If (ANY(iret(:) /= 0)) GOTO 9999
 
@@ -416,7 +456,7 @@ meta(22)%iread=iread_soim
 ! calculate end date ide
 call reldat(ids,nhours,ide)
 
-
+write(6,*) 'crea netdf'
 ! Create netCDF out file
 ncstat=nf90_create(fnout,NF90_CLOBBER,ncid)
 NCERR(__LINE__)
@@ -447,7 +487,8 @@ ALLOCATE(clol(nzonal,nmerid),clom(nzonal,nmerid),cloh(nzonal,nmerid), &
          pblh(nzonal,nmerid),u10m(nzonal,nmerid),v10m(nzonal,nmerid), &
          usta(nzonal,nmerid),tem2(nzonal,nmerid),sshf(nzonal,nmerid), &
          slhf(nzonal,nmerid),lspc(nzonal,nmerid),copc(nzonal,nmerid), &
-         soim(nzonal,nmerid),swrd(nzonal,nmerid),alb(nzonal,nmerid))
+         soim(nzonal,nmerid),swrd(nzonal,nmerid),alb(nzonal,nmerid), &
+         psfc(nzonal,nmerid))
 
 ALLOCATE (idlev(10,nlev))
 
@@ -484,11 +525,13 @@ slot=1        ! MM5 time index
 !-------------------------------------------------------------------------------
 ! Main loop (input dates)
 
+
 DO n1 = 1,nhours+1
+     write(6,*) 'time ', n1
+
   CALL reldat(ids,n1-1,idnow)
   CALL ddate(idnow,iyear,imon,iday,ihour)
   id(1:nfilmax) = idnow
-
 ! Reading Mandatory data
   CALL grib_read_3d(ifn_alti,"ALTI_3D",nzonal,nmerid,nlev,&
     id(1),idlev(1,1:nlev),alti(:,:,:))
@@ -506,9 +549,9 @@ DO n1 = 1,nhours+1
   CALL grib_read_2d(ifn_tem2,"TEM2_2D",nzonal,nmerid,id(7),idum,tem2(:,:))
   CALL grib_read_2d(ifn_swrd,"SWRD_2D",nzonal,nmerid,id(23),idum,swrd(:,:))
   CALL grib_read_2d(ifn_alb,"ALB_2D",nzonal,nmerid,id(24),idum,alb(:,:))
-  
+  CALL grib_read_2d(ifn_psfc,"SURP_2D",nzonal,nmerid,id(25),idum,psfc(:,:)) !!
 ! Reading optional data
-  IF (iopt_cloudw==0) THEN
+  IF (iopt_cloudw==1) THEN
     CALL grib_read_3d(ifn_cliq,"CLIQ_3D",nzonal,nmerid,nlev, &
       id(8),idlev(8,1:nlev),cliq(:,:,:))
   ELSE 
@@ -517,7 +560,7 @@ DO n1 = 1,nhours+1
 
   IF (iread_cice==1) &
     CALL grib_read_3d(ifn_cice,"CICE_3D",nzonal,nmerid,nlev, &
-      id(9),idlev(9,1:nlev),cice(:,:,:))
+     id(9),idlev(9,1:nlev),cice(:,:,:))
   IF (iread_rain==1) &
     CALL grib_read_3d(ifn_rain,"RAIN_3D",nzonal,nmerid,nlev, &
       id(10),idlev(10,1:nlev),rain(:,:,:))
@@ -532,6 +575,7 @@ DO n1 = 1,nhours+1
     id(14),idum,u10m(:,:))
   IF (iread_u10m==1) CALL grib_read_2d(ifn_v10m,"V10M_2D",nzonal,nmerid, &
     id(15),idum,v10m(:,:))
+!
   IF (iread_usta==1) CALL grib_read_2d(ifn_usta,"USAT_2D",nzonal,nmerid, &
     id(16),idum,usta(:,:))
   IF (iread_flux==1) CALL grib_read_2d(ifn_sshf,"SSHF_2D",nzonal,nmerid, &
@@ -548,10 +592,22 @@ DO n1 = 1,nhours+1
     id(22),idum,soim(:,:))
 
 ! Check
-  IF (ANY(idlev(1:6,1:nlev) /= SPREAD(idlev(1,1:nlev),DIM=1,NCOPIES=6))) GOTO 9998
-  IF (iopt_cloudw==0 .AND. ANY(idlev(8,1:nlev) /= idlev(1,1:nlev))) GOTO 9998
-  IF (iread_cice==1 .AND. ANY(idlev(9,1:nlev) /= idlev(1,1:nlev))) GOTO 9998
-  IF (iread_rain==1 .AND. ANY(idlev(10,1:nlev) /= idlev(1,1:nlev))) GOTO 9998
+  IF (ANY(idlev(1:6,1:nlev) /= SPREAD(idlev(1,1:nlev),DIM=1,NCOPIES=6))) then
+     write(6,*) 'gen  nlev ',nlev,' idlev ',idlev
+          GOTO 9998
+  endif
+  IF (iopt_cloudw==1 .AND. ANY(idlev(8,1:nlev) /= idlev(1,1:nlev))) then 
+     write(6,*) 'clou nlev ',nlev,' idlev ',idlev
+          GOTO 9998
+  endif
+  IF (iread_cice==1 .AND. ANY(idlev(9,1:nlev) /= idlev(1,1:nlev))) then 
+     write(6,*) 'cice nlev ',nlev,' idlev ',idlev
+          GOTO 9998
+  endif
+  IF (iread_rain==1 .AND. ANY(idlev(10,1:nlev) /= idlev(1,1:nlev)))  then 
+     write(6,*) 'rain  nlev ',nlev,' idlev ',idlev
+          GOTO 9998
+  endif
 
   DO i1 = 1,nfilmax
     IF(id(i1) /= idnow) GOTO 9997
@@ -559,18 +615,23 @@ DO n1 = 1,nhours+1
   current_date=numeric2mm5date(idnow)
 
 ! Adujust values
-  WHERE (mixr <= 0) mixr = epsilon(mixr)
+  WHERE (mixr <= 1.e-06) mixr = 1.0e-6  !!!epsilon(mixr)
   WHERE (cliq < 0) cliq = 0.
   WHERE (swrd < 0) swrd = 0.
   swrd = 100*swrd/(100-alb)
+
+
+   write(6,*)' ho letto tutto' 
 
 ! Write to NetCDF file
   IF ((idc>=ids) .AND. (idc<=ide)) THEN
     ncstat=nf90_put_var(ncid,timesvarid,current_date(1:dlen), &
       start=(/1,irec/), count=(/dlen,1/))
     NCERR(__LINE__)
+   write(6,*)' scrivo tutto' 
 
     CALL write_data
+   write(6,*)' fine  tutto' 
     irec=irec+1
   ENDIF
 
@@ -578,9 +639,9 @@ DO n1 = 1,nhours+1
 ENDDO  ! main loop on dates
 
 if (idc<ide) then
-   print *,'*** ERROR: CHIMERE Simulation period exceeding MM5 file'
+   print *,'*** ERROR: CHIMERE Simulation period exceeding COSMOMED file'
    print *,'*** The CHIMERE simulation period must be contained'
-   print *,'*** within one MM5 output file'
+   print *,'*** within one COSMONED output file'
    print *,idc, ide
    stop
 end if
@@ -606,7 +667,7 @@ STOP 4
 9997 CONTINUE
 print *,'*** Date Problem with Meteo File: ',i1
 print *,'*** Expected date: ',idnow,' File date: ',id(i1)
-STOP 4
+STOP 5
 
 !===============================================================================
 
@@ -650,7 +711,6 @@ CONTAINS
       allocate(HTOP(nzonal,nmerid,nlev),hbase(nzonal,nmerid,nlev))
 
 ! determination of levels just below separation altitudes
-
 ! ENR 30/12/2014
 ! Qui sembra che faccia un gran casino: 
 ! - i livelli in ingresso sono ordinati dall'alto, quindi nel primo ciclo la condizone non si verifica mai
@@ -1061,12 +1121,10 @@ enddo
    cntvec2d=(/nzonal,nmerid,1/)
    cntvec3d=(/nzonal,nmerid,nlev,1/)
 
-!     write(6,*)'nzon',nzonal,nmerid,nlev,irec
 !    mandatory variable
 
       ncstat=nf90_put_var(ncid, meta(1)%varid,alti, (/1,1,1,irec/),(/nzonal,nmerid,nlev,1/)) 
       NCERR(__LINE__)
-!          write(76,*),irec,alti
       ncstat=nf90_put_var(ncid, meta(2)%varid, pres, (/1,1,1,irec/),(/nzonal,nmerid,nlev,1/))
       NCERR(__LINE__)
       ncstat=nf90_put_var(ncid, meta(3)%varid, zwin, (/1,1,1,irec/),(/nzonal,nmerid,nlev,1/))
@@ -1083,7 +1141,8 @@ enddo
       NCERR(__LINE__)
       ncstat=nf90_put_var(ncid, meta(24)%varid, alb, (/1,1,irec/),(/nzonal,nmerid,1/))
       NCERR(__LINE__)
-
+      ncstat=nf90_put_var(ncid, meta(25)%varid, psfc, (/1,1,irec/),(/nzonal,nmerid,1/))
+      NCERR(__LINE__)
 
 ! optional variable
       if(meta(8)%iread==1) then
@@ -1280,10 +1339,10 @@ meta(ICOPC) =varmeta('COPC_2D', 2, 'copc', 'kg/m^2'  , 1, 0, 'convective precipi
 meta(ISOIM) =varmeta('SOIM_2D', 2, 'soim', 'm^3/m^3' , 1, 0, 'Soil Moisture level 1'           )
 meta(ISWD)  =varmeta('SWRD_2D', 2, 'swrd', 'W/m^2'   , 1, 0, 'SW radiation down'               ) 
 meta(IALB)  =varmeta('ALB_2D' , 2, 'alb' , 'fraction', 1, 0, 'albedo'                          ) 
-
+meta(ISURP) =varmeta('SURP_2D', 2, 'psfc', 'Pa'      , 1, 0, 'Surface Pressure'               ) !!                          )
 end subroutine initvars
 
-END PROGRAM grib2diagmetncdf
+END PROGRAM prepcosmomed
 
 !===============================================================================
 
@@ -1303,30 +1362,35 @@ CHARACTER (LEN=*), INTENT(IN) :: label
 INTEGER, INTENT(OUT) :: idata,idlevs(nz)
 REAL, INTENT(OUT) :: field(nx,ny,nz)
 !
-TYPE(datetime) :: vtime,vtime1
+TYPE(datetime) :: vtime,vtime1,rtd,vtd1,vtd2
 REAL :: values(nx*ny)
 INTEGER :: ig,iret,kl,j
 INTEGER :: nxg,nyg,lev(3)
 CHARACTER (LEN=10) :: ch10,ch10b
 
 !--------------------------------------------------------------------------
-write (99,*) if,label,nx,ny,nz
 
 DO kl = 1,nz
   CALL grib_new_from_file(if,ig,iret)
 
+
 ! Controllo griglia
-  CALL grib_get(ig,"numberOfPointsAlongAParallel",nxg)
-  CALL grib_get(ig,"numberOfPointsAlongAMeridian",nyg)
+!  CALL grib_get(ig,"numberOfPointsAlongAParallel",nxg)
+!  CALL grib_get(ig,"numberOfPointsAlongAMeridian",nyg)
+if(kl==1)    write(6,*) 'leggo file3D ',label
+
+CALL grib_get(ig,"Ni",nxg)
+CALL grib_get(ig,"Nj",nyg)
   IF (nxg /= nx .OR. nyg /= ny) GOTO 9999 
 
 ! Leggo verification time
-  CALL get_grib_time(ig, VTIME=vtime, IRET=iret)
+  CALL get_grib_time(ig, RTIME=rtd,VTIME=vtime, VTIME1=vtd1, VTIME2=vtd2,IRET=iret)
   IF (iret /= 0) GOTO 9997
   IF (kl == 1) THEN 
     CALL getval(vtime, SIMPLEDATE=ch10)
     READ (ch10,*) idata
     vtime1 = vtime
+    write(6,*)'nz' ,nz, 'kl = ',kl,  " idata ", idata
   ELSE
     IF (vtime /= vtime1) GOTO 9998
   ENDIF
@@ -1338,12 +1402,13 @@ DO kl = 1,nz
 
 ! Leggo i valori
   CALL grib_get(ig,"values",values)
-  CALL grib_release(ig)
   DO j = 1,ny
     field(1:nx,j,kl) = values((j-1)*nx+1:j*nx)
   ENDDO
 ENDDO
+!!!!   write(6,*) 'label ',label,field(1,1,1),field(nx,ny,nz)
 
+CALL grib_release(ig)
 RETURN
 
 !--------------------------------------------------------------------------
@@ -1398,8 +1463,11 @@ CHARACTER (LEN=10) :: ch10
 CALL grib_new_from_file(if,ig,iret)
 
 ! Controllo griglia
-CALL grib_get(ig,"numberOfPointsAlongAParallel",nxg)
-CALL grib_get(ig,"numberOfPointsAlongAMeridian",nyg)
+!CALL grib_get(ig,"numberOfPointsAlongAParallel",nxg)
+!CALL grib_get(ig,"numberOfPointsAlongAMeridian",nyg)
+     write(6,*) 'leggo file2D ',label
+CALL grib_get(ig,"Ni",nxg)
+CALL grib_get(ig,"Nj",nyg)
 IF (nxg /= nx .OR. nyg /= ny) GOTO 9999 
 
 ! Leggo verification time
@@ -1416,10 +1484,10 @@ idlev = lev(2)
 
 ! Leggo i valori
 CALL grib_get(ig,"values",values)
-CALL grib_release(ig)
 DO j = 1,ny
   field(1:nx,j) = values((j-1)*nx+1:j*nx)
 ENDDO
+!!!!   write(6,*) 'label ',label,field(1,1),field(nx,ny)
 
 RETURN
 

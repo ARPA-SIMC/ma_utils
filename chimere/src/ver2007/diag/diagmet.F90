@@ -185,7 +185,7 @@ program diagmet
   real :: dtminu,dtminv,dtminw,tpercent
   real :: dtminup_eu,dtminup_ed,dtminup_du,dtminup_dd
   real :: dzovereu,dzoverdd,dzoverdu,dzovered
- 
+
 !=============================================================================
   integer::ifn_theta
 !#ifdef DEBUG_DIAGMET
