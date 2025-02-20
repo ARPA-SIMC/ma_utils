@@ -1,7 +1,7 @@
 Summary:    Tools, utilties and libraries for environmental meteorology
 Name:       ma_utils
-Version:    0.17
-Release:    3
+Version:    0.18
+Release:    1
 License:    GPL
 Group:      Applications/Meteo
 URL:        http://arpae.it/sim
@@ -89,6 +89,14 @@ GRIB to seriet postprocessor for arkimet
 %{_libdir}/arkimet/seriet
 
 %changelog
+* Thu Feb 20 2025 Daniele Branchini <dbranchini@arpae.it> - 0.18-1
+- Added diagmet for area ITA5KM, removed for LAMAZ, LMSMR4, LAMA3
+- Added prepcosmomed.exe and the corresponding version of chimere utlities
+- Migrated from gribex to grib_api: calc_ustar_mo.f90, grib_uv2ddff.f90
+- Added: geo_rotated.f90, geo_utm.f90, grib_rms_diff.f90, chimere_cdfluse2asc, chimere_ncdfmet2grib
+- Extended to Icon grib2 grib_forc2ana.f90
+- Bug fix: grib2diagmetencdf.f90
+
 * Thu Sep 19 2024 Daniele Branchini <dbranchini@arpae.it> - 0.17-3
 - Another fix for eccodes check
 
