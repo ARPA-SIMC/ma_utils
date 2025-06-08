@@ -51,6 +51,9 @@ IF (idp < 2) THEN
   STOP 1
 ENDIF
 
+CALL parse_check_list(check_list,cl_grid,cl_time,cl_vtime,cl_lev, &
+  cl_var,ier)
+
 ! 1.3 Inizializzazioni
 
 lverbose = .FALSE.

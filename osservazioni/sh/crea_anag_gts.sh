@@ -30,7 +30,7 @@
 #   messaggio contiene quindi tutte le informazioni di anagrafica.
 # - Estremi zoom: per BPA "6 43.5 14 47", per EmR "9.2 43.8 13 45.2"
 #
-#                                              Versione 2.2.0, Enrico 29/06/2015
+#                                              Versione 2.2.1, Enrico 08/06/2025
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -41,10 +41,9 @@ function write_help
   echo "Estre da arkimet le informazioni relative alle stazioni europee della rete"
   echo "GTS (synop e temp)"
   echo "Uso: crea_anag_gts [-z xmin ymin xmax ymax] [-d data_ini data_fin]"
-  echo "     [-h] [-ope] [-coo]"
+  echo "     [-h] [-coo]"
   echo "xmin ymin xmax ymax: estremi dell'aera geografica di ricerca (def: ovunque)"
   echo "data_ini, data_fin: intervallo di date in cui cercare (def: qualsiasi data)"
-  echo "-ope: aggiorna l'anagrafica in ~eminguzzi/svn/ma_utils/data"
   echo "-full: scrive anche coordinate, quota e nome stazione (lento; def: solo codice) "
 }
 
@@ -169,7 +168,6 @@ fi
 # Parametri da riga comando
 data_restrict="N"
 area_restrict="N"
-ope="N"
 full="N"
 
 idp=0
@@ -195,9 +193,6 @@ while [ $# -ge 1 ] ; do
     shift
     data2=$1
     shift
-  elif [ $1 = "-ope" ] ; then
-    ope="Y"
-    shift
   elif [ $1 = "-full" ] ; then
     full="Y"
     shift
@@ -213,20 +208,16 @@ while [ $# -ge 1 ] ; do
 done
 
 # Dir di lavoro e nome files di output
-if [ $ope = "Y" ] ; then
-  fileout1=~eminguzzi/svn/ma_utils/data/anag_synop.csv
-  fileout2=~eminguzzi/svn/ma_utils/data/anag_temp.csv
-  if [ -z $AK_TEMP ] ; then
-    AK_TEMP=$TEMP
-  fi
-  cd $AK_TEMP
-  qid=`mktemp -d ako.XXXXXX | cut -d . -f 2` 2>&1
-  work_dir=${AK_TEMP}/ako.${qid}
-else
-  fileout1=./anag_synop.csv
-  fileout2=./anag_temp.csv
-  work_dir=./
-fi
+#if [ -z $AK_TEMP ] ; then
+#  AK_TEMP=$TEMP
+#fi
+#cd $AK_TEMP
+#qid=`mktemp -d ako.XXXXXX | cut -d . -f 2` 2>&1
+#work_dir=${AK_TEMP}/ako.${qid}
+
+fileout1=./anag_synop.csv
+fileout2=./anag_temp.csv
+work_dir=./
 
 if [ -d $work_dir ] ; then
   cd $work_dir

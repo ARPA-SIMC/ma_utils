@@ -26,7 +26,7 @@
 # Todo:
 # Gestire il caso in cui $doc_file contiene progetti senza il carattere "_"
 #
-#                                                 V9.1.2, Enrico 07/02/2024
+#                                                 V9.2.0, Enrico 08/06/2025
 #==========================================================================
 # set -ex   # per attivare set -e, bisogna scommentare tutte le rige #e 
 # set -x
@@ -96,22 +96,27 @@ function intfill
 #==========================================================================
 # 1) Preliminari
 
-# 1.1) Path di base
-#work_root=/autofs/scratch-mod/eminguzzi/arkimet/tmp_point # root dir lavoro
-if [ ! -z $WORK_ROOT ] ; then
-  if [ -d $WORK_ROOT ] ; then
-    work_root=$WORK_ROOT
-  fi
-elif [ ! -z $SCRATCH ] ; then
-  if [ -d $SCRATCH ] ; then
-    work_root=$SCRATCH
-  fi
+# 1.1) Path
+if [ ! -z $ARC_ROOT ] ; then                          # root arc. progetti
+  arc_root=$ARC_ROOT
 else
+  arc_root=${HOME}/arkimet/progetti_point
+fi
+if [ ! -d $arc_root ] ; then
+  echo "Root delle dir di archiviazione indefinita: assegnare la variabile WORK_ROOT"
+  exit 2
+fi
+
+if [ ! -z $AK_WORK_ROOT ] ; then
+  work_root=$AK_WORK_ROOT
+else
+  work_root=$SCRATCH
+fi
+if [ ! -d $work_root ] ; then
   echo "Root delle dir di lavoro indefinita: assegnare la variabile WORK_ROOT"
   exit 2
 fi
 
-arc_root=~eminguzzi/arkimet/progetti_point        # root arc. estrazioni
 doc_file=${arc_root}/_doc/progetti_estra.list     # elenco progetti archiviati
 
 # 1.2) Utility e files di appoggio (da ma_utils)

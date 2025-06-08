@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/bash
 #==========================================================================
 # crea_progetto_grid.ksh
 #
@@ -6,25 +6,25 @@
 # sottoarea da un dataset Arkimet.
 #
 # Per modificare i path del pacchetto ma_utils, assegnare le variabili:
-# MA_UTILS_DAT: tabelle ma_utils (ad esempio: /home/eminguzzi/svn/ma_utils/data;
+# MA_UTILS_DAT: tabelle ma_utils (ad esempio: /home/eminguzzi/git/ma_utils/data;
 #               se non specificato, usa: /usr/share/ma_utils)
-# MA_UTILS_SVN: esegubili (ad esempio: /home/eminguzzi/svn/ma_utils; se non 
+# MA_UTILS_SVN: esegubili (ad esempio: /home/eminguzzi/git/ma_utils; se non 
 #               specificato, usa gli eseguibili in: /usr/libexec/ma_utils)
 #
 # Per modificare i path di pacchetti libsim/dballe, assegnare le variabili:
 # LIBSIM_DATA:  tabelle libsim (se non specificato usa: /usr/share/libsim)
 # DBA_TABLES:   tabelle dballe (se non specificato usa: /usr/share/wreport)
-# LIBSIM_SVN:   esegubili (ad esempio: /home/eminguzzi/svn/libsim; se non 
+# LIBSIM_SVN:   esegubili (ad esempio: /home/eminguzzi/git/libsim; se non 
 #               specificato, usa gli eseguibili in path)
 #
 # NB: 
+# - Al momento non viene prodotto il file con le coordinate dei punti
 # - Ancora da implemntare: gestione dell'output GRIB1 e AFA per dataset 
 #   GRIB2 (opzioni -afa e -grib)
 # - la conversione FOP dovrebbe diventare superflua quando sara' stato
 #   riallineato il dataset LAMAZ
-# - quando tutto funzionera' ricordasi di togliere set -x da xargs.ksh
 #
-#                                                 V4.3.1, Enrico 19/11/2013
+#                                                 V5.0.0, Enrico 08/06/2025
 #==========================================================================
 #set -x 
 
@@ -55,29 +55,31 @@ function write_help
 #==========================================================================
 # 1) Preliminari
 
-# 1.0) HOME_MINGUZZI
-if [ -z $HOME_MINGUZZI ] ; then
-  export HOME_MINGUZZI=/autofs/nethomes/eminguzzi
-  if [ -d $HOME_MINGUZZI ] ; then
-    echo "Variabile d'environment HOME_MINGUZZI non settata, uso "$HOME_MINGUZZI
-  else
-    echo "Path "$HOME_MINGUZZI" irraggiungibile"
-    exit 1
-  fi
+# 1.1) Path
+akurl="http://arkimet.metarpa:8090"                   # URL archivio Arkimet
+
+if [ ! -z $ARC_ROOT ] ; then                          # root arc. progetti
+  arc_root=$ARC_ROOT
+else
+  arc_root=${HOME}/arkimet/progetti_grid
+fi
+if [ ! -d $arc_root ] ; then
+  echo "Root delle dir di archiviazione indefinita: assegnare la variabile WORK_ROOT"
+  exit 2
 fi
 
-# 1.1) Path
-template_dir=${HOME_MINGUZZI}/arkimet/templates       # templates .akq
-fisiog_dir=${HOME_MINGUZZI}/util/grib/lm_ope          # dati fisiografici
-arc_root=${HOME_MINGUZZI}/arkimet/progetti_grid       # root arc. progetti
-work_root=/autofs/scratch2/eminguzzi/arkimet/tmp_grid # root dir lavoro
-#work_root=/scratch/eminguzzi/tmp_grid
-akurl="http://arkimet.metarpa:8090"                   # URL archivio Arkimet
+if [ ! -z $AK_WORK_ROOT ] ; then
+  work_root=$AK_WORK_ROOT
+else
+  work_root=$SCRATCH
+fi
+if [ ! -d $work_root ] ; then
+  echo "Root delle dir di lavoro indefinita: assegnare la variabile WORK_ROOT"
+  exit 2
+fi
 
 # 1.2) Utility e files di appoggio non in PATH
 doc_file=${arc_root}/_doc/progetti_grid.doc       
-grb2grads=${HOME_MINGUZZI}/util/grads/bin/grb2grads.ksh
-plot_grid_orog=${HOME_MINGUZZI}/arkimet/bin/plot_grid_orog.gs
 
 if [ -z $MA_UTILS_DAT ] ; then
   export MA_UTILS_DAT=/usr/share/ma_utils
@@ -87,23 +89,27 @@ fi
 arkimet_aree=${MA_UTILS_DAT}/arkimet_aree.dat
 aree_geo=${MA_UTILS_DAT}/aree_geo.dat
 aree_utm=${MA_UTILS_DAT}/aree_utm.dat
+template_dir=$MA_UTILS_DAT
+fisiog_dir=$MA_UTILS_DAT
 
 if [ -z $MA_UTILS_SVN ] ; then
   sel_punti=/usr/libexec/ma_utils/sel_punti.exe
   ma_grib2_grib1=/usr/libexec/ma_utils/ma_grib2_grib1.exe
-  grib2latlon=/usr/libexec/ma_utils/grib2latlon.exe
   grib23ddat=/usr/libexec/ma_utils/grib23ddat.exe
   grib2afa=/usr/libexec/ma_utils/grib2afa.exe
   grib_s2f=/usr/libexec/ma_utils/grib_s2f.exe
+  g2g=/usr/libexec/ma_utils/g2g.sh
+  plot_grid_orog=/usr/libexec/ma_utils/plot_grid_orog.gs
 
 else 
   echo "(crea_progetto_grid.ksh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
   sel_punti=${MA_UTILS_SVN}/arkimet/src/sel_punti.exe
   ma_grib2_grib1=${MA_UTILS_SVN}/util/grib/src/ma_grib2_grib1.exe
-  grib2latlon=${MA_UTILS_SVN}/util/grib/src/grib2latlon.exe
   grib23ddat=${MA_UTILS_SVN}/calmet/src/grib23ddat.exe
   grib2afa=${MA_UTILS_SVN}/util/grib/src/grib2afa.exe
   grib_s2f=${MA_UTILS_SVN}/util/grib/src/grib_s2f.exe
+  g2g=${MA_UTILS_SVN}/util/grads/sh/g2g.sh
+  plot_grid_orog=${MA_UTILS_SVN}/arkimet/sh/plot_grid_orog.gs
 
 fi
 
@@ -207,7 +213,7 @@ echo "Directory di lavoro: "`pwd`
 if [ $modif = "R" ] ; then
   rm -f * >/dev/null 2>/dev/null
 else
-  rm -f arki.log* ${proj}.query* xargs.ksh tmp*
+  rm -f arki.log* ${proj}.query* xargs.ksh tmp.zoom tmp.inp tmp.grb tmp.ctl tmp.idx
 fi
 
 # dir. dei dati di output
@@ -464,23 +470,22 @@ if [ $dsarea != "NIL" -a $fisiog = "Y" -a $modif != "E" ] ; then
   grib_set -s table2Version=2,centre=200,indicatorOfParameter=8 \
     ${proj}_orog.grb tmp.grb 
 
-  $grb2grads -t 200 -b tmp                               >> static.log 2>&1
-  grads -clb 'run '$plot_grid_orog' tmp '$dsproj
+  $g2g tmp.grb ana                                           >> static.log 2>&1
+  echo "grads -clb run $plot_grid_orog tmp.ctl $dsproj"
+  grads -clb 'run '$plot_grid_orog' tmp.ctl '$dsproj
   mv orog.png ${proj}_orog.png
 
-  $grib2latlon ${proj}_orog.grb ${proj}_latlon.grb       >> static.log 2>&1
-  if [ $outfmt = "afa" ] ; then
-    $grib2afa ${proj}_latlon.grb ${proj}_latlon.afa      >> static.log 2>&1
-  fi
+  grib_get_data ${proj}_orog.grb > ${proj}_latlon.txt
 
 # Salvo i files statici nella dir di output
-  for field in orog levels layers latlon ; do
+  for field in orog levels layers ; do
     if [ $outfmt = "afa" ] ; then
       cp ${proj}_${field}.afa $out_dir
     else
       cp ${proj}_${field}.grb $out_dir
     fi
   done
+  cp ${proj}_latlon.txt $out_dir
 fi
 
 # Se richiesto, creo nella dir di output i files richiesti da grib23ddat
@@ -503,7 +508,6 @@ fi
 # 3.1 Costruisco lo script per arki-xargs
 
 cat <<EOF1 > xargs.ksh
-set -x
 cd ${work_dir}
 rm -f tmp?.${ext} tmp3.afa
 datac=\`grib_get -p dataDate \$1 | head -n 1\`
@@ -636,7 +640,7 @@ if [ $yn = "y" -o $yn = "Y" ] ; then
   fi
 
   for file in ${proj}.akq ${proj}.zoom ${proj}_orog.grb ${proj}_orog.png \
-    ${proj}_layers.grb ${proj}_levels.grb ${proj}_latlon.grb ; do
+    ${proj}_layers.grb ${proj}_levels.grb ${proj}_latlon.txt ; do
     if [ -s $file ] ; then
       cp -v $file $arc_dir
     else

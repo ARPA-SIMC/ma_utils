@@ -21,7 +21,7 @@ if(filein="-h" | filein="")
  say "         -d manages DOS generated files with commas"
  say ""
  say "with option -f filein is the complete path, otherwise use:"
- say "/autofs/nfshomes/eminguzzi/server/util/grads/dat/shape_{filein}.dat"
+ say "/usr/share/ma_utils/shape_{filein}.dat"
  return
 endif
 
@@ -48,7 +48,7 @@ endwhile
 * cerco nella dir di default
 idum1=read(filein)
 if(sublin(idum1,1)!=0)
- filein2='/autofs/nfshomes/eminguzzi/server/util/grads/dat/shape_'filein'.dat'
+ filein2='/usr/share/ma_utils/shape_'filein'.dat'
  idum2=read(filein2)
  if(sublin(idum2,1)!=0)
   say "Shape file non trovato:"

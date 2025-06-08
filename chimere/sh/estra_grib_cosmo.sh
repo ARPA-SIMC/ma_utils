@@ -111,24 +111,6 @@ fi
 
 #-------------------------------------------------------------------------------
 # 1.3) Definisco le variabili d'ambiente relative a questo run Chimere 
-#      (dipendono  pre_chimere.inp e dalle dir di installazione)
-
-# if [ $proj != "none" ] ; then
-#   if [ $HOSTNAME = "maialinux" ] ; then           # maialinux fed16
-#     chimere_env=$HOME/ver16/ope/ninfa/bin/chimere_env.sh
-#   else                                            # lattuga e PCs
-#     chimere_env=/home/eminguzzi/chimere/bin/chimere_env.sh
-#   fi
-#   . $chimere_env $proj || exit 2
-# fi
-
-# if [ -z $akurl ] ; then
-#   if [ $dataset = "cosmo_i7" -o $dataset = "COSMO_I7" ] ; then
-#     akurl="http://maialinux.metarpa:8090"
-#   else
-#     akurl="http://arkimet.metarpa:8090"
-#   fi
-# fi
 
 akurl="http://arkimet.metarpa:8090"
 
@@ -686,8 +668,7 @@ done
 
 # 2.3.5 Calcolo il contenuto d'acqua nello strato superificale del terreno.
 # I calcoli e codifica grib  (2/86 invece di 201/198) sono gli stessi usati per 
-# produrre le analisi LAMA: Per maggiori dettagli vedi
-# /home/eminguzzi/svn/feed_lama/proc_cosmo_ana.sh, sez. 3.5
+# produrre le analisi LAMA:
 
 if [ `echo $plist_2d | grep SOIM_2D | wc -l` -eq 1 -a \
      \( $dataset = "lm7tmpc" -o $dataset = "cosmo_5M_vol_ita" \) ] ; then

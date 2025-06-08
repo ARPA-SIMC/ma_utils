@@ -11,7 +11,7 @@
 #   quelle sull'intero dataset (non e' chiaro quale sia quella giusta...)
 # - Estremi zoom: per BPA "6 43.5 14 47", per EmR "9.2 43.8 13 45.2"
 #
-#                                              Versione 3.0.1, Enrico 02/09/2019
+#                                              Versione 3.0.2, Enrico 08/06/2025
 #-------------------------------------------------------------------------------
 #set -x
 
@@ -21,12 +21,11 @@ function write_help
 #       123456789012345678901234567890123456789012345678901234567890123456789012345678
   echo "Costruisce la lsita completa di parametri e stazioni presenti in arkioss"
   echo "Uso: crea_anag_arkioss [-z xmin ymin xmax ymax] [-d data_ini data_fin]"
-  echo "     [-h] [-ope] [-url URL]"
+  echo "     [-h] [-url URL]"
   echo ""
   echo "Output: files anag_arkioss.csv e param_arkioss.csv, nella dir corrente"
   echo "xmin ymin xmax ymax: estremi dell'aera geografica di ricerca (def: ovunque)"
   echo "data_ini, data_fin: intervallo di date in cui cercare (def: qualsiasi data)"
-  echo "-ope: mette i files di ouput nella dir: ~eminguzzi/svn/ma_utils/data"
   echo "URL: indirizzo del server arkioss (def: http://arkioss.metarpa:8090)"
 }
 
@@ -204,7 +203,6 @@ str_product_csv=${id_var}","${bcode}","${long_name}${ltru}","${short_name}
 akurl="http://arkioss.metarpa:8090"
 data_restrict="N"
 area_restrict="N"
-ope="N"
 
 idp=0
 while [ $# -ge 1 ] ; do
@@ -228,9 +226,6 @@ while [ $# -ge 1 ] ; do
     data1=$1
     shift
     data2=$1
-    shift
-  elif [ $1 = "-ope" ] ; then
-    ope="Y"
     shift
   elif [ $1 = "-url" ] ; then
     shift
@@ -264,20 +259,16 @@ else
 fi
 
 # Dir di lavoro e nome files di output
-if [ $ope = "Y" ] ; then
-  fileout1=~eminguzzi/git/ma_utils/data/anag_arkioss.csv
-  fileout2=~eminguzzi/git/ma_utils/data/param_arkioss.csv
-  if [ -z $AK_TEMP ] ; then
-    AK_TEMP=$TEMP
-  fi
-  cd $AK_TEMP
-  qid=`mktemp -d ako.XXXXXX | cut -d . -f 2` 2>&1
-  work_dir=${AK_TEMP}/ako.${qid}
-else
-  fileout1=./anag_arkioss.csv
-  fileout2=./param_arkioss.csv
-  work_dir=./
-fi
+#if [ -z $AK_TEMP ] ; then
+#  AK_TEMP=$TEMP
+#fi
+#cd $AK_TEMP
+#qid=`mktemp -d ako.XXXXXX | cut -d . -f 2` 2>&1
+#work_dir=${AK_TEMP}/ako.${qid}
+
+fileout1=./anag_arkioss.csv
+fileout2=./param_arkioss.csv
+work_dir=./
 
 if [ -d $work_dir ] ; then
   cd $work_dir

@@ -73,13 +73,14 @@ ENDIF
 
 IF (PRESENT(par)) THEN
   par(:) = imiss
-  CALL grib_get(gaid,"centre",par(1))
 
   IF (en == 1) THEN
+    CALL grib_get(gaid,"centre",par(1))
     CALL grib_get(gaid,"table2Version",par(2))
     CALL grib_get(gaid,"indicatorOfParameter",par(3))
 
   ELSE IF (en == 2) THEN  
+    CALL grib_get(gaid,"discipline",par(1))
     CALL grib_get(gaid,"productDefinitionTemplateNumber",pdtn)
 
     IF (pdtn == 0 .OR. pdtn == 1 .OR. pdtn == 8) THEN  ! analisi o previsioni
