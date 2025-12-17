@@ -11,7 +11,7 @@ PROGRAM ma_grib2_grib1
 !
 ! Uso: ma_grib2_grib1.exe [-h] filein fileout
 !
-!                                         Versione 3.0.0, Enrico 08/03/2017
+!                                         Versione 3.0.1, Enrico 03/12/2025
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -277,8 +277,8 @@ DO kg = 1,HUGE(0)
   IF (lev(1) == 1 .OR. lev(1) == 105 .OR. lev(1) == 109) THEN
     CALL grib_set(igout,"level",lev(2))
   ELSE IF (lev(1) == 110) THEN
-    CALL grib_set(igout,"bottomLevel",lev(2))
-    CALL grib_set(igout,"topLevel",lev(3))
+    CALL grib_set(igout,"bottomLevel",lev(3))
+    CALL grib_set(igout,"topLevel",lev(2))
   ENDIF
  
 ! Reference time

@@ -1,4 +1,4 @@
-#/bin/ksh
+#/bin/bash
 #--------------------------------------------------------------------------
 # Procedura per estrarre da un dataset Arkimet una serie di Grib 
 #
@@ -24,7 +24,7 @@ function write_help
 {
 #       123456789012345678901234567890123456789012345678901234567890123456789012345
   echo ""
-  echo "Uso: ak_getgrib.ksh PROGETTO DATASET [-arc=URL] [-mon=FILE] [-h]"
+  echo "Uso: ak_getgrib.ksh PROGETTO DATASET [-arc=URL] [-file] [-mon=FILE] [-h]"
   echo "  [-zoom=LON_MIN,LAT_MIN,LON_MAX,LAT_MAX] [-destag] [-split=LENGHT] "
   echo "Estrae un gruppo di grib da un archivio arkimet"
   echo ""
@@ -71,8 +71,9 @@ destag="N"
 mon="N"
 filemon=""
 akurl="http://arkimet.metarpa:8090"
-local_aliases=/usr/share/ma_utils/match-alias.simc.conf
+#local_aliases=/usr/share/ma_utils/match-alias.simc.conf
 #local_aliases=/home/eminguzzi@ARPA.EMR.NET/enr/git/arkimet/conf/match-alias.simc.conf
+local_aliases=/autofs/nfshomes/eminguzzi/git/arkimet/conf/match-alias.simc.conf
 split_req="nil"
 
 mand_par=0

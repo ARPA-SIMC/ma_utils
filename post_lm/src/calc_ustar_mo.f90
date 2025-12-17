@@ -12,7 +12,7 @@ PROGRAM calc_ustar_mo
 !   del mixing ratio come sarebbe piu' corretto (le differenze sono del
 !   tutto trascurabili)
 !
-!                                         Versione 4.0.0, Enrico 05/02/2025
+!                                         Versione 4.0.1, Enrico 06/11/2025
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -215,7 +215,7 @@ ist: DO kist = 1,HUGE(kist)
     CALL grib_set(igout(1),"indicatorOfParameter",201) 
   ELSE
     CALL grib_set(igout(1),"discipline",0)
-    CALL grib_set(igout(1),"parameterCategory",2)
+    CALL grib_set(igout(1),"parameterCategory",7)
     CALL grib_set(igout(1),"parameterNumber",201)
   ENDIF
 
@@ -237,7 +237,7 @@ ist: DO kist = 1,HUGE(kist)
     CALL grib_set(igout(2),"indicatorOfParameter",200) 
   ELSE
     CALL grib_set(igout(2),"discipline",0)
-    CALL grib_set(igout(2),"parameterCategory",2)
+    CALL grib_set(igout(2),"parameterCategory",7)
     CALL grib_set(igout(2),"parameterNumber",200)
   ENDIF
 

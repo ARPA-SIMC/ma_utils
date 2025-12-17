@@ -46,7 +46,7 @@ CHARACTER(LEN=dlen) :: datebuf
 REAL, ALLOCATABLE :: values_out(:,:,:),values2(:,:),values1(:)
 INTEGER :: ift,igt,ifo,igo,iret,en
 INTEGER :: ni,nj,np,yy,mm,dd,hh,yoc,cortod,levt,lev1,lev2,p1
-INTEGER :: toffs,sfoffs,svoffs
+INTEGER :: toffs,sfoffs,svoffs,pdtn
 CHARACTER(LEN=40) :: gt
 
 ! Altre variabili del programma
@@ -155,6 +155,7 @@ ncstat=nf90_inquire(ncid, nVariables=nvarin)
 
 !--------------------------------------------------------------------------
 ! 1.3 Apro il template grib e verifico che la griglia sia compatibile
+!     Se grib2, verifico anche che si riferisca a un campo istantaneo
 
 CALL grib_open_file(ift,filetmpl,"r",iret)
 IF (iret /= GRIB_SUCCESS) GOTO 9999
@@ -180,6 +181,9 @@ ELSE IF (en == 2) THEN
     CALL grib_get(igt,"Nj",nj)
     np = ni*nj
   ENDIF
+
+  CALL grib_get(igt,"productDefinitionTemplateNumber",pdtn)
+  IF (pdtn /= 0 .AND. pdtn /= 1) GOTO 9992
 ENDIF
 
 IF (ni /= nzonal .OR. nj /= nmerid) GOTO 9991
@@ -399,7 +403,7 @@ ist: DO kscad = 1, times1
         CALL grib_set(igo,"scaleFactorOfFirstFixedSurface",sfoffs)
         CALL grib_set(igo,"scaledValueOfFirstFixedSurface",svoffs)
 
-        CALL grib_set(igo,"productDefinitionTemplateNumber",1)
+!       CALL grib_set(igo,"productDefinitionTemplateNumber",1) ! lasci il valore del template
         CALL grib_set(igo,"indicatorOfUnitOfTimeRange",1)
         CALL grib_set(igo,"forecastTime",p1)
 
@@ -433,6 +437,10 @@ WRITE (*,*) "Record illegale o mal posizionato in ",TRIM(fileinfo)
 WRITE (*,*) "Numero record (esclusi commenti) ",k
 WRITE (*,*) TRIM(chrec)
 STOP 2
+
+9992 CONTINUE
+WRITE (*,*) "Il template girb2 non e' un campo istantaneo: pdtn = ",pdtn
+STOP 4
 
 9991 CONTINUE
 WRITE (*,*) "Dati inconsistenti in ",TRIM(filetmpl)," e ",TRIM(filein)

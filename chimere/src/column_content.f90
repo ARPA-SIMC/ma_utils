@@ -112,8 +112,8 @@ DO kg = 1,HUGE(0)
   IF (iret /= 0) GOTO 9990
 
   IF (lev_dum(1) /= 109) GOTO 9989
-  IF (lev_dum(2) > maxlev) GOTO 9988
-  idlev_dum = lev_dum(2)
+  IF (lev_dum(3) > maxlev) GOTO 9988
+  idlev_dum = lev_dum(3)
 
 ! 2.3 Controllo se e' iniziato un nuovo istante
   IF (kg==1 .OR. datahc/=datahc_dum .OR. ANY(scad(:)/=scad_dum(:))) THEN

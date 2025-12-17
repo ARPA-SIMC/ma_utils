@@ -12,7 +12,9 @@
 # dataset,area,proiezione,fisiog?,destag?,edition,sop?,template
 # area: geo, rot1 (centro 10.0, 57.5), rot2 (centro 10.0, 43.0), utm
 
-# Analisi Cosmo
+# Analisi Cosmo/Icon
+iama5_arc,i2ita5km,geo,y,n,2,n,iama5
+iama5,i2ita5km,geo,y,n,2,n,iama5
 lama5,lama5,rot2,y,y,1,n,lama5
 lama5_arc,lama5,rot2,y,y,1,n,lama5
 lamaz,lamaz,rot1,y,n,1,y,lamaz

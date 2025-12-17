@@ -8,7 +8,7 @@ MODULE grib2_utilities
 ! get_grib_time
 ! check_consistency
 !
-!                                         Versione 1.7.0, Enrico 09/12/2024
+!                                         Versione 1.7.1, Enrico 06/11/2025
 !--------------------------------------------------------------------------
 
 USE missing_values
@@ -31,7 +31,7 @@ SUBROUTINE get_grib1_header(gaid,reftime,par,lev,scad,iret)
 ! 4) scad: unit, p1, p2, timerange
 !
 ! Note:
-! - Per ora gestisce solo grib2 con pdtn = 0,8 o 40
+! - Per ora gestisce solo grib2 con pdtn = 0/1, 8/11, 40
 !--------------------------------------------------------------------------
 
 USE datetime_class
@@ -83,7 +83,7 @@ IF (PRESENT(par)) THEN
     CALL grib_get(gaid,"discipline",par(1))
     CALL grib_get(gaid,"productDefinitionTemplateNumber",pdtn)
 
-    IF (pdtn == 0 .OR. pdtn == 1 .OR. pdtn == 8) THEN  ! analisi o previsioni
+    IF (pdtn == 0 .OR. pdtn == 1 .OR. pdtn == 8 .OR. pdtn == 11) THEN  ! analisi o previsioni
       CALL grib_get(gaid,"parameterCategory",par(2))
       CALL grib_get(gaid,"parameterNumber",par(3))
 
@@ -164,8 +164,8 @@ IF (PRESENT(lev)) THEN
       CALL grib_get(gaid,"level",lev(2))
       lev(3) = 0
     ELSE IF (lev(1) == 110 .OR. lev(1) == 112) THEN
-      CALL grib_get(gaid,"bottomLevel",lev(2))
-      CALL grib_get(gaid,"topLevel",lev(3))
+      CALL grib_get(gaid,"topLevel",lev(2))
+      CALL grib_get(gaid,"bottomLevel",lev(3))
     ENDIF
  
   ELSE IF (en == 2) THEN 
@@ -190,6 +190,10 @@ IF (PRESENT(lev)) THEN
       lev(1) = 1                  ! Surface
       lev(2) = 0
       lev(3) = 0
+    ELSE IF (toffs == 4) THEN     ! Level of 0C isotherm
+      lev(1) = 4
+      lev(2) = 0
+      lev(3) = 0
     ELSE IF (toffs == 100) THEN
       lev(1) = 100                ! Isobaric surface
       lev(2) = NINT(voffs)
@@ -202,13 +206,13 @@ IF (PRESENT(lev)) THEN
       lev(1) = 105                ! Specified height level above ground m
       lev(2) = NINT(voffs)
       lev(3) = 0
-    ELSE IF (toffs == 105 .AND. (tosfs == 255 .OR. &
+    ELSE IF ((toffs == 105 .OR. toffs == 150) .AND. (tosfs == 255 .OR. &
         (tosfs == toffs .AND. sfoffs == sfosfs .AND. svoffs == svosfs))) THEN
       lev(1) = 109                ! Hybrid level
       lev(2) = NINT(voffs)
       lev(3) = 0
-    ELSE IF (toffs == 105 .AND. tosfs == toffs .AND. sfoffs == sfosfs .AND. &
-        svoffs /= svosfs) THEN
+    ELSE IF ((toffs == 105 .OR. toffs == 150) .AND. &
+        tosfs == toffs .AND. sfoffs == sfosfs .AND. svoffs /= svosfs) THEN
       lev(1) = 110                ! Hybrid layer
       lev(2) = NINT(voffs)
       lev(3) = NINT(vosfs)
@@ -216,10 +220,6 @@ IF (PRESENT(lev)) THEN
       lev(1) = 112                ! Layer between two depths below land
       lev(2) = NINT(voffs)
       lev(3) = NINT(vosfs)
-    ELSE IF (toffs == 150) THEN
-      lev(1) = 109                ! Generalised vert. height coord. (= model level)
-      lev(2) = NINT(voffs)
-      lev(3) = 0
     ELSE IF (toffs == 162 .OR. toffs == 165 .OR. toffs == 166) THEN
       lev(1) = 1                  ! Special levels: river/sediment bottom, Zi
       lev(2) = 0
@@ -310,7 +310,7 @@ IF (PRESENT(scad)) THEN
       scad(4) = 0
 
 !   4.2 Analisi non istantanee (togp = 0?): reftime = inizio dell'intervallo di elaborazione
-    ELSE IF (sortt==0 .AND. topd==0 .AND. (pdtn==8 .OR. pdtn==11) .AND. ft==0 .AND. toti==1) THEN
+    ELSE IF (sortt<=1 .AND. topd<=5 .AND. (pdtn==8 .OR. pdtn==11) .AND. ft==0 .AND. toti==1) THEN
       scad(1) = iouotr_g1
       scad(2) = 0
       scad(3) = lotr
@@ -618,6 +618,7 @@ INTEGER :: nib,njb,npb,smb,zb,ddb,dtb
 INTEGER :: para(3),leva(3),scada(4),parb(3),levb(3),scadb(4)
 INTEGER :: ireta,iretb
 CHARACTER(LEN=40) :: gta,gtb
+CHARACTER(LEN=32) :: idhga,idhgb
 
 !--------------------------------------------------------------------------
 
@@ -628,9 +629,29 @@ ier = 0
 clret(:) = -1
 
 ! 1.1) se necessario calcolo le caratteristiche del grib in stile GRIB1
-IF (cl_time .OR. cl_vtime .OR. cl_lev .OR. cl_var) THEN
-  CALL get_grib1_header(iga,par=para,lev=leva,scad=scada,iret=ireta)
-  CALL get_grib1_header(igb,par=parb,lev=levb,scad=scadb,iret=iretb)
+IF (cl_time .OR. cl_vtime) THEN
+  CALL get_grib1_header(iga,scad=scada,iret=ireta)
+  CALL get_grib1_header(igb,scad=scadb,iret=iretb)
+  IF (ireta /= 0 .OR. iretb /= 0) THEN
+    WRITE (*,*) "check_consistency: errore elborazione header"
+    ier = 2
+    RETURN
+  ENDIF
+ENDIF
+
+IF (cl_lev) THEN
+  CALL get_grib1_header(iga,lev=leva,iret=ireta)
+  CALL get_grib1_header(igb,lev=levb,iret=iretb)
+  IF (ireta /= 0 .OR. iretb /= 0) THEN
+    WRITE (*,*) "check_consistency: errore elborazione header"
+    ier = 2
+    RETURN
+  ENDIF
+ENDIF
+
+IF (cl_var) THEN
+  CALL get_grib1_header(iga,par=para,iret=ireta)
+  CALL get_grib1_header(igb,par=parb,iret=iretb)
   IF (ireta /= 0 .OR. iretb /= 0) THEN
     WRITE (*,*) "check_consistency: errore elborazione header"
     ier = 2
@@ -781,6 +802,16 @@ IF (cl_grid) THEN
       IF (lverbose .AND. sma /= smb) WRITE (*,*) "sm ",sma,smb
     ENDIF
     
+  ELSE IF (gta == "unstructured_grid") THEN
+    CALL grib_get(iga,"uuidOfHGrid",idhga)
+    CALL grib_get(igb,"uuidOfHGrid",idhgb)
+    IF (idhga == idhgb) THEN
+      clret(1) = 0
+    ELSE
+      clret(1) = 1
+      IF (lverbose) WRITE (*,*) ",idhga: ",idhga," idhgb: ",idhgb
+    ENDIF
+
   ELSE
     WRITE (*,*) "check_list: proiezione non gestita ",TRIM(gta)
     ier = 2
@@ -803,6 +834,10 @@ IF (cl_time) THEN
     clret(2) = 1
     IF (lverbose .AND. dda /= ddb) WRITE (*,*) "dd ",dda,ddb
     IF (lverbose .AND. dta /= dtb) WRITE (*,*) "dt ",dta,dtb
+    IF (lverbose .AND. ANY(scada(:) == scadb(:))) THEN
+      WRITE (*,*) "scada: ",scada(:)
+      WRITE (*,*) "scadb: ",scadb(:)
+    ENDIF
   ENDIF
 ENDIF
 

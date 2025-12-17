@@ -5,14 +5,11 @@ PROGRAM grib23ddat
 ! Use: grib3ddat.exe file_static file_dat file_out
 !
 ! Input:
-! - file_static: topography and height of model layers (in this order!)
-! - file_dat:    meteorolgical data, GRIB1 or GRIB2 format
+! - file_static: topography and height of model layers
+! - file_dat:    meteorolgical data, GRIB1 format
 ! - grib23dddat.inp: program namelist
 !
-! NOTES:
-! - Version 3 manges both Cosmo (grib1, dataset LAMA5) and Icon (grib2,
-!   dataset IAMA5) input. All inputs must be either grib1 or grib2 (no mix)
-!
+! NOTES: 
 ! - GRIB data in file_dat:
 !   * must be defined on the same grid as file_static
 !   * can contain analysis, or forecast from a single model run (only 
@@ -61,12 +58,11 @@ PROGRAM grib23ddat
 ! - Add to file_dat the surface fields that are read but not used 
 !   (sub. RDMM5, line 20175)
 !
-!                                                 V3.0.0, Enrico 02/12/2025
+!                                                 V2.0.0, Enrico 25/10/2019
 !--------------------------------------------------------------------------
 
 USE grib_api
-USE datetime_class
-USE grib2_utilities
+USE date_handler
 IMPLICIT NONE
 
 !==========================================================================
@@ -91,16 +87,13 @@ INTEGER, ALLOCATABLE :: id_lev3d(:),rq_par3d(:,:),rq_lev3d(:,:)
 INTEGER, ALLOCATABLE :: rq_lev2d(:,:),rq_par2d(:,:)
 LOGICAL, ALLOCATABLE :: found3d(:,:),found2d(:)
 
-TYPE(datetime) :: data_ini,datac,datav
-TYPE(timedelta) :: dlt
+TYPE(date) :: data_ini,datac,datag,datav
 REAL :: x1,y1,dx,dy,xx,yy,xrot,yrot,rdum
-INTEGER :: yea,mon,dd,hh
 INTEGER :: nx,ny,nlev3d,nscad,npar3d,npar2d
-INTEGER :: hh_step,nht,hht,lev(3),par(3)
+INTEGER :: hh_step,nht,hh_ini,hhc,hhg,hhv,hht,scad(3),lev(3),par(3)
 INTEGER :: tipo_scad,inp_h2o,out_fmt,dlth,utmz
 INTEGER :: if_static,if_dat,ig_orog,ig,idxl,idxp
-INTEGER :: iret,ier,idum(4),k,kpar,cnt_par,kl,kp,i,j,ilu,cnt_sea,cnt_out
-INTEGER :: en,gdtn
+INTEGER :: iret,ier,idum(3),k,kpar,cnt_par,kl,kp,i,j,ilu,cnt_sea,cnt_out
 CHARACTER (LEN=200) :: file_static,file_dat,file_out,error_message,chpar
 CHARACTER (LEN=20) :: str_model,str_tipo_scad
 CHARACTER (LEN=15) :: hr2
@@ -174,7 +167,76 @@ IF ((tipo_scad/=1 .AND. tipo_scad/=2) .OR. &
 ENDIF
 
 !--------------------------------------------------------------------------
-! 1.4) Leggo file_static: parametri griglia, orografia, quota livelli
+! 1.4 Calcolo i parametri dipendenti dalle opzioni di file_nml
+
+! 1.4.1 Step e durata totale del file (in ore)
+hh_step = 1 
+nht = 1+(nscad-1)*hh_step
+
+! 1.4.2 Numero e codifica parametri e livelli richiesti in input: COSMO
+
+! Numero e codifica grib dei parametri 3D letti nel file di input
+IF (inp_h2o == 0) THEN               ! P,T,U,V; ioutmm5 = 81
+  npar3d = 4
+  ALLOCATE (rq_par3d(3,npar3d))
+  rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34/), &
+    (/3,npar3d/))
+  WRITE (hr2,'(5i3)') 0,0,0,0,0
+
+ELSE IF (inp_h2o == 1) THEN          ! P,T,U,V,Q; ioutmm5 = 82
+  npar3d = 5
+  ALLOCATE (rq_par3d(3,npar3d))
+  rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34, &
+    200,2,51/),(/3,npar3d/))
+  WRITE (hr2,'(5i3)') 0,1,0,0,0
+
+ELSE IF (inp_h2o == 2) THEN          ! T,P,U,V,Q,Qcr; ioutmm5 = 83
+  npar3d = 6
+  ALLOCATE (rq_par3d(3,npar3d))
+  rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34, &
+    200,2,51, 200,2,150/),(/3,npar3d/))
+  WRITE (hr2,'(5i3)') 0,1,1,0,0
+
+ELSE IF (inp_h2o == 3) THEN          ! T,P,U,V,Q,Qcr,Qis; ioutmm5 = 83
+  npar3d = 7
+  ALLOCATE (rq_par3d(3,npar3d))
+  rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34, &
+    200,2,51, 200,2,150, 200,2,151/),(/3,npar3d/))
+  WRITE (hr2,'(5i3)') 0,1,1,0,0
+ENDIF
+
+! Codifica grib dei livelli 3d richiesti
+ALLOCATE (rq_lev3d(3,nlev3d))
+rq_lev3d(1,:) = 110
+rq_lev3d(2,:) = id_lev3d(1:nlev3d)
+rq_lev3d(3,:) = id_lev3d(1:nlev3d) + 1
+
+! Numero e codifica grib dei parametri 2D letti nel file di input: 
+! (Temperatura superficie e Preciptazione)
+npar2d = 2
+ALLOCATE (rq_par2d(3,npar2d))
+rq_par2d(:,:) = RESHAPE((/200,2,11, 200,2,61/),(/3,npar2d/))
+
+! Codifica grib dei livelli superficiali richiesti
+ALLOCATE (rq_lev2d(3,npar2d))
+rq_lev2d(:,:) = RESHAPE((/1,0,0, 1,0,0/),(/3,npar2d/))
+
+
+! 1.4.4 Stringhe per log
+str_model = "COSMO "        
+IF (tipo_scad == 1) THEN
+  str_tipo_scad = "Analisi"
+ELSE IF (tipo_scad == 2) THEN
+  str_tipo_scad = "Previsioni"
+ENDIF
+
+!--------------------------------------------------------------------------
+! 1.5 Apro file log
+
+OPEN (UNIT=iulog, FILE=file_log, STATUS="REPLACE", ACTION="WRITE")
+
+!==========================================================================
+! 2) Leggo file_static: parametri griglia, orografia, quota livelli
 
 ! Leggo grib orografia
 CALL grib_open_file(if_static,file_static,"r",iret)
@@ -183,24 +245,9 @@ IF (iret /= GRIB_SUCCESS) GOTO 9999
 ig_orog = -1
 CALL grib_new_from_file(if_static,ig_orog,iret)
 IF (iret /= GRIB_SUCCESS) GOTO 9998
-CALL grib_get(ig_orog,"editionNumber",en)
-
-! Controllo che il campo sia orografia
-IF (en == 1) THEN
-  WRITE (*,*) "Processing grib1 input (Cosmo)"
-  CALL grib_get(ig_orog,"indicatorOfParameter",idum(1))
-  CALL grib_get(ig_orog,"indicatorOfTypeOfLevel",idum(2))
-  IF (idum(1) /= 8 .OR. idum(2) /= 1) GOTO 9997
-ELSE IF (en == 2) THEN
-  WRITE (*,*) "Processing grib2 input (Icon)"
-  CALL grib_get(ig_orog,"discipline",idum(1))
-  CALL grib_get(ig_orog,"parameterCategory",idum(2))
-  CALL grib_get(ig_orog,"parameterNumber",idum(3))
-  CALL grib_get(ig_orog,"typeOfFirstFixedSurface",idum(4))
-  IF (idum(1) /= 0 .OR. idum(2) /= 3 .OR. idum(3) /= 6 .OR. idum(4) /= 1) GOTO 9997
-ENDIF
-  
-! Controllo l'ordine dei punti
+CALL grib_get(ig_orog,"indicatorOfParameter",idum(1))
+CALL grib_get(ig_orog,"indicatorOfTypeOfLevel",idum(2))
+IF (idum(1) /= 8 .OR. idum(2) /= 1) GOTO 9997
 CALL grib_get(ig_orog,"iScansNegatively",idum(1))
 CALL grib_get(ig_orog,"jScansPositively",idum(2))
 CALL grib_get(ig_orog,"jPointsAreConsecutive",idum(3))
@@ -213,17 +260,9 @@ CALL grib_get(ig_orog,"longitudeOfFirstGridPointInDegrees",x1)
 CALL grib_get(ig_orog,"latitudeOfFirstGridPointInDegrees",y1)
 CALL grib_get(ig_orog,"iDirectionIncrementInDegrees",dx)
 CALL grib_get(ig_orog,"jDirectionIncrementInDegrees",dy)
-
-IF (en == 1) THEN
-  CALL grib_get(ig_orog,"longitudeOfSouthernPoleInDegrees",xrot)
-  CALL grib_get(ig_orog,"latitudeOfSouthernPoleInDegrees",rdum)
-  yrot = rdum + 90.
-ELSE IF (en == 2) THEN
-  CALL grib_get(ig_orog,"gridDefinitionTemplateNumber",gdtn)
-  IF (gdtn /= 0) GOTO 9985
-  xrot = 0.
-  yrot = 0.
-ENDIF
+CALL grib_get(ig_orog,"longitudeOfSouthernPoleInDegrees",xrot)
+CALL grib_get(ig_orog,"latitudeOfSouthernPoleInDegrees",rdum)
+yrot = rdum + 90.
 
 ! Alloco arrays dipendenti dal numero di punti
 ALLOCATE (xgeo(nx,ny),ygeo(nx,ny),orog(nx*ny),zlev3d(nx*ny,nlev3d)) 
@@ -232,17 +271,17 @@ zlev3d(:,:) = rmis
 ! Salvo orografia
 CALL grib_get(ig_orog,"values",orog)
 
-! Se devo elaborare model layers COSMO/ICON, ne leggo le quote
+! Se devo elaborare model layers COSMO, ne leggo le quote
 DO
   ig = -1
   CALL grib_new_from_file(if_static,ig,iret)
   IF (iret == GRIB_END_OF_FILE) EXIT   
-  CALL grib_get(ig,"editionNumber",idum(1))
-  IF (idum(1) /= en) GOTO 9983
-  
+
 !   Controlli
   IF (.NOT. samegrid(ig_orog,ig)) GOTO 9995
-  CALL get_grib1_header(ig, LEV=idum(1:3))
+  CALL grib_get(ig,"indicatorOfTypeOfLevel",idum(1))
+  CALL grib_get(ig,"topLevel",idum(2))
+  CALL grib_get(ig,"bottomLevel",idum(3))
   IF (idum(1) /= 110 .OR. idum(3) /= idum(2)+1) GOTO 9994
 
 !   Se e' uno dei livelli richiesti, salvo le quote
@@ -258,127 +297,39 @@ ENDDO
 
 IF (ANY(zlev3d(:,:) == rmis)) GOTO 9993
 
-!--------------------------------------------------------------------------
-! 1.5 Calcolo i parametri dipendenti dalle opzioni di file_nml
-
-! 1.5.1 Step e durata totale del file (in ore)
-hh_step = 1 
-nht = 1+(nscad-1)*hh_step
-
-! 1.5.2 Numero e codifica parametri richiesti in input: grib1 (COSMO)
-IF (en == 1) THEN
-   
-! Parametri 3D (cem, tab, var)
-  IF (inp_h2o == 0) THEN               ! P,T,U,V; ioutmm5 = 81
-    npar3d = 4
-    ALLOCATE (rq_par3d(3,npar3d))
-    rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34/), &
-      (/3,npar3d/))
-    WRITE (hr2,'(5i3)') 0,0,0,0,0
-  
-  ELSE IF (inp_h2o == 1) THEN          ! P,T,U,V,Q; ioutmm5 = 82
-    npar3d = 5
-    ALLOCATE (rq_par3d(3,npar3d))
-    rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34, &
-      200,2,51/),(/3,npar3d/))
-    WRITE (hr2,'(5i3)') 0,1,0,0,0
-  
-  ELSE IF (inp_h2o == 2) THEN          ! T,P,U,V,Q,Qcr; ioutmm5 = 83
-    npar3d = 6
-    ALLOCATE (rq_par3d(3,npar3d))
-    rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34, &
-      200,2,51, 200,2,150/),(/3,npar3d/))
-    WRITE (hr2,'(5i3)') 0,1,1,0,0
-  
-  ELSE IF (inp_h2o == 3) THEN          ! T,P,U,V,Q,Qcr,Qis; ioutmm5 = 83
-    npar3d = 7
-    ALLOCATE (rq_par3d(3,npar3d))
-    rq_par3d(:,:) = RESHAPE((/200,2,1, 200,2,11, 200,2,33, 200,2,34, &
-      200,2,51, 200,2,150, 200,2,151/),(/3,npar3d/))
-    WRITE (hr2,'(5i3)') 0,1,1,0,0
-  ENDIF
-
-! Parametri 2D (Temperatura superficie e Preciptazione)
-  npar2d = 2
-  ALLOCATE (rq_par2d(3,npar2d))
-  rq_par2d(:,:) = RESHAPE((/200,2,11, 200,2,61/),(/3,npar2d/))
-
-! 1.5.3 Numero e codifica parametri richiesti in input: grib2 (ICON)
-ELSE IF (en == 2) THEN
-
-! Parametri 3D (discipline, category, number)
-  IF (inp_h2o == 0) THEN               ! P,T,U,V; ioutmm5 = 81
-    npar3d = 4
-    ALLOCATE (rq_par3d(3,npar3d))
-    rq_par3d(:,:) = RESHAPE((/0,3,0, 0,0,0, 0,2,2, 0,2,3/), &
-      (/3,npar3d/))
-    WRITE (hr2,'(5i3)') 0,0,0,0,0
-  
-  ELSE IF (inp_h2o == 1) THEN          ! P,T,U,V,Q; ioutmm5 = 82
-    npar3d = 5
-    ALLOCATE (rq_par3d(3,npar3d))
-    rq_par3d(:,:) = RESHAPE((/0,3,0, 0,0,0, 0,2,2, 0,2,3, &
-      0,1,0/),(/3,npar3d/))
-    WRITE (hr2,'(5i3)') 0,1,0,0,0
-  
-  ELSE IF (inp_h2o == 2 .OR. inp_h2o == 3) THEN
-    GOTO 9984
-
-  ENDIF
-
-! Parametri 2D (Temperatura superficie e Preciptazione)
-  npar2d = 2
-  ALLOCATE (rq_par2d(3,npar2d))
-  rq_par2d(:,:) = RESHAPE((/0,0,0, 0,1,52/),(/3,npar2d/))
-
-ENDIF
-  
-! 1.5.4 Codifica grib dei livelli richiesti
-ALLOCATE (rq_lev3d(3,nlev3d))
-rq_lev3d(1,:) = 110
-rq_lev3d(2,:) = id_lev3d(1:nlev3d)
-rq_lev3d(3,:) = id_lev3d(1:nlev3d) + 1
-
-ALLOCATE (rq_lev2d(3,npar2d))
-rq_lev2d(:,:) = RESHAPE((/1,0,0, 1,0,0/),(/3,npar2d/))
-
-! 1.5.5 Stringhe per log
-str_model = "COSMO "        
-IF (tipo_scad == 1) THEN
-  str_tipo_scad = "Analisi"
-ELSE IF (tipo_scad == 2) THEN
-  str_tipo_scad = "Previsioni"
-ENDIF
-
-!--------------------------------------------------------------------------
-! 1.6 Apro file log
-
-OPEN (UNIT=iulog, FILE=file_log, STATUS="REPLACE", ACTION="WRITE")
-
-
 !==========================================================================
 ! 3) Scrivo gli header di file_out
 
-! Leggo la data iniziale dal primo grib
+! Se i grib sono ordinati, leggo la data iniziale dal primo grib
 CALL grib_open_file(if_dat,file_dat,"r",iret)
 IF (iret /= GRIB_SUCCESS) GOTO 9991
 ig = -1
 CALL grib_new_from_file(if_dat,ig,iret)
 IF (iret /= GRIB_SUCCESS) GOTO 9990
-CALL grib_get(ig,"editionNumber",idum(1))
-IF (idum(1) /= en) GOTO 9982
+CALL grib_get(ig,"dataDate",idum(1))
+CALL grib_get(ig,"dataTime",idum(2))
 
-IF (tipo_scad == 1) THEN     ! analisi
-  CALL get_grib_time(ig, rtime=data_ini)
-ELSE                         ! forecast
-  CALL get_grib_time(ig, vtime2=data_ini)
-ENDIF
-  
+data_ini%yy = idum(1)/10000
+data_ini%mm = MOD(idum(1)/100,100)
+data_ini%dd = MOD(idum(1),100)
+hh_ini = idum(2) / 100
+
 CALL grib_release(ig)
 CALL grib_close_file(if_dat)
 
 ! Se richiesto, trasformo la data iniziale da GMT a LST
-IF (utmz /= 0) data_ini = data_ini + timedelta_new(hour=utmz)
+IF (utmz /= 0) THEN
+  hht = hh_ini + utmz
+  IF (hht < 0) THEN
+    hh_ini = hht + 24
+    data_ini = data_ini - 1
+  ELSE IF (hht > 24) THEN
+    hh_ini = hht - 24
+    data_ini = data_ini + 1
+  ELSE
+    hh_ini = hht
+  ENDIF
+ENDIF
 
 ! Calcolo le coordinate geografiche di tutti i punti
 DO j = 1,ny
@@ -386,12 +337,7 @@ DO i = 1,nx
   k = (j-1)*nx + i
   xx = x1 + (i-1) * dx
   yy = y1 + (j-1) * dy
-  IF (xrot == 0. .OR. yrot == 0.) THEN
-    xgeo(i,j) = xx
-    ygeo(i,j) = yy
-  ELSE
-    CALL rtll (xx,yy,xrot,yrot,xgeo(i,j),ygeo(i,j))
-  ENDIF
+  CALL rtll (xx,yy,xrot,yrot,xgeo(i,j),ygeo(i,j))
 ENDDO
 ENDDO
 
@@ -400,14 +346,13 @@ OPEN (UNIT=iuout, FILE=file_out, STATUS="REPLACE", ACTION="WRITE")
 
 IF (out_fmt == 2) THEN
 !                      12345678901234561234567890123456
-  WRITE (iuout,'(3a)') "3D.DAT          2.1             ",TRIM(str_tipo_scad), " operative ARPAE-SIMC" ! hr 1
+  WRITE (iuout,'(a)') "3D.DAT          2.1             Analisi operative COSMO-I7" ! hr 1
   WRITE (iuout,'(a)') "0"                                       ! n.ro record commento
   WRITE (iuout,'(a15)') hr2                                     ! hr 2
   WRITE (iuout,'(a)') ""                                        ! hr 3
   WRITE (iuout,'(21i3)') (0,k=1,21)                             ! hr 4
-  CALL getval(data_ini, YEAR=yea, MONTH=mon, DAY=dd, HOUR=hh) 
   WRITE (iuout,'(i4.4,3i2.2,i5,3i4)') &                         ! hr 5
-    yea,mon,dd,hh,nht,nx,ny,nlev3d
+    data_ini%yy,data_ini%mm,data_ini%dd,hh_ini,nht,nx,ny,nlev3d
   WRITE (iuout,'(6i4,2f10.4,2f9.4)') &                          ! hr 6
     1,1,nx,ny,1,nlev3d,MINVAL(xgeo),MAXVAL(xgeo),MINVAL(ygeo),MAXVAL(ygeo)
   DO k = 1,nlev3d                                               ! sigma coeff.
@@ -415,14 +360,13 @@ IF (out_fmt == 2) THEN
   ENDDO
 
 ELSE IF (out_fmt == 3) THEN 
-  WRITE (iuout,'(3a)') "3D.DAT            3             ",TRIM(str_tipo_scad), " operative ARPAE-SIMC" ! hr 1
+  WRITE (iuout,'(a)') "3D.DAT            3             Analisi operative COSMO-I7" ! hr 1
   WRITE (iuout,'(a)') "0"                                       ! n.ro record commento
   WRITE (iuout,'(a)') hr2                                       ! hr 2
   WRITE (iuout,'(a)') ""                                        ! hr 3
   WRITE (iuout,'(21i3)') (0,k=1,21)                             ! hr 4
-  CALL getval(data_ini, YEAR=yea, MONTH=mon, DAY=dd, HOUR=hh) 
   WRITE (iuout,'(i4.4,3i2.2,i4,i5,i5,3i4)') &                   ! hr 5
-    yea,mon,dd,hh,0,nht,0,nx,ny,nlev3d
+    data_ini%yy,data_ini%mm,data_ini%dd,hh_ini, 0,nht,0, nx,ny,nlev3d
   WRITE (iuout,'(6i4,2f10.4,2f9.4)') &                          ! hr 6
     1,1,nx,ny,1,nlev3d,MINVAL(xgeo),MAXVAL(xgeo),MINVAL(ygeo),MAXVAL(ygeo)
   DO k = 1,nlev3d                                               ! sigma coeff.
@@ -437,8 +381,7 @@ cnt_sea = 0
 DO j = 1,ny
 DO i = 1,nx
   k = (j-1)*nx + i
-  IF ((en == 1 .AND. orog(k) > 0.050 .AND. orog(k) < 0.051) .OR. &
-      (en == 2 .AND. orog(k) > 0.023 .AND. orog(k) < 0.024)) THEN
+  IF (orog(k) < 0.015 .AND. orog(k) > 0.01) THEN
     ilu = 16
     cnt_sea = cnt_sea + 1
   ELSE
@@ -461,19 +404,18 @@ WRITE (*,'(4a)') "Modello ",TRIM(str_model), &
   " scadenze di ",TRIM(str_tipo_scad)
 WRITE (*,'(a,2i4,a,4(1x,f9.4))') &
   "Area grib: nx,ny ",nx,ny,"    x1,y1,dx,dy",x1,y1,dx,dy
-CALL getval(data_ini, YEAR=yea, MONTH=mon, DAY=dd, HOUR=hh) 
 IF (utmz == 0) THEN
   WRITE (*,'(a,i4.4,3(1x,i2.2),a,i4)') &
-    "Data iniziale (GMT)",yea,mon,dd,hh, &
+    "Data iniziale (GMT)",data_ini%yy,data_ini%mm,data_ini%dd,hh_ini, &
     ", durata attesa del input file (ore) ",nht
 ELSE
   WRITE (*,'(a,i3,a,i4.4,3(1x,i2.2),a,i4)') &
-    "Data iniziale (LST, utmz =",utmz,") ",yea,mon,dd,hh, &
-    ", durata attesa del input file (ore) ",nht
+    "Data iniziale (LST, utmz =",utmz,") ",data_ini%yy,data_ini%mm, &
+    data_ini%dd,hh_ini,", durata attesa del input file (ore) ",nht
 ENDIF
 WRITE (*,'(2a,i2,a,i2)') "Parametri richiesti in input: ", &
   "model layers " ,npar3d,", superficiali ",npar2d
-WRITE (*,'(a,3f7.0,2x,i6,a,i6)') "Orografia (m): ave, max, min, p.ti mare ", &
+WRITE (*,'(a,3f7.0,i5,a,i5)') "Orografia (m): ave, max, min, p.ti mare ", &
   SUM(orog(:))/REAL(nx*ny), MAXVAL(orog(:)), MINVAL(orog(:)), cnt_sea,"/",nx*ny
 WRITE (*,*)
 
@@ -495,46 +437,73 @@ cnt_out = 0
 DO k = 1,HUGE(0)
 
 !--------------------------------------------------------------------------
-! 4.2 Leggo il prossimo grib, trovo data, par, liv
+! 4.2 Leggo il prossimo grib, trovo data, scad, par, liv
   CALL grib_new_from_file(if_dat,ig,iret)
   IF (iret == GRIB_END_OF_FILE) EXIT
   IF (iret /= GRIB_SUCCESS) GOTO 9990
   IF (.NOT. samegrid(ig_orog,ig)) GOTO 9986
-  CALL grib_get(ig,"editionNumber",idum(1))
-  IF (idum(1) /= en) GOTO 9981
 
 ! data
-  IF (tipo_scad == 1) THEN     ! analisi
-    CALL get_grib_time(ig, rtime=datav)
-  ELSE                         ! forecast
-    CALL get_grib_time(ig, vtime2=datav)
-  ENDIF
+  CALL grib_get(ig,"dataDate",idum(1))
+  CALL grib_get(ig,"dataTime",idum(2))
+  datag%yy = idum(1)/10000
+  datag%mm = MOD(idum(1)/100,100)
+  datag%dd = MOD(idum(1),100)
+  hhg = idum(2) / 100
 
 ! Se richiesto, trasformo la data corrente da GMT a LST
-  IF (utmz /= 0) datav = datav + timedelta_new(hour=utmz)
-
-! Liv, var
-  CALL get_grib1_header(ig, par=par(1:3), lev=lev(1:3))
-! WRITE (*,'(7i4)') k,lev,par
+  IF (utmz /= 0) THEN
+    hht = hhg + utmz
+    IF (hht < 0) THEN
+      hhg = hht + 24
+      datag = datag - 1
+    ELSE IF (hht > 24) THEN
+      hhg = hht - 24
+      datag = datag + 1
+    ELSE
+      hhg = hht
+    ENDIF
+  ENDIF
   
+! scad
+  CALL grib_get(ig,"timeRangeIndicator",scad(1))
+  CALL grib_get(ig,"startStep",scad(2))
+  CALL grib_get(ig,"endStep",scad(3))
+  
+! liv
+  CALL grib_get(ig,"indicatorOfTypeOfLevel",lev(1))
+  CALL grib_get(ig,"topLevel",lev(2))
+  CALL grib_get(ig,"bottomLevel",lev(3))
+  
+! par
+  CALL grib_get(ig,"centre",par(1))
+  CALL grib_get(ig,"gribTablesVersionNo",par(2))
+  CALL grib_get(ig,"indicatorOfParameter",par(3))
+
 !--------------------------------------------------------------------------
 ! 4.3 Gestisco i cambiamenti di istante
 !
-! datav: data di validita' dell'ultimo grib letto
-! datac: data cui si riferiscono i dati in memeoria (arrays values*)
+! datag,hhg: data di emissione dell'ultimo grib letto
+! datav,hhv: data di validita' dell'ultimo grib letto
+! datac,hhc: data cui si riferiscono i dati in memeoria (arrays values*)
+
+  CALL scad2val(datag,hhg,scad,datav,hhv,ier)
+  IF (ier /=0) GOTO 9988
+  IF (ier == -1) WRITE (*,*) &
+    "Warning, trovati dati non istantanei e non riferiti all'ora precedente"
 
 ! Primo grib del file: salvo data di validita', azzero gli arrays
   IF (k == 1) THEN
     datac = datav
+    hhc = hhv    
     values3d(:,:,:) = rmis
     values2d(:,:) = rmis
     found3d(:,:) = .FALSE.
     found2d(:) = .FALSE.
   
   ELSE
-    dlt = datav - datac
-    CALL getval(dlt, AHOUR=dlth)
-    
+    dlth = (datav - datac) * 24 + (hhv - hhc)
+
 !   Nuovo istante: scrivo output istante precedente, azzero gli arrays
     IF (dlth == hh_step) THEN
       IF (COUNT(found3d(:,:)) /= nlev3d*npar3d .OR. &
@@ -542,26 +511,33 @@ DO k = 1,HUGE(0)
 
 !     Se richiesto, sovrascrivo i dati per test/debug
       IF (lmodif) THEN
-        CALL getval(datav, HOUR=hh)
-        values3d(:,:,3) = REAL(hh)  ! U = ora GMT
-        values3d(:,:,4) = 0.        ! V
+        idum(1) = hhc-utmz
+        IF (hhc-utmz < 0) THEN
+          rdum = REAL(hhc-utmz+24)
+        ELSE IF (hhc-utmz > 24) THEN
+          rdum = REAL(hhc-utmz-24)
+        ELSE
+          rdum = REAL(hhc-utmz)
+        ENDIF
+        values3d(:,:,3) = rdum  ! U = ora GMT
+        values3d(:,:,4) = 0.    ! V
       ENDIF
 
       CALL write_dat(values3d,zlev3d,values2d,nx,ny,nlev3d, &
-        npar3d,npar2d,datac,iuout,inp_h2o,rmis,out_fmt)
+        npar3d,npar2d,datac,hhc,iuout,inp_h2o,rmis,out_fmt)
 !     CALL write_log(found3d,found2d)
       cnt_out = cnt_out + 1
 
-      CALL getval(datac, YEAR=yea, MONTH=mon, DAY=dd, HOUR=hh) 
       IF (utmz == 0) THEN
         WRITE (*,'(a,i4.4,3(1x,i2.2))') &
-          "Elaborato istante (GMT): ",yea,mon,dd,hh
+          "Elaborato istante (GMT): ",datac%yy,datac%mm,datac%dd,hhc
       ELSE
         WRITE (*,'(a,i3,a,i4.4,3(1x,i2.2))') "Elaborato istante (LST, utmz=", &
-          utmz,"): ",yea,mon,dd,hh
+          utmz,"): ",datac%yy,datac%mm,datac%dd,hhc
       ENDIF
  
       datac = datav
+      hhc = hhv
 
       values3d(:,:,:) = rmis
       values2d(:,:) = rmis
@@ -622,23 +598,29 @@ ENDDO
 
 ! Se richiesto, sovrascrivo i dati per test/debug
 IF (lmodif) THEN
-  CALL getval(datac, HOUR=hh)
-  values3d(:,:,3) = REAL(hh)  ! U = ora GMT
-  values3d(:,:,4) = 0.        ! V
+  idum(1) = hhc-utmz
+  IF (hhc-utmz < 0) THEN
+    rdum = REAL(hhc-utmz+24)
+  ELSE IF (hhc-utmz > 24) THEN
+    rdum = REAL(hhc-utmz-24)
+  ELSE
+    rdum = REAL(hhc-utmz)
+  ENDIF
+  values3d(:,:,3) = rdum  ! U = ora GMT
+  values3d(:,:,4) = 0.    ! V
 ENDIF
 
 CALL write_dat(values3d,zlev3d,values2d,nx,ny,nlev3d, &
-  npar3d,npar2d,datac,iuout,inp_h2o,rmis,out_fmt)
+  npar3d,npar2d,datac,hhc,iuout,inp_h2o,rmis,out_fmt)
 !CALL write_log(found3d,found2d)
 cnt_out = cnt_out + 1
 
-CALL getval(datac, YEAR=yea, MONTH=mon, DAY=dd, HOUR=hh) 
 IF (utmz == 0) THEN
   WRITE (*,'(a,i4.4,3(1x,i2.2))') &
-    "Elaborato istante (GMT): ",yea,mon,dd,hh
+    "Elaborato istante (GMT): ",datac%yy,datac%mm,datac%dd,hhc
 ELSE
   WRITE (*,'(a,i3,a,i4.4,3(1x,i2.2))') "Elaborato istante (LST, utmz=", &
-    utmz,"): ",yea,mon,dd,hh
+    utmz,"): ",datac%yy,datac%mm,datac%dd,hhc
 ENDIF
 WRITE (*,*) "Totale scadenze scritte: ",cnt_out
 
@@ -681,7 +663,6 @@ STOP
 9994 CONTINUE
 WRITE (*,*) "Model layer incompatibile con modello richiesto"
 WRITE (*,*) TRIM(file_static)
-WRITE (*,*) "Atteso (110,n,n+1), trovato: ",idum(1:3)
 STOP
 
 9993 CONTINUE
@@ -712,20 +693,20 @@ ELSE
   WRITE (*,'(a,i3,2a)') "Errore, data di validita' (LST, utmz =",utmz, &
     ") non ordinata in ",TRIM(file_dat)
 ENDIF
-WRITE (*,*) "  campo: ",k 
 
-CALL getval(datac, YEAR=yea, MONTH=mon, DAY=dd, HOUR=hh)
 WRITE (*,'(a,1x,i4.4,3(1x,i2.2))') &
-  "Data precedente ",yea,mon,dd,hh
-CALL getval(datav, YEAR=yea, MONTH=mon, DAY=dd, HOUR=hh)
+  "Data precedente ",datac%yy,datac%mm,datac%dd,hhc
 WRITE (*,'(a,1x,i4.4,3(1x,i2.2))') &
-  "Data trovata    ",yea,mon,dd,hh
+  "Data trovata    ",datav%yy,datav%mm,datav%dd,hhv
+STOP
+
+9988 CONTINUE
+WRITE (*,'(a,3i4)') "Errore, scadenza non gestita ",scad(:)
 STOP
 
 9987 CONTINUE
-CALL getval(datac, YEAR=yea, MONTH=mon, DAY=dd, HOUR=hh)
 WRITE (*,'(a,i4.4,3(1x,i2.2))') &
-  "Campi incompleti elaborando l'istante: ",yea,mon,dd,hh
+  "Campi incompleti elaborando l'istante: ",datac%yy,datac%mm,datac%dd,hhc
 WRITE (*,'(2(a,i3),2(a,i2))') "Trovati: 3D ", &
   COUNT(found3d(:,:)),"/",nlev3d*npar3d,", 2D ",COUNT(found2d(:)),"/",npar2d
 WRITE (*,'(2a)') "Verificare la consitenza tra grib23ddat.inp e ",TRIM(file_dat)
@@ -734,26 +715,6 @@ STOP
 9986 CONTINUE
 WRITE (*,*) "Campo in input definito su griglia diversa da orografia"
 WRITE (*,*) "Campo ",k," file ",TRIM(file_dat)
-STOP
-
-9985 CONTINUE
-WRITE (*,*) "Grib2: gestite solo griglie lat-lon non ruotate; gdtn ",gdtn
-STOP
-
-9984 CONTINUE
-WRITE (*,*) "inp_h2o non gestito per grib2 ",inp_h2o
-STOP
-
-9983 CONTINUE
-WRITE (*,*) "Grib static con editionNumber diversa "
-STOP
-
-9982 CONTINUE
-WRITE (*,*) "Grib dati con editionNumber diversa, campo 1"
-STOP
-
-9981 CONTINUE
-WRITE (*,*) "Grib dati con editionNumber diversa, campo ",k
 STOP
 
 END PROGRAM grib23ddat
@@ -820,13 +781,10 @@ FUNCTION samegrid(ig1,ig2) RESULT (same)
 USE grib_api
 IMPLICIT NONE
 
-INTEGER, INTENT(IN) :: ig1,ig2
+INTEGER :: ig1,ig2
 LOGICAL :: same
-REAL :: rval(2,8)
-INTEGER :: ival(2,6),en(2)
-
-rval(:,:) = 0.
-ival(:,:)= 0
+REAL :: rval(2,6)
+INTEGER :: ival(2,5)
 
 CALL grib_get(ig1,"numberOfPointsAlongAParallel",      ival(1,1))
 CALL grib_get(ig1,"numberOfPointsAlongAMeridian",      ival(1,2))
@@ -852,21 +810,7 @@ CALL grib_get(ig2,"latitudeOfLastGridPointInDegrees",  rval(2,4))
 CALL grib_get(ig2,"iDirectionIncrementInDegrees",      rval(2,5))
 CALL grib_get(ig2,"jDirectionIncrementInDegrees",      rval(2,6))
 
-CALL grib_get(ig1,"editionNumber",en(1))
-CALL grib_get(ig2,"editionNumber",en(2))
-
-IF (en(1) == 1) THEN
-  CALL grib_get(ig1,"longitudeOfSouthernPoleInDegrees",rval(1,7))
-  CALL grib_get(ig1,"latitudeOfSouthernPoleInDegrees", rval(1,8))
-  CALL grib_get(ig2,"longitudeOfSouthernPoleInDegrees",rval(2,7))
-  CALL grib_get(ig2,"latitudeOfSouthernPoleInDegrees", rval(2,8))
-
-ELSE IF (en(1) == 2) THEN
-  CALL grib_get(ig1,"gridDefinitionTemplateNumber",    ival(1,6))
-  CALL grib_get(ig2,"gridDefinitionTemplateNumber",    ival(2,6))
-ENDIF
-
-IF (ALL(ival(1,1:6)==ival(2,1:6)) .AND. ALL(rval(1,1:8)==rval(2,1:8))) THEN
+IF (ALL(ival(1,1:5)==ival(2,1:5)) .AND. ALL(rval(1,1:6)==rval(2,1:6))) THEN
   same = .TRUE.
 ELSE
   same= .FALSE.
@@ -876,18 +820,74 @@ END FUNCTION samegrid
 
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
+SUBROUTINE scad2val(datag,hhg,scad,datav,hhv,ier)
+!
+! Calcola la data di validita', a partire da data di emissione e scadenza
+! scad(1:3) = time range, start step, end step
+!
+USE date_handler
+IMPLICIT NONE
+
+TYPE(date), INTENT(IN) :: datag
+INTEGER, INTENT(IN) :: hhg,scad(3)
+TYPE(date), INTENT(OUT) :: datav
+INTEGER, INTENT(OUT) :: hhv,ier
+INTEGER :: sca,hh_tot
+
+!--------------------------------------------------------------------------
+! gestisco time range
+
+SELECT CASE(scad(1))
+CASE(0,10)
+  IF (scad(2) == 0) THEN        ! unintialised analysis
+    sca = 0
+  ELSE                          ! forecast
+    sca = scad(2)
+  ENDIF
+
+CASE(1)                         ! initialised analysis
+  sca = 0
+
+CASE(2:5)                       ! prodotto riferito a un intervallo
+  sca = scad(3)
+
+CASE(13)                        ! analisi LAMA
+  sca = 0
+
+CASE DEFAULT                    ! time range non gestito
+  ier = 1
+  RETURN
+
+END SELECT
+
+! Calcolo data-ora di validita'
+hh_tot = hhg + sca
+datav = datag + (hh_tot/24)
+hhv = MOD(hh_tot,24)
+
+IF (scad(1)>=2 .AND. scad(1)<=5 .AND. scad(3)-scad(2)/=1) THEN
+  ier = -1
+ELSE
+  ier = 0
+ENDIF
+
+RETURN
+END SUBROUTINE scad2val
+
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
 SUBROUTINE write_dat(values3d,zlev3d,values2d,nx,ny,nlev3d, &
-  npar3d,npar2d,datav,iuout,inp_h2o,rmis,out_fmt)
+  npar3d,npar2d,datav,hhv,iuout,inp_h2o,rmis,out_fmt)
 !
 ! Scrive su iuout una scadenza di dati superficiali e 3d
 !
 
-USE datetime_class
+USE date_handler
 IMPLICIT NONE
 
 ! Argomenti subroutine
-TYPE(datetime), INTENT(IN) :: datav
-INTEGER, INTENT(IN) :: nx,ny,nlev3d,npar3d,npar2d,iuout,inp_h2o,out_fmt
+TYPE(date), INTENT(IN) :: datav
+INTEGER, INTENT(IN) :: nx,ny,nlev3d,npar3d,npar2d,hhv,iuout,inp_h2o,out_fmt
 REAL, INTENT(IN) :: values3d(nx*ny,nlev3d,npar3d),values2d(nx*ny,npar2d)
 REAL, INTENT(IN) :: zlev3d(nx*ny,nlev3d),rmis
 
@@ -904,13 +904,15 @@ CHARACTER (LEN=80) :: chfmt3d
 ! periodo di validita' dei dati (startStep), mentre (myr,mmo,mday,mhr,msec)
 ! e' l'istante finale (endStep). Calmet richiede che i due istanti coincidano.
 
-CALL getval(datav, YEAR=myrb, MONTH=mmob, DAY=mdayb, HOUR=mhrb) 
-
-myr = myrb
-mmo = mmob
-mday = mdayb
-mhr = mhrb
+myrb = datav%yy
+mmob = datav%mm
+mdayb = datav%dd
+mhrb = hhv
 msecb = 0
+myr = datav%yy
+mmo = datav%mm
+mday = datav%dd
+mhr = hhv
 msec = 0
 
 ! Parametri attualmente non gestiti (Calmet non li usa)

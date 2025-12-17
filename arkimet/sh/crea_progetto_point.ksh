@@ -103,7 +103,7 @@ else
   arc_root=${HOME}/arkimet/progetti_point
 fi
 if [ ! -d $arc_root ] ; then
-  echo "Root delle dir di archiviazione indefinita: assegnare la variabile WORK_ROOT"
+  echo "Root delle dir di archiviazione inesistente "$arc_root": crearla o assegnare la variabile ARC_ROOT"
   exit 2
 fi
 
@@ -113,7 +113,7 @@ else
   work_root=$SCRATCH
 fi
 if [ ! -d $work_root ] ; then
-  echo "Root delle dir di lavoro indefinita: assegnare la variabile WORK_ROOT"
+  echo "Root delle dir di lavoro inesistente "$work_root": crearla o assegnare la variabile WORK_ROOT"
   exit 2
 fi
 

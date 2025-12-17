@@ -9,7 +9,7 @@ PROGRAM grib_forc2ana
 !
 ! ToDo: opzione -force per scrivere comunque qualcosa nei casi non gestiti
 !
-!                                         Versione 2.0.0, Enrico 09/12/2024
+!                                         Versione 2.1.0, Enrico 06/11/2025
 !--------------------------------------------------------------------------
 
 USE grib2_utilities
@@ -19,11 +19,11 @@ IMPLICIT NONE
 
 TYPE (datetime) :: rtime_in,vtime1_in,vtime2_in,rtime_out
 INTEGER :: ifin=0,ifout=0,igin=0,igout=0
-INTEGER :: kg,idp,kp,iret,yy,mon,dd,hh,min,en,yoc,cortod,scad(4),pdtn_in
+INTEGER :: kg,idp,kp,iret,yy,mon,dd,hh,min,en,yoc,cortod,scad(4),pdtn_in,pdtn_out
 CHARACTER(LEN=200) :: filein,fileout,chdum
 CHARACTER(LEN=1) :: out_times
 
-!debug INTEGER :: sortm,topd,pdtn,togp,ft,tosp,toti,lotr
+!debug INTEGER :: sortm,topd,togp,pdtn,ft,tosp,toti,lotr
 
 !--------------------------------------------------------------------------
 ! 1) Preliminari
@@ -131,11 +131,17 @@ DO kg = 1,HUGE(0)
       IF (iret /= 0) CALL grib_set(igout,"typeOfStatisticalProcessing",255)
 !     IF (iret == GRIB_SUCCESS) CALL grib_set(igout,"typeOfStatisticalProcessing",255)
 
-      CALL grib_set(igout,"productDefinitionTemplateNumber",0)
-      CALL grib_set(igout,"significanceOfReferenceTime",0)
-      CALL grib_set(igout,"typeOfProcessedData",0)
-      CALL grib_set(igout,"typeOfGeneratingProcess",0)
+      CALL grib_get(igout,"productDefinitionTemplateNumber",pdtn_in)
+      IF (pdtn_in == 11) THEN
+        pdtn_out = 1
+      ELSE IF (pdtn_in == 8) THEN
+        pdtn_out = 0
+      ELSE
+        pdtn_out = pdtn_in
+      ENDIF
+      CALL grib_set(igout,"productDefinitionTemplateNumber",pdtn_out)
       CALL grib_set(igout,"forecastTime",0)
+      CALL check_g2_keys(igout,"ist")
   
     ENDIF
 
@@ -164,17 +170,24 @@ DO kg = 1,HUGE(0)
         
     ELSE IF (en == 2) THEN
       IF (scad(4) == 0) THEN    ! Campo istantaneo
-        CALL grib_set(igout,"productDefinitionTemplateNumber",0)
-        CALL grib_set(igout,"significanceOfReferenceTime",0)
-        CALL grib_set(igout,"typeOfProcessedData",0)
-        CALL grib_set(igout,"typeOfGeneratingProcess",0)
+        CALL grib_get(igout,"productDefinitionTemplateNumber",pdtn_in)
+        IF (pdtn_in == 11) THEN
+          pdtn_out = 1
+        ELSE IF (pdtn_in == 8) THEN
+          pdtn_out = 0
+        ELSE
+          pdtn_out = pdtn_in
+        ENDIF
+        CALL grib_set(igout,"productDefinitionTemplateNumber",pdtn_out)
         CALL grib_set(igout,"forecastTime",0)
+        CALL check_g2_keys(igout,"ist")
 
       ELSE                      ! Campo elaborato
-        CALL grib_set(igout,"productDefinitionTemplateNumber",8)
-        CALL grib_set(igout,"significanceOfReferenceTime",0)
-        CALL grib_set(igout,"typeOfProcessedData",0)
-        CALL grib_set(igout,"typeOfGeneratingProcess",0)
+        CALL check_g2_keys(igout,"spr")
+!       CALL grib_set(igout,"productDefinitionTemplateNumber",8)
+!       CALL grib_set(igout,"significanceOfReferenceTime",0)
+!       CALL grib_set(igout,"typeOfProcessedData",0)
+!       CALL grib_set(igout,"typeOfGeneratingProcess",0)
         CALL grib_set(igout,"forecastTime",0)
         CALL grib_set(igout,"typeOfTimeIncrement",1)
         CALL grib_set(igout,"lengthOfTimeRange",scad(3)-scad(2))
@@ -243,6 +256,48 @@ WRITE (*,*) "Errore converisone timerange ",TRIM(filein)," grib n.ro " ,kg
 
 END PROGRAM grib_forc2ana
 
+!$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+SUBROUTINE check_g2_keys(igout,trg)
+
+! Controlla che alcune chiavi del GRIB2 in output siano compatibili con il
+! timerange dei dati (istantaneo o elaborato)
+! E' un'alternativa a fissare le chiavi ai valori standard, che puo'
+! introdurre cambiamenti fastidiosi e non necessari nella codifica dei grib
+
+USE grib_api
+
+IMPLICIT NONE
+INTEGER, INTENT(IN) :: igout
+CHARACTER(LEN=3), INTENT(IN) :: trg
+
+INTEGER :: pdtn,sort,topd,togp
+
+IF (trg == "ist") THEN
+  CALL grib_get(igout,"productDefinitionTemplateNumber",pdtn)
+  CALL grib_get(igout,"significanceOfReferenceTime",sort)
+  CALL grib_get(igout,"typeOfProcessedData",topd)
+  CALL grib_get(igout,"typeOfGeneratingProcess",togp)
+  IF (pdtn > 7) WRITE (*,*) "WARNING: pdtn potrebbe non essere istantaneo ",pdtn
+  IF (sort /= 0 .AND. sort /= 1) WRITE (*,*) "WARNING: sort non standard ",sort
+  IF (topd > 5) WRITE (*,*) "WARNING: topd non standard ",topd
+  IF (togp > 4) WRITE (*,*) "WARNING: togp non standard ",togp
+  
+ELSE IF (trg == "spr") THEN
+  CALL grib_get(igout,"productDefinitionTemplateNumber",pdtn)
+  CALL grib_get(igout,"significanceOfReferenceTime",sort)
+  CALL grib_get(igout,"typeOfProcessedData",topd)
+  CALL grib_get(igout,"typeOfGeneratingProcess",togp)
+  IF (pdtn < 8 .OR. pdtn > 15) WRITE (*,*) "WARNING: pdtn potrebbe non essere istantaneo ",pdtn
+  IF (sort /= 0 .AND. sort /= 1) WRITE (*,*) "WARNING: sort non standard ",sort
+  IF (topd > 5) WRITE (*,*) "WARNING: topd non standard ",topd
+  IF (togp > 4) WRITE (*,*) "WARNING: togp non standard ",togp
+
+ENDIF
+
+RETURN
+END SUBROUTINE check_g2_keys
+  
 !$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 SUBROUTINE write_help

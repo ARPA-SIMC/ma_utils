@@ -1,4 +1,4 @@
-#/bin/ksh
+#/bin/bash
 #-------------------------------------------------------------------------------
 # Procedura per estrarre da un dataset Arkimet o da un file i dati su uno o piu'
 # punti in formato seriet (tabella ASCII con una riga per ogni ora, una colonna
@@ -46,7 +46,7 @@
 # - Calcolo automatico degli estremi dello zoom (se mai si rivelasse utile...)
 #   * se non richiesta destag, posso farlo a partire dal .ptn, passando a
 #     vg6d_subarea le coordinate estreme.
-#   * con destag sono castretto a passare a vg6d_subarea gli indici, e per
+#   * con destag sono costretto a passare a vg6d_subarea gli indici, e per
 #     calcolarli devo anche estrarre e leggere un grib (lanciare la query con 
 #     arki-xargs --max-args=1)
 # - Opzione -server
@@ -55,7 +55,7 @@
 #   l'append di quelli dei vari segmenti, quindi o non c'e' header, oppure c'e'
 #   un header per ciascun segmento.
 #
-#                                             Versione 1.11.3, Enrico 16/02/2018
+#                                             Versione 1.12.0, Enrico 17/12/2025
 #-------------------------------------------------------------------------------
 #set -x
 #set -e
@@ -68,7 +68,7 @@ function write_help
   echo ""
   echo "Uso: ak_seriet.ksh PROG DATASET"
   echo "    [-inpdata=arkimet/file/filelist] [-reqdata=pts/ptn[,dsc][,vl]]"
-  echo "    [-split=LENGHT] [-destag] [-decum] [-fop] [-zoom] [-fis=FILE] [-noconv]"
+  echo "    [-split=LENGHT] [-destag] [-decum] [-penda/-pendf] [-fop] [-zoom] [-fis=FILE] [-noconv]"
   echo "    [-arc=URL] [-debug] [-tdeb] [-mon=FILE] [-h]"
   echo ""
   echo "PROG      nome del progetto (determina i nomi dei files di input e output)"
@@ -96,8 +96,13 @@ function write_help
   echo "          (default: hour + 20MB; con opzione -destag, solo hour)"
   echo "-destag   interpola su griglia H i dati su grigle U e V (usare se e solo "
   echo "          se si estraggono vento sui model layers o flusso di momento COSMO)"
-  echo "-decum    restituisce i parametri cumulati e medi come valori relativi all'"
-  echo "          ora precedente (utile solo con dati superficiali previsti)"
+  echo "-decum    modifica i parametri non istantanei, scrivendoli come valori elaborati"
+  echo "          su un periodo di un'ora. Puo' essere utile elaborando dati previsti"
+  echo "-penda/pendf  modifica i parametri grib2 non istantanei, fissando il reference"
+  echo "          time (se analisi, -penda) o il forecast time (se previsioni, -pendf)"
+  echo "          alla fine dell'intervallo di elaborazione (seguendo quindi la "
+  echo "          convenzione grib1)."
+  echo "          Puo' essere utile per facilitare il confronot con i dati osservati"
   echo "-fop      come prima operazione converte al primo ordine i grib1 con "
   echo "          compressione al secondo ordine (fissa un baco GRIB-API; usare"
   echo "          solo se sono richiesti qcr o qis dal dataset LAMAZ)"
@@ -187,6 +192,7 @@ if [ -z $MA_UTILS_SVN ] ; then
   test_1grib=/usr/libexec/ma_utils/test_1grib.exe
   grib_s2f=/usr/libexec/ma_utils/grib_s2f.exe
   ma_grib1_grib2=/usr/libexec/ma_utils/ma_grib1_grib2.exe
+  shift_proc=/usr/libexec/ma_utils/grib2_endOfInterval.exe
 else 
   echo "(ak_seriet.ksh) Eseguibili ma_utils: copia di lavoro in "$MA_UTILS_SVN
   write_libsim_anag=${MA_UTILS_SVN}/arkimet/src/write_libsim_anag.exe
@@ -197,6 +203,7 @@ else
   test_1grib=${MA_UTILS_SVN}/util/grib/src/test_1grib.exe
   grib_s2f=${MA_UTILS_SVN}/util/grib/src/grib_s2f.exe
   ma_grib1_grib2=${MA_UTILS_SVN}/util/grib/src/ma_grib1_grib2.exe
+  shift_proc=${MA_UTILS_SVN}/util/grib/src/grib2_endOfInterval.exe
 fi
 
 # 1.1.2 Assegno l'ambiente LibSim
@@ -245,6 +252,7 @@ fis="N"
 zoom="N"
 destag="N"
 decum="N"
+procend="N"
 debug="N"
 tdeb="N"
 filemon=""
@@ -319,6 +327,12 @@ while [ $# -ge 1 ] ; do
     shift
   elif [ $1 = '-decum' ] ; then
     decum="Y"
+    shift
+  elif [ $1 = '-penda' ] ; then
+    procend="A"
+    shift
+  elif [ $1 = '-pendf' ] ; then
+    procend="F"
     shift
   elif [ $1 = '-debug' ] ; then
     debug="Y"
@@ -631,6 +645,20 @@ else
   echo ln -s tmp2.grb tmp3.grb >> xargs.ksh
 fi
 
+if [ $procend = "A" ] ; then
+  if [ ! -z $profiler ] ; then
+    echo "echo inizio shift reftime/ftime" >> xargs.ksh
+  fi
+  echo $profiler $shift_proc tmp3.grb tmp4.grb ana >> xargs.ksh
+elif [ $procend = "F" ] ; then
+  if [ ! -z $profiler ] ; then
+    echo "echo inizio shift reftime/ftime" >> xargs.ksh
+  fi
+  echo $profiler $shift_proc tmp3.grb tmp4.grb for >> xargs.ksh
+else
+  echo ln -s tmp3.grb tmp4.grb >> xargs.ksh
+fi
+
 if [ ! -z $profiler ] ; then
   echo "echo inizio getpoint" >> xargs.ksh
 fi
@@ -639,7 +667,7 @@ cat <<EOF2 >> xargs.ksh
 $profiler $getpoint --output-td=0 --coord-file=${prog}_anag.v7d \
   --trans-type=inter --sub-type=near --coord-format=native --output-format=grib_api_csv $getpoint_opt \
   --output-keys=gacsv:simpledate,gacsv:p1h,gacsv:p2h,gacsv:timerange,gacsv:level1,gacsv:l1,gacsv:l2,gacsv:discipline,gacsv:category,gacsv:number,gacsv:npoint,gacsv:lon,gacsv:lat,gacsv:value,editionNumber \
-  tmp3.grb tmp.gacsv
+  tmp4.grb tmp.gacsv
 cat tmp.gacsv >> \$1
 EOF2
 
