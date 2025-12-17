@@ -1,6 +1,6 @@
 Summary:    Tools, utilties and libraries for environmental meteorology
 Name:       ma_utils
-Version:    0.18
+Version:    0.19
 Release:    1
 License:    GPL
 Group:      Applications/Meteo
@@ -89,6 +89,9 @@ GRIB to seriet postprocessor for arkimet
 %{_libdir}/arkimet/seriet
 
 %changelog
+* Mon Jun  9 2025 Daniele Branchini <dbranchini@arpae.it> - 0.19-1
+- Removed all explicit references to specific users (#6)
+
 * Thu Feb 20 2025 Daniele Branchini <dbranchini@arpae.it> - 0.18-1
 - Added diagmet for area ITA5KM, removed for LAMAZ, LMSMR4, LAMA3
 - Added prepcosmomed.exe and the corresponding version of chimere utlities
