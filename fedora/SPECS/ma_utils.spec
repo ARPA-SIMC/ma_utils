@@ -1,6 +1,6 @@
 Summary:    Tools, utilties and libraries for environmental meteorology
 Name:       ma_utils
-Version:    0.19
+Version:    0.20
 Release:    1
 License:    GPL
 Group:      Applications/Meteo
@@ -89,6 +89,8 @@ GRIB to seriet postprocessor for arkimet
 %{_libdir}/arkimet/seriet
 
 %changelog
+* Thu Dec 18 2025 Enrico Minguzzi <eminguzzi@arpae.it> - 0.20-1
+- modifications for managing the new datasets of Icon analysis
 * Mon Jun  9 2025 Daniele Branchini <dbranchini@arpae.it> - 0.19-1
 - Removed all explicit references to specific users (#6)
 
