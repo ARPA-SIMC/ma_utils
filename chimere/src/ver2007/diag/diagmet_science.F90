@@ -701,6 +701,12 @@ contains
 
        zii = dvsca
 
+       if (lshow) then
+         write (90,'(a,6f10.3)') &
+         " wlf,tlf,sigw,sigt,dt0,w20 ", &
+         wlf,tlf,sigw,sigt,dt0,w20
+       endif
+      
        do nit=1,10
 
           !  Vertical integration between reference level (ZTHERM) and the
@@ -718,6 +724,12 @@ contains
           wsq(levstart+1) = w2start
           dth(levstart+1) = dtstart
 
+          if (lshow) then
+            write (90,'(a,i3,2f10.3,a,f8.3,2f6.1,2e10.3)') &
+            "- iteration,w2start,dtstart,-,dt0,dz,zmid,vscale,buoy", &
+            nit,w2start,dtstart,"-",dt0,dz,zmid,vscale,buoy
+          endif
+            
           if(w2start.le.0.0.or.dtstart.lt.0.0) then
              zt = ztherm
           else
@@ -745,8 +757,13 @@ contains
              zt = al(nlevels)
 1395         continue
           endif
-
           testscale = abs((zii-0.6*zt)/zii)
+
+          if (lshow) then
+            write (90,'(a,3(1x,f8.3))') &
+            "  test: zt,zii,testscale",zt,zii,testscale
+          endif
+         
           if(testscale.lt.0.01) then
              go to 5762
           else

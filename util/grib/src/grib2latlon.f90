@@ -1,271 +1,135 @@
 PROGRAM grib2latlon
 !--------------------------------------------------------------------------
 ! Legge il primo grib di un file, e scrive 2 grib con latitudini e 
-! longitudini dei punti della griglia.
+! longitudini dei punti della griglia. Evoluzione di gribex2latlon.f90
 !
-!                                         Versione 1.0.1, Enrico 13/01/2014
+!                                         Versione 2.0.0, Enrico 10/03/2026
 !--------------------------------------------------------------------------
 
+USE grib_api
 IMPLICIT NONE
 
-! Parametri costanti
-REAL, PARAMETER :: rmis = -9999.           ! valore per dati mancanti
-INTEGER, PARAMETER :: maxdim = 1000000      ! dimensione massima dei GRIB
+INTEGER :: ifin,ifout,igin=0,iglat=0,iglon=0,iret
+CHARACTER(LEN=200) :: filein,fileout
 
-! Dichiarazioni per GRIBEX.
-INTEGER :: ksec0(2),ksec1(1024),ksec2(1024),ksec3(2),ksec4(512)
-INTEGER :: kbuffer(maxdim), klen, kret
-REAL    :: psec2(512),psec3(2)
-REAL    :: field(maxdim)
-
-! Altre variabili del programma
-REAL :: lat(maxdim),lon(maxdim)
-REAL :: x1,y1,dx,dy,xrot,yrot,xx,yy
-INTEGER :: iuin,iuout,nx,ny,i,j,k
-CHARACTER (LEN=200) :: filein,fileout
-CHARACTER (LEN=1) :: proj
+REAL, ALLOCATABLE :: out_lat(:),out_lon(:)
+REAL :: alatf,alonf,alatl,alonl,dx,dy
+INTEGER :: latf,lonf,latl,lonl,en,gdtn,ni,nj,sm,i,j,k
 
 !--------------------------------------------------------------------------
-! 1) Preliminari
-
-! 1.1 Parametri da riga comando
+! Parametri da riga comando
 CALL getarg(1,filein)
 CALL getarg(2,fileout)
-
-IF (filein == "" .OR. fileout == "" .OR. TRIM(filein) == "-h") THEN
-  WRITE (*,*) "Uso: grib2latlon.exe [-h] filein fileout" 
-  WRITE (*,*) "Legge il primo campo di filein"
-  WRITE (*,*) "scrive su fileout i campi lat e lon dei punti griglia (formato grib)"
+IF (TRIM(filein) == "" .OR. TRIM(fileout) == "" .OR. &
+  TRIM(filein) == "-h" .OR. TRIM(filein) == "--help") THEN
+  WRITE (*,*) "Uso: grib2latlon.exe filein fileout"
   STOP
 ENDIF
 
-! 1.2 Disabilito i controlli sui parametri GRIBEX
-CALL grsvck(0)
+! Apro i files
+CALL grib_open_file(ifin,filein,"r",iret)
+IF (iret /= GRIB_SUCCESS) GOTO 9999
+CALL grib_open_file(ifout,fileout,"w")
 
-! 1.3 Apro i files
-CALL PBOPEN (iuin,filein,'R',kret)
-CALL PBOPEN (iuout,fileout,'W',kret)
+! Leggo il primo campo
+CALL grib_new_from_file(ifin,igin,iret)
+IF (iret /= GRIB_SUCCESS) GOTO 9998
 
-!--------------------------------------------------------------------------
-! 2) Leggo primo campo
+! Leggo i dati della griglia
 
-CALL PBGRIB(iuin,kbuffer,maxdim*4,klen,kret)
-IF (kret <= -1) THEN
-  WRITE(*,*) "Error pbgrib: kret ",kret
-  STOP
+CALL grib_get(igin,"editionNumber",en)
+IF (en /= 2) GOTO 9997
+
+CALL grib_get(igin,"gridDefinitionTemplateNumber",gdtn)
+IF (gdtn /= 0) GOTO 9996
+
+CALL grib_get(igin,"scanningMode",sm)
+IF (sm /= 0 .AND. sm /= 64) GOTO 9995
+
+IF (en == 2) THEN
+   CALL grib_get(igin,"Ni",ni)
+   CALL grib_get(igin,"Nj",nj)
+   CALL grib_get(igin,"latitudeOfFirstGridPoint",latf)
+   CALL grib_get(igin,"longitudeOfFirstGridPoint",lonf)
+   CALL grib_get(igin,"latitudeOfLastGridPoint",latl)
+   CALL grib_get(igin,"longitudeOfLastGridPoint",lonl)
 ENDIF
 
-CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
-             field,maxdim,kbuffer,maxdim,klen,'D',kret)
-IF (kret.gt.0) WRITE(*,*) "Warning gribex: kret ",kret
+ALLOCATE (out_lat(ni*nj),out_lon(ni*nj))
 
-!--------------------------------------------------------------------------
-! 3) Calcolo coordinate punti griglia
+alatf = REAL(latf) / 1000000.
+alonf = REAL(lonf) / 1000000.
+alatl = REAL(latl) / 1000000.
+alonl = REAL(lonl) / 1000000.
 
-IF (ksec2(11) /= 64) THEN
-  WRITE (*,*) "Scanning mode ",ksec2(11)," non gestito"
-  STOP
+dy = ABS(alatl-alatf)/REAL(nj-1)
+dx = ABS(alonl-alonf)/REAL(ni-1)
+WRITE (*,*) "dx, dy: ",dx,dy
+
+CALL grib_clone(igin,iglat)
+CALL grib_clone(igin,iglon)
+
+IF (sm == 64) THEN
+  DO k = 1,ni*nj
+    i = MOD((k-1), ni) + 1
+    j = (k-1)/ni + 1
+    out_lon(k) = alonf + (i-1)*dx 
+    out_lat(k) = alatf + (j-1)*dy 
+  ENDDO
+
+ELSE IF (sm == 0) THEN
+  DO k = 1,ni*ni
+    i = MOD((k-1), ni) + 1
+    j = nj - (k-1)/ni
+    out_lon(k) = lonf + (i-1)*dx 
+    out_lat(k) = latl + (j-1)*dy 
+  ENDDO
+
 ENDIF
 
-! Trovo parametri griglia
-nx = ksec2(2)
-ny = ksec2(3)
-y1 = REAL(ksec2(4)) / 1000.
-x1 = REAL(ksec2(5)) / 1000.
-IF (ksec2(6) == 0) THEN               ! grid spacing not given
-  dx = ABS(REAL(ksec2(8))/1000. - REAL(ksec2(5))/1000.) / REAL(nx-1)
-  dy = ABS(REAL(ksec2(7))/1000. - REAL(ksec2(4))/1000.) / REAL(ny-1)
-ELSE
-  dx = REAL(ksec2(9)) / 1000. 
-  dy = REAL(ksec2(10)) / 1000.
-ENDIF
-yrot = REAL(ksec2(13)) / 1000. + 90.
-xrot = REAL(ksec2(14)) / 1000.
-
-! Trovo tipo prioezione
-IF (ksec2(1) == 10) THEN
-  proj = "R"
-ELSE IF (ksec2(1) == 0) THEN
-  IF (x1 < 360. .AND. y1 < 90.) THEN
-    proj = "G"
-  ELSE
-    proj = "U"
-  ENDIF
-ELSE
-  WRITE (*,*) "Prioezione geografica non gestita, ksec1(2) ",ksec1(2)
-  STOP
-ENDIF
-
-! Calcolo lat & lon
-DO k = 1,nx*ny
-  j = (k-1) / nx + 1
-  i = k - (j-1)*nx
-  xx = x1 + (i-1) * dx
-  yy = y1 + (j-1) * dy
+WRITE (*,*) "Lat: min, max ",MINVAL(out_lat(:)),MAXVAL(out_lat(:))
+WRITE (*,*) "Lon: min, max ",MINVAL(out_lon(:)),MAXVAL(out_lon(:))
   
-  IF (proj == "G") THEN
-    lat(k) = yy
-    lon(k) = xx
-  ELSE IF (proj == "R") THEN
-    CALL rtll(xx,yy,xrot,yrot,lon(k),lat(k)) 
-  ELSE IF (proj == "U") THEN
-    CALL utm2ll(xx,yy,32,.FALSE.,lat(k),lon(k))
-  ENDIF
-ENDDO
+! Scrivo output
+CALL grib_set(iglat,"values",out_lat(:))
+CALL grib_set(iglat,"discipline",0)
+CALL grib_set(iglat,"parameterCategory",191)
+CALL grib_set(iglat,"parameterNumber",1)
+CALL grib_write(iglat,ifout)
 
-!--------------------------------------------------------------------------
-! 4) Scrivo lat e lon su fileout
 
-ksec1(1) = 203
-ksec1(6) = 114
-ksec4(2) = 24
-CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
-             lat,maxdim,kbuffer,maxdim,klen,'C',kret)
-IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
+CALL grib_set(iglon,"values",out_lon(:))
+CALL grib_set(iglon,"discipline",0)
+CALL grib_set(iglon,"parameterCategory",191)
+CALL grib_set(iglon,"parameterNumber",2)
+CALL grib_write(iglon,ifout)
 
-CALL PBWRITE (iuout,kbuffer,ksec0(1),kret)
-IF (kret <= 0) WRITE(*,*) "Error pbwrite, kret ",kret
-
-ksec1(1) = 203
-ksec1(6) = 115
-ksec4(2) = 24
-CALL GRIBEX (ksec0,ksec1,ksec2,psec2,ksec3,psec3,ksec4, &
-             lon,maxdim,kbuffer,maxdim,klen,'C',kret)
-IF (kret > 0) WRITE (*,*) "Warning gribex: kret ",kret
-
-CALL PBWRITE (iuout,kbuffer,ksec0(1),kret)
-IF (kret <= 0) WRITE(*,*) "Error pbwrite, kret ",kret
+! Libero memoria
+CALL grib_release(igin)
+CALL grib_release(iglat)
+CALL grib_release(iglon)
 
 STOP
 
+! Gestione errori
+9999 CONTINUE
+WRITE (*,*) "Errore aprendo ",TRIM(filein)
+STOP
+
+9998 CONTINUE
+WRITE (*,*) "Errore leggendo ",TRIM(filein)
+STOP
+
+9997 CONTINUE
+WRITE (*,*) "GRIB editon non gestita ",en
+STOP
+
+9996 CONTINUE
+WRITE (*,*) "gridDefinitionTemplateNumber non gestito ",gdtn
+STOP
+
+9995 CONTINUE
+WRITE (*,*) "Scanning mode non gestito ",sm
+STOP
+
 END PROGRAM grib2latlon
-
-!----------------------------------------------------------------------
-      subroutine utm2ll(x,y,iz,lsohem,rlat,rlon)
-!----------------------------------------------------------------------
-! VERSIONE CON SINTASSI F90 DELLA ROUTINE DI CALMET
-!
-! --- CALMET   Version: 5.0       Level: 970825                  UTM2LL
-!
-! --- PURPOSE:  Converts UTM coordinates to latitude/longitude
-!               Works in both Northern & Southern Hemispheres
-!               Reference--
-!                 "Map Projections--A Working Manual", p61,
-!                  U.S. Geological Survey Professional Paper 1395,
-!                    Note: assumes the Clarke 1866 ellipsoid
-!               Adapted from --
-!                  EPS version 2.0; subr. MAPUTG
-!
-! --- INPUTS:
-!                  X - real    - UTM easting in km
-!                  Y - real    - UTM northing in km
-!                 IZ - integer - UTM zone (6 deg N-S strip, range=1,60)
-!             LSOHEM - logical - TRUE = southern hemisphere
-!                                FALSE = northern hemisphere
-!
-! --- OUTPUT:
-!               RLAT - real    - N Latitude in decimal degrees
-!               RLON - real    - E Longitude in decimal degrees
-!
-! --- UTM2LL called by:  READCF
-! --- UTM2LL calls:      none
-!----------------------------------------------------------------------
-
-      real k0,M,N1,l
-      logical lsohem
-
-      parameter (k0=0.9996)
-      parameter (a=6378206.4)
-      parameter (e1=0.001697916)
-      parameter (e11=3.0*e1/2.0 - 27.0*e1*e1*e1/32.0)
-      parameter (e12=21.0*e1*e1/16.0 - 55.0*e1*e1*e1*e1/32.0)
-      parameter (e13=151.0*e1*e1*e1/96.0)
-      parameter (e14=1097.0*e1*e1*e1*e1/512.0)
-      parameter (e2=0.00676866)
-      parameter (e4=e2*e2)
-      parameter (e6=e2*e4)
-      parameter (ep2=0.0068148)
-      parameter (false_e=500000.0)
-      parameter (rtd=180.0/3.141592654)
-
-! --- Parameter definitions
-!      k0        -  scale on central meridian
-!      a         -  Clarke 1866 equatorial radius
-!      e2        -  squared Clarke 1866 eccentricity
-!      ep2       -  (e2/(1.0-e2)
-!      false_e   -  false easting
-!      rtd       -  radians to degrees conversion
-
-! --- Central meridian
-      rlon0 = iz*6.0 - 183.0
-
-! --- Correct for false easting, southern hemisphere and change to meters
-      xm = 1000.0*x - false_e
-      if(LSOHEM) then
-        ym = 1000.0 * (y-10000.)
-      else
-        ym = 1000.0 * y
-      endif
-
-      M = ym/k0
-      u = M/(a*(1.0-e2/4.0 - 3.0*e4/64.0 - 5.0*e6/256.0))
-      p1 = u + e11*sin(2.0*u) + e12*sin(4.0*u) + e13*sin(6.0*u) + &
-               e14*sin(8.0*u)
-      cosp1 = cos(p1)
-      C1 = ep2*cosp1**2
-      C2 = C1**2
-      tanp1 = tan(p1)
-      T1 = tanp1**2
-      T2 = T1**2
-      sinp1 = sin(p1)
-      sin2p1 = sinp1**2
-      N1 = a/sqrt(1.0-e2*sin2p1)
-      R0 = 1.0-e2*sin2p1
-      R1 = a*(1.0-e2)/sqrt(R0**3)
-
-      D = xm/(N1*k0)
-      D2=D**2
-      D3=D*D2
-      D4=D*D3
-      D5=D*D4
-      D6=D*D5
-
-      p = p1 - (N1*tanp1/R1) * (D2/2.0                                  &
-             - (5.0+3.0*T1+10.0*C1-4.0*C2-9.0*ep2)*D4/24.0              &
-             + (61.0+90.0*T1+298.0*C1+45.0*T2-252*ep2-3.0*C2)*D6/720.0)
-      rlat = rtd*p
-      l = (D - (1.0+2.0*T1+C1)*D3/6.0                                   &
-             + (5.0-2.0*C1+28*T1-3.0*C2+8.0*ep2+24.0*T2)*D5/120.0)/cosp1
-      rlon = rtd*l + rlon0
-
-      return
-      end subroutine utm2ll
-
-!-------------------------------------------------------------------------
-      SUBROUTINE RTLL(TLMD,TPHD,TLM0D,TPH0D,ALMD,APHD)        
-!-------------------------------------------------------------------------
-! trasforma le coordinate ruotate (TLMD,TPHD) in coordinate geografiche
-! ordinarie (ALMD,APHD). I/O in gradi e decimi
-! TLM0D, TPH0D: lon e lat del centro di rotazione, in gradi e decimi.
-! 
-      PARAMETER (DTR=3.141592654/180.)
-
-      CTPH0=COS(TPH0D*DTR)
-      STPH0=SIN(TPH0D*DTR)
-
-      STPH=SIN(TPHD*DTR)
-      CTPH=COS(TPHD*DTR)
-      CTLM=COS(TLMD*DTR)
-      STLM=SIN(TLMD*DTR)
-
-      APH=ASIN(STPH0*CTPH*CTLM+CTPH0*STPH)                            
-      CPH=COS(APH)                                                    
-
-      ALMD=TLM0D+ASIN(STLM*CTPH/CPH)/DTR                               
-      APHD=APH/DTR                                                    
-
-      RETURN                                                          
-      END   
-
-
-

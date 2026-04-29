@@ -113,6 +113,7 @@ datafilelist = \
  $(top_srcdir)/data/tabella_201.txt \
  $(top_srcdir)/data/tabella_203_ser.txt \
  $(top_srcdir)/data/tabella_203.txt \
+ $(top_srcdir)/data/tabella_grib2_ser.txt \
  $(top_srcdir)/data/template.akq.cosmo \
  $(top_srcdir)/data/template.akq.cosmo.vol \
  $(top_srcdir)/data/template.akq.def \

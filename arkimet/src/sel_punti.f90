@@ -67,8 +67,9 @@ INTEGER :: iret,ifil,ig,en,yf,yl
 INTEGER :: pts_inp,pts_coor,n_list_stz,grid_coor,npunti
 INTEGER :: niexp,njexp,nskipexp
 CHARACTER (LEN=200) :: file_out,chrec,file_grb,chpar,str_xread,str_yread
-CHARACTER (LEN=40) :: progetto,pts_file,grid_area,gt
-CHARACTER (LEN=40) :: pts_coor_unit,pts_coor_str,str,str_lon,str_lat
+CHARACTER (LEN=120) :: str,pts_file
+CHARACTER (LEN=40) :: progetto,grid_area,gt
+CHARACTER (LEN=40) :: pts_coor_unit,pts_coor_str,str_lon,str_lat
 CHARACTER (LEN=30) :: label_out
 CHARACTER (LEN=20) :: label(mxpunti)
 CHARACTER (LEN=10) :: strx,stry,chfmt

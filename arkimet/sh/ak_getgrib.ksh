@@ -54,6 +54,10 @@ function write_help
   return
 }
 
+# tmp
+# export WREPORT_TABLES=/autofs/nfshomes/eminguzzi/git/dballe/tables
+# export LIBSIM_DATA=/autofs/nfshomes/eminguzzi/git/libsim/data/
+
 #--------------------------------------------------------------------------
 # 1) Preliminari
 

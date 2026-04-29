@@ -4,10 +4,10 @@ LDADD = $(top_builddir)/modules/libmautils.la
 if SMND_BUILD
 pkglibexec_PROGRAMS = grib_runmean.exe grib_skip_first.exe grib_smooth.exe math_grib.exe split_grib_par.exe ma_grib1_grib2.exe ma_grib2_grib1.exe grib2_forc2ana.exe
 else
-pkglibexec_PROGRAMS = crea_templ_grib2_utm.exe diff_grib.exe grib2afa.exe grib_ana2forc.exe grib_calc_median.exe grib_daily_stat.exe grib2_endOfInterval.exe grib_fill_missing.exe grib_forc_shift.exe grib_forc2ana.exe grib2_forc2ana.exe grib_rms_diff.exe grib_runmean.exe grib_set_scanning.exe grib_smooth.exe grib_skip_first.exe grib_stat.exe grib_uniq.exe grib_uv2ffdd.exe intercala_grib.exe llgrib.exe ma_grib1_grib2.exe ma_grib2_grib1.exe maskout_grib.exe math_grib.exe proc_flat_grib.exe split_grib_par.exe test_1grib.exe tinterp_grib.exe
+pkglibexec_PROGRAMS = crea_templ_grib2_utm.exe diff_grib.exe grib2afa.exe grib2latlon.exe grib_ana2forc.exe grib2_ana2forc.exe grib_calc_median.exe grib_daily_stat.exe grib2_endOfInterval.exe grib_fill_missing.exe grib_forc_shift.exe grib_forc2ana.exe grib2_forc2ana.exe grib_rms_diff.exe grib_runmean.exe grib_set_scanning.exe grib_smooth.exe grib_skip_first.exe grib_stat.exe grib_ttd2rh.exe grib_uniq.exe grib_uv2ffdd.exe intercala_grib.exe llgrib.exe ma_grib1_grib2.exe ma_grib2_grib1.exe maskout_grib.exe math_grib.exe proc_flat_grib.exe split_grib_par.exe test_1grib.exe tinterp_grib.exe
 endif
 
-## Programs that call emoslib: diff_header_gribex.exe grib_dist_freq.exe moltiplica_grib.exe somma_grib.exe interp_grib.exe grib_step_explicit.exe grib_f2s.exe grib_s2f.exe diff_gribex.exe replace_dat_grib.exe ma_grib2_grib1_gribex.exe llgribex.exe split_gribex_par.exe grib_ave.exe grib2latlon.exe afa2grib.exe zoom_grib.exe mask_grib.exe grib_local_std.exe cong2.exe
+## Programs that call emoslib: diff_header_gribex.exe grib_dist_freq.exe moltiplica_grib.exe somma_grib.exe interp_grib.exe grib_step_explicit.exe grib_f2s.exe grib_s2f.exe diff_gribex.exe replace_dat_grib.exe ma_grib2_grib1_gribex.exe llgribex.exe split_gribex_par.exe grib_ave.exe afa2grib.exe zoom_grib.exe mask_grib.exe grib_local_std.exe cong2.exe
 
 afa2grib_exe_SOURCES = afa2grib.f90
 crea_templ_grib2_utm_exe_SOURCES = crea_templ_grib2_utm.f90
@@ -18,6 +18,7 @@ diff_header_gribex_exe_SOURCES = diff_header_gribex.f90
 grib2afa_exe_SOURCES = grib2afa.f90
 grib2latlon_exe_SOURCES = grib2latlon.f90
 grib_ana2forc_exe_SOURCES = grib_ana2forc.f90
+grib2_ana2forc_exe_SOURCES = grib2_ana2forc.f90
 grib_ave_exe_SOURCES = grib_ave.f90
 grib_calc_median_exe_SOURCES = grib_calc_median.f90
 grib_daily_stat_exe_SOURCES = grib_daily_stat.f90
@@ -37,6 +38,7 @@ grib_skip_first_exe_SOURCES = grib_skip_first.f90
 grib_smooth_exe_SOURCES = grib_smooth.f90
 grib_stat_exe_SOURCES = grib_stat.f90
 grib_step_explicit_exe_SOURCES = grib_step_explicit.f90
+grib_ttd2rh_exe_SOURCES = grib_ttd2rh.f90
 grib_uniq_exe_SOURCES = grib_uniq.f90
 grib_uv2ffdd_exe_SOURCES = grib_uv2ffdd.f90      
 intercala_grib_exe_SOURCES = intercala_grib.f90    

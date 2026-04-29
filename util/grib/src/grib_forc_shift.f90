@@ -17,7 +17,7 @@ PROGRAM grib_forc_shift
 !
 ! On Atos, replace "-I.. -l.." with $ECCODES_INCLUDE $ECCODES_LIB 
 !
-!                                         Versione 1.0.0, Enrico 30/09/2025
+!                                         Versione 1.1.0, Enrico 17/03/2026
 !--------------------------------------------------------------------------
 
 USE datetime_class
@@ -41,7 +41,7 @@ REAL, ALLOCATABLE :: field0(:,:),field(:),field_out(:),field_mask(:)
 REAL :: fill_value
 CHARACTER(LEN=200) :: filein,filein0,fileout,chdum
 CHARACTER(LEN=2) :: next_arg
-LOGICAL :: lf0,lfill
+LOGICAL :: lf0,lfill,lforce
 
 !--------------------------------------------------------------------------
 ! 1) Preliminary
@@ -49,6 +49,7 @@ LOGICAL :: lf0,lfill
 ! 1.1 Command line
 lf0 = .FALSE.
 lfill = .FALSE.
+lforce = .FALSE.
 idp = 0
 next_arg = ""
 DO kp = 1,HUGE(0)
@@ -60,6 +61,8 @@ DO kp = 1,HUGE(0)
     STOP 1
   ELSE IF (TRIM(chdum) == "-fill") THEN
     lfill = .TRUE.
+  ELSE IF (TRIM(chdum) == "-force") THEN
+    lforce = .TRUE.
   ELSE IF (next_arg == "f0") THEN
     filein0 = chdum
     lf0 = .TRUE.
@@ -208,13 +211,14 @@ grib: DO kg = 1,HUGE(0)
     ELSE IF (ioufft == 1) THEN  ! hours
       fth_in = ft_in
     ELSE
-      GOTO 9997
+      GOTO 9996
     ENDIF
     
 !   Output forecastTime in hours
     IF (fth_in < hh_shift) THEN
-      GOTO 9992
-    ELSE
+      IF (.NOT. lforce) GOTO 9992
+      WRITE (*,*) "Warning: forecast time < shift (",fth_in,",",hh_shift,") grib n.er " ,kg
+   ELSE
       fth_out = fth_in - hh_shift
     ENDIF
     
@@ -257,7 +261,7 @@ grib: DO kg = 1,HUGE(0)
 !--------------------------------------------------------------------------
 ! 2.5 Fields that are average or accumulated
 
-  ELSE IF (pdtn == 11 .AND. (tosp == 0 .OR. tosp == 1) ) THEN
+  ELSE IF (pdtn == 11 .AND. (tosp == 0 .OR. tosp == 1 .OR. tosp == 4) ) THEN
 
 ! 2.5.1 Change lenghtOfTimeRange
 
@@ -275,7 +279,8 @@ grib: DO kg = 1,HUGE(0)
     
 !   Output lengthOfTimeRange in hours
     IF (lotrh_in < hh_shift) THEN
-      GOTO 9992
+       IF (.NOT. lforce) GOTO 9991
+       WRITE (*,*) "Warning: length of time range < shift (",lotrh_in,",",hh_shift,") grib n.er " ,kg
     ELSE
       lotrh_out = lotrh_in - hh_shift
     ENDIF
@@ -301,7 +306,7 @@ grib: DO kg = 1,HUGE(0)
     IF (kg0 > ng0) GOTO 9984
     CALL grib_get(igin,"values",field(:))
 
-    IF (tosp == 1) THEN            ! field is cumulated
+    IF (tosp == 1 .OR. tosp == 4) THEN      ! field is cumulated
       field_out(:) = field(:) - field0(:,kg0)
       WRITE (*,*) "Processing cumulate field: ",dis,pc,pn
       mlc = MAXLOC(field(:),DIM=1)
@@ -310,7 +315,7 @@ grib: DO kg = 1,HUGE(0)
       WRITE (*,*) "F0:     ave, test ", SUM(field0(:,kg0))/REAL(np_sav),field0(mlc,kg0)
       WRITE (*,*) "Output: ave, test ", SUM(field_out(:))/REAL(np_sav),field_out(mlc)
 
-    ELSE IF (tosp == 0) THEN       ! field is average
+    ELSE IF (tosp == 0) THEN                ! field is average
       field_out(:) = (field(:)*REAL(lotrh_in) - field0(:,kg0)*REAL(hh_shift)) / REAL(lotrh_out)
       WRITE (*,*) "Processing average field: ",dis,pc,pn,lotrh_in,hh_shift,lotrh_out
       mlc = MAXLOC(field(:),DIM=1)
@@ -387,6 +392,10 @@ STOP 2
 WRITE (*,*) "Error reading ",TRIM(filein)," grib n.er " ,kg
 STOP 2
 
+9996 CONTINUE
+WRITE (*,*) "ioufft non hours or minutes ",ioufft
+STOP 3
+
 9997 CONTINUE
 WRITE (*,*) "grib1 field, not allowed ",kg
 STOP 3
@@ -404,7 +413,11 @@ WRITE (*,*) "Error reading ",TRIM(filein0)," grib n.er " ,kg
 STOP 2
 
 9992 CONTINUE
-WRITE (*,*) "Error: forecast time < shift ",TRIM(filein)," grib n.er " ,kg
+WRITE (*,*) "Error: forecast time < shift (",fth_in,",",hh_shift,") grib n.er " ,kg
+STOP 3
+
+9991 CONTINUE
+WRITE (*,*) "Error: length of time range < shift (",lotrh_in,",",hh_shift,") grib n.er " ,kg
 STOP 3
 
 9989 CONTINUE
@@ -448,11 +461,12 @@ SUBROUTINE write_help
 ! Scrive a schermo l'help del programma
 
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
-WRITE (*,*) "Uso: grib2_forc_shift.exe [-h] filein fileout hh_shift [-f0 file0] [-fill]"
+WRITE (*,*) "Uso: grib2_forc_shift.exe [-h] filein fileout hh_shift [-f0 file0] [-fill] [-force]"
 WRITE (*,*) "Legge un file con molti grib (edizione 2) e lo riscrive spostando il ref. time"
 WRITE (*,*) "  hh_shift: spostamento richiesto per il ref. time (>0)"
 WRITE (*,*) "  file0: eventuale file con i campi non istantanei all'istante del nuovo ref. time"
 WRITE (*,*) "  -fill: sostituisce i valori mancanti con la media del campo"
+WRITE (*,*) "  -force: se trova un campo con forecastTime < shift lo ignora e prosegue"
 !            123456789012345678901234567890123456789012345678901234567890123456789012345
 
 RETURN

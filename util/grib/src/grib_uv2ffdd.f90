@@ -4,7 +4,7 @@ PROGRAM grib_uv2ffdd
 ! corrispondenti), scrive due files con i campi "direzione" e "modulo"
 ! Programma derivato dalla vecchia versione gribex e da grib_rms_diff.f90
 !  
-!                                         Versione 1.0.0, Enrico 28/01/2025
+!                                         Versione 1.1.0, Enrico 02/03/2026
 !--------------------------------------------------------------------------
 USE grib_api
 USE missing_values
@@ -15,7 +15,7 @@ IMPLICIT NONE
 REAL, ALLOCATABLE :: valuesu(:),valuesv(:),valuesf(:),valuesd(:)
 INTEGER :: ifu,ifv,iff,ifd,igu=0,igv=0,igf=0,igd=0
 INTEGER :: idp,kp,iret,ier,ni,nj,np,ni_sav,nj_sav,np_sav,gnov,nom,nocv,k,kgu,nmiss
-INTEGER :: enu,du,pcu,pnu,env,dv,pcv,pnv,enout
+INTEGER :: enu,du,pcu,pnu,env,dv,pcv,pnv,enout,t2vu,iopu,t2vv,iopv
 INTEGER :: clret(0:6),cllog(0:6)
 CHARACTER (LEN=250) :: fileu,filev,filef,filed,chdum,check_list
 CHARACTER(LEN=40) :: gtu
@@ -127,7 +127,9 @@ DO kgu = 1,HUGE(0)
 ! 2.4.1) Leggo il prossimo campo U
   CALL grib_get(igu,"editionNumber",enu)         ! grib edition
   IF (enu == 1) THEN
-    GOTO 9990
+    CALL grib_get(igu,"table2Version",t2vu)
+    CALL grib_get(igu,"indicatorOfParameter",iopu)
+    IF ((t2vu/=2 .AND. t2vu/=200) .OR. iopu/=33) GOTO 9989
   ELSE
     CALL grib_get(igu,"discipline",du)
     CALL grib_get(igu,"parameterCategory",pcu)
@@ -150,7 +152,9 @@ DO kgu = 1,HUGE(0)
 ! 2.4.2) Leggo il prossimo campo V
   CALL grib_get(igv,"editionNumber",env)         ! grib edition
   IF (env == 1) THEN
-    GOTO 9990
+    CALL grib_get(igv,"table2Version",t2vv)
+    CALL grib_get(igv,"indicatorOfParameter",iopv)
+    IF ((t2vv/=2 .AND. t2vv/=200) .OR. iopv/=34) GOTO 9988
   ELSE
     CALL grib_get(igv,"discipline",dv)
     CALL grib_get(igv,"parameterCategory",pcv)
@@ -190,7 +194,13 @@ DO kgu = 1,HUGE(0)
     ENDIF
     CALL grib_set(igd,"missingValue",rmiss)
   ENDIF
-  CALL grib_set(igd,"parameterNumber",0)
+  IF (enout == 1 .AND. t2vu == 2) THEN
+    CALL grib_set(igd,"indicatorOfParameter",31)
+  ELSE IF (enout == 1 .AND. t2vu == 200) THEN
+    CALL grib_set(igd,"indicatorOfParameter",35)
+  ELSE IF (enout == 2) THEN
+    CALL grib_set(igd,"parameterNumber",0)
+  ENDIF
   CALL grib_set(igd,"values",valuesd(:))
   CALL grib_write (igd,ifd)
   
@@ -204,7 +214,13 @@ DO kgu = 1,HUGE(0)
     ENDIF
     CALL grib_set(igf,"missingValue",rmiss)
   ENDIF
-  CALL grib_set(igf,"parameterNumber",1)
+  IF (enout == 1 .AND. t2vu == 2) THEN
+    CALL grib_set(igf,"indicatorOfParameter",32)
+  ELSE IF (enout == 1 .AND. t2vu == 200) THEN
+    CALL grib_set(igf,"indicatorOfParameter",36)
+  ELSE IF (enout == 2) THEN
+    CALL grib_set(igf,"parameterNumber",1)
+  ENDIF
   CALL grib_set(igf,"values",valuesf(:))
   CALL grib_write (igf,iff)
 
@@ -278,16 +294,22 @@ WRITE (*,*) "Trovati (ni,nj,np) ",ni,nj,np
 WRITE (*,*) "Attesi  (ni,nj,np) ",ni_sav,nj_sav,np_sav
 STOP 5
 
-9990 CONTINUE
-WRITE (*,*) "grib editon 1 not yet implemented ",kgu
-STOP 6
-
 9989 CONTINUE
 WRITE (*,*) "Not a U component ",kgu
+IF (enu==1) THEN
+  WRITE (*,*) "t2v,iop ",t2vu, iopu
+ELSE IF (enu==2) THEN
+  WRITE (*,*) "d,pc,pn ",du,pcu,pnu 
+ENDIF
 STOP 6
 
 9988 CONTINUE
 WRITE (*,*) "Not a V component ",kgu
+IF (env==1) THEN
+  WRITE (*,*) "t2v,iop ",t2vv, iopv
+ELSE IF (env==2) THEN
+  WRITE (*,*) "d,pc,pn ",dv,pcv,pnv 
+ENDIF
 STOP 6
 
 9987 CONTINUE

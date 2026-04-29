@@ -515,7 +515,7 @@ DO k = 1,HUGE(0)
 
 ! Liv, var
   CALL get_grib1_header(ig, par=par(1:3), lev=lev(1:3))
-! WRITE (*,'(7i4)') k,lev,par
+!  WRITE (*,'(7i4)') k,lev,par !debug
   
 !--------------------------------------------------------------------------
 ! 4.3 Gestisco i cambiamenti di istante
@@ -603,6 +603,7 @@ DO k = 1,HUGE(0)
   ELSE IF (lev(1) == 1) THEN
     idxp = 0
     DO kp = 1,npar2d
+    write (*,'(6i4)') lev(1:3),par(1:3)
       IF (ALL(rq_lev2d(1:3,kp) == lev(1:3)) .AND. &
           ALL(rq_par2d(1:3,kp) == par(1:3))) idxp = kp
     ENDDO
@@ -687,6 +688,8 @@ STOP
 9993 CONTINUE
 WRITE (*,*) "Quota dei model layers richiesti non trovata in ", &
   TRIM(file_static)
+WRITE (*,*) "nlev: ",nlev3d
+WRITE (*,*) zlev3d(1,:)
 STOP
 
 9992 CONTINUE

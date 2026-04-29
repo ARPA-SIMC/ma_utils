@@ -206,8 +206,11 @@ IF (PRESENT(lev)) THEN
       lev(1) = 105                ! Specified height level above ground m
       lev(2) = NINT(voffs)
       lev(3) = 0
-    ELSE IF ((toffs == 105 .OR. toffs == 150) .AND. (tosfs == 255 .OR. &
-        (tosfs == toffs .AND. sfoffs == sfosfs .AND. svoffs == svosfs))) THEN
+    ELSE IF ((toffs == 105 .OR. toffs == 150) .AND. &
+        (tosfs == 255 .OR. &                                                    ! 2nd fix. surf. = missing
+         (tosfs == toffs .AND. sfosfs == sfoffs .AND. svosfs == svoffs) .OR. &  ! 2nd fix. surf. = 1st fix. surf.
+         (tosfs == 101 .AND. sfosfs == 0 .AND. svosfs == 0)) &                  ! 2nd fix. surf. = MSL (Icon)
+         ) THEN
       lev(1) = 109                ! Hybrid level
       lev(2) = NINT(voffs)
       lev(3) = 0
@@ -266,7 +269,7 @@ IF (PRESENT(scad)) THEN
 !   CALL grib_get(gaid,"typeOfGeneratingProcess",togp)
     CALL grib_get(gaid,"forecastTime",ft)
     CALL grib_get(gaid,"indicatorOfUnitOfTimeRange",iouotr)
-    IF (pdtn == 8 .OR. pdtn == 11) THEN
+    IF (pdtn == 8 .OR. pdtn == 10 .OR. pdtn == 11) THEN
       CALL grib_get(gaid,"typeOfTimeIncrement",toti)
       CALL grib_get(gaid,"typeOfStatisticalProcessing",tosp)
       CALL grib_get(gaid,"indicatorOfUnitForTimeRange",iouotr)
@@ -310,7 +313,7 @@ IF (PRESENT(scad)) THEN
       scad(4) = 0
 
 !   4.2 Analisi non istantanee (togp = 0?): reftime = inizio dell'intervallo di elaborazione
-    ELSE IF (sortt<=1 .AND. topd<=5 .AND. (pdtn==8 .OR. pdtn==11) .AND. ft==0 .AND. toti==1) THEN
+    ELSE IF (sortt<=1 .AND. topd<=5 .AND. (pdtn==8 .OR. pdtn==10 .OR. pdtn==11) .AND. ft==0 .AND. toti==1) THEN
       scad(1) = iouotr_g1
       scad(2) = 0
       scad(3) = lotr
@@ -334,7 +337,8 @@ IF (PRESENT(scad)) THEN
       scad(4) = 15      ! cumulata, reftime = inizio intervallo di elaborazione
 
 !   4.3 Prevsioni non istantanee (togp = 2?)
-    ELSE IF (sortt==1 .AND. (topd==1 .OR. topd==4 .OR. topd==5) .AND. (pdtn==8 .OR. pdtn==11) .AND. toti==2) THEN
+     ELSE IF (sortt==1 .AND. (topd==1 .OR. topd==4 .OR. topd==5 .OR. topd==255) .AND. &
+        (pdtn==8 .OR. pdtn==10 .OR. pdtn==11) .AND. (toti==2 .OR. toti==255)) THEN
       scad(1) = iouotr_g1
       scad(2) = ft 
       scad(3) = ft + lotr
@@ -345,6 +349,8 @@ IF (PRESENT(scad)) THEN
         scad(4) = 4
       ELSE IF (tosp==2) THEN           ! Massimo (NinfaUB: NO2)
         scad(4) = 6
+      ELSE IF (tosp==4) THEN           ! "Differenza" (IFS-ENS): tratto come cumulata
+        scad(4) = 4
       ELSE IF (tosp==206) THEN         ! Max MM 8h (NinfaUB: O3)
         scad(4) = 7
       ENDIF

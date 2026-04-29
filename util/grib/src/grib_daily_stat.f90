@@ -29,7 +29,7 @@ PROGRAM grib_daily_stat
 ! - Per rendere piu' leggibile il codice, il programma fa comunque tutti i
 !   calcoli, ma scrive solo gli output richiesti
 !
-!                                         Versione 6.0.0, Enrico 19/03/2020
+!                                         Versione 6.1.0, Enrico 27/02/2026
 !--------------------------------------------------------------------------
 
 USE grib_api
@@ -46,19 +46,19 @@ INTEGER, PARAMETER :: nval_aot = hh_aot_max - hh_aot_min + 1
 ! Parametri da riga comando
 REAL :: thr_aot,thr_exc,thr_mxrm1,thr_mxrm2
 INTEGER :: nrm,nval,nval_rm,nbit
-LOGICAL :: lave,lmax,ldty,ldtylc,laot,lmxrm1,lmxrm2,lexc
+LOGICAL :: lave,lmax,lmin,ldty,ldtylc,laot,lmxrm1,lmxrm2,lexc
 LOGICAL :: l_mod_scad
 
 ! Altre variabili del programma
 REAL, ALLOCATABLE :: field(:),fout(:)
-REAL, ALLOCATABLE :: field_ave(:),field_max(:),field_aot(:),field_mxrm(:),field_exc(:)
+REAL, ALLOCATABLE :: field_ave(:),field_max(:),field_min(:),field_aot(:),field_mxrm(:),field_exc(:)
 REAL, ALLOCATABLE :: field_dty(:,:),field_rm(:,:),field_mxrm1(:),field_mxrm2(:)
 INTEGER,ALLOCATABLE :: cnt_ok(:),cnt_ok_mxrm(:),cnt_ok_aot(:)
 INTEGER, ALLOCATABLE :: cnt_ok_dty(:,:),cnt_ok_rm(:,:)
 TYPE(datetime) :: datav,datav_sav,datav_ini,datav_inip1
 REAL :: fave
 INTEGER :: ngribin,ngribout
-INTEGER :: ifin,ifout_ave,ifout_max,ifout_dty,ifout_aot,ifout_rm1,ifout_rm2,ifout_exc
+INTEGER :: ifin,ifout_ave,ifout_max,ifout_min,ifout_dty,ifout_aot,ifout_rm1,ifout_rm2,ifout_exc
 INTEGER :: igin=0,igin_first=0,igout=0,iret
 INTEGER :: ni,nj,ni_first,nj_first,np,par(3),par_first(3),lev(3),lev_first(3),sca(4),en,en_first
 INTEGER :: nok,hhv,dlth,ier,kh,ios,kpar,cnt_par,kg,pdb
@@ -82,6 +82,7 @@ deb = .FALSE.
 deb2 = .FALSE.
 lave = .FALSE.
 lmax = .FALSE.
+lmin = .FALSE.
 ldty = .FALSE.
 ldtylc = .FALSE.
 laot = .FALSE.
@@ -124,6 +125,8 @@ DO kpar = 1,HUGE(0)
     lave = .TRUE.
   ELSE IF (TRIM(chpar) == "-max") THEN
     lmax = .TRUE.
+  ELSE IF (TRIM(chpar) == "-min") THEN
+    lmin = .TRUE.
   ELSE IF (TRIM(chpar) == "-dty") THEN
     ldty = .TRUE.
   ELSE IF (TRIM(chpar) == "-dtylc") THEN
@@ -199,13 +202,14 @@ ENDIF
 CALL grib_open_file(ifin,filein,"r",iret)
 IF (iret /= GRIB_SUCCESS) GOTO 9999
 
-IF (lave)             CALL grib_open_file (ifout_ave,"ave.grb",'w',iret)
-IF (lmax)             CALL grib_open_file (ifout_max,"max.grb",'w',iret)
-IF (ldty.OR.ldtylc)   CALL grib_open_file (ifout_dty,"dty.grb",'w',iret)
-IF (laot)             CALL grib_open_file (ifout_aot,"aot.grb",'w',iret)
-IF (lmxrm1)           CALL grib_open_file (ifout_rm1,"rm1.grb",'w',iret)
-IF (lmxrm2)           CALL grib_open_file (ifout_rm2,"rm2.grb",'w',iret)
-IF (lexc)             CALL grib_open_file (ifout_exc,"exc.grb",'w',iret)
+IF (lave)             CALL grib_open_file (ifout_ave,"ave.grib",'w',iret)
+IF (lmax)             CALL grib_open_file (ifout_max,"max.grib",'w',iret)
+IF (lmin)             CALL grib_open_file (ifout_min,"min.grib",'w',iret)
+IF (ldty.OR.ldtylc)   CALL grib_open_file (ifout_dty,"dty.grib",'w',iret)
+IF (laot)             CALL grib_open_file (ifout_aot,"aot.grib",'w',iret)
+IF (lmxrm1)           CALL grib_open_file (ifout_rm1,"rm1.grib",'w',iret)
+IF (lmxrm2)           CALL grib_open_file (ifout_rm2,"rm2.grib",'w',iret)
+IF (lexc)             CALL grib_open_file (ifout_exc,"exc.grib",'w',iret)
 
 OPEN (UNIT=96, FILE="grib_daily_stat.log", STATUS="REPLACE", ACTION="WRITE")
 OPEN (UNIT=97, FILE="grib_daily_stat_pts.log", STATUS="REPLACE", ACTION="WRITE")
@@ -263,7 +267,7 @@ grib: DO kg = 1,HUGE(0)
     CALL grib_clone(igin,igin_first)
     
     ALLOCATE (field(np),fout(np))
-    ALLOCATE (field_ave(np),field_max(np),field_aot(np),field_exc(np))
+    ALLOCATE (field_ave(np),field_max(np),field_min(np),field_aot(np),field_exc(np))
     ALLOCATE (field_mxrm(np),field_mxrm1(np),field_mxrm2(np))
     ALLOCATE (field_dty(np,0:23),field_rm(np,nrm))
     ALLOCATE (cnt_ok(np),cnt_ok_mxrm(np),cnt_ok_aot(np))
@@ -337,6 +341,7 @@ grib: DO kg = 1,HUGE(0)
     WHERE (field(1:np) /= rmiss)
       field_ave(1:np) = field(1:np)
       field_max(1:np) = field(1:np)
+      field_min(1:np) = field(1:np)
       field_dty(1:np,hhv) = field(1:np)
       field_mxrm(1:np) = -HUGE(0.)
       field_mxrm1(1:np) = -HUGE(0.)
@@ -347,6 +352,7 @@ grib: DO kg = 1,HUGE(0)
     ELSEWHERE
       field_ave(1:np) = 0.
       field_max(1:np) = -HUGE(0.)
+      field_min(1:np) = HUGE(0.)
       field_dty(1:np,hhv) = 0.
       field_mxrm(1:np) = -HUGE(0.)
       field_mxrm1(1:np) = -HUGE(0.)
@@ -400,6 +406,7 @@ grib: DO kg = 1,HUGE(0)
     WHERE (field(1:np) /= rmiss)
       field_ave(1:np) = field(1:np) + field_ave(1:np)
       field_max(1:np) = MAX(field(1:np),field_max(1:np))
+      field_min(1:np) = MIN(field(1:np),field_min(1:np))
       field_dty(1:np,hhv) = field(1:np) + field_dty(1:np,hhv)
       cnt_ok(1:np) = cnt_ok(1:np) + 1
       cnt_ok_dty(1:np,hhv) = cnt_ok_dty(1:np,hhv) + 1
@@ -460,6 +467,7 @@ grib: DO kg = 1,HUGE(0)
     ELSEWHERE
       field_ave(1:np) = rmiss
       field_max(1:np) = rmiss
+      field_min(1:np) = rmiss
     ENDWHERE
 
 !   AOT
@@ -550,6 +558,19 @@ grib: DO kg = 1,HUGE(0)
       ngribout = ngribout + 1
     ENDIF
 
+!   Scrivo il campo minimo del giorno precedente
+    nok = COUNT(field_min(1:np) /= rmiss)
+    IF (lmin .AND. nok>0) THEN
+      fave = rmiss
+      IF (nok>0) fave = SUM(field_min(1:np), MASK = field_min(1:np)/=rmiss) / REAL(nok)
+      WRITE (96,*) "Scrivo min del",ch8,": dati ok, media ",nok,fave
+      IF (deb) WRITE (97,*) "min  : ",field_min(pdb)
+  
+      CALL grib_set(igout,"values",field_min(1:np))
+      CALL grib_write (igout,ifout_min)
+      ngribout = ngribout + 1
+    ENDIF
+
 !   Scrivo il campo AOT del giorno precedente
     nok = COUNT(field_aot(1:np) /= rmiss)
     IF (laot .AND. nok>0) THEN
@@ -627,6 +648,7 @@ grib: DO kg = 1,HUGE(0)
     WHERE (field(1:np) /= rmiss)
       field_ave(1:np) = field(1:np)
       field_max(1:np) = field(1:np)
+      field_min(1:np) = field(1:np)
       field_dty(1:np,hhv) = field(1:np) + field_dty(1:np,hhv)
       field_mxrm(1:np) = -HUGE(0.)
       field_mxrm1(1:np) = -HUGE(0.)
@@ -637,6 +659,7 @@ grib: DO kg = 1,HUGE(0)
     ELSEWHERE
       field_ave(1:np) = 0.
       field_max(1:np) = -HUGE(0.)
+      field_min(1:np) = HUGE(0.)
       field_mxrm(1:np) = -HUGE(0.)
       field_mxrm1(1:np) = -HUGE(0.)
       field_mxrm2(1:np) = -HUGE(0.)
@@ -694,12 +717,13 @@ IF (ngribin > 0) THEN
 !--------------------------------------------------------------------------
 ! 3.1 Calcolo le statistiche relative all'ultima giornata
 
-! Ave, Max
+! Ave, Max, Min
   WHERE (cnt_ok(1:np) >= nval)
     field_ave(1:np) = field_ave(1:np) / REAL(cnt_ok(1:np))
   ELSEWHERE
     field_ave(1:np) = rmiss
     field_max(1:np) = rmiss
+    field_min(1:np) = rmiss
   ENDWHERE
 
 ! AOT
@@ -795,6 +819,19 @@ IF (ngribin > 0) THEN
   
     CALL grib_set(igout,"values",field_max(1:np))
     CALL grib_write (igout,ifout_max)
+    ngribout = ngribout + 1
+  ENDIF
+
+! Scrivo il campo minimo dell'ultima giornata
+  nok = COUNT(field_min(1:np) /= rmiss)
+  IF (lmin .AND. nok>0) THEN
+    fave = rmiss
+    IF (nok>0) fave = SUM(field_min(1:np), MASK = field_min(1:np)/=rmiss) / REAL(nok)
+    WRITE (96,*) "Scrivo min del",ch8," (last): dati ok, media ",nok,fave
+    IF (deb) WRITE (97,*) "min  : ",field_min(pdb)
+  
+    CALL grib_set(igout,"values",field_min(1:np))
+    CALL grib_write (igout,ifout_min)
     ngribout = ngribout + 1
   ENDIF
 
@@ -1006,36 +1043,37 @@ IMPLICIT NONE
 WRITE (*,*)
 WRITE (*,*) "Uso: grib_daily_stat.exe filein [-h] [-pts N] [-nbit N] "
 WRITE (*,*) " [-nval NVAL] [-nrm NRM] [-nvalrm NVALRM]"
-WRITE (*,*) " [-ave] [-max] [-dty/dtylc] [-aot X] [-mxrm1 X] [-mxrm2 X] [-exc X]"
+WRITE (*,*) " [-ave] [-max] [-min] [-dty/dtylc] [-aot X] [-mxrm1 X] [-mxrm2 X] [-exc X]"
 WRITE (*,*)
-WRITE (*,*) "filein   file in input, in formato GRIB1"
+WRITE (*,*) "filein   file in input, in formato GRIB1/GRIB2"
 WRITE (*,*) "-h       visualizza questo help"
 WRITE (*,*) "-pts N   scrive un file di log relativo al punto N"
 WRITE (*,*) "-nbit N  forza il numero di bit nei grib in uscita [1-24, def: 16]"
 WRITE (*,*) ""
 WRITE (*,*) "-nval NVAL: numero minimo di dati orari per considerare valide le statistiche"
-WRITE (*,*) "         giornaliere; si applica a: media, massimo,  superamenti, max media"
+WRITE (*,*) "         giornaliere; si applica a: media, max, min, superamenti, max media"
 WRITE (*,*) "         media mobile [1-24, def. 18]"
 WRITE (*,*) "-nrm NRM: numero di ore su cui calcolare le medie mobili [def. 8]"
 WRITE (*,*) "-nvalrm NVALRM numero minimo di dati orari per considerare valida una media"
 WRITE (*,*) "         mobile [0-nrm, def. 6]"
 WRITE (*,*) ""
-WRITE (*,*) "-ave     (ave.grb) scrive la media giornaliera"
-WRITE (*,*) "-max     (max.grb) scrive il massimo giornaliero"
-WRITE (*,*) "-dty     (dty.grb) scrive il giorno medio"
-WRITE (*,*) "-dtylc   (dtylc.grb) scrive il giorno medio, attribuendo il dato delle ore 00"
+WRITE (*,*) "-ave     (ave.grib) scrive la media giornaliera"
+WRITE (*,*) "-max     (max.grib) scrive il massimo giornaliero"
+WRITE (*,*) "-min     (min.grib) scrive il minimo giornaliero"
+WRITE (*,*) "-dty     (dty.grib) scrive il giorno medio"
+WRITE (*,*) "-dtylc   (dtylc.grib) scrive il giorno medio, attribuendo il dato delle ore 00"
 WRITE (*,*) "         al giorno successivo (utile per campi Cosmo da decumulare)"
-WRITE (*,*) "-aot X   (aot.grb) calcola AOT con soglia X (somma della parte dei dati"
+WRITE (*,*) "-aot X   (aot.grib) calcola AOT con soglia X (somma della parte dei dati"
 WRITE (*,*) "         eccedente X, calcolata tra le 8 e le 19 GMT e solo se tutti i 12 "
 WRITE (*,*) "         dati orari sono presenti)"
-WRITE (*,*) "-mxrm1 X (rm1.grb) calcola il massimo giornaliero della media mobile nelle NRM"
+WRITE (*,*) "-mxrm1 X (rm1.grib) calcola il massimo giornaliero della media mobile nelle NRM"
 WRITE (*,*) "         ore precedenti, purche' abbiano almeno NVALRM dati validi, e sottrae"
 WRITE (*,*) "         X dal risultato [per calcolo SOMO35: NRM=8, NVALRM=6, X=35., NVAL=???]"
-WRITE (*,*) "-mxrm2 X (rm2.grb) calcola il massimo giornaliero della media mobile nelle NRM"
+WRITE (*,*) "-mxrm2 X (rm2.grib) calcola il massimo giornaliero della media mobile nelle NRM"
 WRITE (*,*) "         ore precedenti, purche' abbiano almeno NVALRM dati validi; scrive 1."
 WRITE (*,*) "         nei punti in cui questa e' maggiore di X, 0. negli altri punti"
 WRITE (*,*) "         [per calcoli di legge: NRM=8, NVALRM=6, X=120., NVAL=???]"
-WRITE (*,*) "-exc X   (exc.grb) scrive 1. nei punti in cui la media giornaliera supera la"
+WRITE (*,*) "-exc X   (exc.grib) scrive 1. nei punti in cui la media giornaliera supera la"
 WRITE (*,*) "         soglia X, 0., nei punti in cui non la supera"
 WRITE (*,*)
 WRITE (*,*) "NB: i dati non istantanei sono sempre attribuiti al giorno in cui termina"

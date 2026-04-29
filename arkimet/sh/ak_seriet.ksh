@@ -37,12 +37,18 @@
 #               se non specificato, usa: /usr/bin)
 #
 # TODO eventuali:
-# - Quando sara' sistemato l'archivio LAMAZ, togliere l'opzione -fop
+# - (18/02/2026) Le opzioni -fop e -penda/-pendf al momento sono inutili: 
+#   * con la dismissione di LAMAZ, non ci sono piu' archivi con la compressione 
+#     "second order packing"
+#   * la versione attuale di libsim ritorna gia' i parametri non istantanei con
+#     data relativa alla fine dell'intervallo di validita: comando "vg6d_getpoint 
+#     --output-keys=gacsv:simpledate", simpledate e' diverso da reftime del grib 
+#   Le lascio nello script (ma non nell'help) per avere un template pronto nel
+#   casi ci fossero cambiamenti
+
 # - Quando vg6d_getpoint restituira' i dati con timerange ordinato per 
 #   verification time, si potranno togliere i comandi sort (adesso le analisi
 #   escono dopo le previsioni)
-# - Quando le Grib-API gestiranno correttamente i campi Grib1 SOP, eliminare 
-#   l'opzione -fop e tutto quanto ad essa collegato
 # - Calcolo automatico degli estremi dello zoom (se mai si rivelasse utile...)
 #   * se non richiesta destag, posso farlo a partire dal .ptn, passando a
 #     vg6d_subarea le coordinate estreme.
@@ -55,7 +61,7 @@
 #   l'append di quelli dei vari segmenti, quindi o non c'e' header, oppure c'e'
 #   un header per ciascun segmento.
 #
-#                                             Versione 1.12.0, Enrico 17/12/2025
+#                                             Versione 1.12.1, Enrico 18/02/2026
 #-------------------------------------------------------------------------------
 #set -x
 #set -e
@@ -68,7 +74,7 @@ function write_help
   echo ""
   echo "Uso: ak_seriet.ksh PROG DATASET"
   echo "    [-inpdata=arkimet/file/filelist] [-reqdata=pts/ptn[,dsc][,vl]]"
-  echo "    [-split=LENGHT] [-destag] [-decum] [-penda/-pendf] [-fop] [-zoom] [-fis=FILE] [-noconv]"
+  echo "    [-split=LENGHT] [-destag] [-decum] [-zoom] [-fis=FILE] [-noconv]"
   echo "    [-arc=URL] [-debug] [-tdeb] [-mon=FILE] [-h]"
   echo ""
   echo "PROG      nome del progetto (determina i nomi dei files di input e output)"
@@ -98,15 +104,15 @@ function write_help
   echo "          se si estraggono vento sui model layers o flusso di momento COSMO)"
   echo "-decum    modifica i parametri non istantanei, scrivendoli come valori elaborati"
   echo "          su un periodo di un'ora. Puo' essere utile elaborando dati previsti"
-  echo "-penda/pendf  modifica i parametri grib2 non istantanei, fissando il reference"
-  echo "          time (se analisi, -penda) o il forecast time (se previsioni, -pendf)"
-  echo "          alla fine dell'intervallo di elaborazione (seguendo quindi la "
-  echo "          convenzione grib1)."
-  echo "          Puo' essere utile per facilitare il confronot con i dati osservati"
-  echo "-fop      come prima operazione converte al primo ordine i grib1 con "
-  echo "          compressione al secondo ordine (fissa un baco GRIB-API; usare"
-  echo "          solo se sono richiesti qcr o qis dal dataset LAMAZ)"
-  echo ""
+#  echo "-penda/pendf  modifica i parametri grib2 non istantanei, fissando il reference"
+#  echo "          time (se analisi, -penda) o il forecast time (se previsioni, -pendf)"
+#  echo "          alla fine dell'intervallo di elaborazione (seguendo quindi la "
+#  echo "          convenzione grib1). Default: non modifica reftime"
+#  echo "          Puo' essere utile per facilitare il confronot con i dati osservati"
+#  echo "-fop      come prima operazione converte al primo ordine i grib1 con "
+#  echo "          compressione al secondo ordine (fissa un baco GRIB-API; usare"
+#  echo "          solo se sono richiesti qcr o qis dal dataset LAMAZ)"
+#  echo ""
   echo "-zoom     come prima operazione sui grib estratti, li ritaglia sull'area"
   echo "          specificata nella prima riga del file PROGETTO.zoom" 
   echo "-fis=FILE: legge da FILE orografia, albedo, roghness e quota livelli. FILE"
@@ -178,6 +184,10 @@ return
 
 #===============================================================================
 # 1) Preliminari
+
+# tmp
+# export WREPORT_TABLES=/autofs/nfshomes/eminguzzi/git/dballe/tables
+# export LIBSIM_DATA=/autofs/nfshomes/eminguzzi/git/libsim/data/
 
 #-------------------------------------------------------------------------------
 # 1.1) Path e utility
